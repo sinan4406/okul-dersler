@@ -27,6 +27,9 @@ main{margin-top:-52px;padding-bottom:56px}
 .btns a{padding:7px 14px;border-radius:9px;background:var(--cbg);color:var(--cfg);font-weight:700;font-size:.88rem}
 .btns a:first-child{background:var(--c);color:#fff}
 .btns a:hover{filter:brightness(1.12)}
+.course.soon{opacity:.65;box-shadow:none;border:1px dashed var(--line);border-top:5px solid var(--line)}
+.course.soon:hover{transform:none}
+.course.soon .go{background:var(--line);color:var(--mute)}
 details{margin-top:2px;font-size:.9rem}
 summary{cursor:pointer;font-weight:700;color:var(--cfg)}
 .apps{margin:8px 0 0;padding-left:18px;color:var(--mute)}
