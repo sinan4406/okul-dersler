@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>display: flex Öncesi / Sonrası</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 16px; }
+    h2 { margin: 30px 0 10px; }
+    .panel { border: 1px solid #ccc; border-radius: 8px; padding: 16px; }
+
+    .menu a {
+      display: block;
+      text-decoration: none;
+      background: #1a5fb4;
+      color: white;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    /* SONRASI: sadece display:flex ve gap eklendi, başka hiçbir şey değişmedi */
+    .menu-flex {
+      display: flex;
+      gap: 8px;
+    }
+    .menu-flex a {
+      margin-bottom: 0;
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Aynı HTML, Tek Fark: <code>display: flex</code></h1>
+  <p>Aşağıdaki iki menü, <b>birebir aynı HTML koduna</b> sahip (4 tane <code>&lt;a&gt;</code> elemanı içeren
+  bir <code>&lt;nav&gt;</code>). Tek fark, ikinci menünün kapsayıcısına <code>display: flex;</code>
+  eklenmiş olması.</p>
+
+  <h2>ÖNCESİ — display: flex yok</h2>
+  <div class="panel">
+    <nav class="menu">
+      <a href="#">Ana Sayfa</a>
+      <a href="#">Hakkımızda</a>
+      <a href="#">Bölümlerimiz</a>
+      <a href="#">İletişim</a>
+    </nav>
+  </div>
+  <p><i>Bağlantılar alt alta diziliyor çünkü &lt;a&gt; normalde "inline", biz de "block" yaptık —
+  block elemanlar her zaman kendi satırını kaplar.</i></p>
+
+  <h2>SONRASI — display: flex eklendi</h2>
+  <div class="panel">
+    <nav class="menu menu-flex">
+      <a href="#">Ana Sayfa</a>
+      <a href="#">Hakkımızda</a>
+      <a href="#">Bölümlerimiz</a>
+      <a href="#">İletişim</a>
+    </nav>
+  </div>
+  <p><i>Aynı elemanlar şimdi yan yana, eşit genişlikte ve aralarında boşluk (<code>gap</code>) bırakarak
+  diziliyor — tipik bir site menüsü görünümü.</i></p>
+
+</body>
+</html>

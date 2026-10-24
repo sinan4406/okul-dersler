@@ -1,0 +1,18 @@
+<section id="tek-led" class="sl light tight">
+<div class="hd"><p class="eb">Adım adım animasyon · Kitap s.62–63 · 1 LED’in çalışma mantığı</p><h2 class="ttl">Akım LED’e nasıl ulaşır?</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:960px;gap:14px"><div class="ckt" id="tl-ckt"></div>
+<div class="stp"><button type="button" data-act="first">⏮ Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1 / 6</span></div>
+</div>
+<div class="col f1" style="gap:14px">
+<div class="card dk" style="min-height:250px"><h3 id="tl-t">Hazır devre</h3><p id="tl-x" style="font-size:25px">D8 → direnç → LED → GND yolu kapalı bir halkadır. Akım yalnız kapalı halkada akar.</p></div>
+<div class="card info" style="padding:14px 22px"><h3 style="font-size:24px">Devredeki roller</h3>
+<table class="bt" id="tl-tab" style="font-size:21px"><tr><th>Parça</th><th>Görevi</th></tr>
+<tr data-r="0"><td>Arduino D8</td><td>HIGH ise 5 V verir, LOW ise 0 V</td></tr>
+<tr data-r="1"><td>220 Ω direnç</td><td>Akımı yaklaşık 13,6 mA’e sınırlar</td></tr>
+<tr data-r="2"><td>LED</td><td>Akım anottan katota geçerken ışık verir</td></tr>
+<tr data-r="3"><td>Kablo ve GND hattı</td><td>Akımı Arduino GND’sine geri taşır</td></tr></table></div>
+</div>
+</div>
+<aside>Adım adım ilerleyin. Her adımda animasyonda yanıp sönen parça, o adımın konusudur ve tablodaki ilgili satır turuncu çerçeveyle işaretlenir. Anahtar fikir: akım yalnızca kapalı bir halkada akar; D8’den çıkar, dirençten ve LED’den geçer, GND’den Arduino’ya geri döner. LOW yazınca D8 0 V olur, iki uç arasında gerilim farkı kalmaz ve akım durur. Hesap: (5 V − 2 V) / 220 Ω = 13,6 mA. Kitap s.62’deki Görsel 2.15 ve 2.16 aynı devredir; kitap LED’i D2’ye bağlar, biz D8 kullanıyoruz. Öğrencilere sorun: “Halkanın neresi kopsa LED söner?” (herhangi bir kablo çıksa).</aside>
+</section>

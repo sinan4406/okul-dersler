@@ -1,0 +1,23 @@
+<section id="baglanti7" class="sl light tight">
+<div class="hd"><p class="eb">Örnek 4 hazırlığı · Kitap s.69, Görsel 2.21–2.22 · 7 LED’li devre</p><h2 class="ttl">7 LED’in bağlantı planı</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="card info f1" style="padding:18px 26px;gap:10px">
+<h3 style="font-size:26px">Soldan sağa: her LED’in kendi direnci</h3>
+<table class="bt" style="font-size:23px"><tr><th>LED</th><th>Arduino pini</th><th>Direnç (sütun)</th><th>Anot</th><th>Katot (→ GND)</th></tr>
+<tr><td>1</td><td>D8</td><td>1–5</td><td>5</td><td>6</td></tr>
+<tr><td>2</td><td>D7</td><td>7–11</td><td>11</td><td>12</td></tr>
+<tr><td>3</td><td>D6</td><td>13–17</td><td>17</td><td>18</td></tr>
+<tr><td>4</td><td>D5</td><td>19–23</td><td>23</td><td>24</td></tr>
+<tr><td>5</td><td>D4</td><td>25–29</td><td>29</td><td>30</td></tr>
+<tr><td>6</td><td>D3</td><td>31–35</td><td>35</td><td>36</td></tr>
+<tr><td>7</td><td>D2</td><td>37–41</td><td>41</td><td>42</td></tr></table>
+</div>
+<div class="col" style="width:640px;gap:16px">
+<div class="card warn" style="padding:16px 24px"><h3 style="font-size:25px">Uzun breadboard</h3><p style="font-size:22px">7 LED için 42 sütun gerekir. Küçük breadboard 30 sütundur: iki küçük breadboard’u yan yana birleştir veya büyük breadboard kullan.</p></div>
+<div class="card warn" style="padding:16px 24px"><h3 style="font-size:25px">D0 ve D1’i kullanma</h3><p style="font-size:22px">Bunlar seri haberleşme pinleridir. LED’ler D2’den D8’e bağlanır.</p></div>
+<div class="card ok" style="padding:16px 24px"><h3 style="font-size:25px">Toplam akım</h3><p style="font-size:22px">7 LED aynı anda yanarsa 7 × 13,6 ≈ 95 mA çeker. Tüm çip için yaklaşık 200 mA sınırının altındadır, güvenlidir.</p></div>
+</div>
+</div>
+<p class="foot">Pin kablosu direncin ilk sütununa, katot kablosu mavi (−) hatta gider. Tablo Örnek 4’ün canlı devresiyle birebir aynıdır.</p>
+<aside>Önce tabloyu okutun, sonra bir sonraki slayttaki canlı devreyle karşılaştırın: sütun numaraları devrenin altındaki numaralarla aynıdır. Her satırda aynı kalıp: pin kablosu direncin ilk sütununa, direnç 4 sütun ileriye uzanır ve LED’in anoduna ulaşır, LED’in katodu bir sonraki sütundadır ve mavi hatta bağlanır. Tinkercad’de “Breadboard Small” 30 sütundur; 7 LED için iki breadboard birleştirilir veya LED’ler iki sıraya bölünür. Kitap s.69 Görsel 2.21’de LED’ler daha sıkışık yerleştirilmiş ve kablolar çaprazlanmıştır. Akım hesabı: (5 − 2) / 220 = 13,6 mA; ATmega328P çipinin toplam sınırı yaklaşık 200 mA, pin başına önerilen en çok 20 mA’dir.</aside>
+</section>

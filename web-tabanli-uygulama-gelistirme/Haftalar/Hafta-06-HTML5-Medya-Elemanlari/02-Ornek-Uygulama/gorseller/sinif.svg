@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160" viewBox="0 0 240 160">
+  <rect width="240" height="160" fill="#1b1e2a"/>
+  <rect x="16" y="16" width="208" height="100" rx="8" fill="#2a2e3d"/>
+  <text x="120" y="140" font-family="Arial, sans-serif" font-size="14" fill="#eef0f6" text-anchor="middle">Bilişim Laboratuvarı</text>
+</svg>

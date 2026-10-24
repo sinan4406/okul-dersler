@@ -1,0 +1,14 @@
+<section id="kod-iskelet" class="sl dark tight">
+<div class="hd"><p class="eb">Kitap s.63 · Programın iskeleti · İmleci altı çizgili kelimelerin üzerine getir</p><h2 class="ttl">Her Arduino programı iki bölümden oluşur</h2></div>
+<div class="row" style="gap:30px;align-items:flex-start">
+<div class="codebox" style="width:1040px;padding:26px 34px"><pre class="code lg" id="ki-code" style="line-height:1.55"></pre></div>
+<div class="col f1" style="gap:14px">
+<button type="button" class="opt" data-b="1" style="border-color:#6CB6FF"><span class="ab" style="color:#6CB6FF">1</span><span class="tx" style="font-size:26px"><b>setup()</b> Hazırlık. Kart açılınca <b>bir kez</b> çalışır.</span></button>
+<button type="button" class="opt" data-b="2" style="border-color:#9BE38B"><span class="ab" style="color:#9BE38B">2</span><span class="tx" style="font-size:26px"><b>loop()</b> Ana iş. Kart açık kaldıkça <b>sürekli</b> tekrarlanır.</span></button>
+<button type="button" class="opt" data-b="3" style="border-color:#FF9F5A"><span class="ab">3</span><span class="tx" style="font-size:26px"><b>Komutlar.</b> Her komut <b>;</b> ile biter.</span></button>
+<button type="button" class="opt" data-b="4" style="border-color:#93A3B8"><span class="ab" style="color:#93A3B8">4</span><span class="tx" style="font-size:26px"><b>Yorum.</b> <span class="mono">//</span> ile başlar, bilgisayar okumaz.</span></button>
+<div class="card info" style="padding:14px 22px"><p style="font-size:22px">Bir düğmeye tıkla: kodda ilgili satırlar yanar.</p></div>
+</div>
+</div>
+<aside>Bu slayttaki kod ders planındaki Örnek 1’in (Deniz Feneri) aynısıdır. Kitaptaki s.63 kodunda 1 ve 0 yazıyordu; biz HIGH ve LOW kullanıyoruz. İmleci altı noktalı kelimelerin üzerine getirince balon açılır: setup, loop, pinMode, OUTPUT, digitalWrite, HIGH, LOW, delay. Sağdaki dört düğme kodu parçalara ayırır. Soru: “Neden iki ayrı bölüm var? Hepsini loop’a yazsak olmaz mıydı?” (pinMode’u her turda tekrar çağırmak gereksiz iş olur; hazırlık bir kez yapılır.)</aside>
+</section>

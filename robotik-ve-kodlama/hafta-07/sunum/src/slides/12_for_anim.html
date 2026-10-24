@@ -1,0 +1,18 @@
+<section id="for-anim" class="sl dark tight">
+<div class="hd"><p class="eb">Adım adım animasyon · for döngüsü nasıl işler?</p><h2 class="ttl">i her turda değişir, LED’ler sırayla yanar</h2></div>
+<div class="row" style="gap:32px;align-items:flex-start">
+<div class="col" style="width:900px;gap:16px">
+<div class="codebox" style="padding:22px 28px"><pre class="code lg" id="fa-code" style="font-size:30px"></pre></div>
+<div class="card dk" style="gap:8px;padding:16px 24px"><p style="font-size:22px;letter-spacing:2px;text-transform:uppercase;color:#93A3B8">LED’ler (D2 – D8)</p><div class="ledrow" id="fa-leds"></div></div>
+<div class="stp"><button type="button" data-act="first">⏮ Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1 / 17</span></div>
+</div>
+<div class="col f1" style="gap:16px">
+<div class="row" style="gap:16px">
+<div class="vbox f1"><p style="font-size:24px;color:#93A3B8">Değişken i</p><b id="fa-i">—</b></div>
+<div class="vbox f1"><p style="font-size:24px;color:#93A3B8">Koşul i &lt;= 8 ?</p><b id="fa-c" style="color:#93A3B8">—</b></div>
+</div>
+<div class="card dk" style="min-height:300px;gap:12px"><h3 id="fa-t">Hazır</h3><p id="fa-x" style="font-size:27px;line-height:1.45">Döngü başlamadı. Değişken i henüz yok.</p></div>
+</div>
+</div>
+<aside>Adım adım ilerleyin. Üç şeye bakın: kodda çerçevelenen satır, i’nin değeri ve koşulun sonucu. Her tur iki adımdır: “koşul doğru, gövde çalışır” ve “i++ ile i bir artar”. Gövdede LED’i söndüren satır olmadığı için yanan LED’ler birikir; Örnek 4’te söndüren satırı da ekleyeceğiz. Sekizinci turdan sonra i = 9 olur, koşul yanlıştır ve döngü biter. Öğrencilere her adımdan önce tahmin ettirin: “Sıradaki i kaç olacak?”.</aside>
+</section>

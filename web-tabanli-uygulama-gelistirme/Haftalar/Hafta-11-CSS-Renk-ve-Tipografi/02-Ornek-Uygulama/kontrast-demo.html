@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Düşük Kontrast Sorunu</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 16px; }
+    .panel { padding: 24px; border-radius: 8px; margin-bottom: 20px; }
+
+    .dusuk-kontrast {
+      background: #ffffff;
+      color: #e0e0e0; /* açık gri metin, beyaz zemin -> neredeyse okunmuyor */
+    }
+
+    .yeterli-kontrast {
+      background: #ffffff;
+      color: #333333; /* koyu gri metin, beyaz zemin -> rahat okunuyor */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Herkes Metninizi Okuyabiliyor mu?</h1>
+  <p>Renk seçimi sadece "güzel görünmek" değil, <b>erişilebilirlik</b> meselesidir. Aşağıdaki iki kutuya
+  bakın:</p>
+
+  <div class="panel dusuk-kontrast">
+    <b>DÜŞÜK KONTRAST:</b> Bu yazıyı okumakta zorlanıyor musunuz? Özellikle güneşli bir günde telefon
+    ekranında veya görme zorluğu yaşayan bir kullanıcı için bu metin neredeyse görünmez olabilir.
+  </div>
+
+  <div class="panel yeterli-kontrast">
+    <b>YETERLİ KONTRAST:</b> Bu metni okumak çok daha kolay, değil mi? Koyu gri metin, beyaz zemin
+    üzerinde net bir şekilde ayrışıyor.
+  </div>
+
+  <p><b>Ders:</b> Web Erişilebilirlik Yönergeleri (WCAG), normal metin için zemin ile yazı arasında
+  <b>en az 4.5:1</b> oranında kontrast önerir. Açık gri üzerine açık gri, sarı üzerine beyaz gibi
+  kombinasyonlardan kaçının — "güzel" görünse de birçok kullanıcı için okunamaz hâle gelebilir.</p>
+
+</body>
+</html>

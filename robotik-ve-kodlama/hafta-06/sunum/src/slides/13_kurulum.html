@@ -1,0 +1,15 @@
+<section id="kurulum" class="sl light tight">
+<div class="hd"><p class="eb">Adım adım animasyon · Kitap s.62, Görsel 2.15–2.16 · Devre kurulumu</p><h2 class="ttl">LED + direnç devresi nasıl kurulur?</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:1000px;gap:14px"><div class="ckt" id="kur-ckt"></div>
+<div class="stp"><button type="button" data-act="first">⏮ Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1 / 7</span></div>
+</div>
+<div class="col f1" style="gap:14px">
+<div class="card dk" style="min-height:260px"><h3 id="kur-t">Hazırlık</h3><p id="kur-x" style="font-size:25px">Boş breadboard ve Arduino. USB kablosu takılı değil.</p></div>
+<div class="card info" style="padding:16px 24px"><h3 style="font-size:24px">Bağlantı tablosu (D8)</h3>
+<table style="font-size:21px"><tr><th>Parça</th><th>Nereye</th></tr><tr><td>GND</td><td>mavi (−) hat, 1. delik</td></tr><tr><td>LED katot (kısa)</td><td>16. sütun → mavi hat</td></tr><tr><td>LED anot (uzun)</td><td>15. sütun</td></tr><tr><td>Direnç 220 Ω</td><td>11. ve 15. sütun</td></tr><tr><td>D8</td><td>11. sütun</td></tr></table></div>
+<div class="card ok" style="padding:14px 22px"><p style="font-size:22px">İş birliği: Biri sesli okusun, diğeri kursun. Sonra roller değişsin.</p></div>
+</div>
+</div>
+<aside>Adım adım ilerleyin; her adımda öğrenciler kendi breadboard’unda aynı parçayı yerine takar. Parlayan (yanıp sönen) parça o adımda eklenen parçadır. 1. adım GND kablosu: Arduino GND pini mavi (−) hatta. 2. adım LED: uzun bacak 15. sütun, kısa bacak 16. sütun. 3. adım LED’in kısa bacağının sütunundan mavi hatta kablo. 4. adım direnç: 11. ve 15. sütun arası; 15. sütun LED’in anot sütunu olduğu için direnç LED’e seri bağlanmış olur. 5. adım D8’den direncin 11. sütununa kablo. 6. adım USB’yi takıp kodu yüklemek. Kitaptaki devre (Görsel 2.15) LED’i D2’ye bağlar; biz D8 kullanıyoruz, mantık aynıdır. Kitapta metin “sarı kablo” der, görselde turuncudur; biz farklı renkler kullanıyoruz ki izlemesi kolay olsun.</aside>
+</section>

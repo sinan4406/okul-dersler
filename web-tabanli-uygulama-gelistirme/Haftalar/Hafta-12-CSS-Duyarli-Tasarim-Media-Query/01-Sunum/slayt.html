@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duyarlı Tasarım ve Media Query — Hafta 12</title>
+<style>
+  :root {
+    --bg: #12141c; --bg-panel: #1b1e2a; --bg-code: #0d0f16;
+    --ink: #eef0f6; --ink-dim: #9298ab; --accent: #f2a154; --accent-dim: #7a5a34; --line: #2a2e3d;
+    --bad: #e08585; --good: #7fd99a;
+    --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  .deck { position: relative; height: 100vh; width: 100vw; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 6vh 9vw; opacity: 0; transition: opacity 0.25s ease; }
+  .slide.active { display: flex; opacity: 1; }
+  .kicker { font-size: clamp(13px, 1.4vw, 16px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 18px; }
+  h1 { font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; margin-bottom: 8px; }
+  h2 { font-size: clamp(24px, 3.4vw, 40px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; margin-bottom: 24px; max-width: 900px; }
+  .subtitle { font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-dim); max-width: 640px; margin-top: 10px; }
+  .body-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; max-width: 1220px; }
+  .body-grid.single { grid-template-columns: 1fr; max-width: 880px; }
+  .body-grid.wide { grid-template-columns: 1fr 1fr; max-width: 1240px; }
+  ul.points { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+  ul.points li { font-size: clamp(14.5px, 1.3vw, 17.5px); line-height: 1.5; color: var(--ink); padding-left: 24px; position: relative; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  ul.points li b { color: var(--accent); font-weight: 600; }
+  code.inline { font-family: var(--mono); background: var(--bg-code); padding: 2px 8px; border-radius: 5px; font-size: 0.86em; color: #f7c98a; border: 1px solid var(--line); }
+  pre.code-block { background: var(--bg-code); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; font-family: var(--mono); font-size: clamp(11.5px, 1vw, 14.5px); line-height: 1.6; overflow-x: auto; color: #d8dce8; }
+  pre.code-block .tag { color: #8ab4f8; } pre.code-block .attr { color: #f2a154; } pre.code-block .val { color: #a3d9a5; } pre.code-block .cmt { color: #6b7185; } pre.code-block .txt { color: #d8dce8; } pre.code-block .sel { color: #f7c98a; } pre.code-block .prop { color: #8ab4f8; }
+  .panel-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; font-weight: 600; }
+  .center-note { background: var(--bg-panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 16px 20px; font-size: 14px; color: var(--ink-dim); max-width: 780px; margin-top: 18px; line-height: 1.6; }
+  .summary-list { display: flex; flex-direction: column; gap: 14px; max-width: 800px; }
+  .summary-list .row { display: grid; grid-template-columns: 210px 1fr; gap: 20px; align-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .summary-list .row:last-child { border-bottom: none; }
+  .summary-list .desc { color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+  .browser-frame { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .browser-chrome { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+  .browser-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .browser-chrome .dot.r { background: #e08585; } .browser-chrome .dot.y { background: #f2c46e; } .browser-chrome .dot.g { background: #7fd99a; }
+  .browser-chrome .tab { margin-left: 10px; font-family: var(--sans); font-size: 11.5px; color: var(--ink); background: var(--bg-code); padding: 4px 12px; border-radius: 6px 6px 0 0; border: 1px solid var(--line); border-bottom: none; }
+  .browser-frame iframe { width: 100%; height: 170px; border: none; display: block; background: #fff; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; }
+  .compare .card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; }
+  .compare .card.bad { border-color: rgba(224,133,133,0.4); }
+  .compare .card.good { border-color: rgba(127,217,154,0.4); }
+  .compare .card h3 { font-size: 16px; margin-bottom: 10px; }
+  .compare .card.bad h3 { color: var(--bad); } .compare .card.good h3 { color: var(--good); }
+  .compare .card:not(.bad):not(.good) h3 { color: var(--accent); }
+  .compare .card p { font-size: 13.5px; color: var(--ink-dim); line-height: 1.6; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
+  .badge.bad { background: rgba(224,133,133,0.15); color: var(--bad); }
+  .badge.good { background: rgba(127,217,154,0.15); color: var(--good); }
+  .seekbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--line); z-index: 20; }
+  .seekbar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; position: relative; }
+  .seekbar-fill::after { content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(242,161,84,0.18); }
+  .counter { position: fixed; bottom: 18px; right: 28px; font-size: 13px; color: var(--ink-dim); font-family: var(--mono); z-index: 20; }
+  .logo { position: fixed; left: 22px; top: 18px; font-size: 12px; color: var(--ink-dim); letter-spacing: 0.06em; z-index: 20; }
+  .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: var(--bg-panel); border: 1px solid var(--line); color: var(--ink); font-size: 18px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: var(--accent-dim); }
+  .nav-btn.prev { left: 20px; } .nav-btn.next { right: 20px; }
+  .tag-list span { display: inline-block; background: rgba(242,161,84,0.12); color: var(--accent); border: 1px solid var(--accent-dim); border-radius: 999px; padding: 5px 14px; font-size: 13px; margin: 4px 6px 4px 0; }
+  @media (max-width: 820px) { .body-grid, .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="logo">WEB TABANLI UYGULAMA GELİŞTİRME · CSS Ünitesi · Hafta 12</div>
+<div class="deck" id="deck">
+
+  <section class="slide active">
+    <div class="kicker">CSS — Bölüm 4</div>
+    <h1>Duyarlı (Responsive)<br>Tasarım ve Media Query</h1>
+    <p class="subtitle">Aynı sayfanın, telefonda da masaüstünde de düzgün görünmesini nasıl sağlarız?</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">01 — Sorunun Kaynağı</div>
+    <h2>Tek Sayfa, Sonsuz Ekran Boyutu</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Bir web sayfası; 6 inçlik telefonda, 10 inçlik tablette, 15 inçlik dizüstünde ve 27 inçlik masaüstü monitörde <b>aynı anda</b> açılabilir.</li>
+        <li><b>Duyarlı (responsive) tasarım</b>, sayfanın bu farklı ekran genişliklerine göre kendini otomatik olarak uyarlamasıdır.</li>
+        <li>Günümüzde internet trafiğinin yarısından fazlası mobil cihazlardan gelir — "önce masaüstü, mobili sonra düşünürüz" yaklaşımı artık kabul edilebilir değildir.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">02 — Canlı Kanıt — Sabit Genişlik Sorunu</div>
+    <h2>Sabit Piksel mi, Esnek Birim mi?</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">width: 900px (SABİT)</div>
+        <h3>Dar Ekranda Taşıyor</h3>
+        <div class="browser-frame">
+          <div class="browser-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tab">telefon görünümü</span></div>
+          <iframe title="Sabit genişlik" srcdoc="&lt;body style=&quot;margin:0;padding:0;overflow-x:auto&quot;&gt;&lt;div style=&quot;width:900px;background:#e08585;color:#3a1414;padding:16px;font-family:sans-serif;font-size:12px;box-sizing:border-box&quot;&gt;Bu kutu her zaman 900px genişliğinde — dar ekranda yatay kaydırma çubuğu çıkar, içerik kesilir.&lt;/div&gt;&lt;/body&gt;"></iframe>
+        </div>
+      </div>
+      <div class="card good">
+        <div class="badge good">max-width: 900px; width: 100%</div>
+        <h3>Her Ekrana Uyum Sağlıyor</h3>
+        <div class="browser-frame">
+          <div class="browser-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tab">telefon görünümü</span></div>
+          <iframe title="Esnek genişlik" srcdoc="&lt;body style=&quot;margin:0;padding:0&quot;&gt;&lt;div style=&quot;max-width:900px;width:100%;background:#7fd99a;color:#0e2e1c;padding:16px;font-family:sans-serif;font-size:12px;box-sizing:border-box&quot;&gt;Bu kutu ekran ne kadar dar olursa olsun taşmaz, mevcut genişliğe uyum sağlar.&lt;/div&gt;&lt;/body&gt;"></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="center-note">Bu, ödevde ve örnek uygulamada canlı olarak tekrar göreceğimiz "mobilde neden bozuk görünüyor" hatasının temel nedenlerinden biridir.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">03 — Hatırlatma</div>
+    <h2><code class="inline" style="font-size:0.8em">&lt;meta name="viewport"&gt;</code> Olmadan Olmaz</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Hafta 3'te gördüğümüz bu satırı <b>hatırlayın</b> — duyarlı tasarımın ön koşuludur.</li>
+        <li>Bu satır <b>eksikse</b>, mobil tarayıcılar sayfayı "masaüstü boyutunda" varsayıp otomatik olarak küçültür — kullanıcı yazıları okumak için parmaklarıyla yakınlaştırmak zorunda kalır.</li>
+        <li>Bu satır <b>varsa</b>, sayfa gerçek ekran genişliğinde (device-width) render edilir ve yazdığımız duyarlı kurallar devreye girer.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span>
+  <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">04 — Yeni Araç</div>
+    <h2>Media Query Nedir?</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><b>Media query</b>, "ekran şu koşulu sağlıyorsa bu CSS kurallarını uygula" diyen özel bir CSS bloğudur.</li>
+        <li><code class="inline">@media</code> ile başlar, parantez içinde bir <b>koşul</b> (örn. ekran genişliği), süslü parantez içinde de <b>normal CSS kuralları</b> yazılır.</li>
+        <li>Bir sayfada istediğiniz kadar media query bloğu olabilir.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="sel">.menu</span> { <span class="prop">display</span>: flex; }
+
+<span class="txt">@media</span> (max-width: 768px) {
+  <span class="sel">.menu</span> { <span class="prop">flex-direction</span>: column; }
+}</pre>
+      </div>
+    </div>
+    <div class="center-note">Yukarıdaki örnek: ekran 768px'den <b>dar</b> olduğunda, menü öğelerini yan yana değil <b>alt alta</b> dizer.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">05 — En Sık Yapılan Hata</div>
+    <h2><code class="inline" style="font-size:0.7em">max-width</code> mi, <code class="inline" style="font-size:0.7em">min-width</code> mi?</h2>
+    <div class="compare">
+      <div class="card">
+        <h3>max-width: 768px</h3>
+        <p>"Ekran <b>en fazla</b> 768px ise" — yani <b>768px ve daha dar</b> ekranlarda uygulanır. Genelde "mobilde şunu değiştir" demek için kullanılır.</p>
+      </div>
+      <div class="card">
+        <h3>min-width: 768px</h3>
+        <p>"Ekran <b>en az</b> 768px ise" — yani <b>768px ve daha geniş</b> ekranlarda uygulanır. Genelde "masaüstünde şunu ekle" demek için kullanılır.</p>
+      </div>
+    </div>
+    <div class="center-note">Bu ikisini karıştırmak (örn. mobil stilini <code class="inline">min-width</code> ile yazmak), kuralın <b>tam tersi ekranda</b> uygulanmasına yol açar — birazdan örnek uygulamada tam olarak bu hatayı avlayacağız.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">06 — Strateji Seçimi</div>
+    <h2>Mobile-First mi, Desktop-First mi?</h2>
+    <div class="compare">
+      <div class="card good">
+        <div class="badge good">GÜNCEL YAKLAŞIM</div>
+        <h3>Mobile-First</h3>
+        <p>Önce <b>mobil için</b> temel stiller yazılır, sonra <code class="inline">min-width</code> ile büyük ekranlara <b>ekleme</b> yapılır. Daha az kod, daha performanslı — çünkü mobil zaten "varsayılan" durumdur.</p>
+      </div>
+      <div class="card">
+        <h3>Desktop-First</h3>
+        <p>Önce <b>masaüstü için</b> tam stiller yazılır, sonra <code class="inline">max-width</code> ile küçük ekranlarda <b>geçersiz kılınır (override)</b>. Eski/klasik yaklaşım, öğrenmesi bu derste daha kolay olduğu için biz bunu kullanacağız.</p>
+      </div>
+    </div>
+    <div class="center-note">İkisi de doğrudur, önemli olan tutarlı seçmektir. Bu ders boyunca örneklerimizde <b>desktop-first</b> (max-width) yaklaşımını kullanacağız.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">07 — Yaygın Değerler</div>
+    <h2>Breakpoint (Kırılma Noktası)</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li><b>Breakpoint</b>, tasarımın "kırılıp" farklı bir düzene geçtiği ekran genişliğidir.</li>
+        <li>Kesin bir kural yoktur, ama yaygın kullanılan yaklaşık değerler:</li>
+      </ul>
+      <div class="tag-list" style="margin-top:16px">
+        <span>Telefon: ~480px</span>
+        <span>Tablet: ~768px</span>
+        <span>Küçük Dizüstü: ~1024px</span>
+        <span>Masaüstü: 1200px+</span>
+      </div>
+      <div class="center-note" style="margin-top:24px">En sağlıklı yöntem: cihaz listesinden ezbere değer almak değil, <b>kendi tasarımınızı</b> tarayıcı penceresini yavaşça daraltarak nerede "bozulmaya başladığını" gözlemleyip breakpoint'i oradan seçmektir.</div>
+      </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">08 — Akıcı Boyutlandırma</div>
+    <h2><code class="inline" style="font-size:0.8em">clamp()</code> ile Esnek Yazı Boyutu</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">MEDIA QUERY İLE</div>
+        <h3>Aşamalı, Sıçramalı</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="sel">h1</span> { <span class="prop">font-size</span>: 22px; }
+@media (min-width:768px){
+  <span class="sel">h1</span>{<span class="prop">font-size</span>:32px;}
+}
+@media (min-width:1200px){
+  <span class="sel">h1</span>{<span class="prop">font-size</span>:48px;}
+}</pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">clamp() İLE</div>
+        <h3>Tek Satır, Pürüzsüz Geçiş</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="sel">h1</span> {
+  <span class="prop">font-size</span>: clamp(22px, 4vw, 48px);
+}
+<span class="cmt">// min: 22px, tercih: ekranın %4'ü, max: 48px</span></pre>
+      </div>
+    </div>
+    <div class="center-note"><code class="inline">clamp(min, tercih, max)</code> — üç değer arasında tarayıcı otomatik, akıcı bir geçiş yapar; her ekran genişliği için ayrı satır yazmaya gerek kalmaz.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">09 — Görsellerde Duyarlılık</div>
+    <h2>Resimler Taşmasın</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Bir <code class="inline">&lt;img&gt;</code> etiketine genişlik verilmezse, resmin <b>orijinal boyutu</b> kullanılır — konteynerinden taşabilir.</li>
+        <li>Standart çözüm: her görsele bu iki kuralı uygulamak.</li>
+        <li><code class="inline">height: auto</code>, resmin <b>en-boy oranını</b> koruyarak deforme olmasını engeller.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="sel">img</span> {
+  <span class="prop">max-width</span>: 100%;
+  <span class="prop">height</span>: auto;
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">10 — Güncel Not</div>
+    <h2>Container Query — Bileşenin Kendi Genişliğine Göre</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li><code class="inline">@media</code>, <b>tüm ekranın</b> genişliğine bakar.</li>
+        <li><code class="inline">@container</code> (2023 sonrası tüm modern tarayıcılarda desteklenir), bir <b>bileşenin kendi konteynerinin</b> genişliğine bakar — aynı kart bileşeni, geniş bir sayfada 3 sütunlu bir alanda farklı, dar bir kenar çubuğunda farklı görünebilir.</li>
+        <li>Bu ders kapsamında sadece <b>farkındalık</b> için tanıtılır, ileri seviye bir konudur.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">11 — Test Etme</div>
+    <h2>Chrome DevTools — Cihaz Araç Çubuğu</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Gerçek bir telefon olmadan, sayfamızın mobilde nasıl göründüğünü test edebiliriz.</li>
+        <li><b>F12</b> ile geliştirici araçlarını açın, sonra sol üstteki <b>telefon/tablet simgesine</b> tıklayın (kısayol: <code class="inline">Ctrl+Shift+M</code>).</li>
+        <li>Üstteki menüden farklı cihaz modelleri (iPhone, Galaxy, iPad) seçilebilir, veya genişlik elle sürüklenebilir.</li>
+      </ul>
+      <div class="center-note">Bu araç, birazdan yapacağımız "mobilde neden bozuk görünüyor" uygulamasında sürekli kullanılacak — şimdiden açıp deneyin.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">12 — Gerçek Proje</div>
+    <h2>"Okulum" — Mobilde Dikey Menü</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Şimdiye kadar yan yana duran üst menümüzü (nav), dar ekranlarda <b>alt alta</b> dizeceğiz.</li>
+        <li>Ayrıca başlık yazı boyutunu <code class="inline">clamp()</code> ile akıcı hale getireceğiz.</li>
+      </ul>
+      <pre class="code-block" style="margin-top:10px"><span class="sel">.site-nav</span> { <span class="prop">display</span>: flex; <span class="prop">gap</span>: 20px; }
+
+@media (max-width: 700px) {
+  <span class="sel">.site-nav</span> { <span class="prop">flex-direction</span>: column; <span class="prop">gap</span>: 8px; }
+}
+
+<span class="sel">h1</span> { <span class="prop">font-size</span>: clamp(24px, 5vw, 44px); }</pre>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Özet</div>
+    <h2>Bugün Öğrendiklerimiz</h2>
+    <div class="summary-list">
+      <div class="row"><code class="inline">meta viewport</code><div class="desc">Duyarlı tasarımın ön koşulu — bu olmadan diğer her şey boşa gider</div></div>
+      <div class="row"><code class="inline">max-width / min-width</code><div class="desc">Sabit px genişlik yerine esnek, taşmayan kutu</div></div>
+      <div class="row"><code class="inline">@media (max-width: ...)</code><div class="desc">Belirli ekran genişliklerinde farklı CSS uygulama</div></div>
+      <div class="row"><code class="inline">clamp(min, tercih, max)</code><div class="desc">Akıcı, sıçramasız yazı/boşluk boyutlandırma</div></div>
+      <div class="row">DevTools — Ctrl+Shift+M<div class="desc">Gerçek cihaz olmadan mobil görünümü test etme</div></div>
+    </div>
+  </section>
+
+</div>
+
+<button class="nav-btn prev" id="prevBtn" aria-label="Önceki slayt">‹</button>
+<button class="nav-btn next" id="nextBtn" aria-label="Sonraki slayt">›</button>
+<div class="seekbar"><div class="seekbar-fill" id="seekFill"></div></div>
+<div class="counter" id="counter">1 / 14</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('seekFill').style.width = `${((current + 1) / total) * 100}%`;
+  }
+  function next() { if (current < total - 1) { current++; render(); } }
+  function prev() { if (current > 0) { current--; render(); } }
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  render();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Elemanları — Hafta 8</title>
+<style>
+  :root {
+    --bg: #12141c; --bg-panel: #1b1e2a; --bg-code: #0d0f16;
+    --ink: #eef0f6; --ink-dim: #9298ab; --accent: #f2a154; --accent-dim: #7a5a34; --line: #2a2e3d;
+    --bad: #e08585; --good: #7fd99a;
+    --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  .deck { position: relative; height: 100vh; width: 100vw; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 6vh 9vw; opacity: 0; transition: opacity 0.25s ease; }
+  .slide.active { display: flex; opacity: 1; }
+  .kicker { font-size: clamp(13px, 1.4vw, 16px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 18px; }
+  h1 { font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; margin-bottom: 8px; }
+  h2 { font-size: clamp(24px, 3.4vw, 40px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; margin-bottom: 24px; max-width: 900px; }
+  .subtitle { font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-dim); max-width: 640px; margin-top: 10px; }
+  .body-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; max-width: 1220px; }
+  .body-grid.single { grid-template-columns: 1fr; max-width: 880px; }
+  .body-grid.wide { grid-template-columns: 1fr 1fr; max-width: 1240px; }
+  ul.points { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+  ul.points li { font-size: clamp(14.5px, 1.3vw, 17.5px); line-height: 1.5; color: var(--ink); padding-left: 24px; position: relative; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  ul.points li b { color: var(--accent); font-weight: 600; }
+  code.inline { font-family: var(--mono); background: var(--bg-code); padding: 2px 8px; border-radius: 5px; font-size: 0.86em; color: #f7c98a; border: 1px solid var(--line); }
+  pre.code-block { background: var(--bg-code); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; font-family: var(--mono); font-size: clamp(11.5px, 1vw, 14.5px); line-height: 1.6; overflow-x: auto; color: #d8dce8; }
+  pre.code-block .tag { color: #8ab4f8; } pre.code-block .attr { color: #f2a154; } pre.code-block .val { color: #a3d9a5; } pre.code-block .cmt { color: #6b7185; } pre.code-block .txt { color: #d8dce8; }
+  .panel-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; font-weight: 600; }
+  .center-note { background: var(--bg-panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 16px 20px; font-size: 14px; color: var(--ink-dim); max-width: 780px; margin-top: 18px; line-height: 1.6; }
+  .summary-list { display: flex; flex-direction: column; gap: 14px; max-width: 800px; }
+  .summary-list .row { display: grid; grid-template-columns: 210px 1fr; gap: 20px; align-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .summary-list .row:last-child { border-bottom: none; }
+  .summary-list .desc { color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+  .browser-frame { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .browser-chrome { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+  .browser-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .browser-chrome .dot.r { background: #e08585; } .browser-chrome .dot.y { background: #f2c46e; } .browser-chrome .dot.g { background: #7fd99a; }
+  .browser-chrome .tab { margin-left: 10px; font-family: var(--sans); font-size: 11.5px; color: var(--ink); background: var(--bg-code); padding: 4px 12px; border-radius: 6px 6px 0 0; border: 1px solid var(--line); border-bottom: none; }
+  .browser-frame iframe { width: 100%; height: 170px; border: none; display: block; background: #fff; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; }
+  .compare .card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; }
+  .compare .card.bad { border-color: rgba(224,133,133,0.4); }
+  .compare .card.good { border-color: rgba(127,217,154,0.4); }
+  .compare .card h3 { font-size: 16px; margin-bottom: 10px; }
+  .compare .card.bad h3 { color: var(--bad); } .compare .card.good h3 { color: var(--good); }
+  .compare .card:not(.bad):not(.good) h3 { color: var(--accent); }
+  .compare .card p { font-size: 13.5px; color: var(--ink-dim); line-height: 1.6; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
+  .badge.bad { background: rgba(224,133,133,0.15); color: var(--bad); }
+  .badge.good { background: rgba(127,217,154,0.15); color: var(--good); }
+  .tag-pill { display: inline-block; background: rgba(242,161,84,0.12); color: var(--accent); border: 1px solid rgba(242,161,84,0.35); border-radius: 999px; padding: 5px 13px; font-size: 13px; font-family: var(--mono); margin: 3px 5px 3px 0; }
+  .seekbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--line); z-index: 20; }
+  .seekbar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; position: relative; }
+  .seekbar-fill::after { content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(242,161,84,0.18); }
+  .counter { position: fixed; bottom: 18px; right: 28px; font-size: 13px; color: var(--ink-dim); font-family: var(--mono); z-index: 20; }
+  .logo { position: fixed; left: 22px; top: 18px; font-size: 12px; color: var(--ink-dim); letter-spacing: 0.06em; z-index: 20; }
+  .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: var(--bg-panel); border: 1px solid var(--line); color: var(--ink); font-size: 18px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: var(--accent-dim); }
+  .nav-btn.prev { left: 20px; } .nav-btn.next { right: 20px; }
+  @media (max-width: 820px) { .body-grid, .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="logo">WEB TABANLI UYGULAMA GELİŞTİRME · HTML5 Ünitesi · Hafta 08</div>
+<div class="deck" id="deck">
+
+  <section class="slide active">
+    <div class="kicker">HTML5 — Bölüm 6 (Ünite Kapanışı)</div>
+    <h1>Form Elemanları</h1>
+    <p class="subtitle">Kullanıcıdan veri almanın yolu — ve HTML5 ünitesinin son durağı.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">01 — Neden Gerekli?</div>
+    <h2>Form Nedir?</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Şimdiye kadar sayfalarımız <b>tek yönlüydü</b> — biz yazdık, kullanıcı okudu.</li>
+        <li><b>Form</b>, kullanıcıdan bilgi <b>toplamamızı</b> sağlayan HTML yapısıdır — giriş ekranları, iletişim formları, kayıt formları, arama kutuları hep formdur.</li>
+        <li>Bugün öğreneceklerimiz, Hafta 25-26'da (.NET Core ünitesi) bu verileri sunucuda **gerçekten işlemeyi** öğrendiğimizde temel oluşturacak.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">02 — Kapsayıcı Etiket</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;form&gt;</code> Etiketi</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Tüm form elemanlarını içine alan <b>kapsayıcı</b> etikettir.</li>
+        <li><code class="inline">action</code> — verinin nereye gönderileceği (bir sunucu adresi).</li>
+        <li><code class="inline">method</code> — verinin nasıl gönderileceği (<code class="inline">get</code> / <code class="inline">post</code>).</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;form</span> <span class="attr">action</span>=<span class="val">"#"</span> <span class="attr">method</span>=<span class="val">"post"</span><span class="tag">&gt;</span>
+  ...
+<span class="tag">&lt;/form&gt;</span></pre>
+      </div>
+    </div>
+    <div class="center-note">Bu hafta <code class="inline">action="#"</code> kullanacağız çünkü henüz veriyi işleyecek bir sunucumuz yok — sadece görünümü ve tarayıcı doğrulamasını öğreniyoruz.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">03 — En Sık Kullanılan Eleman</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;input&gt;</code> ve <code class="inline" style="font-size:0.85em">type</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">&lt;input&gt;</code>, kendi kendini kapatan bir etikettir.</li>
+        <li><code class="inline">type</code> özniteliği, kutunun **nasıl davranacağını** belirler — aynı etiket, farklı `type` değerleriyle tamamen farklı bir kutuya dönüşür.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"text"</span> <span class="attr">name</span>=<span class="val">"ad"</span><span class="tag">&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">04 — Klasik Tipler</div>
+    <h2>Bilinen Input Tipleri</h2>
+    <div class="body-grid single">
+      <div>
+        <span class="tag-pill">text</span>
+        <span class="tag-pill">password</span>
+        <span class="tag-pill">checkbox</span>
+        <span class="tag-pill">radio</span>
+        <span class="tag-pill">submit</span>
+        <span class="tag-pill">file</span>
+      </div>
+      <ul class="points" style="margin-top:20px">
+        <li><code class="inline">checkbox</code> — birden fazla seçim yapılabilir (örn. ilgi alanları).</li>
+        <li><code class="inline">radio</code> — aynı <code class="inline">name</code> değerine sahip kutulardan sadece <b>biri</b> seçilebilir.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">05 — HTML5'in Getirdikleri — Kod Karşılaştırma</div>
+    <h2>Eski Alışkanlık vs HTML5 Tipleri</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">ESKİ ALIŞKANLIK</div>
+        <h3>Her şey type="text"</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"text"</span>
+  <span class="attr">placeholder</span>=<span class="val">"E-posta"</span><span class="tag">&gt;</span></pre>
+        <p style="margin-top:10px">Tarayıcı bunun bir e-posta olduğunu <b>bilmez</b> — hiçbir yardım/kontrol sağlamaz.</p>
+      </div>
+      <div class="card good">
+        <div class="badge good">HTML5</div>
+        <h3>Anlamlı tip = otomatik yardım</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"email"</span><span class="tag">&gt;</span></pre>
+        <p style="margin-top:10px">Mobilde <b>@ tuşlu özel klavye</b> açılır, tarayıcı format kontrolü yapar. Diğer yeni tipler: <code class="inline">tel</code>, <code class="inline">date</code>, <code class="inline">number</code>, <code class="inline">range</code>, <code class="inline">color</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">06 — Kod Karşılaştırma</div>
+    <h2>Doğrulamasız / Doğrulamalı Form</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">DOĞRULAMASIZ</div>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"text"</span>
+  <span class="attr">name</span>=<span class="val">"eposta"</span><span class="tag">&gt;</span></pre>
+        <p style="margin-top:10px">"merhaba" yazıp gönderseniz bile form <b>kabul eder</b> — hiçbir uyarı yok.</p>
+      </div>
+      <div class="card good">
+        <div class="badge good">DOĞRULAMALI</div>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"email"</span>
+  <span class="attr">name</span>=<span class="val">"eposta"</span> <span class="attr">required</span><span class="tag">&gt;</span></pre>
+        <p style="margin-top:10px">Geçersiz/boş girişte tarayıcı <b>kendisi</b> engeller ve uyarı gösterir — hiç kod yazmadan.</p>
+      </div>
+    </div>
+    <div class="center-note">Birazdan örnek uygulamada bu iki formu yan yana canlı test edeceğiz (`dogrulama-karsilastirma.html`).</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">07 — Doğrulama Öznitelikleri</div>
+    <h2><code class="inline" style="font-size:0.7em">required</code>, <code class="inline" style="font-size:0.7em">pattern</code>, <code class="inline" style="font-size:0.7em">min/max</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">required</code> — alan boş bırakılamaz.</li>
+        <li><code class="inline">pattern</code> — belirli bir kalıba (regex) uymayı zorunlu kılar.</li>
+        <li><code class="inline">min</code> / <code class="inline">max</code> — sayısal veya tarihsel bir aralık sınırı koyar.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"number"</span>
+  <span class="attr">min</span>=<span class="val">"1"</span> <span class="attr">max</span>=<span class="val">"100"</span> <span class="attr">required</span><span class="tag">&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">08 — Erişilebilirlik</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;label for&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Her giriş kutusunun bir <b>etiketi (label)</b> olmalıdır — kutunun ne istediğini açıklar.</li>
+        <li><code class="inline">for</code> değeri, kutunun <code class="inline">id</code>'si ile <b>birebir</b> eşleşmelidir.</li>
+        <li>Doğru eşleşme sayesinde etikete tıklamak da kutuya odaklanmayı sağlar — hem mobilde hem ekran okuyucularda önemlidir.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="val">"ad"</span><span class="tag">&gt;</span>Adınız<span class="tag">&lt;/label&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"text"</span> <span class="attr">id</span>=<span class="val">"ad"</span><span class="tag">&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">09 — Kod Karşılaştırma</div>
+    <h2>Eşleşmeyen Etiket = Erişilemeyen Form</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">ÇALIŞMAZ</div>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="val">"ogrenci-adi"</span><span class="tag">&gt;</span>Adınız<span class="tag">&lt;/label&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">id</span>=<span class="val">"ad"</span><span class="tag">&gt;</span></pre>
+        <p style="margin-top:10px"><code class="inline">for</code> ve <code class="inline">id</code> farklı — etikete tıklamak kutuya odaklanmaz.</p>
+      </div>
+      <div class="card good">
+        <div class="badge good">ÇALIŞIR</div>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="val">"ad"</span><span class="tag">&gt;</span>Adınız<span class="tag">&lt;/label&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">id</span>=<span class="val">"ad"</span><span class="tag">&gt;</span></pre>
+        <p style="margin-top:10px">Birebir aynı — etikete tıklamak kutuya odaklanır.</p>
+      </div>
+    </div>
+    <div class="center-note">Bu tam olarak örnek uygulamadaki "Erişilemeyen Form" avımızın konusu — birazdan canlı test edeceğiz.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">10 — Seçim Kutusu</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;select&gt;</code> / <code class="inline" style="font-size:0.85em">&lt;option&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Kullanıcıya hazır bir listeden <b>tek</b> seçim yaptırır (açılır menü).</li>
+        <li>Her seçenek bir <code class="inline">&lt;option&gt;</code>'dur, <code class="inline">value</code> gönderilecek gerçek değerdir.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;select</span> <span class="attr">name</span>=<span class="val">"konu"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="val">"kayit"</span><span class="tag">&gt;</span>Kayıt<span class="tag">&lt;/option&gt;</span>
+  <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="val">"diger"</span><span class="tag">&gt;</span>Diğer<span class="tag">&lt;/option&gt;</span>
+<span class="tag">&lt;/select&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">11 — Çok Satırlı Metin</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;textarea&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">&lt;input&gt;</code>'dan farklı olarak <b>açılış+kapanış</b> etiketi vardır — içine yazılan metin başlangıç değeridir.</li>
+        <li><code class="inline">rows</code> özniteliği, kutunun görünür yüksekliğini (satır sayısı) ayarlar.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;textarea</span> <span class="attr">name</span>=<span class="val">"mesaj"</span> <span class="attr">rows</span>=<span class="val">"5"</span><span class="tag">&gt;&lt;/textarea&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">12 — Formu Gönderme</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;button type="submit"&gt;</code></h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Formu göndermek için kullanılır — tıklanınca tarayıcı önce **tüm doğrulamaları** kontrol eder, sonra `action`'a gönderir.</li>
+        <li><code class="inline">&lt;input type="submit"&gt;</code> de aynı işi görür, ama <code class="inline">&lt;button&gt;</code> içine ikon/farklı HTML koyabildiği için daha esnektir.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">13 — Gerçek Proje</div>
+    <h2>"Okulum" Projesine Gerçek Bir Form</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li><code class="inline">iletisim.html</code> sayfamıza artık gerçek bir iletişim formu ekliyoruz.</li>
+      </ul>
+      <pre class="code-block" style="margin-top:10px"><span class="tag">&lt;form</span> <span class="attr">action</span>=<span class="val">"#"</span> <span class="attr">method</span>=<span class="val">"post"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="val">"eposta"</span><span class="tag">&gt;</span>E-posta<span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"email"</span> <span class="attr">id</span>=<span class="val">"eposta"</span>
+    <span class="attr">name</span>=<span class="val">"eposta"</span> <span class="attr">required</span><span class="tag">&gt;</span>
+
+  <span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="val">"mesaj"</span><span class="tag">&gt;</span>Mesaj<span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;textarea</span> <span class="attr">id</span>=<span class="val">"mesaj"</span> <span class="attr">name</span>=<span class="val">"mesaj"</span>
+    <span class="attr">required</span><span class="tag">&gt;&lt;/textarea&gt;</span>
+
+  <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="val">"submit"</span><span class="tag">&gt;</span>Gönder<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span></pre>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">14 — Ünite Kapanışı</div>
+    <h2>HTML5 Ünitesi Boyunca Ne Öğrendik?</h2>
+    <div class="summary-list">
+      <div class="row">Hafta 3 — Belge Yapısı<div class="desc">DOCTYPE, html/head/body, meta charset</div></div>
+      <div class="row">Hafta 4 — Başlık/Metin<div class="desc">h1-h6, p, liste, tablo</div></div>
+      <div class="row">Hafta 5 — Yerleşim<div class="desc">header, nav, main, section, footer</div></div>
+      <div class="row">Hafta 6 — Medya<div class="desc">img, audio, video</div></div>
+      <div class="row">Hafta 7 — Bağlantı<div class="desc">a, href, çapa, target/rel</div></div>
+      <div class="row">Hafta 8 — Form<div class="desc">form, input, label, select, textarea</div></div>
+    </div>
+    <div class="center-note">Bir sonraki hafta (Hafta 9) CSS ünitesine başlıyoruz — bugüne kadar kurduğumuz "iskeletleri" artık <b>görsel olarak güzelleştirmeyi</b> öğreneceğiz.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Özet</div>
+    <h2>Bugün Öğrendiklerimiz</h2>
+    <div class="summary-list">
+      <div class="row"><code class="inline">&lt;form action method&gt;</code><div class="desc">Form verisini nereye/nasıl gönderir</div></div>
+      <div class="row"><code class="inline">&lt;input type="..."&gt;</code><div class="desc">text, email, tel, date, number, range, color</div></div>
+      <div class="row"><code class="inline">required / pattern / min / max</code><div class="desc">Tarayıcının kendi doğrulama öznitelikleri</div></div>
+      <div class="row"><code class="inline">&lt;label for&gt;</code><div class="desc">id ile birebir eşleşmeli — erişilebilirlik için zorunlu</div></div>
+      <div class="row"><code class="inline">&lt;select&gt; / &lt;textarea&gt;</code><div class="desc">Seçim listesi / çok satırlı metin</div></div>
+    </div>
+  </section>
+
+</div>
+
+<button class="nav-btn prev" id="prevBtn" aria-label="Önceki slayt">‹</button>
+<button class="nav-btn next" id="nextBtn" aria-label="Sonraki slayt">›</button>
+<div class="seekbar"><div class="seekbar-fill" id="seekFill"></div></div>
+<div class="counter" id="counter">1 / 16</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('seekFill').style.width = `${((current + 1) / total) * 100}%`;
+  }
+  function next() { if (current < total - 1) { current++; render(); } }
+  function prev() { if (current > 0) { current--; render(); } }
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  render();
+</script>
+
+</body>
+</html>

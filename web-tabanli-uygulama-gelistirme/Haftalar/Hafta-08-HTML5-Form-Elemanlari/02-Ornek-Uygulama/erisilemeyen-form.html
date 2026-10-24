@@ -1,0 +1,41 @@
+<!-- GÖREV: Etiketlere (label) tıklayın. Bazılarında tıklayınca ilgili kutuya odaklanmıyor —
+     neden olduğunu bulup düzeltin. (İpucu: label'ın "for" değeri ile kutunun "id" değeri eşleşmeli.) -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kayıt Formu</title>
+</head>
+<body>
+
+  <h1>Öğrenci Kulübü Kayıt Formu</h1>
+
+  <form action="#" method="post">
+
+    <p>
+      <label for="ogrenci-adi">Adınız</label><br>
+      <input type="text" id="ad" name="ad">
+    </p>
+
+    <p>
+      <label for="ogrenci-sinif">Sınıfınız</label><br>
+      <input type="text" id="sinif" name="sinif">
+    </p>
+
+    <p>
+      <label>Kulüp Seçiminiz</label><br>
+      <select name="kulup">
+        <option value="satranc">Satranç Kulübü</option>
+        <option value="robotik">Robotik Kulübü</option>
+      </select>
+    </p>
+
+    <p>
+      <button type="submit">Kaydol</button>
+    </p>
+
+  </form>
+
+</body>
+</html>

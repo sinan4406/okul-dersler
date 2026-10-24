@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#0d0f16"/>
+  <circle cx="320" cy="180" r="46" fill="#f2a154"/>
+  <polygon points="308,160 308,200 344,180" fill="#12141c"/>
+  <text x="320" y="260" font-family="Arial, sans-serif" font-size="18" fill="#eef0f6" text-anchor="middle">Okul Tanıtım Videosu — Kapak Görseli</text>
+</svg>

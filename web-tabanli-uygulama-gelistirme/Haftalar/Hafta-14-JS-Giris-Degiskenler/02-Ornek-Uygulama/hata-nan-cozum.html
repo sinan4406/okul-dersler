@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toplama Makinesi (Düzeltilmiş)</title>
+</head>
+<body style="font-family:sans-serif; padding:24px; max-width:420px;">
+
+  <h1>Basit Toplama Makinesi — Çözüm</h1>
+
+  <input type="text" id="sayi1" placeholder="1. sayı" style="width:100px;">
+  +
+  <input type="text" id="sayi2" placeholder="2. sayı" style="width:100px;">
+  <button id="topla-btn">Topla</button>
+
+  <p>Sonuç: <span id="sonuc" style="font-weight:bold;">-</span></p>
+
+  <script>
+    const btn = document.querySelector("#topla-btn");
+
+    btn.addEventListener("click", function () {
+      // ÇÖZÜM: Number() ile string'i sayıya çeviriyoruz.
+      // (Virgüllü ondalık girilirse önce virgülü noktaya çevirmemiz gerekir,
+      // aksi hâlde yine NaN çıkar — replace() metodunu ileride göreceğiz.)
+      const s1 = document.querySelector("#sayi1").value.replace(",", ".");
+      const s2 = document.querySelector("#sayi2").value.replace(",", ".");
+
+      const toplam = Number(s1) + Number(s2);
+
+      document.querySelector("#sonuc").textContent = toplam;
+      console.log("s1 (number):", Number(s1), "| tipi:", typeof Number(s1));
+      console.log("s2 (number):", Number(s2), "| tipi:", typeof Number(s2));
+      console.log("toplam:", toplam);
+    });
+  </script>
+
+</body>
+</html>

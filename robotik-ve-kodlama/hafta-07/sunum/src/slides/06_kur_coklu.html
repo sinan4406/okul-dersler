@@ -1,0 +1,21 @@
+<section id="kur-coklu" class="sl light tight">
+<div class="hd"><p class="eb">Adım adım animasyon · Kitap s.66, Görsel 2.19–2.20 · 5 LED’li devre</p><h2 class="ttl">LED sayısı artınca devre aynı kalıpla büyür</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:960px;gap:14px"><div class="ckt" id="kc-ckt"></div>
+<div class="stp"><button type="button" data-act="first">⏮ Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1 / 8</span></div>
+</div>
+<div class="col f1" style="gap:14px">
+<div class="card dk" style="min-height:200px"><h3 id="kc-t">Hazırlık</h3><p id="kc-x" style="font-size:24px">Boş breadboard ve Arduino. USB takılı değil.</p></div>
+<div class="card info" style="padding:14px 22px"><h3 style="font-size:24px">Bağlantı tablosu</h3>
+<table class="bt" id="kc-tab" style="font-size:20px"><tr><th>Parça</th><th>Nereye</th></tr>
+<tr class="off" data-r="0"><td>GND kablosu</td><td>Arduino GND → mavi (−) hat</td></tr>
+<tr class="off" data-r="1"><td>1. LED · D6 (kırmızı)</td><td>direnç 1–5. sütun · anot 5 · katot 6</td></tr>
+<tr class="off" data-r="2"><td>2. LED · D5 (sarı)</td><td>direnç 7–11. sütun · anot 11 · katot 12</td></tr>
+<tr class="off" data-r="3"><td>3. LED · D4 (sarı)</td><td>direnç 13–17. sütun · anot 17 · katot 18</td></tr>
+<tr class="off" data-r="4"><td>4. LED · D3 (yeşil)</td><td>direnç 19–23. sütun · anot 23 · katot 24</td></tr>
+<tr class="off" data-r="5"><td>5. LED · D2 (yeşil)</td><td>direnç 25–29. sütun · anot 29 · katot 30</td></tr></table></div>
+<div class="card ok" style="padding:12px 22px"><p style="font-size:22px">Kalıp: <b>direnç + LED + katot kablosu + pin kablosu</b>. Her LED için tekrar.</p></div>
+</div>
+</div>
+<aside>Adım adım ilerleyin; her adımda öğrenciler kendi breadboard’unda aynı parçayı takar. Tabloya satırlar adım adım eklenir. Dikkat: her LED’in kendi 220 Ω direnci var (kitap s.66: “5 adet 220 Ω direnç”), tüm katotlar ortak mavi (−) hatta birleşir. LED sırası soldan sağa D6 … D2: Arduino’nun fiziksel pin sırası D8 … D2 şeklinde soldan sağa dizildiği için kablolar çaprazlanmasın diye böyle yerleştirdik; kitaptaki Görsel 2.19’da kablolar çapraz gider, mantık aynıdır. Renk sırası kırmızı, sarı, sarı, yeşil, yeşil: şarj göstergesi örneğinde kullanacağız. Tinkercad’de “Breadboard Small” 30 sütunludur ve 5 LED tam sığar.</aside>
+</section>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <rect width="160" height="160" rx="16" fill="#12141c"/>
+  <circle cx="80" cy="66" r="34" fill="#f2a154"/>
+  <text x="80" y="76" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="#12141c" text-anchor="middle">ATL</text>
+  <text x="80" y="128" font-family="Arial, sans-serif" font-size="14" fill="#eef0f6" text-anchor="middle">Anadolu Teknik Lisesi</text>
+</svg>

@@ -1,0 +1,24 @@
+<section id="dikkat" class="sl dark">
+<div class="hd"><p class="eb">Oylama · Dikkat çekme</p><h2 class="ttl">Arduino Uno’da D0–D13 etiketli kaç dijital pin var?</h2></div>
+<div class="row" style="gap:40px;align-items:flex-start">
+<div class="col f1" style="gap:16px">
+<button type="button" class="opt" data-vote="0"><span class="ab">A</span><span class="tx">7 pin</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<button type="button" class="opt" data-vote="1"><span class="ab">B</span><span class="tx">14 pin</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<button type="button" class="opt" data-vote="2"><span class="ab">C</span><span class="tx">20 pin</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<p style="font-size:24px;color:#93A3B8">Her seçeneğe tıkla: sınıfın oy sayısı artar. Sayıyı tahtaya yazdır.</p>
+</div>
+<svg viewBox="0 0 620 330" width="620" height="330" role="img" aria-label="Arduino Uno dijital pin başlığı" style="flex:none;background:#1F2E40;border-radius:20px">
+<text x="310" y="40" text-anchor="middle" font-family="Rubik,Arial" font-size="22" fill="#BFCAD6">Arduino Uno dijital pin başlığı</text>
+<rect x="30" y="70" width="560" height="64" rx="8" fill="#171B22"/>
+<g font-family="JetBrains Mono,monospace" font-size="18" font-weight="700" text-anchor="middle" fill="#E6EDF3">
+<text x="56" y="108" fill="#FF8A80">D0</text><text x="96" y="108" fill="#FF8A80">D1</text><text x="136" y="108">D2</text><text x="176" y="108">D3</text><text x="216" y="108">D4</text><text x="256" y="108">D5</text><text x="296" y="108">D6</text><text x="336" y="108">D7</text><text x="376" y="108">D8</text><text x="416" y="108">D9</text><text x="456" y="108">D10</text><text x="496" y="108">D11</text><text x="536" y="108">D12</text><text x="572" y="108">D13</text>
+</g>
+<rect x="34" y="150" width="82" height="34" rx="10" fill="#5B1B1B"/><text x="75" y="173" text-anchor="middle" font-family="Rubik,Arial" font-size="17" fill="#FFD3CF">RX / TX</text>
+<text x="310" y="230" text-anchor="middle" font-family="Rubik,Arial" font-size="20" fill="#93A3B8">Kırmızı pinler seri haberleşme içindir</text>
+<text x="310" y="266" text-anchor="middle" font-family="Rubik,Arial" font-size="20" fill="#93A3B8">LED için D2’den başlarız</text>
+</svg>
+</div>
+<div class="col" style="gap:14px"><button class="ans-btn" type="button">Oylamadan sonra cevabı göster</button>
+<div class="ans" hidden><b>Cevap: B, 14 pin.</b> D0’dan D13’e kadar 14 dijital pin var. D0 ve D1 bilgisayarla haberleşmede (USB) kullanıldığı için LED’ler D2’den başlar: D2–D13 arası 12 pin LED’e uygundur. Bu hafta en çok 7 LED (D2–D8) kullanacağız.</div></div>
+<aside>5 dakika. Oylamayı el kaldırtarak da yapabilirsiniz; ekrandaki düğmeler sayımı kolaylaştırır. Cevabı hemen açmayın: oylama sonucunu tahtaya yazın, sonra düğmeye basın. Sağdaki çizimde D0 ve D1 kırmızı: bunlar RX/TX, yani seri haberleşme pinleri; LED bağlarsak program yüklemede sorun çıkabilir. Güdüleme: bir sonraki soru “LED’e uygun 12 pinin hepsine LED bağlarsam kodu kaç satır olur?”; bunu dersin ortasındaki “Kod uzuyor” slaytında göreceğiz. Not: A0–A5 analog pinleri de dijital çıkış olarak kullanılabilir (toplam 20), bunu ileride işleyeceğiz; bu soru yalnız D0–D13 etiketlerini sorar.</aside>
+</section>

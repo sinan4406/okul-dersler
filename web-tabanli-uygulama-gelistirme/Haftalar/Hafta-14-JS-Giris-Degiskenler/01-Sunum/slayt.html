@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Javascript'e Giriş, Değişkenler ve Veri Tipleri — Hafta 14</title>
+<style>
+  :root {
+    --bg: #12141c; --bg-panel: #1b1e2a; --bg-code: #0d0f16;
+    --ink: #eef0f6; --ink-dim: #9298ab; --accent: #f2a154; --accent-dim: #7a5a34; --line: #2a2e3d;
+    --bad: #e08585; --good: #7fd99a;
+    --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  .deck { position: relative; height: 100vh; width: 100vw; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 6vh 9vw; opacity: 0; transition: opacity 0.25s ease; }
+  .slide.active { display: flex; opacity: 1; }
+  .kicker { font-size: clamp(13px, 1.4vw, 16px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 18px; }
+  h1 { font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; margin-bottom: 8px; }
+  h2 { font-size: clamp(24px, 3.4vw, 40px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; margin-bottom: 24px; max-width: 900px; }
+  .subtitle { font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-dim); max-width: 640px; margin-top: 10px; }
+  .body-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; max-width: 1220px; }
+  .body-grid.single { grid-template-columns: 1fr; max-width: 880px; }
+  .body-grid.wide { grid-template-columns: 1fr 1fr; max-width: 1240px; }
+  ul.points { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+  ul.points li { font-size: clamp(14.5px, 1.3vw, 17.5px); line-height: 1.5; color: var(--ink); padding-left: 24px; position: relative; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  ul.points li b { color: var(--accent); font-weight: 600; }
+  code.inline { font-family: var(--mono); background: var(--bg-code); padding: 2px 8px; border-radius: 5px; font-size: 0.86em; color: #f7c98a; border: 1px solid var(--line); }
+  pre.code-block { background: var(--bg-code); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; font-family: var(--mono); font-size: clamp(11.5px, 1vw, 14.5px); line-height: 1.6; overflow-x: auto; color: #d8dce8; }
+  pre.code-block .tag { color: #8ab4f8; } pre.code-block .attr { color: #f2a154; } pre.code-block .val { color: #a3d9a5; } pre.code-block .cmt { color: #6b7185; } pre.code-block .txt { color: #d8dce8; } pre.code-block .kw { color: #c792ea; } pre.code-block .fn { color: #82aaff; }
+  .panel-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; font-weight: 600; }
+  .center-note { background: var(--bg-panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 16px 20px; font-size: 14px; color: var(--ink-dim); max-width: 780px; margin-top: 18px; line-height: 1.6; }
+  .summary-list { display: flex; flex-direction: column; gap: 14px; max-width: 800px; }
+  .summary-list .row { display: grid; grid-template-columns: 210px 1fr; gap: 20px; align-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .summary-list .row:last-child { border-bottom: none; }
+  .summary-list .desc { color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+  .browser-frame { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .browser-chrome { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+  .browser-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .browser-chrome .dot.r { background: #e08585; } .browser-chrome .dot.y { background: #f2c46e; } .browser-chrome .dot.g { background: #7fd99a; }
+  .browser-chrome .tab { margin-left: 10px; font-family: var(--sans); font-size: 11.5px; color: var(--ink); background: var(--bg-code); padding: 4px 12px; border-radius: 6px 6px 0 0; border: 1px solid var(--line); border-bottom: none; }
+  .browser-frame iframe { width: 100%; height: 170px; border: none; display: block; background: #fff; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; }
+  .compare .card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; }
+  .compare .card.bad { border-color: rgba(224,133,133,0.4); }
+  .compare .card.good { border-color: rgba(127,217,154,0.4); }
+  .compare .card h3 { font-size: 16px; margin-bottom: 10px; }
+  .compare .card.bad h3 { color: var(--bad); } .compare .card.good h3 { color: var(--good); }
+  .compare .card:not(.bad):not(.good) h3 { color: var(--accent); }
+  .compare .card p { font-size: 13.5px; color: var(--ink-dim); line-height: 1.6; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
+  .badge.bad { background: rgba(224,133,133,0.15); color: var(--bad); }
+  .badge.good { background: rgba(127,217,154,0.15); color: var(--good); }
+  .seekbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--line); z-index: 20; }
+  .seekbar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; position: relative; }
+  .seekbar-fill::after { content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(242,161,84,0.18); }
+  .counter { position: fixed; bottom: 18px; right: 28px; font-size: 13px; color: var(--ink-dim); font-family: var(--mono); z-index: 20; }
+  .logo { position: fixed; left: 22px; top: 18px; font-size: 12px; color: var(--ink-dim); letter-spacing: 0.06em; z-index: 20; }
+  .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: var(--bg-panel); border: 1px solid var(--line); color: var(--ink); font-size: 18px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: var(--accent-dim); }
+  .nav-btn.prev { left: 20px; } .nav-btn.next { right: 20px; }
+  @media (max-width: 820px) { .body-grid, .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="logo">WEB TABANLI UYGULAMA GELİŞTİRME · Javascript Ünitesi · Hafta 14</div>
+<div class="deck" id="deck">
+
+  <section class="slide active">
+    <div class="kicker">Javascript — Bölüm 1</div>
+    <h1>Javascript'e Giriş,<br>Değişkenler ve Veri Tipleri</h1>
+    <p class="subtitle">HTML iskeleti kurar, CSS giydirir — bugünden itibaren sayfalarımıza <b>davranış</b> ve <b>hareket</b> katıyoruz.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">01 — Üçüncü Dil</div>
+    <h2>Javascript Nedir?</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li><b>Javascript (JS)</b>, tarayıcıda çalışan, gerçek bir <b>programlama dilidir</b> — HTML/CSS'ten farklı olarak hesaplama yapar, karar alır, verileri hatırlar.</li>
+        <li>Üçlü benzetme: <b>HTML = iskelet</b> (yapı), <b>CSS = kıyafet</b> (görünüm), <b>JS = kaslar/sinir sistemi</b> (hareket, tepki, davranış).</li>
+        <li>Bir butona tıklayınca bir şeyin değişmesi, bir formun kontrol edilmesi, bir sayacın çalışması — hepsi JS'in işi.</li>
+        <li>JS, Java ile <b>aynı dil değildir</b> — sadece isimleri benzer, 1995'te pazarlama amacıyla benzer isim verilmiştir.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">02 — Kod Nereye Yazılır? — Kod Karşılaştırma</div>
+    <h2>Üç Yöntem, Tek Doğru Tercih</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">SATIR İÇİ — kaçının</div>
+        <h3>HTML İçine Gömülü</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;button</span> <span class="attr">onclick</span>=<span class="val">"alert('Merhaba')"</span><span class="tag">&gt;</span>
+  Tıkla
+<span class="tag">&lt;/button&gt;</span></pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">HARİCİ DOSYA — tercih edilen</div>
+        <h3>Ayrı bir .js Dosyası</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="cmt">// script.js</span>
+<span class="kw">const</span> btn = document.querySelector(<span class="val">"button"</span>);
+btn.addEventListener(<span class="val">"click"</span>, () =&gt; {
+  alert(<span class="val">"Merhaba"</span>);
+});</pre>
+      </div>
+    </div>
+    <div class="center-note">HTML = yapı, JS = davranış. İkisini karıştırmamak, kodu okunaklı ve <b>bakımı kolay</b> tutar — büyük projelerde tercih her zaman harici dosyadır.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">03 — Bağlama Yeri</div>
+    <h2><code class="inline" style="font-size:0.75em">&lt;script&gt;</code> Nereye Konur?</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">&lt;script&gt;</code> etiketi genelde <code class="inline">&lt;/body&gt;</code>'nin hemen <b>öncesine</b> konur.</li>
+        <li>Neden? Tarayıcı sayfayı yukarıdan aşağı okur — script <code class="inline">&lt;head&gt;</code>'te olursa, henüz oluşmamış HTML elemanlarını seçmeye çalışıp <b>hata verebilir</b>.</li>
+        <li>Bu hatayı Hafta 15'te canlı olarak göreceğiz ("Butonum Neden Çalışmıyor?").</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block">&lt;body&gt;
+  ...tüm sayfa içeriği...
+
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"script.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+&lt;/body&gt;</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">04 — Yazılımcının En Yakın Dostu</div>
+    <h2>Tarayıcı Konsolu (DevTools)</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><b>F12</b> (veya sağ tık → "İncele") ile tarayıcı geliştirici araçlarını, oradan <b>Console</b> sekmesini açıyoruz.</li>
+        <li><code class="inline">console.log()</code>, kod içindeki bir değeri konsola yazdırmamızı sağlar — hata ayıklamanın (debugging) temelidir.</li>
+        <li>Bu dersten itibaren <b>her</b> uygulamada konsol açık olacak — kodun "ne düşündüğünü" orada göreceğiz.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="fn">console</span>.log(<span class="val">"Merhaba Konsol!"</span>);
+<span class="fn">console</span>.log(<span class="txt">5</span> + <span class="txt">3</span>);  <span class="cmt">// 8</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">05 — Bilgiyi Saklama</div>
+    <h2>Değişken (Variable) Nedir?</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Değişken, bir değeri <b>hafızada saklayıp</b> sonra tekrar kullanmamızı sağlayan isimlendirilmiş bir <b>kutudur</b>.</li>
+        <li>Benzetme: Öğrenci karnesi üzerindeki her kutu (isim, not, sınıf) bir değişkendir — içine bir değer yazılır, sonra o kutuya isimle erişilir.</li>
+        <li>Javascript'te değişken tanımlamak için 3 anahtar kelime vardır: <code class="inline">let</code>, <code class="inline">const</code>, <code class="inline">var</code> (eski, artık kullanmıyoruz).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">06 — Kod Karşılaştırma</div>
+    <h2><code class="inline" style="font-size:0.7em">var</code> Neden Artık Kullanılmıyor?</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">var — ESKİ</div>
+        <h3>Fonksiyon Kapsamlı, Sızıntı Yapar</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">for</span> (<span class="kw">var</span> i = 0; i &lt; 3; i++) {}
+<span class="fn">console</span>.log(i);
+<span class="cmt">// 3 — döngü bitmesine rağmen
+// i'ye hâlâ erişilebiliyor!</span></pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">let / const — YENİ</div>
+        <h3>Blok Kapsamlı, Güvenli</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">for</span> (<span class="kw">let</span> j = 0; j &lt; 3; j++) {}
+<span class="fn">console</span>.log(j);
+<span class="cmt">// HATA! j döngü dışında
+// tanımlı değil — beklenen davranış</span></pre>
+      </div>
+    </div>
+    <div class="center-note"><b>Kural:</b> Değeri hiç değişmeyecekse <code class="inline">const</code>, değişecekse <code class="inline">let</code> kullanın. <code class="inline">var</code>'ı bu derste hiç kullanmayacağız.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">07 — Değerlerin Çeşitleri</div>
+    <h2>Veri Tipleri (Data Types)</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">string</code> — metin: <code class="inline">"Merhaba"</code></li>
+        <li><code class="inline">number</code> — sayı: <code class="inline">42</code>, <code class="inline">3.14</code></li>
+        <li><code class="inline">boolean</code> — doğru/yanlış: <code class="inline">true</code>, <code class="inline">false</code></li>
+        <li><code class="inline">undefined</code> — değer <b>henüz atanmamış</b></li>
+        <li><code class="inline">null</code> — değer <b>bilerek boş</b> bırakılmış</li>
+        <li><code class="inline">array</code>, <code class="inline">object</code> — birden çok veriyi bir arada tutar (Hafta 17'de detaylı)</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="kw">const</span> ad = <span class="val">"Ahmet"</span>;      <span class="cmt">// string</span>
+<span class="kw">const</span> yas = <span class="txt">17</span>;          <span class="cmt">// number</span>
+<span class="kw">const</span> ogrenciMi = <span class="kw">true</span>;  <span class="cmt">// boolean</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">08 — Tip Sorgulama</div>
+    <h2><code class="inline" style="font-size:0.75em">typeof</code> Operatörü</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Bir değişkenin hangi veri tipinde olduğunu <b>öğrenmemizi</b> sağlar.</li>
+        <li>Hata ayıklarken çok kullanışlıdır: "Bu değişken gerçekten sayı mı, yoksa string mi?"</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="fn">console</span>.log(<span class="kw">typeof</span> <span class="val">"Ahmet"</span>);  <span class="cmt">// "string"</span>
+<span class="fn">console</span>.log(<span class="kw">typeof</span> 17);       <span class="cmt">// "number"</span>
+<span class="fn">console</span>.log(<span class="kw">typeof</span> <span class="kw">true</span>);     <span class="cmt">// "boolean"</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">09 — Kod Karşılaştırma</div>
+    <h2>Metin Birleştirme — Eski / Yeni</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">ESKİ — String Birleştirme</div>
+        <h3>Artı işaretleriyle uzun ve karışık</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">const</span> mesaj = <span class="val">"Merhaba, "</span> + ad +
+  <span class="val">"! "</span> + yas + <span class="val">" yaşındasın."</span>;</pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">YENİ — Şablon Dizgesi</div>
+        <h3>Ters tırnak + ${'{'} ${'}'} — okunaklı</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">const</span> mesaj = `Merhaba, ${ad}! ${yas} yaşındasın.`;</pre>
+      </div>
+    </div>
+    <div class="center-note">Şablon dizgeleri (template literals) çift/tek tırnak yerine <b>ters tırnak</b> (backtick, <code class="inline">`</code>) kullanır, değişkenleri <code class="inline">${ }</code> içine koyar.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">10 — Bugünkü Bug Avının Zemini</div>
+    <h2>Operatörler: Aritmetik ve Atama</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Aritmetik: <code class="inline">+</code> <code class="inline">-</code> <code class="inline">*</code> <code class="inline">/</code> <code class="inline">%</code> (kalan)</li>
+        <li>Atama: <code class="inline">=</code> (ata), <code class="inline">+=</code>, <code class="inline">-=</code> (kısayol)</li>
+        <li><b>Kritik nokta:</b> <code class="inline">+</code> operatörü, iki sayı arasında <b>toplar</b>, ama iki string arasında <b>birleştirir (concat)</b>. Bu ikisini karıştırmak en sık yapılan başlangıç hatasıdır.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="fn">console</span>.log(5 + 3);        <span class="cmt">// 8  (sayı + sayı)</span>
+<span class="fn">console</span>.log(<span class="val">"5"</span> + <span class="val">"3"</span>);    <span class="cmt">// "53" (string + string!)</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">11 — Canlı Kanıt — Bozuk Toplama</div>
+    <h2>"Neden 5 + 8 = 58 Çıktı?"</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">Number() UNUTULMUŞ</div>
+        <h3>input.value her zaman string'dir</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">const</span> s1 = input1.value;  <span class="cmt">// "5" (string!)</span>
+<span class="kw">const</span> s2 = input2.value;  <span class="cmt">// "8" (string!)</span>
+<span class="kw">const</span> toplam = s1 + s2;
+<span class="cmt">// toplam = "58" — birleşti, toplanmadı</span></pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">Number() İLE ÇEVRİLDİ</div>
+        <h3>Artık gerçekten sayı</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">const</span> toplam = Number(s1) + Number(s2);
+<span class="cmt">// toplam = 13 — doğru!</span></pre>
+      </div>
+    </div>
+    <div class="center-note">Birazdan örnek uygulamada bunu <code class="inline">hata-nan.html</code> ile canlı test edeceğiz — hatta virgüllü ondalık sayı (<code class="inline">7,5</code>) yazınca <code class="inline">NaN</code> (Not a Number) bile çıkabiliyor!</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">12 — Sayfayla Konuşmak</div>
+    <h2>DOM Seçici: <code class="inline" style="font-size:0.7em">document.querySelector()</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><b>DOM</b> (Document Object Model), tarayıcının HTML'i hafızada bir "ağaç yapısı" olarak temsil etme şeklidir.</li>
+        <li><code class="inline">document.querySelector("...")</code>, CSS seçici sözdizimiyle (Hafta 9'da öğrendiğimiz <code class="inline">#id</code>, <code class="inline">.class</code>) sayfadan bir eleman seçmemizi sağlar.</li>
+        <li>Seçilen eleman, JS ile okunabilir/değiştirilebilir hâle gelir.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="kw">const</span> baslik = document.querySelector(<span class="val">"#okul-basligi"</span>);
+<span class="fn">console</span>.log(baslik);</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">13 — Gerçek Proje</div>
+    <h2>"Okulum" Projesine İlk JS Bağlantısı</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li><code class="inline">index.html</code>'in sonuna <code class="inline">&lt;script src="script.js"&gt;&lt;/script&gt;</code> ekliyoruz.</li>
+        <li><code class="inline">script.js</code> içinde okulun bilgilerini değişkenlere atayıp konsola yazdırıyoruz.</li>
+      </ul>
+      <pre class="code-block" style="margin-top:10px"><span class="kw">const</span> okulAdi = <span class="val">"Anadolu Teknik Lisesi"</span>;
+<span class="kw">const</span> kurulusYili = 1998;
+<span class="kw">const</span> ogrenciSayisi = 640;
+<span class="kw">const</span> kayitAcik = <span class="kw">true</span>;
+
+<span class="kw">const</span> bilgi = `${okulAdi}, ${kurulusYili} yılında kuruldu.`;
+<span class="fn">console</span>.log(bilgi);</pre>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Özet</div>
+    <h2>Bugün Öğrendiklerimiz</h2>
+    <div class="summary-list">
+      <div class="row"><code class="inline">let / const</code><div class="desc">Değişken tanımlama — var kullanmıyoruz</div></div>
+      <div class="row">string / number / boolean<div class="desc">Temel veri tipleri</div></div>
+      <div class="row"><code class="inline">typeof</code><div class="desc">Bir değerin veri tipini sorgular</div></div>
+      <div class="row">Şablon dizgesi <code class="inline">` `</code></div>
+      <div class="row"><code class="inline">Number()</code><div class="desc">String'i sayıya çevirir — input.value için zorunlu</div></div>
+      <div class="row"><code class="inline">document.querySelector()</code><div class="desc">Sayfadan bir HTML elemanı seçer</div></div>
+    </div>
+  </section>
+
+</div>
+
+<button class="nav-btn prev" id="prevBtn" aria-label="Önceki slayt">‹</button>
+<button class="nav-btn next" id="nextBtn" aria-label="Sonraki slayt">›</button>
+<div class="seekbar"><div class="seekbar-fill" id="seekFill"></div></div>
+<div class="counter" id="counter">1 / 15</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('seekFill').style.width = `${((current + 1) / total) * 100}%`;
+  }
+  function next() { if (current < total - 1) { current++; render(); } }
+  function prev() { if (current > 0) { current--; render(); } }
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  render();
+</script>
+
+</body>
+</html>

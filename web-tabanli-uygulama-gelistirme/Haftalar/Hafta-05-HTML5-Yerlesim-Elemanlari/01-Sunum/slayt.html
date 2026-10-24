@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yerleşim (Layout) Elemanları — Hafta 5</title>
+<style>
+  :root {
+    --bg: #12141c; --bg-panel: #1b1e2a; --bg-code: #0d0f16;
+    --ink: #eef0f6; --ink-dim: #9298ab; --accent: #f2a154; --accent-dim: #7a5a34; --line: #2a2e3d;
+    --bad: #e08585; --good: #7fd99a;
+    --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  .deck { position: relative; height: 100vh; width: 100vw; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 6vh 9vw; opacity: 0; transition: opacity 0.25s ease; }
+  .slide.active { display: flex; opacity: 1; }
+  .kicker { font-size: clamp(13px, 1.4vw, 16px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 18px; }
+  h1 { font-size: clamp(32px, 4.6vw, 54px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; margin-bottom: 8px; }
+  h2 { font-size: clamp(24px, 3.4vw, 40px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; margin-bottom: 24px; max-width: 900px; }
+  .subtitle { font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-dim); max-width: 640px; margin-top: 10px; }
+  .body-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; max-width: 1220px; }
+  .body-grid.single { grid-template-columns: 1fr; max-width: 880px; }
+  .body-grid.wide { grid-template-columns: 1fr 1fr; max-width: 1240px; }
+  ul.points { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+  ul.points li { font-size: clamp(14.5px, 1.3vw, 17.5px); line-height: 1.5; color: var(--ink); padding-left: 24px; position: relative; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  ul.points li b { color: var(--accent); font-weight: 600; }
+  code.inline { font-family: var(--mono); background: var(--bg-code); padding: 2px 8px; border-radius: 5px; font-size: 0.86em; color: #f7c98a; border: 1px solid var(--line); }
+  pre.code-block { background: var(--bg-code); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; font-family: var(--mono); font-size: clamp(11.5px, 1vw, 14.5px); line-height: 1.6; overflow-x: auto; color: #d8dce8; }
+  pre.code-block .tag { color: #8ab4f8; } pre.code-block .attr { color: #f2a154; } pre.code-block .val { color: #a3d9a5; } pre.code-block .cmt { color: #6b7185; } pre.code-block .txt { color: #d8dce8; }
+  .panel-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; font-weight: 600; }
+  .center-note { background: var(--bg-panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 16px 20px; font-size: 14px; color: var(--ink-dim); max-width: 780px; margin-top: 18px; line-height: 1.6; }
+  .summary-list { display: flex; flex-direction: column; gap: 14px; max-width: 800px; }
+  .summary-list .row { display: grid; grid-template-columns: 210px 1fr; gap: 20px; align-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .summary-list .row:last-child { border-bottom: none; }
+  .summary-list .desc { color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+  .browser-frame { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .browser-chrome { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+  .browser-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .browser-chrome .dot.r { background: #e08585; } .browser-chrome .dot.y { background: #f2c46e; } .browser-chrome .dot.g { background: #7fd99a; }
+  .browser-chrome .tab { margin-left: 10px; font-family: var(--sans); font-size: 11.5px; color: var(--ink); background: var(--bg-code); padding: 4px 12px; border-radius: 6px 6px 0 0; border: 1px solid var(--line); border-bottom: none; }
+  .browser-frame iframe { width: 100%; height: 220px; border: none; display: block; background: #fff; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; }
+  .compare .card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; }
+  .compare .card.bad { border-color: rgba(224,133,133,0.4); }
+  .compare .card.good { border-color: rgba(127,217,154,0.4); }
+  .compare .card h3 { font-size: 16px; margin-bottom: 10px; }
+  .compare .card.bad h3 { color: var(--bad); } .compare .card.good h3 { color: var(--good); }
+  .compare .card:not(.bad):not(.good) h3 { color: var(--accent); }
+  .compare .card p { font-size: 13.5px; color: var(--ink-dim); line-height: 1.6; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
+  .badge.bad { background: rgba(224,133,133,0.15); color: var(--bad); }
+  .badge.good { background: rgba(127,217,154,0.15); color: var(--good); }
+  .seekbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--line); z-index: 20; }
+  .seekbar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; position: relative; }
+  .seekbar-fill::after { content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(242,161,84,0.18); }
+  .counter { position: fixed; bottom: 18px; right: 28px; font-size: 13px; color: var(--ink-dim); font-family: var(--mono); z-index: 20; }
+  .logo { position: fixed; left: 22px; top: 18px; font-size: 12px; color: var(--ink-dim); letter-spacing: 0.06em; z-index: 20; }
+  .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: var(--bg-panel); border: 1px solid var(--line); color: var(--ink); font-size: 18px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: var(--accent-dim); }
+  .nav-btn.prev { left: 20px; } .nav-btn.next { right: 20px; }
+  .layout-map { display: flex; flex-direction: column; gap: 6px; max-width: 480px; font-family: var(--mono); font-size: 12.5px; }
+  .layout-map div { border: 1px solid var(--accent-dim); border-radius: 6px; padding: 8px 12px; color: var(--accent); background: rgba(242,161,84,0.06); }
+  .layout-map .mid { display: flex; gap: 6px; }
+  .layout-map .mid > div { flex: 1; }
+  @media (max-width: 820px) { .body-grid, .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="logo">WEB TABANLI UYGULAMA GELİŞTİRME · HTML5 Ünitesi · Hafta 05</div>
+<div class="deck" id="deck">
+
+  <section class="slide active">
+    <div class="kicker">HTML5 — Bölüm 3</div>
+    <h1>Yerleşim (Layout)<br>Elemanları</h1>
+    <p class="subtitle">Bir sayfanın "bölgelerini" (üst menü, ana içerik, kenar çubuğu, alt bilgi) anlamlı etiketlerle nasıl kurduğumuzu öğreniyoruz.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">01 — Genel Amaçlı Kutular</div>
+    <h2><code class="inline" style="font-size:0.7em">&lt;div&gt;</code> ve <code class="inline" style="font-size:0.7em">&lt;span&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">&lt;div&gt;</code> (division) — anlamı olmayan, genel amaçlı bir <b>blok</b> konteynerdir. Kendinden önce/sonra yeni satıra geçer.</li>
+        <li><code class="inline">&lt;span&gt;</code> — anlamı olmayan, genel amaçlı bir <b>satır içi (inline)</b> konteynerdir. Metnin akışını bozmaz.</li>
+        <li>İkisi de "bu bir başlıktır", "bu bir paragraftır" gibi bir anlam taşımaz — sadece <b>gruplamak</b> için vardır (genelde CSS ile stil vermek amacıyla).</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;div&gt;</span>
+  <span class="tag">&lt;p&gt;</span>Bu bir blok.<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;p&gt;</span>Bu cümlede <span class="tag">&lt;span&gt;</span>bir kelime<span class="tag">&lt;/span&gt;</span> vurgulanacak.<span class="tag">&lt;/p&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">02 — Kod Karşılaştırma</div>
+    <h2>"Div Çorbası" Problemi</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">ANLAMSIZ — "DIV ÇORBASI"</div>
+        <h3>Her Şey div</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ust-menu"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"icerik"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"alt-bilgi"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span></pre>
+        <p style="margin-top:10px">Tarayıcı/ekran okuyucu için hepsi aynı: "anlamsız bir kutu". Hangisinin menü, hangisinin içerik olduğunu ancak `class` adını okuyarak (bir insan) anlar.</p>
+      </div>
+      <div class="card good">
+        <div class="badge good">ANLAMLI — SEMANTİK</div>
+        <h3>Her Etiket Kendi Rolünde</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;nav&gt;</span>...<span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;main&gt;</span>...<span class="tag">&lt;/main&gt;</span>
+<span class="tag">&lt;footer&gt;</span>...<span class="tag">&lt;/footer&gt;</span></pre>
+        <p style="margin-top:10px">Tarayıcı ve ekran okuyucu, hangi bölümün menü, hangisinin ana içerik olduğunu <b>doğrudan etiketten</b> anlar — class ismine bağımlı değildir.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">03 — HTML5'in Çözümü</div>
+    <h2>Semantik Yerleşim Etiketleri</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li><code class="inline">&lt;header&gt;</code> — sayfanın veya bir bölümün <b>üst kısmı/girişi</b> (genelde logo, başlık, menü).</li>
+        <li><code class="inline">&lt;nav&gt;</code> — <b>gezinme (navigasyon)</b> bağlantılarının bulunduğu alan.</li>
+        <li><code class="inline">&lt;main&gt;</code> — sayfanın <b>asıl, benzersiz</b> içeriği (sayfada yalnızca 1 tane olur).</li>
+        <li><code class="inline">&lt;section&gt;</code> / <code class="inline">&lt;article&gt;</code> — içerik grupları (bir sonraki slaytta farkını göreceğiz).</li>
+        <li><code class="inline">&lt;aside&gt;</code> — asıl içerikle <b>dolaylı ilişkili</b> yan bilgi (kenar çubuğu, reklam, ilgili bağlantılar).</li>
+        <li><code class="inline">&lt;footer&gt;</code> — sayfanın veya bir bölümün <b>alt kısmı</b> (iletişim, telif hakkı, alt menü).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">04 — Sayfanın Haritası</div>
+    <h2>Bir Sayfa Nasıl Bölümlenir?</h2>
+    <div class="body-grid wide">
+      <div class="layout-map">
+        <div>header — logo, site adı, ana menü (nav)</div>
+        <div class="mid">
+          <div>main — asıl içerik (section / article)</div>
+          <div>aside — kenar çubuğu</div>
+        </div>
+        <div>footer — iletişim, telif hakkı</div>
+      </div>
+      <div>
+        <div class="panel-label">Kod (İskelet)</div>
+        <pre class="code-block"><span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;header&gt;</span>...<span class="tag">&lt;/header&gt;</span>
+  <span class="tag">&lt;main&gt;</span>...<span class="tag">&lt;/main&gt;</span>
+  <span class="tag">&lt;aside&gt;</span>...<span class="tag">&lt;/aside&gt;</span>
+  <span class="tag">&lt;footer&gt;</span>...<span class="tag">&lt;/footer&gt;</span>
+<span class="tag">&lt;/body&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">05 — Detay</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;header&gt;</code> ve <code class="inline" style="font-size:0.85em">&lt;nav&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">&lt;header&gt;</code> sadece sayfanın en tepesinde değil, bir <code class="inline">&lt;article&gt;</code>'ın da kendi header'ı olabilir (örn. bir haberin başlığı+tarihi).</li>
+        <li><code class="inline">&lt;nav&gt;</code>, içinde genelde bir <code class="inline">&lt;ul&gt;</code> liste ile bağlantılar (<code class="inline">&lt;a&gt;</code>) barındırır — bağlantıları Hafta 7'de detaylı işleyeceğiz.</li>
+        <li>Bir sayfada birden fazla <code class="inline">&lt;nav&gt;</code> olabilir (örn. üst menü + alt menü).</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;header&gt;</span>
+  <span class="tag">&lt;h1&gt;</span>Anadolu Teknik Lisesi<span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;nav&gt;</span>
+    <span class="tag">&lt;ul&gt;</span>
+      <span class="tag">&lt;li&gt;</span>Ana Sayfa<span class="tag">&lt;/li&gt;</span>
+      <span class="tag">&lt;li&gt;</span>Hakkımızda<span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;/ul&gt;</span>
+  <span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;/header&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">06 — Tek ve Benzersiz</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;main&gt;</code></h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Sayfanın <b>tekrar etmeyen, asıl</b> içeriğini sarar — header/nav/footer gibi her sayfada tekrar eden kısımlar hariç.</li>
+        <li>Bir sayfada <b>sadece bir kez</b> kullanılmalıdır.</li>
+        <li>Ekran okuyucu kullanıcıları "asıl içeriğe atla" kısayolunu genelde <code class="inline">&lt;main&gt;</code> sayesinde kullanabilir — her sayfada tekrarlanan menüyü baştan dinlemek zorunda kalmazlar.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">07 — Kod Karşılaştırma — Sık Karışan İkili</div>
+    <h2><code class="inline" style="font-size:0.7em">&lt;section&gt;</code> mi, <code class="inline" style="font-size:0.7em">&lt;article&gt;</code> mi?</h2>
+    <div class="compare">
+      <div class="card">
+        <h3>&lt;section&gt;</h3>
+        <p>Bir sayfanın <b>tematik bir bölümüdür</b> — tek başına anlam ifade etmesi şart değildir. Örn. "Bölümlerimiz" bölümü, "İstatistiklerimiz" bölümü.</p>
+      </div>
+      <div class="card">
+        <h3>&lt;article&gt;</h3>
+        <p><b>Bağımsız, kendi başına anlamlı ve paylaşılabilir</b> bir içeriktir. Örn. bir blog yazısı, bir haber, bir forum gönderisi — başka bir siteye kopyalansa bile hâlâ anlamlıdır.</p>
+      </div>
+    </div>
+    <div class="center-note">Basit test: "Bu içeriği RSS/haber bülteni olarak tek başına gönderebilir miyim?" Cevap evetse <code class="inline">&lt;article&gt;</code>, hayırsa (sayfanın geri kalanına bağımlıysa) <code class="inline">&lt;section&gt;</code>. Bir <code class="inline">&lt;section&gt;</code> içinde birden çok <code class="inline">&lt;article&gt;</code> olabilir.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">08 — Dolaylı İlişkili İçerik</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;aside&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Asıl içerikle <b>doğrudan ilgili olmayan ama alakalı</b> ek bilgi için kullanılır.</li>
+        <li>Örnekler: kenar çubuğundaki "benzer haberler", bir blog yazısının yanındaki yazar bilgisi kutusu, reklam alanı.</li>
+        <li>Kaldırılsa bile asıl içeriğin anlamı bozulmaz — bu, section'dan temel farkıdır.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;main&gt;</span>
+  <span class="tag">&lt;article&gt;</span>...<span class="tag">&lt;/article&gt;</span>
+<span class="tag">&lt;/main&gt;</span>
+<span class="tag">&lt;aside&gt;</span>
+  <span class="tag">&lt;h2&gt;</span>İlgili Duyurular<span class="tag">&lt;/h2&gt;</span>
+  ...
+<span class="tag">&lt;/aside&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">09 — Kapanış</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;footer&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Sayfanın (veya bir <code class="inline">&lt;article&gt;</code>/<code class="inline">&lt;section&gt;</code>'ın) <b>alt bilgisidir</b>.</li>
+        <li>Genelde iletişim bilgileri, telif hakkı metni, sosyal medya bağlantıları, alt menü içerir.</li>
+        <li><code class="inline">&lt;header&gt;</code> gibi, bir sayfada birden fazla <code class="inline">&lt;footer&gt;</code> olabilir (her article kendi footer'ına sahip olabilir).</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;footer&gt;</span>
+  <span class="tag">&lt;p&gt;</span>&amp;copy; 2026 Anadolu Teknik Lisesi<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/footer&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">10 — Hepsi Bir Arada</div>
+    <h2>Tam Bir Semantik İskelet</h2>
+    <div class="body-grid single">
+      <pre class="code-block"><span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;header&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>Anadolu Teknik Lisesi<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>...<span class="tag">&lt;/nav&gt;</span>
+  <span class="tag">&lt;/header&gt;</span>
+
+  <span class="tag">&lt;main&gt;</span>
+    <span class="tag">&lt;section&gt;</span>
+      <span class="tag">&lt;h2&gt;</span>Hakkımızda<span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;article&gt;</span>...<span class="tag">&lt;/article&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+  <span class="tag">&lt;/main&gt;</span>
+
+  <span class="tag">&lt;aside&gt;</span>...<span class="tag">&lt;/aside&gt;</span>
+  <span class="tag">&lt;footer&gt;</span>...<span class="tag">&lt;/footer&gt;</span>
+<span class="tag">&lt;/body&gt;</span></pre>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">11 — Peki div hiç mi kullanılmayacak?</div>
+    <h2>div'in Hâlâ Yeri Var</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Semantik bir karşılığı olmayan, <b>sadece CSS ile stil vermek/gruplamak</b> için bir kutuya ihtiyacınız olduğunda hâlâ <code class="inline">&lt;div&gt;</code> kullanılır.</li>
+        <li>Kural: <b>Önce anlamlı bir etiket var mı diye düşünün</b> (header? nav? section?) — yoksa div'e geçin.</li>
+        <li>Bu ders boyunca (özellikle CSS ünitesinde, Hafta 9+) div'i sık kullanacağız — ama artık "önce semantik" alışkanlığıyla.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">12 — Neden Önemli?</div>
+    <h2>Erişilebilirlik: "Landmark" Gezinme</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Ekran okuyucular, semantik etiketleri <b>"landmark" (işaret noktası)</b> olarak tanır ve kullanıcıya "menüye git", "asıl içeriğe git" gibi hızlı gezinme sunar.</li>
+        <li>Tüm sayfa div'lerden oluşuyorsa, ekran okuyucu kullanıcısı sayfanın tamamını baştan sona dinlemek zorunda kalır.</li>
+        <li>SEO açısından da arama motorları, sayfanın hangi kısmının "asıl içerik" olduğunu semantik etiketlerden daha kolay anlar.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">13 — Güncel Not</div>
+    <h2>Geleceğe Bir Bakış: template / slot</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li><code class="inline">&lt;template&gt;</code>, tarayıcının hemen göstermediği, Javascript ile daha sonra kullanılacak bir HTML parçası tanımlamaya yarar.</li>
+        <li><code class="inline">&lt;slot&gt;</code>, yeniden kullanılabilir bileşenlerde (Web Components) "buraya dışarıdan içerik gelecek" boşluğunu tanımlar.</li>
+        <li>Bu, ileri düzey bir konudur — sadece farkındalık için değiniyoruz. Modern framework'ler (React, Vue — Hafta 18'de tanıtılacak) benzer "bileşen" mantığını kullanır.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">14 — Okulum Projesi</div>
+    <h2>Bu Hafta Eklenenler</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Hafta 4'te sadece başlık/paragraf/liste/tablo ile yazdığımız içeriği bu hafta <b>semantik etiketlerle yeniden yapılandırıyoruz</b> (refactor).</li>
+        <li><code class="inline">&lt;header&gt;</code> (logo yerine h1 + nav), <code class="inline">&lt;main&gt;</code> (tüm ana içerik), <code class="inline">&lt;section&gt;</code> (her başlık bir section), <code class="inline">&lt;aside&gt;</code> (duyurular), <code class="inline">&lt;footer&gt;</code> (iletişim) eklenecek.</li>
+      </ul>
+      <div class="center-note">Tam kod için <code class="inline">02-Ornek-Uygulama/okulum-iskelet.html</code> dosyasına bakınız.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Özet</div>
+    <h2>Bugün Öğrendiklerimiz</h2>
+    <div class="summary-list">
+      <div class="row"><code class="inline">&lt;div&gt; / &lt;span&gt;</code><div class="desc">Anlamsız blok/satır içi konteynerler — sadece gerektiğinde</div></div>
+      <div class="row"><code class="inline">&lt;header&gt; / &lt;nav&gt; / &lt;footer&gt;</code><div class="desc">Üst kısım, gezinme, alt kısım</div></div>
+      <div class="row"><code class="inline">&lt;main&gt;</code><div class="desc">Sayfanın tekil, asıl içeriği</div></div>
+      <div class="row"><code class="inline">&lt;section&gt; / &lt;article&gt;</code><div class="desc">Tematik bölüm / bağımsız-paylaşılabilir içerik</div></div>
+      <div class="row"><code class="inline">&lt;aside&gt;</code><div class="desc">Dolaylı ilişkili yan içerik</div></div>
+    </div>
+  </section>
+
+</div>
+
+<button class="nav-btn prev" id="prevBtn" aria-label="Önceki slayt">‹</button>
+<button class="nav-btn next" id="nextBtn" aria-label="Sonraki slayt">›</button>
+<div class="seekbar"><div class="seekbar-fill" id="seekFill"></div></div>
+<div class="counter" id="counter">1 / 16</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('seekFill').style.width = `${((current + 1) / total) * 100}%`;
+  }
+  function next() { if (current < total - 1) { current++; render(); } }
+  function prev() { if (current > 0) { current--; render(); } }
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  render();
+</script>
+
+</body>
+</html>

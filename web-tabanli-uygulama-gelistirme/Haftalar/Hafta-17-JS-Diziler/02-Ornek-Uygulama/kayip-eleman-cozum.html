@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kayıp Eleman — Çözüm</title>
+</head>
+<body>
+
+  <h1>Sınıf Listesi</h1>
+  <p>Düzeltilmiş hâli: döngü artık dizinin sınırları içinde kalıyor, "undefined" satırı kayboldu.</p>
+
+  <pre id="cikti" style="background:#111;color:#0f0;padding:16px;border-radius:8px;font-family:monospace;"></pre>
+
+  <script>
+    const ogrenciler = ["Ayşe", "Mehmet", "Elif", "Can", "Zeynep"];
+    const cikti = document.getElementById("cikti");
+
+    // Düzeltme: <= yerine < kullanıyoruz — son geçerli index (length - 1) ile duruyoruz.
+    for (let i = 0; i < ogrenciler.length; i++) {
+      console.log(i + ". öğrenci: " + ogrenciler[i]);
+      cikti.textContent += (i + 1) + ". öğrenci: " + ogrenciler[i] + "\n";
+    }
+  </script>
+
+</body>
+</html>

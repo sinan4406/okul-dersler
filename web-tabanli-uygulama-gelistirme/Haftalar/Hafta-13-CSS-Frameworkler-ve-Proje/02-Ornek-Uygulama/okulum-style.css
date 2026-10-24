@@ -1,0 +1,153 @@
+/* ============================================================
+   OKULUM PROJESİ — style.css (CSS ÜNİTESİ SONU / REFACTOR HÂLİ)
+   ------------------------------------------------------------
+   Bu dosya, Hafta 9-12'de parça parça eklenen stillerin, Hafta 13'te
+   tek bir düzenli/temiz dosyada bölümlere ayrılmış hâlidir:
+     - Hafta 9  → seçiciler, harici CSS bağlama mantığı
+     - Hafta 10 → kutu modeli (border-box, padding, border, margin, flex)
+     - Hafta 11 → renk değişkenleri (custom properties) ve tipografi
+     - Hafta 12 → duyarlı tasarım (clamp, media query)
+   NOT: Hafta 4-11 gerçek sınıf çıktısı farklıysa, öğretmen bu dosyayı
+   sınıfın ürettiği içerikle uyumlu hale getirmelidir.
+   ============================================================ */
+
+/* ---------- 1) SIFIRLAMA VE DEĞİŞKENLER (Hafta 9 / 11) ---------- */
+
+* { box-sizing: border-box; }
+
+:root {
+  --renk-birincil: #1c2a38;
+  --renk-vurgu: #e8722c;
+  --renk-arkaplan: #f7f8fa;
+  --renk-metin: #22303c;
+  --renk-metin-soluk: #5c6b78;
+  --yazitipi: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--yazitipi);
+  color: var(--renk-metin);
+  background: var(--renk-arkaplan);
+  line-height: 1.6;
+}
+
+h1, h2, h3 { color: var(--renk-birincil); line-height: 1.25; }
+
+img { max-width: 100%; height: auto; }
+
+/* ---------- 2) ÜST MENÜ (Hafta 10 — kutu modeli / flex) ---------- */
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--renk-birincil);
+  padding: 16px 32px;
+}
+.site-header .logo { color: #fff; font-weight: 700; font-size: 1.2rem; }
+
+.site-nav { display: flex; gap: 24px; }
+.site-nav a {
+  color: #eef3f8;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 4px;
+  border-bottom: 2px solid transparent;
+}
+.site-nav a:hover { border-bottom-color: var(--renk-vurgu); }
+
+/* ---------- 3) ANA İÇERİK DÜZENİ ---------- */
+
+main { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+
+.hero { text-align: center; padding: 40px 0; }
+.hero h1 { font-size: clamp(1.6rem, 5vw, 2.6rem); } /* Hafta 12: akıcı tipografi */
+.hero p { max-width: 640px; margin: 12px auto 0; color: var(--renk-metin-soluk); }
+
+/* ---------- 4) KARTLAR (Hafta 10 — box model) ---------- */
+
+.kart-alani { margin-top: 40px; }
+.kart-grid { display: flex; gap: 20px; margin-top: 20px; }
+.kart {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #dfe3e8;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.kart h3 { margin-top: 0; }
+
+/* ---------- 5) TABLO (Hafta 9 — eleman seçicileri) ---------- */
+
+.tablo-alani { margin-top: 48px; }
+table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+th, td { border: 1px solid #dfe3e8; padding: 10px 14px; text-align: left; }
+th { background: var(--renk-birincil); color: #fff; }
+tr:nth-child(even) td { background: #eef1f4; }
+
+/* ---------- 6) GALERİ ---------- */
+
+.galeri-alani { margin-top: 48px; }
+.galeri-grid { display: flex; gap: 16px; margin-top: 16px; }
+.gorsel {
+  flex: 1;
+  height: 160px;
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  color: #fff;
+  font-weight: 600;
+  background: linear-gradient(160deg, var(--renk-birincil), var(--renk-vurgu));
+}
+.gorsel-2 { background: linear-gradient(160deg, #2c4a5e, #6ea8c9); }
+.gorsel-3 { background: linear-gradient(160deg, #3c2a58, #a06ec9); }
+
+/* ---------- 7) İLETİŞİM FORMU (Hafta 8 HTML formuna karşılık gelen stil) ---------- */
+
+.form-alani { max-width: 560px; margin: 0 auto; }
+.form-alani form { display: flex; flex-direction: column; gap: 6px; margin-top: 20px; }
+.form-alani label { font-weight: 600; margin-top: 10px; }
+.form-alani input[type="text"],
+.form-alani input[type="email"],
+.form-alani select,
+.form-alani textarea {
+  padding: 10px 12px;
+  border: 1px solid #c7ccd1;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+.form-alani fieldset { border: 1px solid #c7ccd1; border-radius: 6px; margin-top: 10px; }
+.form-alani button {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--renk-vurgu);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- 8) ALT BİLGİ ---------- */
+
+.site-footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--renk-metin-soluk);
+  font-size: 0.9rem;
+}
+
+/* ---------- 9) DUYARLI TASARIM (Hafta 12) ---------- */
+
+@media (max-width: 700px) {
+  .site-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .site-nav { flex-direction: column; gap: 10px; }
+  .kart-grid { flex-direction: column; }
+  .galeri-grid { flex-direction: column; }
+  main { padding: 20px 16px; }
+}

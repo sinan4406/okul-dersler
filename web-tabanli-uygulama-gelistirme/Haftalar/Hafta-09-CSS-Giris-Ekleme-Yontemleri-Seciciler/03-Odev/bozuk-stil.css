@@ -1,0 +1,16 @@
+/* Bu dosya, bozuk-stil.html tarafından çağrılıyor sanılıyor ama aslında hiç yüklenmiyor.
+   İpucu: bozuk-stil.html içindeki <link> etiketindeki dosya adına dikkat edin! */
+
+baslik {
+  color: green;
+  text-align: center;
+}
+
+#son-tarih {
+  colr: red;
+}
+
+p {
+  font-size: 18px
+  background: #eee;
+}

@@ -1,0 +1,61 @@
+/* Anadolu Teknik Lisesi — Okulum Projesi
+   NOT: Bu dosya, HTML5 (Hafta 3-8) ve CSS (Hafta 9-13) ünitelerinde birlikte
+   geliştirilmiş olması beklenen "Okulum" projesinin varsayımsal/örnek bir
+   devamıdır. Gerçek sınıfta öğrencilerle üretilen CSS bundan farklı olabilir —
+   öğretmen bu dosyayı kendi sınıfının gerçek çıktısıyla değiştirebilir.
+   Hafta 14-15'teki style.css ile aynıdır, JS haftalarında CSS değişmez. */
+
+:root {
+  --renk-ana: #1d4ed8;
+  --renk-ana-koyu: #1e3a8a;
+  --renk-vurgu: #f59e0b;
+  --renk-metin: #1f2937;
+  --renk-metin-soluk: #6b7280;
+  --renk-zemin: #f8fafc;
+  --renk-kart: #ffffff;
+  --renk-cizgi: #e5e7eb;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; color: var(--renk-metin); background: var(--renk-zemin); line-height: 1.6; }
+
+header { background: var(--renk-ana-koyu); color: #fff; padding: 18px 6vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+header .logo { font-weight: 700; font-size: 1.2rem; }
+header nav a { color: #dbeafe; text-decoration: none; margin-left: 22px; font-size: 0.95rem; }
+header nav a:hover { color: #fff; text-decoration: underline; }
+
+.hero { background: linear-gradient(135deg, var(--renk-ana), var(--renk-ana-koyu)); color: #fff; padding: 60px 6vw; text-align: center; }
+.hero h1 { margin: 0 0 10px; font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.hero p { margin: 0; color: #dbeafe; font-size: 1.05rem; }
+
+main { max-width: 1000px; margin: 0 auto; padding: 40px 6vw; }
+section { margin-bottom: 44px; }
+h2 { color: var(--renk-ana-koyu); border-bottom: 3px solid var(--renk-vurgu); display: inline-block; padding-bottom: 4px; }
+
+.bolumler { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.bolumler li { background: var(--renk-kart); border: 1px solid var(--renk-cizgi); border-radius: 10px; padding: 16px 18px; }
+.bolumler li b { color: var(--renk-ana); }
+
+table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+th, td { border: 1px solid var(--renk-cizgi); padding: 10px 14px; text-align: left; }
+th { background: var(--renk-ana); color: #fff; }
+tr:nth-child(even) td { background: #f1f5f9; }
+
+footer { background: var(--renk-ana-koyu); color: #cbd5e1; text-align: center; padding: 18px; font-size: 0.85rem; }
+
+/* İletişim formu */
+form { background: var(--renk-kart); border: 1px solid var(--renk-cizgi); border-radius: 12px; padding: 24px; max-width: 520px; }
+form label { display: block; font-weight: 600; margin: 14px 0 6px; }
+form input, form textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--renk-cizgi); border-radius: 8px; font-family: inherit; font-size: 0.95rem; }
+form textarea { resize: vertical; min-height: 100px; }
+form button { margin-top: 18px; background: var(--renk-ana); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+form button:hover { background: var(--renk-ana-koyu); }
+
+.mesaj-kutusu { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; display: none; }
+.mesaj-kutusu.basarili { display: block; background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.mesaj-kutusu.hata { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+@media (max-width: 640px) {
+  header { flex-direction: column; align-items: flex-start; }
+  header nav a { margin-left: 0; margin-right: 16px; }
+}

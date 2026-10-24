@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML'e Giriş ve Belge Yapısı</title>
+<style>
+  :root {
+    --bg: #12141c; --bg-panel: #1b1e2a; --bg-code: #0d0f16;
+    --ink: #eef0f6; --ink-dim: #9298ab; --accent: #f2a154; --accent-dim: #7a5a34; --line: #2a2e3d;
+    --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  .deck { position: relative; height: 100vh; width: 100vw; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 6vh 9vw; opacity: 0; transition: opacity 0.25s ease; }
+  .slide.active { display: flex; opacity: 1; }
+  .kicker { font-size: clamp(13px, 1.4vw, 16px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 18px; }
+  h1 { font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; margin-bottom: 8px; }
+  h2 { font-size: clamp(26px, 3.6vw, 42px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; margin-bottom: 26px; max-width: 900px; }
+  .subtitle { font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-dim); max-width: 640px; margin-top: 10px; }
+  .body-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; max-width: 1200px; }
+  .body-grid.single { grid-template-columns: 1fr; max-width: 880px; }
+  .body-grid.wide { grid-template-columns: 1fr 1fr; max-width: 1240px; }
+  ul.points { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  ul.points li { font-size: clamp(15px, 1.4vw, 18px); line-height: 1.5; color: var(--ink); padding-left: 24px; position: relative; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  ul.points li b { color: var(--accent); font-weight: 600; }
+  code.inline { font-family: var(--mono); background: var(--bg-code); padding: 2px 8px; border-radius: 5px; font-size: 0.86em; color: #f7c98a; border: 1px solid var(--line); }
+  pre.code-block { background: var(--bg-code); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; font-family: var(--mono); font-size: clamp(12px, 1.05vw, 15px); line-height: 1.6; overflow-x: auto; color: #d8dce8; }
+  pre.code-block .tag { color: #8ab4f8; } pre.code-block .attr { color: #f2a154; } pre.code-block .val { color: #a3d9a5; } pre.code-block .cmt { color: #6b7185; }
+  .panel-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; font-weight: 600; }
+  .center-note { background: var(--bg-panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 16px 20px; font-size: 14.5px; color: var(--ink-dim); max-width: 760px; margin-top: 20px; line-height: 1.6; }
+  .summary-list { display: flex; flex-direction: column; gap: 16px; max-width: 780px; }
+  .summary-list .row { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: start; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .summary-list .row:last-child { border-bottom: none; }
+  .summary-list .desc { color: var(--ink-dim); font-size: 14.5px; line-height: 1.5; }
+  .browser-frame { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .browser-chrome { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .browser-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .browser-chrome .dot.r { background: #e08585; } .browser-chrome .dot.y { background: #f2c46e; } .browser-chrome .dot.g { background: #7fd99a; }
+  .browser-chrome .tab { margin-left: 10px; font-family: var(--sans); font-size: 12px; color: var(--ink); background: var(--bg-code); padding: 5px 14px; border-radius: 6px 6px 0 0; border: 1px solid var(--line); border-bottom: none; }
+  .browser-frame iframe { width: 100%; height: 220px; border: none; display: block; background: #fff; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; max-width: 1080px; }
+  .compare .card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px; padding: 24px 26px; }
+  .compare .card h3 { font-size: 17px; margin-bottom: 12px; color: var(--accent); }
+  .compare .card p { font-size: 14.5px; color: var(--ink-dim); line-height: 1.6; }
+  .seekbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--line); z-index: 20; }
+  .seekbar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; position: relative; }
+  .seekbar-fill::after { content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(242,161,84,0.18); }
+  .counter { position: fixed; bottom: 18px; right: 28px; font-size: 13px; color: var(--ink-dim); font-family: var(--mono); z-index: 20; }
+  .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: var(--bg-panel); border: 1px solid var(--line); color: var(--ink); font-size: 18px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: var(--accent-dim); }
+  .nav-btn.prev { left: 20px; } .nav-btn.next { right: 20px; }
+  @media (max-width: 820px) { .body-grid, .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <section class="slide active">
+    <div class="kicker">HTML5 — Bölüm 1</div>
+    <h1>HTML'e Giriş ve Belge Yapısı</h1>
+    <p class="subtitle">Bir web sayfasının en temel iskeletini nasıl kurduğumuzu öğreniyoruz.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">01 — HTML Nedir?</div>
+    <h2>Tarayıcının Anladığı Dil</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li><b>HTML</b> (HyperText Markup Language), web sayfalarının <b>yapısını</b> tanımlayan bir işaretleme dilidir.</li>
+        <li>Bir programlama dili <b>değildir</b> — hesaplama yapmaz, sadece içeriği tarayıcıya "bu bir başlıktır", "bu bir paragraftır" diye tanıtır.</li>
+        <li>Tarayıcı (Chrome, Edge, Firefox...), HTML dosyasını okuyup ekranda görsel bir sayfaya dönüştürür.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">02 — Temel Mantık</div>
+    <h2>Etiket (Tag) Nedir?</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>HTML, <b>etiketler</b> ile çalışır — her etiket, içeriğe bir anlam yükler.</li>
+        <li>Etiketler <code class="inline">&lt;</code> ile başlar, <code class="inline">&gt;</code> ile biter.</li>
+        <li>Çoğu etiketin bir <b>açılış</b> ve bir <b>kapanış</b> etiketi vardır.</li>
+        <li>Bazı etiketlerin kapanışı yoktur — <b>kendi kendini kapatır</b> (örn. <code class="inline">&lt;meta&gt;</code>).</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;etiket&gt;</span>içerik<span class="tag">&lt;/etiket&gt;</span>
+
+<span class="cmt">// Kendi kendini kapatan örnek:</span>
+<span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">03 — İlk Satır</div>
+    <h2><code class="inline" style="font-size:0.75em">&lt;!DOCTYPE html&gt;</code></h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Her HTML dosyasının <b>ilk satırı</b> budur.</li>
+        <li>Tarayıcıya "bu belge modern HTML5 standardına göre yazıldı" der.</li>
+        <li>Bu satır olmadan, eski tarayıcılar sayfayı farklı (ve bazen hatalı) yorumlayabilir.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">04 — Belgenin Çerçevesi</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;html&gt;</code> Etiketi</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Tüm HTML içeriği <code class="inline">&lt;html&gt;</code> ile <code class="inline">&lt;/html&gt;</code> arasında yer alır.</li>
+        <li><code class="inline">lang="tr"</code> özniteliği, sayfanın dilini belirtir.</li>
+        <li>Bu, tarayıcı çeviri araçları ve ekran okuyucular için önemlidir — doğru telaffuz/çeviri için gereklidir.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"tr"</span><span class="tag">&gt;</span>
+  ...
+<span class="tag">&lt;/html&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">05 — İki Bölüm</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;head&gt;</code> ve <code class="inline" style="font-size:0.85em">&lt;body&gt;</code></h2>
+    <div class="compare">
+      <div class="card">
+        <h3>&lt;head&gt;</h3>
+        <p>Sayfa <b>hakkında bilgi</b> içerir — karakter kodlaması, başlık, meta veriler. Kullanıcı tarafından <b>görünmez</b>.</p>
+      </div>
+      <div class="card">
+        <h3>&lt;body&gt;</h3>
+        <p>Sayfanın <b>görünür içeriği</b> — başlıklar, paragraflar, görseller. Tarayıcıda ekranda görünen her şey burada.</p>
+      </div>
+    </div>
+    <div class="center-note">Bir eve benzetirsek: <code class="inline">head</code>, evin tapusu/kimlik bilgileri gibidir — ziyaretçi göremez. <code class="inline">body</code> ise evin içi — ziyaretçinin gerçekten gördüğü kısım.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">06 — Head İçeriği</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;meta charset&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Tarayıcıya, dosyanın hangi <b>karakter kodlamasıyla</b> yazıldığını söyler.</li>
+        <li><code class="inline">UTF-8</code>, Türkçe karakterler (ç, ğ, ı, ö, ş, ü) dahil, neredeyse tüm dilleri destekleyen evrensel standarttır.</li>
+        <li>Bu satır olmadan, Türkçe karakterler <b>bozuk</b> görünebilir.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">07 — Head İçeriği</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;meta name="viewport"&gt;</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Sayfanın <b>mobil cihazlarda</b> nasıl ölçekleneceğini belirler.</li>
+        <li><code class="inline">width=device-width</code> — sayfa genişliğini cihazın ekran genişliğine eşitler.</li>
+        <li>Bu satır olmadan, mobilde site "masaüstü boyutunda küçültülmüş" görünür — okunması zor olur.</li>
+        <li>Bu konuya CSS'te (responsive tasarım) tekrar döneceğiz.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span>
+  <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">08 — Head İçeriği</div>
+    <h2><code class="inline" style="font-size:0.85em">&lt;title&gt;</code> Etiketi</h2>
+    <div class="body-grid wide">
+      <div>
+        <ul class="points">
+          <li>İçeriği, tarayıcının <b>sekme/başlık çubuğunda</b> görünür.</li>
+          <li>Arama motorları, bu başlığı sonuçlarda gösterir — SEO açısından önemlidir.</li>
+        </ul>
+        <div class="panel-label" style="margin-top:20px">Kod</div>
+        <pre class="code-block"><span class="tag">&lt;title&gt;</span>Anadolu Teknik Lisesi<span class="tag">&lt;/title&gt;</span></pre>
+      </div>
+      <div>
+        <div class="panel-label">Tarayıcıda Görünümü</div>
+        <div class="browser-frame">
+          <div class="browser-chrome">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="tab">Anadolu Teknik Lisesi</span>
+          </div>
+          <iframe title="Canlı önizleme" srcdoc="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body style=&quot;margin:0;display:flex;align-items:center;justify-content:center;height:220px;color:#999;font-family:sans-serif;font-size:13px;&quot;&gt;body şu an boş — henüz içerik öğrenmedik&lt;/body&gt;&lt;/html&gt;"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">09 — Gerçek Proje Başlangıcı</div>
+    <h2>"Okulum" Projesi — İlk İskelet</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Bundan sonraki her bölümde bu sayfaya yeni bir şey ekleyeceğiz.</li>
+        <li>Şimdilik sadece <b>doğru, boş bir iskelet</b> kuruyoruz.</li>
+      </ul>
+      <pre class="code-block" style="margin-top:10px"><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"tr"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Anadolu Teknik Lisesi<span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></pre>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Özet</div>
+    <h2>Bugün Öğrendiklerimiz</h2>
+    <div class="summary-list">
+      <div class="row"><code class="inline">&lt;!DOCTYPE html&gt;</code><div class="desc">Belgenin HTML5 standardında olduğunu belirtir</div></div>
+      <div class="row"><code class="inline">&lt;html lang="tr"&gt;</code><div class="desc">Tüm içeriği kapsar, sayfanın dilini belirtir</div></div>
+      <div class="row"><code class="inline">&lt;head&gt;</code><div class="desc">Görünmez bilgiler: karakter kodlama, viewport, başlık</div></div>
+      <div class="row"><code class="inline">&lt;body&gt;</code><div class="desc">Sayfanın görünür içeriği</div></div>
+      <div class="row"><code class="inline">&lt;meta&gt; / &lt;title&gt;</code><div class="desc">Head içindeki temel etiketler</div></div>
+    </div>
+  </section>
+
+</div>
+
+<button class="nav-btn prev" id="prevBtn" aria-label="Önceki slayt">‹</button>
+<button class="nav-btn next" id="nextBtn" aria-label="Sonraki slayt">›</button>
+<div class="seekbar"><div class="seekbar-fill" id="seekFill"></div></div>
+<div class="counter" id="counter">1 / 10</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('seekFill').style.width = `${((current + 1) / total) * 100}%`;
+  }
+  function next() { if (current < total - 1) { current++; render(); } }
+  function prev() { if (current > 0) { current--; render(); } }
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  render();
+</script>
+
+</body>
+</html>

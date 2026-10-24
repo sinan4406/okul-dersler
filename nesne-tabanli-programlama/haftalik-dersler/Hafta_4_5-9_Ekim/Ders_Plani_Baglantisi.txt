@@ -1,0 +1,11 @@
+NTP 10 - 4. Hafta (5-9 Ekim)
+Konu: if, if-else, else if
+
+Ders plani (Claude Docs, cevrimici):
+https://claude.ai/artifact/9oJjRAzk8WdfBiJ13o89rU
+
+Sunumun cevrimici kopyasi:
+https://claude.ai/artifact/GZGVmnZBUnLPR6N14qidYs
+
+Sunum.html tek basina ve internetsiz calisir. Klasoru istediginiz yere tasiyabilirsiniz.
+Kisayollar: Sag/Sol ok = ileri/geri, N = ogretmen notu, F = tam ekran.

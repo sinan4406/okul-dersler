@@ -1,0 +1,19 @@
+<section id="satir" class="sl dark tight">
+<div class="hd"><p class="eb">Kod uzuyor! · Kaydırıcıyı oynat</p><h2 class="ttl">LED sayısı artınca kod kaç satır olur?</h2></div>
+<div class="row" style="gap:32px;align-items:flex-start">
+<div class="col" style="width:1020px;gap:18px">
+<div class="card dk" style="gap:14px;padding:22px 30px">
+<div class="row" style="align-items:center;gap:24px"><p style="font-size:30px;white-space:nowrap">LED sayısı:</p><input type="range" id="st-sl" min="1" max="12" value="5" aria-label="LED sayısı" style="flex:1;height:36px;accent-color:#FF9F5A"><b id="st-n" class="mono" style="font-size:56px;color:#F2CC60;min-width:90px;text-align:right">5</b></div>
+</div>
+<div class="card dk" style="gap:14px;padding:22px 30px">
+<div class="row" style="align-items:center;gap:20px"><p style="font-size:26px;width:330px">Her LED için ayrı satır</p><div style="flex:1;background:#0B121B;border-radius:10px;height:40px"><div id="st-b1" style="height:40px;border-radius:10px;background:#FF8A80;width:0;transition:width .25s"></div></div><b id="st-l1" class="mono" style="font-size:34px;color:#FF8A80;min-width:150px;text-align:right">15 satır</b></div>
+<div class="row" style="align-items:center;gap:20px"><p style="font-size:26px;width:330px">for döngüsüyle</p><div style="flex:1;background:#0B121B;border-radius:10px;height:40px"><div id="st-b2" style="height:40px;border-radius:10px;background:#9BE38B;width:0;transition:width .25s"></div></div><b id="st-l2" class="mono" style="font-size:34px;color:#9BE38B;min-width:150px;text-align:right">11 satır</b></div>
+<p style="font-size:22px;color:#93A3B8">Sayım: setup ve loop içindeki komut satırları; süslü parantez ve boş satırlar sayılmaz.</p>
+</div>
+<div class="row" style="gap:16px;align-items:flex-start"><button class="ans-btn" type="button">Soru: 12 LED (D2–D13) olsaydı?</button><div class="ans" hidden style="font-size:24px">Her LED için 3 satır: <b>12 × 3 = 36 satır</b>. for döngüsü ise yine <b>11 satır</b>; yalnızca koşulu <span class="mono">i &lt;= 13</span> yaparız.</div></div>
+</div>
+<div class="col f1" style="gap:12px"><p style="font-size:22px;letter-spacing:2px;text-transform:uppercase;color:#93A3B8">Uzun yöntemin başı</p>
+<div class="codebox" style="padding:16px 22px"><pre class="code" id="st-code" style="font-size:22px;line-height:1.45"></pre></div></div>
+</div>
+<aside>Kaydırıcıyı 5’e, 7’ye ve 12’ye getirin (Uno’da D2–D13 arası 12 pin LED’e uygundur). Uzun yöntemde her LED için üç satır gerekir: bir pinMode, bir “yak” satırı, bir “söndür” satırı (örn. kitap s.67’deki 5 LED kodu: 5 pinMode + 5 yak + 5 söndür = 15 komut satırı). for yönteminde sayı sabittir ve Örnek 4’ün kodundan gelir: int i; (1 satır) + setup içinde for ve pinMode (2 satır) + loop içinde iki for, her biri for satırı ve 3 komut (8 satır) = 11 satır. Süslü parantezler ve boş satırlar sayılmaz. Önemli mesaj: LED sayısı 5’i geçtikten sonra döngü kazanç sağlar, 12 LED’de fark çok büyüktür. Soruyu öğrencilere sorun: “12 LED olsaydı?” sonra cevabı açın. Bir sonraki slaytta for döngüsünün parçalarını öğreneceğiz.</aside>
+</section>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olaylar ve Fonksiyonlar — Hafta 15</title>
+<style>
+  :root {
+    --bg: #12141c; --bg-panel: #1b1e2a; --bg-code: #0d0f16;
+    --ink: #eef0f6; --ink-dim: #9298ab; --accent: #f2a154; --accent-dim: #7a5a34; --line: #2a2e3d;
+    --bad: #e08585; --good: #7fd99a;
+    --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  .deck { position: relative; height: 100vh; width: 100vw; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 6vh 9vw; opacity: 0; transition: opacity 0.25s ease; }
+  .slide.active { display: flex; opacity: 1; }
+  .kicker { font-size: clamp(13px, 1.4vw, 16px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 18px; }
+  h1 { font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; margin-bottom: 8px; }
+  h2 { font-size: clamp(24px, 3.4vw, 40px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; margin-bottom: 24px; max-width: 900px; }
+  .subtitle { font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-dim); max-width: 640px; margin-top: 10px; }
+  .body-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; max-width: 1220px; }
+  .body-grid.single { grid-template-columns: 1fr; max-width: 880px; }
+  .body-grid.wide { grid-template-columns: 1fr 1fr; max-width: 1240px; }
+  ul.points { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+  ul.points li { font-size: clamp(14.5px, 1.3vw, 17.5px); line-height: 1.5; color: var(--ink); padding-left: 24px; position: relative; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  ul.points li b { color: var(--accent); font-weight: 600; }
+  code.inline { font-family: var(--mono); background: var(--bg-code); padding: 2px 8px; border-radius: 5px; font-size: 0.86em; color: #f7c98a; border: 1px solid var(--line); }
+  pre.code-block { background: var(--bg-code); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; font-family: var(--mono); font-size: clamp(11.5px, 1vw, 14.5px); line-height: 1.6; overflow-x: auto; color: #d8dce8; }
+  pre.code-block .tag { color: #8ab4f8; } pre.code-block .attr { color: #f2a154; } pre.code-block .val { color: #a3d9a5; } pre.code-block .cmt { color: #6b7185; } pre.code-block .txt { color: #d8dce8; } pre.code-block .kw { color: #c792ea; } pre.code-block .fn { color: #82aaff; }
+  .panel-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; font-weight: 600; }
+  .center-note { background: var(--bg-panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 16px 20px; font-size: 14px; color: var(--ink-dim); max-width: 780px; margin-top: 18px; line-height: 1.6; }
+  .summary-list { display: flex; flex-direction: column; gap: 14px; max-width: 800px; }
+  .summary-list .row { display: grid; grid-template-columns: 210px 1fr; gap: 20px; align-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .summary-list .row:last-child { border-bottom: none; }
+  .summary-list .desc { color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; }
+  .compare .card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; }
+  .compare .card.bad { border-color: rgba(224,133,133,0.4); }
+  .compare .card.good { border-color: rgba(127,217,154,0.4); }
+  .compare .card h3 { font-size: 16px; margin-bottom: 10px; }
+  .compare .card.bad h3 { color: var(--bad); } .compare .card.good h3 { color: var(--good); }
+  .compare .card:not(.bad):not(.good) h3 { color: var(--accent); }
+  .compare .card p { font-size: 13.5px; color: var(--ink-dim); line-height: 1.6; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
+  .badge.bad { background: rgba(224,133,133,0.15); color: var(--bad); }
+  .badge.good { background: rgba(127,217,154,0.15); color: var(--good); }
+  .seekbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--line); z-index: 20; }
+  .seekbar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; position: relative; }
+  .seekbar-fill::after { content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(242,161,84,0.18); }
+  .counter { position: fixed; bottom: 18px; right: 28px; font-size: 13px; color: var(--ink-dim); font-family: var(--mono); z-index: 20; }
+  .logo { position: fixed; left: 22px; top: 18px; font-size: 12px; color: var(--ink-dim); letter-spacing: 0.06em; z-index: 20; }
+  .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: var(--bg-panel); border: 1px solid var(--line); color: var(--ink); font-size: 18px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: var(--accent-dim); }
+  .nav-btn.prev { left: 20px; } .nav-btn.next { right: 20px; }
+  @media (max-width: 820px) { .body-grid, .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="logo">WEB TABANLI UYGULAMA GELİŞTİRME · Javascript Ünitesi · Hafta 15</div>
+<div class="deck" id="deck">
+
+  <section class="slide active">
+    <div class="kicker">Javascript — Bölüm 2</div>
+    <h1>Olaylar ve<br>Fonksiyonlar</h1>
+    <p class="subtitle">Sayfalarımızın kullanıcıya <b>tepki vermesini</b> sağlıyoruz — bir tıklama, bir form gönderimi artık bir şey "yapacak".</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">01 — Tekrar Eden İşler</div>
+    <h2>Fonksiyon (Function) Nedir?</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Fonksiyon, belirli bir işi yapan, <b>isimlendirilmiş, tekrar kullanılabilir</b> bir kod bloğudur.</li>
+        <li>Benzetme: Bir yemek <b>tarifi</b> gibidir — malzemeleri (parametre) verirsiniz, tarif işlemi yapar, sonucu (return) size verir.</li>
+        <li>Aynı işlemi 5 yerde tekrar tekrar yazmak yerine, bir kere fonksiyon olarak yazıp <b>5 yerde çağırırız</b>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">02 — Söz Dizimi</div>
+    <h2>Fonksiyon Tanımlama</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">function</code> anahtar kelimesi + fonksiyon adı + parantez içinde parametreler.</li>
+        <li>Fonksiyon çağrılmadan (ismiyle + parantezle kullanılmadan) <b>hiçbir şey çalışmaz</b> — sadece tanımlanmış olur.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="kw">function</span> <span class="fn">selamVer</span>(isim) {
+  <span class="fn">console</span>.log(`Merhaba, ${isim}!`);
+}
+
+<span class="cmt">// Çağırmadan hiçbir şey olmaz:</span>
+<span class="fn">selamVer</span>(<span class="val">"Ahmet"</span>);  <span class="cmt">// "Merhaba, Ahmet!"</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">03 — Sık Karışan İkili</div>
+    <h2>Parametre mi, Argüman mı?</h2>
+    <div class="compare">
+      <div class="card">
+        <h3>Parametre</h3>
+        <p>Fonksiyon <b>tanımlanırken</b> parantez içine yazılan, "yer tutucu" isimdir: <code class="inline">function selamVer(isim)</code> — <code class="inline">isim</code> bir parametredir.</p>
+      </div>
+      <div class="card">
+        <h3>Argüman</h3>
+        <p>Fonksiyon <b>çağrılırken</b> gerçekten gönderilen değerdir: <code class="inline">selamVer("Ahmet")</code> — <code class="inline">"Ahmet"</code> bir argümandır.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">04 — Sonucu Geri Vermek</div>
+    <h2><code class="inline" style="font-size:0.75em">return</code> Anahtar Kelimesi</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">return</code>, fonksiyonun bir <b>sonuç değeri</b> üretmesini sağlar — bu değer bir değişkene atanabilir.</li>
+        <li><code class="inline">return</code> çalıştığı an fonksiyon <b>durur</b>, sonrasındaki satırlar çalışmaz.</li>
+        <li><code class="inline">return</code> yoksa fonksiyon <code class="inline">undefined</code> döndürür.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="kw">function</span> <span class="fn">topla</span>(a, b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="kw">const</span> sonuc = <span class="fn">topla</span>(5, 8);
+<span class="fn">console</span>.log(sonuc);  <span class="cmt">// 13</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">05 — Kod Karşılaştırma</div>
+    <h2>Ok (Arrow) Fonksiyonlar</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">KLASİK YAZIM</div>
+        <h3>function anahtar kelimesiyle</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">function</span> <span class="fn">topla</span>(a, b) {
+  <span class="kw">return</span> a + b;
+}</pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">MODERN — ARROW</div>
+        <h3>Daha kısa, yaygın kullanılıyor</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">const</span> <span class="fn">topla</span> = (a, b) =&gt; {
+  <span class="kw">return</span> a + b;
+};</pre>
+      </div>
+    </div>
+    <div class="center-note">Ok fonksiyonlar, özellikle olay dinleyicisi (event listener) içinde kısa fonksiyonlar yazarken çok kullanılır — birazdan göreceğiz.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">06 — Sayfayı Canlandırmak</div>
+    <h2>Olay (Event) Nedir?</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Olay, kullanıcının sayfada yaptığı bir <b>eylemdir</b>: tıklama (<code class="inline">click</code>), form gönderme (<code class="inline">submit</code>), fare üzerine gelme (<code class="inline">mouseover</code>), tuşa basma (<code class="inline">keydown</code>).</li>
+        <li>Tarayıcı bu olayları sürekli "dinler"; biz de "bu olay olduğunda şunu yap" diyerek JS ile tepki tanımlarız.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">07 — Kod Karşılaştırma</div>
+    <h2>Olay Dinleme — Eski / Yeni</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">SATIR İÇİ — kaçının</div>
+        <h3>HTML ve JS karışık</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="tag">&lt;button</span> <span class="attr">onclick</span>=<span class="val">"alert('Merhaba')"</span><span class="tag">&gt;</span>
+  Tıkla
+<span class="tag">&lt;/button&gt;</span></pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">addEventListener — modern</div>
+        <h3>HTML ve JS ayrı, temiz</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">const</span> btn = document.querySelector(<span class="val">"button"</span>);
+btn.addEventListener(<span class="val">"click"</span>, () =&gt; {
+  alert(<span class="val">"Merhaba"</span>);
+});</pre>
+      </div>
+    </div>
+    <div class="center-note">Bir elemana <code class="inline">addEventListener</code> ile <b>birden fazla</b> dinleyici eklenebilir — <code class="inline">onclick</code> ile sadece bir tane atanabilir, üzerine yazılırsa öncekini siler.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">08 — Canlı Kanıt — Bozuk Buton</div>
+    <h2>"Butonum Neden Çalışmıyor?"</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">SCRIPT head İÇİNDE</div>
+        <h3>Buton henüz oluşmamış</h3>
+        <pre class="code-block" style="margin-top:8px">&lt;head&gt;
+  <span class="tag">&lt;script&gt;</span>
+    <span class="kw">const</span> btn = document.querySelector(<span class="val">"#btn"</span>);
+    btn.addEventListener(...);
+    <span class="cmt">// HATA: btn null!</span>
+  <span class="tag">&lt;/script&gt;</span>
+&lt;/head&gt;
+&lt;body&gt;&lt;button id="btn"&gt;...&lt;/button&gt;&lt;/body&gt;</pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">SCRIPT body SONUNDA</div>
+        <h3>Buton zaten hazır</h3>
+        <pre class="code-block" style="margin-top:8px">&lt;body&gt;
+  &lt;button id="btn"&gt;...&lt;/button&gt;
+
+  <span class="tag">&lt;script&gt;</span>
+    <span class="kw">const</span> btn = document.querySelector(<span class="val">"#btn"</span>);
+    btn.addEventListener(...);
+    <span class="cmt">// Çalışıyor!</span>
+  <span class="tag">&lt;/script&gt;</span>
+&lt;/body&gt;</pre>
+      </div>
+    </div>
+    <div class="center-note">Birazdan örnek uygulamada bu hatayı <code class="inline">buton-calismiyor.html</code> ile canlı olarak konsolda göreceğiz: <code class="inline">Cannot read properties of null</code>.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">09 — Olay Nesnesi</div>
+    <h2><code class="inline" style="font-size:0.7em">event.target</code> ve <code class="inline" style="font-size:0.7em">e.preventDefault()</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Olay dinleyicisi fonksiyonuna otomatik olarak bir <b>olay nesnesi</b> (genelde <code class="inline">e</code> veya <code class="inline">event</code> adıyla) gelir.</li>
+        <li><code class="inline">e.target</code>, olayın gerçekleştiği HTML elemanını verir.</li>
+        <li><code class="inline">e.preventDefault()</code>, tarayıcının o olay için yapacağı <b>varsayılan davranışı durdurur</b> — form gönderiminde sayfanın yeniden yüklenmesini engellemek için kritik.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block">form.addEventListener(<span class="val">"submit"</span>, (e) =&gt; {
+  e.preventDefault();  <span class="cmt">// sayfa yenilenmesin</span>
+  <span class="fn">console</span>.log(<span class="val">"Form gönderildi!"</span>);
+});</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">10 — Kısa Bir Not</div>
+    <h2>Olay Kabarması (Event Bubbling)</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Bir elemanda tetiklenen olay, o elemanı saran <b>üst elemanlara doğru "kabarır"</b> (yayılır).</li>
+        <li>Örnek: Bir butona tıklarsanız, önce butonun kendi <code class="inline">click</code> olayı, ardından onu saran <code class="inline">&lt;div&gt;</code>'in <code class="inline">click</code> olayı da (varsa) tetiklenir.</li>
+        <li>Şimdilik sadece farkında olmamız yeterli — ileri seviye JS derslerinde derinleşecek bir konu.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">11 — Gerçek Proje</div>
+    <h2>"Okulum" İletişim Formuna Olay Ekleme</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Kendi yazdığımız <code class="inline">geriBildirimGoster()</code> fonksiyonu, form gönderildiğinde kullanıcıya mesaj gösterir.</li>
+        <li><code class="inline">submit</code> olayına dinleyici ekliyoruz, <code class="inline">e.preventDefault()</code> ile sayfanın yenilenmesini engelliyoruz.</li>
+      </ul>
+      <pre class="code-block" style="margin-top:10px"><span class="kw">const</span> iletisimFormu = document.querySelector(<span class="val">"#iletisim-formu"</span>);
+
+<span class="kw">if</span> (iletisimFormu) {
+  iletisimFormu.addEventListener(<span class="val">"submit"</span>, (e) =&gt; {
+    e.preventDefault();
+    geriBildirimGoster(kutu, <span class="val">"basarili"</span>, <span class="val">"Mesajınız alındı!"</span>);
+  });
+}</pre>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Özet</div>
+    <h2>Bugün Öğrendiklerimiz</h2>
+    <div class="summary-list">
+      <div class="row"><code class="inline">function</code> / arrow <code class="inline">=&gt;</code><div class="desc">Fonksiyon tanımlama iki yöntemi</div></div>
+      <div class="row">parametre / argüman<div class="desc">Tanımdaki yer tutucu / çağrıdaki gerçek değer</div></div>
+      <div class="row"><code class="inline">return</code><div class="desc">Fonksiyonun sonucunu geri verir</div></div>
+      <div class="row"><code class="inline">addEventListener()</code><div class="desc">Olay dinleyicisi ekler — onclick yerine tercih edilir</div></div>
+      <div class="row"><code class="inline">e.preventDefault()</code><div class="desc">Formun varsayılan gönderim/yenileme davranışını durdurur</div></div>
+      <div class="row">script konumu<div class="desc">body sonunda olmalı, aksi hâlde null hatası alınır</div></div>
+    </div>
+  </section>
+
+</div>
+
+<button class="nav-btn prev" id="prevBtn" aria-label="Önceki slayt">‹</button>
+<button class="nav-btn next" id="nextBtn" aria-label="Sonraki slayt">›</button>
+<div class="seekbar"><div class="seekbar-fill" id="seekFill"></div></div>
+<div class="counter" id="counter">1 / 13</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('seekFill').style.width = `${((current + 1) / total) * 100}%`;
+  }
+  function next() { if (current < total - 1) { current++; render(); } }
+  function prev() { if (current > 0) { current--; render(); } }
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  render();
+</script>
+
+</body>
+</html>

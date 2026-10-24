@@ -1,0 +1,11 @@
+NTP 10 - 3. Hafta (28Eylul-2Ekim)
+Konu: Aritmetik operatorler, islem onceligi
+
+Ders plani (Claude Docs, cevrimici):
+https://claude.ai/artifact/1U7SXHUeCEAhpMVQWVvUr6
+
+Sunumun cevrimici kopyasi:
+https://claude.ai/artifact/8Q4L8xbbQxZPfYiyc6WaSj
+
+Sunum.html tek basina ve internetsiz calisir. Klasoru istediginiz yere tasiyabilirsiniz.
+Kisayollar: Sag/Sol ok = ileri/geri, N = ogretmen notu, F = tam ekran.

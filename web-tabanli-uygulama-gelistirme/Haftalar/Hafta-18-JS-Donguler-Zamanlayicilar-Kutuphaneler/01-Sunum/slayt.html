@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Döngüler, Zamanlayıcılar ve Kütüphaneler — Hafta 18</title>
+<style>
+  :root {
+    --bg: #12141c; --bg-panel: #1b1e2a; --bg-code: #0d0f16;
+    --ink: #eef0f6; --ink-dim: #9298ab; --accent: #f2a154; --accent-dim: #7a5a34; --line: #2a2e3d;
+    --bad: #e08585; --good: #7fd99a;
+    --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  .deck { position: relative; height: 100vh; width: 100vw; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 6vh 9vw; opacity: 0; transition: opacity 0.25s ease; }
+  .slide.active { display: flex; opacity: 1; }
+  .kicker { font-size: clamp(13px, 1.4vw, 16px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 18px; }
+  h1 { font-size: clamp(32px, 4.6vw, 54px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; margin-bottom: 8px; }
+  h2 { font-size: clamp(23px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; margin-bottom: 22px; max-width: 900px; }
+  .subtitle { font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-dim); max-width: 660px; margin-top: 10px; }
+  .body-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; max-width: 1220px; }
+  .body-grid.single { grid-template-columns: 1fr; max-width: 880px; }
+  .body-grid.wide { grid-template-columns: 1fr 1fr; max-width: 1240px; }
+  ul.points { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  ul.points li { font-size: clamp(14px, 1.25vw, 17px); line-height: 1.5; color: var(--ink); padding-left: 24px; position: relative; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  ul.points li b { color: var(--accent); font-weight: 600; }
+  code.inline { font-family: var(--mono); background: var(--bg-code); padding: 2px 8px; border-radius: 5px; font-size: 0.86em; color: #f7c98a; border: 1px solid var(--line); }
+  pre.code-block { background: var(--bg-code); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; font-family: var(--mono); font-size: clamp(11px, 0.95vw, 14px); line-height: 1.55; overflow-x: auto; color: #d8dce8; }
+  pre.code-block .kw { color: #c792ea; } pre.code-block .fn { color: #8ab4f8; } pre.code-block .str { color: #a3d9a5; } pre.code-block .num { color: #f2a154; } pre.code-block .cmt { color: #6b7185; } pre.code-block .txt { color: #d8dce8; }
+  .panel-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; font-weight: 600; }
+  .center-note { background: var(--bg-panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 15px 20px; font-size: 13.5px; color: var(--ink-dim); max-width: 800px; margin-top: 16px; line-height: 1.6; }
+  .center-note.warn { border-left-color: var(--bad); }
+  .summary-list { display: flex; flex-direction: column; gap: 13px; max-width: 820px; }
+  .summary-list .row { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; padding-bottom: 11px; border-bottom: 1px solid var(--line); }
+  .summary-list .row:last-child { border-bottom: none; }
+  .summary-list .desc { color: var(--ink-dim); font-size: 13.5px; line-height: 1.5; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 1100px; }
+  .compare.three { grid-template-columns: 1fr 1fr 1fr; max-width: 1200px; }
+  .compare .card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+  .compare .card.bad { border-color: rgba(224,133,133,0.4); }
+  .compare .card.good { border-color: rgba(127,217,154,0.4); }
+  .compare .card h3 { font-size: 15.5px; margin-bottom: 9px; }
+  .compare .card.bad h3 { color: var(--bad); } .compare .card.good h3 { color: var(--good); }
+  .compare .card:not(.bad):not(.good) h3 { color: var(--accent); }
+  .compare .card p { font-size: 13px; color: var(--ink-dim); line-height: 1.6; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
+  .badge.bad { background: rgba(224,133,133,0.15); color: var(--bad); }
+  .badge.good { background: rgba(127,217,154,0.15); color: var(--good); }
+  .anatomy { display: flex; gap: 8px; flex-wrap: wrap; font-family: var(--mono); font-size: clamp(13px,1.3vw,18px); margin: 20px 0; }
+  .anatomy span { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); }
+  .anatomy .p1 { background: rgba(138,180,248,0.15); color: #8ab4f8; }
+  .anatomy .p2 { background: rgba(242,161,84,0.15); color: var(--accent); }
+  .anatomy .p3 { background: rgba(127,217,154,0.15); color: var(--good); }
+  .anatomy-labels { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-dim); margin-top: -8px; }
+  .anatomy-labels span { padding: 2px 10px; }
+  .seekbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--line); z-index: 20; }
+  .seekbar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; position: relative; }
+  .seekbar-fill::after { content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(242,161,84,0.18); }
+  .counter { position: fixed; bottom: 18px; right: 28px; font-size: 13px; color: var(--ink-dim); font-family: var(--mono); z-index: 20; }
+  .logo { position: fixed; left: 22px; top: 18px; font-size: 12px; color: var(--ink-dim); letter-spacing: 0.06em; z-index: 20; }
+  .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: var(--bg-panel); border: 1px solid var(--line); color: var(--ink); font-size: 18px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: var(--accent-dim); }
+  .nav-btn.prev { left: 20px; } .nav-btn.next { right: 20px; }
+  @media (max-width: 820px) { .body-grid, .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="logo">WEB TABANLI UYGULAMA GELİŞTİRME · Javascript Ünitesi · Hafta 18</div>
+<div class="deck" id="deck">
+
+  <section class="slide active">
+    <div class="kicker">Javascript — Bölüm 5 · Ünite Kapanışı</div>
+    <h1>Döngüler, Zamanlayıcılar<br>ve Popüler Kütüphaneler</h1>
+    <p class="subtitle">Javascript ünitesinin son haftası — tekrar eden işleri otomatikleştiriyor, zamana yayılmış işlemler kuruyor ve günümüz front-end dünyasına genel bir bakış atıyoruz.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">01 — Tekrar Eden İşler</div>
+    <h2>Döngü Nedir?</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Aynı kod bloğunu, bir koşul sağlandığı sürece <b>tekrar tekrar</b> çalıştırmamızı sağlar.</li>
+        <li>Hafta 17'de dizi elemanlarını gezerken zaten döngü kullanmıştık — bugün döngülerin kendisine, farklı türlerine ve nasıl "tuzağa" dönüşebileceğine odaklanıyoruz.</li>
+        <li>Günlük hayat benzetmesi: "Sınıftaki her öğrenciye tek tek yoklama sorusu sormak" bir döngüdür — her öğrenci için AYNI işlemi (soruyu sormak) tekrarlarsınız.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">02 — Anatomi</div>
+    <h2><code class="inline" style="font-size:0.7em">for</code> Döngüsünün 3 Parçası</h2>
+    <div class="anatomy">
+      <span class="p1">let i = 0</span><span>;</span><span class="p2">i &lt; 5</span><span>;</span><span class="p3">i++</span>
+    </div>
+    <div class="anatomy-labels">
+      <span style="color:#8ab4f8">① Başlangıç değeri</span>
+      <span style="color:var(--accent)">② Devam koşulu</span>
+      <span style="color:var(--good)">③ Artırım</span>
+    </div>
+    <div class="center-note">Bu üç parçadan biri eksik veya yanlış yazılırsa döngü ya <b>hiç çalışmaz</b> ya da <b>sonsuza kadar</b> çalışır — birazdan bunu göreceğiz (slayt 5).</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">03 — Alternatif</div>
+    <h2><code class="inline" style="font-size:0.7em">while</code> Döngüsü</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Kaç kez tekrarlanacağı <b>önceden bilinmediğinde</b> tercih edilir.</li>
+        <li>Koşul, döngü başında kontrol edilir — koşul yanlışsa döngü hiç çalışmaz.</li>
+        <li>Artırım işlemini <b>siz elle</b> yazmalısınız — unutursanız sonsuz döngü olur!</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="kw">let</span> sayac = 0;
+<span class="kw">while</span> (sayac < 5) {
+  console.log(sayac);
+  sayac++; <span class="cmt">// bunu unutmayın!</span>
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">04 — Ne Zaman Hangisi?</div>
+    <h2><code class="inline" style="font-size:0.7em">for</code> vs <code class="inline" style="font-size:0.7em">while</code></h2>
+    <div class="compare">
+      <div class="card">
+        <h3>for</h3>
+        <p>Kaç kez tekrarlanacağı <b>bilindiğinde</b> (örn. bir dizinin tüm elemanlarını gezmek, "10 kere tekrarla").</p>
+      </div>
+      <div class="card">
+        <h3>while</h3>
+        <p>Tekrar sayısı <b>belirsiz</b>, bir koşula bağlı olduğunda (örn. "kullanıcı doğru şifreyi girene kadar sor").</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">05 — DİKKAT — Sadece İnceleyin, Çalıştırmayın</div>
+    <h2>Sonsuz Döngü Tuzağı</h2>
+    <div class="compare">
+      <div class="card bad">
+        <div class="badge bad">ÇALIŞTIRMAYIN!</div>
+        <h3>Artırım eksik</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">let</span> i = 0;
+<span class="kw">while</span> (i < 5) {
+  console.log(i);
+  <span class="cmt">// i++ satırı unutulmuş!</span>
+}</pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">DOĞRU</div>
+        <h3>Artırım var</h3>
+        <pre class="code-block" style="margin-top:8px"><span class="kw">let</span> i = 0;
+<span class="kw">while</span> (i < 5) {
+  console.log(i);
+  i++;
+}</pre>
+      </div>
+    </div>
+    <div class="center-note warn"><b>Neden tehlikeli?</b> Soldaki kodda <code class="inline">i</code> hiç değişmediği için koşul (<code class="inline">i &lt; 5</code>) SONSUZA kadar doğru kalır — tarayıcı sekmesi kilitlenir, hatta çökebilir. Bu yüzden birazdan yapacağımız uygulamada bu kodu <b>çalıştırmadan, sadece okuyarak</b> hatayı bulacağız.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">06 — Hafta 17 Bağlantısı</div>
+    <h2><code class="inline" style="font-size:0.7em">for...of</code> ile Dizi Gezme</h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Bir dizinin elemanlarını, index ile uğraşmadan gezmenin bir başka yolu.</li>
+        <li>Hafta 17'de gördüğümüz <code class="inline">forEach()</code>'e çok benzer bir okunabilirlik sağlar.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="kw">const</span> bolumler = [<span class="str">"Bilişim"</span>, <span class="str">"Elektrik"</span>, <span class="str">"Makine"</span>];
+
+<span class="kw">for</span> (<span class="kw">const</span> bolum <span class="kw">of</span> bolumler) {
+  console.log(bolum);
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">07 — Yeni Konu</div>
+    <h2>Zamanlayıcı (Timer) Neden Gerekli?</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Bazı işlemlerin <b>hemen değil, biraz sonra</b> gerçekleşmesini isteriz (örn. bir bildirimin 3 saniye sonra kaybolması).</li>
+        <li>Bazı işlemlerin ise <b>düzenli aralıklarla tekrar tekrar</b> gerçekleşmesini isteriz (örn. bir saatin her saniye güncellenmesi).</li>
+        <li>JavaScript bu iki ihtiyaç için iki farklı araç sunar: <code class="inline">setTimeout</code> ve <code class="inline">setInterval</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">08 — Bir Kere, Gecikmeli</div>
+    <h2><code class="inline" style="font-size:0.7em">setTimeout()</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Verilen süre (milisaniye cinsinden) sonra, belirtilen kodu <b>bir kez</b> çalıştırır.</li>
+        <li>1000 milisaniye = 1 saniye.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block">setTimeout(<span class="kw">function</span>() {
+  console.log(<span class="str">"3 saniye geçti!"</span>);
+}, 3000);</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">09 — Tekrar Tekrar</div>
+    <h2><code class="inline" style="font-size:0.7em">setInterval()</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li>Verilen süre aralığıyla, belirtilen kodu <b>sürekli tekrar</b> çalıştırır — durdurulana kadar durmaz.</li>
+        <li>Canlı saat, kayan duyuru yazısı, otomatik slayt geçişi gibi özellikler bununla yapılır.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block">setInterval(<span class="kw">function</span>() {
+  console.log(<span class="str">"Her 1 saniyede bir çalışır"</span>);
+}, 1000);</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">10 — Kod Karşılaştırma</div>
+    <h2><code class="inline" style="font-size:0.65em">setTimeout</code> vs <code class="inline" style="font-size:0.65em">setInterval</code></h2>
+    <div class="compare">
+      <div class="card">
+        <h3>setTimeout — TEK SEFERLİK</h3>
+        <pre class="code-block" style="margin-top:8px">setTimeout(<span class="kw">function</span>() {
+  bildirim.style.display = <span class="str">"none"</span>;
+}, 3000);
+<span class="cmt">// 3 sn sonra 1 kez çalışır, biter</span></pre>
+      </div>
+      <div class="card">
+        <h3>setInterval — SÜREKLİ</h3>
+        <pre class="code-block" style="margin-top:8px">setInterval(<span class="kw">function</span>() {
+  saat.textContent = <span class="kw">new</span> Date().toLocaleTimeString();
+}, 1000);
+<span class="cmt">// her 1 sn'de bir, DURMADAN çalışır</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">11 — Unutulmaması Gereken</div>
+    <h2>Durdurmayı Unutmayın: <code class="inline" style="font-size:0.6em">clearInterval()</code></h2>
+    <div class="body-grid">
+      <ul class="points">
+        <li><code class="inline">setInterval()</code>, durdurulmadığı sürece sayfa açık olduğu her saniye çalışmaya devam eder — bu, gereksiz kaynak tüketimine (performans sorununa) yol açabilir.</li>
+        <li>Durdurmak için, başlatırken döndürülen kimliği bir değişkende saklamalıyız.</li>
+      </ul>
+      <div>
+        <div class="panel-label">Kod</div>
+        <pre class="code-block"><span class="kw">const</span> zamanlayiciId = setInterval(<span class="kw">function</span>() {
+  console.log(<span class="str">"tik"</span>);
+}, 1000);
+
+<span class="cmt">// bir düğmeye tıklanınca durdurmak için:</span>
+clearInterval(zamanlayiciId);</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">12 — Genel Bakış</div>
+    <h2>Neden "Kütüphane" Kullanırız?</h2>
+    <div class="body-grid single">
+      <ul class="points">
+        <li>Bir JS kütüphanesi, sık karşılaşılan işlemleri (DOM seçme, animasyon, sunucuyla veri alışverişi) sizin için <b>hazır fonksiyonlar</b> hâlinde sunar.</li>
+        <li>Amaç: aynı işi her projede sıfırdan yazmak yerine, test edilmiş, topluluk tarafından bakımı yapılan hazır araçları kullanmak.</li>
+        <li>Bu derste kütüphaneleri <b>kullanmayacağız</b> — sadece isimlerini ve ne işe yaradıklarını tanıyacağız, çünkü staj/iş hayatında mutlaka karşınıza çıkacaklar.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">13 — Tarihsel Bakış</div>
+    <h2>jQuery — Eskiden Çok Popülerdi</h2>
+    <div class="compare">
+      <div class="card">
+        <div class="badge" style="background:rgba(138,180,248,0.15); color:#8ab4f8">2006-2015 CİVARI YAYGIN</div>
+        <h3>jQuery ile</h3>
+        <pre class="code-block" style="margin-top:8px">$(<span class="str">"#baslik"</span>).text(<span class="str">"Merhaba"</span>);</pre>
+      </div>
+      <div class="card good">
+        <div class="badge good">GÜNÜMÜZ — Vanilla JS</div>
+        <h3>Modern JS ile (öğrendiğimiz)</h3>
+        <pre class="code-block" style="margin-top:8px">document.querySelector(<span class="str">"#baslik"</span>)
+  .textContent = <span class="str">"Merhaba"</span>;</pre>
+      </div>
+    </div>
+    <div class="center-note">O dönem tarayıcılar arası farklar çoktu, jQuery bu farkları gizliyordu. Günümüzde modern tarayıcılar çok daha standart olduğu için "sade/vanilla" JS çoğu zaman yeterli — bu derste öğrendiğimiz de budur.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">14 — Günümüz Ekosistemi</div>
+    <h2>React · Vue · Angular (Farkındalık Amaçlı)</h2>
+    <div class="compare three">
+      <div class="card">
+        <h3>React</h3>
+        <p>Meta (Facebook) tarafından geliştirildi. Bileşen (component) tabanlı, günümüzde en yaygın kullanılan front-end kütüphanesi.</p>
+      </div>
+      <div class="card">
+        <h3>Vue</h3>
+        <p>Öğrenmesi görece kolay kabul edilir, HTML'e yakın bir söz dizimi sunar; orta/küçük ölçekli projelerde tercih edilir.</p>
+      </div>
+      <div class="card">
+        <h3>Angular</h3>
+        <p>Google tarafından geliştirildi, büyük kurumsal projelerde tercih edilen, daha kapsamlı bir framework'tür.</p>
+      </div>
+    </div>
+    <div class="center-note">Bu derste bu araçları KULLANMIYORUZ — bugün öğrendiğimiz "sade JavaScript" (vanilla JS), bu kütüphanelerin de temelini oluşturur. Onları anlamadan bunları öğrenmek, temelsiz bina inşa etmek gibidir.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">15 — Gerçek Proje — Kapanış</div>
+    <h2>"Okulum" — Canlı Saat ve Otomatik Kaybolan Bildirim</h2>
+    <div class="body-grid">
+      <div>
+        <div class="panel-label">setInterval — Canlı Saat</div>
+        <pre class="code-block"><span class="kw">function</span> saatiGuncelle() {
+  saatElemani.textContent =
+    <span class="kw">new</span> Date().toLocaleTimeString(<span class="str">"tr-TR"</span>);
+}
+setInterval(saatiGuncelle, 1000);</pre>
+      </div>
+      <div>
+        <div class="panel-label">setTimeout — Bildirim Otomatik Kaybolsun</div>
+        <pre class="code-block">bildirim.textContent = <span class="str">"Mesajınız alındı"</span>;
+setTimeout(<span class="kw">function</span>() {
+  bildirim.textContent = <span class="str">""</span>;
+}, 4000);</pre>
+      </div>
+    </div>
+    <div class="center-note">Bu, Hafta 3'ten beri büyüttüğümüz Okulum projesinin bu dönem için <b>son eklentisidir</b> — proje artık kendi başlığına, listesine, formuna ve şimdi de canlı/zamanlı davranışlarına sahip, çalışan küçük bir web sitesi.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Genel Bakış</div>
+    <h2>Hafta 3'ten Buraya — Neler Öğrendik?</h2>
+    <div class="summary-list">
+      <div class="row"><b>HTML5</b> (Hafta 3-8)<div class="desc">Sayfanın iskeleti ve içeriği — etiketler, öznitelikler, semantik yapı, formlar</div></div>
+      <div class="row"><b>CSS</b> (Hafta 9-13)<div class="desc">Sayfanın görünümü — seçiciler, kutu modeli, renk/tipografi, duyarlı tasarım</div></div>
+      <div class="row"><b>Javascript</b> (Hafta 14-18)<div class="desc">Sayfanın davranışı — değişkenler, olaylar, kontrol yapıları, diziler, döngüler/zamanlayıcılar</div></div>
+    </div>
+    <div class="center-note">Bu üçü birlikte, günümüz web sitelerinin <b>front-end (istemci tarafı)</b> kısmını oluşturur. Önümüzdeki haftalarda (Hafta 19'dan itibaren) sunucu tarafına (.NET Core ile back-end) geçiyoruz — front-end'de öğrendiğimiz HTML sayfalarını artık sunucudan dinamik olarak üreteceğiz.</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Özet</div>
+    <h2>Bugün Öğrendiklerimiz</h2>
+    <div class="summary-list">
+      <div class="row"><code class="inline">for / while</code><div class="desc">Tekrar eden işler — for: bilinen sayıda, while: koşula bağlı</div></div>
+      <div class="row">Sonsuz döngü tuzağı<div class="desc">Artırım/koşul eksikse döngü hiç durmaz — daima koddan kontrol edin</div></div>
+      <div class="row"><code class="inline">setTimeout()</code><div class="desc">Belirli süre sonra, BİR KEZ çalıştırır</div></div>
+      <div class="row"><code class="inline">setInterval() / clearInterval()</code><div class="desc">Belirli aralıkla tekrar tekrar çalıştırır / durdurur</div></div>
+      <div class="row">jQuery / React / Vue / Angular<div class="desc">Farkındalık düzeyinde tanıdığımız popüler JS kütüphaneleri</div></div>
+    </div>
+  </section>
+
+</div>
+
+<button class="nav-btn prev" id="prevBtn" aria-label="Önceki slayt">‹</button>
+<button class="nav-btn next" id="nextBtn" aria-label="Sonraki slayt">›</button>
+<div class="seekbar"><div class="seekbar-fill" id="seekFill"></div></div>
+<div class="counter" id="counter">1 / 18</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('seekFill').style.width = `${((current + 1) / total) * 100}%`;
+  }
+  function next() { if (current < total - 1) { current++; render(); } }
+  function prev() { if (current > 0) { current--; render(); } }
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  render();
+</script>
+
+</body>
+</html>

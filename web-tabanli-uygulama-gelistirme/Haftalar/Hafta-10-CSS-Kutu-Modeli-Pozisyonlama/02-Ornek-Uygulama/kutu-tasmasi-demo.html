@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neden Kutularım Taşıyor?</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 16px; }
+
+    .cerceve {
+      width: 300px;
+      border: 2px dashed #888;
+      margin-bottom: 30px;
+      padding: 10px;
+    }
+
+    /* ESKİ DAVRANIŞ: box-sizing belirtilmemiş, tarayıcı varsayılanı "content-box" kullanılıyor.
+       width: 280px SADECE içeriğe uygulanır; padding ve border bunun ÜZERİNE eklenir.
+       Gerçek toplam genişlik = 280 + (20*2 padding) + (4*2 border) = 328px -> çerçeveyi (300px) taşar! */
+    .kutu-eski {
+      width: 280px;
+      padding: 20px;
+      border: 4px solid #c62828;
+      background: #ffebee;
+    }
+
+    /* YENİ DAVRANIŞ: box-sizing: border-box ile width artık padding+border'ı DA içine alır.
+       Gerçek toplam genişlik = tam olarak 280px -> çerçevenin içinde kalır. */
+    .kutu-yeni {
+      box-sizing: border-box;
+      width: 280px;
+      padding: 20px;
+      border: 4px solid #2e7d32;
+      background: #e8f5e9;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Neden Kutularım Hizalanmıyor / Taşıyor?</h1>
+  <p>Her iki kutuya da <code>width: 280px</code> verdik ve ikisi de aynı 300px'lik kesikli çerçevenin
+  içine konuldu. Ama sonuç çok farklı:</p>
+
+  <div class="cerceve">
+    <div class="kutu-eski">box-sizing YOK (content-box) — çerçeveden taşıyor!</div>
+  </div>
+
+  <div class="cerceve">
+    <div class="kutu-yeni">box-sizing: border-box — tam sığıyor!</div>
+  </div>
+
+  <p><b>Ders:</b> <code>width</code>, varsayılan olarak sadece içeriğin genişliğidir; <code>padding</code>
+  ve <code>border</code> bunun üzerine eklenir. <code>box-sizing: border-box</code> ile <code>width</code>,
+  padding ve border'ı da içine alan "toplam" genişlik hâline gelir — bu yüzden modern CSS'te neredeyse her
+  zaman <code>* { box-sizing: border-box; }</code> ile baştan tüm sayfaya uygulanır (bkz. Okulum
+  projesindeki <code>style.css</code>).</p>
+
+</body>
+</html>

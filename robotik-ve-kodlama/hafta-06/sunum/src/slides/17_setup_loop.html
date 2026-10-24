@@ -1,0 +1,28 @@
+<section id="setup-loop" class="sl dark tight">
+<div class="hd"><p class="eb">Adım adım animasyon · Program nasıl akar?</p><h2 class="ttl">setup() bir kez, loop() sürekli çalışır</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div class="codebox" style="width:700px;padding:22px 28px"><pre class="code" id="sl-code" style="font-size:25px;line-height:1.7"></pre></div>
+<div class="col" style="width:500px;gap:12px">
+<svg viewBox="0 0 500 450" width="500" height="450" role="img" aria-label="Program akış şeması" style="background:#16253A;border-radius:20px">
+<defs><marker id="slar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#FF9F5A"/></marker></defs>
+<rect id="sl-b0" x="140" y="20" width="220" height="56" rx="12" fill="#2A3B50"/><text x="250" y="56" text-anchor="middle" font-family="Rubik,Arial" font-size="24" fill="#F6F4EE">Kart açılır</text>
+<line x1="250" y1="76" x2="250" y2="116" stroke="#FF9F5A" stroke-width="4" marker-end="url(#slar)"/>
+<rect id="sl-b1" x="100" y="120" width="300" height="76" rx="12" fill="#2A3B50"/><text x="250" y="156" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="26" font-weight="700" fill="#6CB6FF">setup()</text><text x="250" y="184" text-anchor="middle" font-family="Rubik,Arial" font-size="19" fill="#BFCAD6">yalnızca bir kez</text>
+<line x1="250" y1="196" x2="250" y2="236" stroke="#FF9F5A" stroke-width="4" marker-end="url(#slar)"/>
+<rect id="sl-b2" x="100" y="240" width="300" height="130" rx="12" fill="#2A3B50"/><text x="250" y="284" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="26" font-weight="700" fill="#9BE38B">loop()</text><text x="250" y="312" text-anchor="middle" font-family="Rubik,Arial" font-size="19" fill="#BFCAD6">sonsuza dek tekrar</text>
+<text id="sl-tur" x="250" y="350" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="20" fill="#F2CC60">tur: 0</text>
+<path d="M400 305 H450 V300 V260 H405" fill="none" stroke="#FF9F5A" stroke-width="4" marker-end="url(#slar)"/>
+<text x="470" y="290" font-family="Rubik,Arial" font-size="40" fill="#FF9F5A">↺</text>
+<rect x="100" y="388" width="300" height="46" rx="10" fill="#1F2E40"/><text id="sl-sc" x="250" y="419" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="21" fill="#BFCAD6">setup çalışma sayısı: 0</text></svg>
+</div>
+<div class="col f1" style="gap:12px">
+<div style="background:#16253A;border-radius:16px;padding:16px 22px"><table class="pt" style="font-size:22px"><tr><th>Pin D8</th><th>Değer</th></tr><tr><td>Mod</td><td id="sl-m">—</td></tr><tr><td>Gerilim</td><td id="sl-v">0 V</td></tr><tr><td>LED</td><td id="sl-l"><span class="chip lo">söndü</span></td></tr></table>
+<svg viewBox="0 0 200 110" width="200" height="110" role="img" aria-label="LED" style="margin-top:6px"><defs><radialGradient id="slg"><stop offset="0" stop-color="#FF5252" stop-opacity="1"/><stop offset="1" stop-color="#FF5252" stop-opacity="0"/></radialGradient></defs>
+<circle id="sl-gl" cx="100" cy="50" r="52" fill="url(#slg)" opacity="0"/><path d="M75 90 V46 A25 25 0 0 1 125 46 V90 Z" fill="#C62828"/><path id="sl-lit" d="M75 90 V46 A25 25 0 0 1 125 46 V90 Z" fill="#FF8A80" opacity="0"/><rect x="68" y="88" width="64" height="8" rx="3" fill="#B71C1C"/></svg></div>
+<div style="background:#16253A;border-radius:16px;padding:12px 18px"><p style="font-size:20px;color:#93A3B8;margin-bottom:8px">delay bekleme çubuğu</p><div style="height:18px;background:#0B121B;border-radius:9px;overflow:hidden"><div id="sl-wait" style="height:100%;width:0;background:#FF9F5A;border-radius:9px"></div></div></div>
+</div>
+</div>
+<div class="row" style="gap:20px;align-items:center"><div class="card dk f1" style="padding:14px 22px"><p id="sl-msg" style="font-size:26px;min-height:70px">İleri’ye bas: programı adım adım çalıştıralım.</p></div>
+<div class="stp"><button type="button" data-act="first">⏮ Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1 / 11</span></div></div>
+<aside>Adım adım ilerleyin; her adımda aktif satır kodda vurgulanır, pin durumu ve LED güncellenir. Önemli noktalar: (1) setup yalnızca bir kez çalışır, sayaç 1’de kalır. (2) loop sona gelince başa döner; bu döngü kart kapanana kadar sürer. (3) delay sırasında pin durumu aynen kalır, LED yanık ya da sönük bekler. Soru: “Kodu loop’tan çıkarıp setup’a koysak ne olurdu?” (LED bir kez yanıp söner, sonra program biter.)</aside>
+</section>

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.rar
+*.zip
+.claude/
+Thumbs.db
+.DS_Store
+# Cevap dosyalari repoya/siteye girmesin
+*Cevaplari*
+cevap-anahtari/

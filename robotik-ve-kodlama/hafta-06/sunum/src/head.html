@@ -1,0 +1,140 @@
+<title>ROB 6. Hafta Sunumu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Düzen: 1920x1080 sabit sahne pencereye ölçeklenir, altta ince kumanda çubuğu, istenince öğretmen notu çekmecesi. Bilinçli olarak tek (koyu) görünüm. */
+:root{
+  color-scheme:dark;
+  --ink:#0E1621; --bar:#18222F; --bar-fg:#E6EDF3; --muted:#8A97A8; --accent:#FF9F5A; --line:#2A3746;
+  --sans:'Rubik',Arial,sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--bar-fg);font-family:var(--sans);overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+#app{height:100%;display:flex;flex-direction:column;gap:8px;padding-block:8px;box-sizing:border-box}
+#viewport{flex:1;position:relative;overflow:hidden;min-height:0}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#stage>section{position:absolute;left:0;top:0;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;
+  transition:opacity .25s ease;opacity:0;visibility:hidden;pointer-events:none}
+#stage>section.active{opacity:1;visibility:visible;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){#stage>section{transition:none}}
+#stage *{margin:0;box-sizing:border-box}
+#stage aside{display:none}
+#stage ul{padding-left:1.1em}
+#stage table{border-collapse:collapse;width:100%}
+#stage td,#stage th{padding:.35em .6em;border-bottom:1px solid rgba(20,32,46,.1);text-align:left;vertical-align:middle}
+#stage th{font-weight:600}
+/* tablo kontrastı: yazı rengi her zaman zemine göre açıkça verilir. Sıra önemli: slayt zemini, sonra kart zemini (kart en yakın zemindir) */
+#stage .light table:not(.pt) td{color:#1B2533!important;background:transparent!important}
+#stage .light table:not(.pt) th{color:#14202E!important;background:rgba(20,32,46,.08)!important}
+#stage .dark table:not(.pt) td{color:#F6F4EE!important;background:transparent!important}
+#stage .dark table:not(.pt) th{color:#FFD9B8!important;background:rgba(255,255,255,.1)!important}
+#stage .card table:not(.pt) td{color:#1B2533!important;background:transparent!important}
+#stage .card table:not(.pt) th{color:#14202E!important;background:rgba(20,32,46,.08)!important}
+#stage .card.dk table:not(.pt) td{color:#F6F4EE!important;background:transparent!important}
+#stage .card.dk table:not(.pt) th{color:#FFD9B8!important;background:rgba(255,255,255,.1)!important}
+#stage h1,#stage h2,#stage h3{text-wrap:balance}
+/* kumanda çubuğu */
+#bar{display:flex;align-items:center;gap:12px;height:48px;background:var(--bar);border-radius:12px;padding:0 12px;flex-wrap:nowrap;min-width:0}
+#bar button{font:500 15px var(--sans);color:var(--bar-fg);background:transparent;border:1px solid var(--line);border-radius:8px;height:34px;padding:0 12px;cursor:pointer;white-space:nowrap}
+#bar button:hover{background:#223042}
+#bar button:focus-visible,.ans-btn:focus-visible,.stp button:focus-visible,.cbtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#count{font:500 15px var(--sans);font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+#stitle{flex:1;min-width:0;font-size:15px;color:var(--bar-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#prog{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);transition:width .2s}
+#barwrap{position:relative}
+#notes{position:absolute;left:0;right:0;bottom:0;max-height:45%;overflow:auto;background:#FBF8F1;color:#1B2533;font:18px/1.5 var(--sans);
+  padding:20px 24px;border-radius:12px 12px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.4);z-index:5}
+#notes b{display:block;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#C2410C;margin-bottom:6px}
+.hide-sm{display:inline}
+@media (max-width:640px){.hide-sm{display:none}#bar{gap:6px}#bar button{padding:0 8px}}
+
+/* slayt yapı taşları (sahne pikseli) */
+.sl{font-family:var(--sans);padding:96px 112px 120px;display:flex;flex-direction:column;gap:32px}
+.sl.nf{padding-bottom:88px}
+.sl.tight{padding:64px 88px 80px;gap:22px}
+.light{background:#F6F4EE;color:#1B2533}
+.dark{background:#14202E;color:#F6F4EE}
+.hd{display:flex;flex-direction:column;gap:10px}
+.eb{font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C2410C}
+.dark .eb{color:#FF9F5A}
+.ttl{font-size:56px;font-weight:600;line-height:1.1;color:#14202E}
+.tight .ttl{font-size:48px}
+.dark .ttl{color:#F6F4EE}
+.foot{position:absolute;left:112px;bottom:40px;width:1696px;font-size:22px;color:#6B7685}
+.dark .foot{color:#93A3B8}
+.row{display:flex;flex-direction:row;gap:32px}
+.col{display:flex;flex-direction:column;gap:20px}
+.f1{flex:1;min-width:0}
+.card{background:#FFFFFF;border:1px solid #E2DED3;border-radius:16px;padding:22px 28px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:28px;font-weight:600;color:#14202E}
+.card p,.card li{font-size:24px;line-height:1.4;color:#3D4A5C}
+.card.warn{background:#FFF3E8;border:0;border-left:8px solid #C2410C}
+.card.info{background:#EAF1FD;border:0;border-left:8px solid #2F6FDE}
+.card.ok{background:#E3F4E8;border:0;border-left:8px solid #2E8540}
+.card.dk{background:#1F2E40;border:0}
+.card.dk h3{color:#FF9F5A}.card.dk p,.card.dk li{color:#E6EDF3}
+.codebox{background:#16212E;border-radius:16px;padding:22px 30px;min-width:0;display:flex;flex-direction:column;gap:12px}
+pre.code{font-family:var(--mono);font-size:24px;line-height:1.5;color:#E6EDF3;white-space:pre;margin:0}
+pre.code.lg{font-size:28px}
+.k{color:#FF9F5A}.t{color:#6CB6FF}.s{color:#9BE38B}.c{color:#93A3B8;font-style:italic}.n{color:#F2CC60}.e{color:#FF8A80}
+.mono{font-family:var(--mono)}
+.pill{display:inline-block;font-size:22px;font-weight:600;letter-spacing:1px;border-radius:999px;padding:6px 16px;background:#E9E5DA;color:#14202E}
+.dark .pill{background:#2A3B50;color:#F6F4EE}
+/* cevap düğmeleri */
+.ans-btn{font:600 24px var(--sans);background:#2F6FDE;color:#FFFFFF;border:0;border-radius:999px;padding:10px 26px;cursor:pointer;align-self:flex-start;white-space:nowrap}
+.ans-btn:hover{background:#2459B8}
+.ans-btn.sm{font-size:21px;padding:6px 18px}
+.ans-btn.alt{background:#C2410C}.ans-btn.alt:hover{background:#9E340A}
+.ans{background:#E3F4E8;color:#14301F;border-left:6px solid #2E8540;border-radius:10px;padding:12px 20px;font-size:23px;line-height:1.45}
+.ans code,.ans .mono{font-family:var(--mono);font-size:21px}
+td .ans{padding:4px 12px;display:inline-block}
+/* açıklama balonları */
+.tip{border-bottom:3px dotted #FF9F5A;cursor:help;position:relative;outline:none}
+.tip::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 14px);width:540px;background:#FFF8E6;color:#14202E;
+  font:400 22px/1.4 var(--sans);font-style:normal;white-space:normal;padding:14px 18px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.35);
+  opacity:0;visibility:hidden;transition:opacity .15s;z-index:20;pointer-events:none;text-shadow:none;letter-spacing:0}
+.tip.dn::after{bottom:auto;top:calc(100% + 14px)}
+.tip.lf::after{left:auto;right:0}
+.tip:hover::after,.tip:focus::after{opacity:1;visibility:visible}
+/* adım adım kumanda */
+.stp{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.stp button,.cbtn{font:600 22px var(--sans);border-radius:12px;padding:8px 20px;cursor:pointer;border:2px solid #14202E;background:#FFFFFF;color:#14202E}
+.dark .stp button,.dark .cbtn{border-color:#5B6E85;background:#1F2E40;color:#F6F4EE}
+.stp button.go,.cbtn.go{background:#14202E;color:#F6F4EE}
+.dark .stp button.go,.dark .cbtn.go{background:#2F6FDE;border-color:#2F6FDE}
+.stp button[aria-pressed="true"],.cbtn[aria-pressed="true"]{background:#C2410C;border-color:#C2410C;color:#FFFFFF}
+.cbtn.sel{background:#C2410C;border-color:#C2410C;color:#FFFFFF}
+.stp .cnt{font-size:22px;color:#6B7685;font-variant-numeric:tabular-nums}
+.dark .stp .cnt{color:#93A3B8}
+.hl{background:rgba(255,159,90,.28);outline:3px solid #FF9F5A;border-radius:8px}
+/* devre paneli */
+.ckt{background:#16253A;border-radius:20px;padding:10px;display:flex;flex-direction:column;gap:0}
+.ckt svg{display:block;width:100%;height:auto}
+.hole{fill:#46505E}
+.hole.on{fill:#FF9F5A}
+.hole.on2{fill:#2F6FDE}
+.hole.pick{fill:#C2410C}
+.hole.ok{fill:#2E8540}
+@keyframes pulseG{0%,100%{opacity:1}50%{opacity:.35}}
+.pulse{animation:pulseG 1s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+/* kod görünümü (satır tablosu) */
+.cgrid{display:grid;grid-template-columns:48px max-content 1fr;column-gap:20px;font-family:var(--mono);font-size:20px;line-height:30px;color:#E6EDF3}
+.cgrid>.ln{color:#5B6E85;text-align:right;user-select:none;padding-right:4px}
+.cgrid>div{border-radius:6px;white-space:pre;cursor:pointer;padding:0 8px}
+.cgrid>div.cm{color:#93A3B8;font-style:italic;padding-left:0}
+.cgrid>div.hi{background:#2A3B50;outline:3px solid #FF9F5A}
+.cgrid>div.dimmed{opacity:.55}
+textarea.ed{width:100%;font:22px/1.5 var(--mono);color:#E6EDF3;background:#16212E;border:2px solid #2A3B50;border-radius:14px;padding:16px 20px;resize:none;tab-size:2;outline:none}
+textarea.ed:focus{border-color:#FF9F5A}
+.conso{background:#0B121B;border-radius:12px;padding:12px 18px;font:20px/1.45 var(--mono);color:#9BE38B;min-height:120px;white-space:pre-wrap;overflow:auto}
+.conso .er{color:#FF8A80}.conso .wr{color:#F2CC60}.conso .dm{color:#93A3B8}
+table.pt{font-family:var(--mono);font-size:20px;color:#E6EDF3}
+table.pt td,table.pt th{border-bottom:1px solid #2A3B50!important;padding:.25em .5em!important}
+table.pt th{color:#FF9F5A;font-weight:600;font-family:var(--sans);font-size:18px;letter-spacing:1px;text-transform:uppercase}
+.chip{display:inline-block;border-radius:999px;padding:2px 12px;font-weight:700;font-size:19px}
+.chip.hi{background:#2E8540;color:#fff}.chip.lo{background:#3A4656;color:#C8D3E0}
+</style>
+<div id="app">
+<div id="viewport"><div id="stage">

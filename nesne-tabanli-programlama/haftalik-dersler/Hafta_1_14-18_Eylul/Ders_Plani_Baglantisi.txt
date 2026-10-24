@@ -1,0 +1,11 @@
+NTP 10 - 1. Hafta (14-18 Eylul)
+Konu: Visual Studio, form, olaylar
+
+Ders plani (Claude Docs, cevrimici):
+https://claude.ai/artifact/6x5286XfuyqJULducLAeAi
+
+Sunumun cevrimici kopyasi:
+https://claude.ai/artifact/CLXUicAdMq8SGi6RVcB4Vs
+
+Sunum.html tek basina ve internetsiz calisir. Klasoru istediginiz yere tasiyabilirsiniz.
+Kisayollar: Sag/Sol ok = ileri/geri, N = ogretmen notu, F = tam ekran.

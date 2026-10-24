@@ -1,0 +1,104 @@
+/* SİMÜLASYON ARAYÜZÜ: devre + sahne + zaman çizelgesi + pin tablosu + (isteğe bağlı) kod editörü ve derleyici konsolu */
+(function(root){
+var Sim={};
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+var COLS={red:'#FF6B6B',green:'#4CE07A',white:'#EAF6FF',yellow:'#FFD54F',blue:'#6CB6FF'};
+
+Sim.mount=function(id,cfg){
+  var sec=$(id);if(!sec)return;
+  var built=Ckt.circuit(id,{leds:cfg.leds,labels:cfg.labels});
+  $(id+'-ckt').innerHTML=built.svg;
+  var leds=built.leds;                                     /* pin sırasına göre */
+  var pins=leds.map(function(l){return l.pin;});
+  var scene=null;
+  if(cfg.scene&&$(id+'-scene')){scene=Ckt.scenes[cfg.scene](id,cfg.map);$(id+'-scene').innerHTML=scene.svg;}
+  var rows=leds.map(function(l){return{pin:l.pin,col:COLS[l.color]||'#fff'};});
+  var tlW=cfg.tlW||640,win=cfg.win||10000;
+  if($(id+'-tl'))$(id+'-tl').innerHTML=Ckt.timelineSvg(id,rows,tlW);
+  var rt=null,running=false,speed=cfg.speed||1,raf=0,last=0,prog=null;
+
+  function pinTable(){
+    var el=$(id+'-pins');if(!el)return;
+    var h='<table class="pt"><tr><th>Pin</th><th>Mod</th><th>Gerilim</th><th>Akım</th><th>LED</th></tr>';
+    leds.forEach(function(l,i){h+='<tr><td>D'+l.pin+'</td><td id="'+id+'-pm'+i+'">—</td><td id="'+id+'-pg'+i+'">0 V</td><td id="'+id+'-pa'+i+'">0,0 mA</td><td id="'+id+'-pl'+i+'"><span class="chip lo">söndü</span></td></tr>';});
+    h+='</table><p id="'+id+'-now" class="mono" style="font-size:19px;color:#93A3B8;margin-top:8px;white-space:pre-wrap">Şu an: —</p>';
+    el.innerHTML=h;}
+  function render(levels){
+    leds.forEach(function(l,i){
+      var lv=levels[l.pin]||0;
+      Ckt.setLevel(id,i,lv,l.pin);
+      var c=Ckt.LEDC[l.color]||Ckt.LEDC.red,ma=lv*(5-c.vf)/220*1000;
+      var pm=$(id+'-pm'+i);if(pm){var mode=rt.mode[l.pin];pm.textContent=mode==='OUTPUT'?'OUTPUT':(mode?'INPUT':'—');pm.style.color=mode==='OUTPUT'?'#9BE38B':'#FF8A80';}
+      var pg=$(id+'-pg'+i);if(pg)pg.textContent=(lv>0.5?'5':'0')+' V';
+      var pa=$(id+'-pa'+i);if(pa)pa.textContent=ma.toFixed(1).replace('.',',')+' mA';
+      var pl=$(id+'-pl'+i);if(pl){var on=lv>0.5;pl.innerHTML=on?'<span class="chip hi">yanıyor</span>':(lv>0.03?'<span class="chip lo">çok soluk</span>':'<span class="chip lo">söndü</span>');}});
+    if(scene&&scene.update)scene.update(levels);
+    if($(id+'-tl'))Ckt.timelineDraw(id,rows,rt,tlW,win);
+    var now=$(id+'-now');if(now)now.textContent='Şu an: '+(rt.cur?rt.cur.txt+'  (satır '+rt.cur.line+')':'—')+'\nSanal süre: '+(rt.t/1000).toFixed(1).replace('.',',')+' sn · loop turu: '+rt.loopRuns;
+  }
+  function load(p){
+    prog=p;rt=new Engine.Runtime(p);
+    if(scene&&scene.edge)rt.onEdge(scene.edge);
+    if(scene&&scene.reset)scene.reset();}
+  function frame(now){
+    if(!running)return;
+    var dt=Math.min(100,now-last)*speed;last=now;
+    var lv=rt.advance(dt);render(lv);
+    raf=requestAnimationFrame(frame);}
+  function start(){if(running)return;running=true;last=performance.now();raf=requestAnimationFrame(frame);setBtn();}
+  function pause(){running=false;cancelAnimationFrame(raf);setBtn();}
+  function restart(){load(prog);var lv=rt.advance(0);render(lv);if(!running)start();}
+  function setBtn(){var b=$(id+'-play');if(b){b.textContent=running?'⏸ Duraklat':'▶ Başlat';b.setAttribute('aria-pressed',running?'false':'false');}}
+
+  var ctl=$(id+'-ctl');
+  if(ctl){ctl.innerHTML='<div class="stp"><button type="button" class="go" id="'+id+'-play">⏸ Duraklat</button><button type="button" id="'+id+'-rst">↺ Başa döndür</button>'
+    +'<span class="cnt" style="margin-left:8px">Hız:</span><button type="button" data-sp="1" class="sel">1×</button><button type="button" data-sp="2">2×</button><button type="button" data-sp="5">5×</button></div>';
+    $(id+'-play').onclick=function(){running?pause():start();};
+    $(id+'-rst').onclick=restart;
+    [].forEach.call(ctl.querySelectorAll('[data-sp]'),function(b){b.onclick=function(){speed=+b.getAttribute('data-sp');
+      [].forEach.call(ctl.querySelectorAll('[data-sp]'),function(x){x.classList.toggle('sel',x===b);});};});}
+  pinTable();
+
+  /* editör ve derleyici */
+  var ed=$(id+'-ed'),con=$(id+'-con');
+  function log(h){if(con)con.innerHTML=h;}
+  function compileAndLoad(){
+    var src=ed?ed.value:cfg.code,p=Engine.compile(src),h='<span class="dm">Derleniyor…</span>\n';
+    if(p.errors.length){
+      p.errors.forEach(function(e){h+='<span class="er">'+(e.line?'satır '+e.line+': ':'')+'error: '+esc(e.msg)+'</span>\n';});
+      h+='<span class="er">Derleme hatası. Karttaki eski program çalışmaya devam eder.</span>';
+      log(h);return false;}
+    var w=[],written={},mo={};
+    p.setup.forEach(function(s){if(s.t==='pm'&&s.mode==='OUTPUT')mo[s.pin]=1;});
+    p.setup.concat(p.loop).forEach(function(s){if(s.t==='dw')written[s.pin]=1;});
+    p.warnings.forEach(function(x){w.push('satır '+x.line+': '+x.msg);});
+    Object.keys(written).forEach(function(pn){pn=+pn;
+      if(pins.indexOf(pn)<0)w.push('D'+pn+' pinine devrede LED bağlı değil: bu pindeki değişim görünmez.');
+      else if(!mo[pn])w.push('D'+pn+' için pinMode('+pn+', OUTPUT) yok: pin giriş modunda kalır, LED çok soluk yanar.');});
+    pins.forEach(function(pn){if(!written[pn])w.push('D'+pn+' pinine hiç digitalWrite yazılmadı: LED hep sönük kalır.');});
+    var hasDelay=p.loop.some(function(s){return s.t==='dl';}),hasW=p.loop.some(function(s){return s.t==='dw';});
+    if(hasW&&!hasDelay)w.push('loop() içinde delay yok: pin saniyede binlerce kez değişir, LED yarı parlak görünür.');
+    h+='<span>Derleme tamam. Karta yüklendi (simülasyon).</span>\n';
+    w.forEach(function(x){h+='<span class="wr">uyarı: '+esc(x)+'</span>\n';});
+    log(h);load(p);var lv=rt.advance(0);render(lv);start();return true;}
+  if(ed){
+    ed.value=cfg.code;
+    ed.addEventListener('keydown',function(e){if(e.key==='Tab'){e.preventDefault();var s=ed.selectionStart,t=ed.selectionEnd;ed.value=ed.value.slice(0,s)+'  '+ed.value.slice(t);ed.selectionStart=ed.selectionEnd=s+2;}
+      if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();compileAndLoad();}});
+    var bt=$(id+'-btn');if(bt)bt.onclick=compileAndLoad;
+    var rs=$(id+'-orig');if(rs)rs.onclick=function(){ed.value=cfg.code;compileAndLoad();};
+    var sb=$(id+'-sol');if(sb&&cfg.solution)sb.onclick=function(){ed.value=cfg.solution;compileAndLoad();};}
+  /* ilk yükleme: derleme hatası olsa bile (hata avı) eski çalışan program yerine boş program */
+  var first=Engine.compile(cfg.code);
+  if(first.errors.length){
+    load({setup:[],loop:[],errors:[],warnings:[]});
+    if(con){var h='<span class="dm">Derleniyor…</span>\n';first.errors.forEach(function(e){h+='<span class="er">'+(e.line?'satır '+e.line+': ':'')+'error: '+esc(e.msg)+'</span>\n';});log(h+'<span class="er">Derleme hatası: önce hataları düzelt.</span>');}}
+  else{load(first);if(con&&ed)log('<span class="dm">Kod hazır. “Derle ve yükle” ile (veya Ctrl+Enter) karta yükle.</span>');}
+  render(rt.advance(0));
+  window.hooks[id]={enter:function(){setBtn();start();},leave:pause};
+  Sim.list[id]={start:start,pause:pause,restart:restart};
+};
+Sim.list={};
+root.Sim=Sim;
+})(window);

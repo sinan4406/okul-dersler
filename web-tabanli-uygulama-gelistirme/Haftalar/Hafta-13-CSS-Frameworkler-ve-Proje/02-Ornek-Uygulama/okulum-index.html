@@ -1,0 +1,76 @@
+<!-- OKULUM PROJESİ — "Anadolu Teknik Lisesi" tanıtım sitesi.
+     Bu, CSS ünitesinin (Hafta 9-13) SONUNDAKİ hâlidir — Hafta 12'deki dosyanın birebir devamıdır,
+     sadece style.css bu haftada düzenlenip (refactor) bölümlere ayrılmıştır.
+     NOT: Hafta 4-11 içerikleri bu fork çalışırken henüz hazırlanmamış olabilir; bu dosyalar makul bir
+     varsayımsal tabandır. Öğretmen, sınıfın gerçek çıktısıyla uyumlu hale getirebilir. -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anadolu Teknik Lisesi</title>
+  <link rel="stylesheet" href="okulum-style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="logo">Anadolu Teknik Lisesi</div>
+    <nav class="site-nav">
+      <a href="okulum-index.html">Anasayfa</a>
+      <a href="#bolumler">Bölümler</a>
+      <a href="#galeri">Galeri</a>
+      <a href="okulum-iletisim.html">İletişim</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Geleceğin Teknolojisine Bugünden Hazırlanın</h1>
+      <p>Anadolu Teknik Lisesi Bilişim Teknolojileri Bölümü olarak öğrencilerimize web tasarımdan
+      yazılım geliştirmeye kadar geniş bir müfredat sunuyoruz.</p>
+    </section>
+
+    <section id="bolumler" class="kart-alani">
+      <h2>Neden Bizi Seçmelisiniz?</h2>
+      <div class="kart-grid">
+        <div class="kart">
+          <h3>Güncel Müfredat</h3>
+          <p>HTML5, CSS, Javascript ve .NET Core ile uçtan uca web geliştirme öğretiyoruz.</p>
+        </div>
+        <div class="kart">
+          <h3>Deneyimli Öğretmenler</h3>
+          <p>Sektör deneyimine sahip öğretmen kadromuzla proje tabanlı öğrenme sağlıyoruz.</p>
+        </div>
+        <div class="kart">
+          <h3>Modern Laboratuvarlar</h3>
+          <p>Her öğrenciye bilgisayar düşen, güncel yazılımlarla donatılmış laboratuvarlarımız var.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="tablo-alani">
+      <h2>Haftalık Ders Programı (Örnek)</h2>
+      <table>
+        <tr><th>Gün</th><th>1-2. Ders</th><th>3-4. Ders</th><th>5-6. Ders</th></tr>
+        <tr><td>Pazartesi</td><td>HTML5</td><td>CSS</td><td>Matematik</td></tr>
+        <tr><td>Salı</td><td>Javascript</td><td>Türk Dili</td><td>Beden Eğitimi</td></tr>
+        <tr><td>Çarşamba</td><td>.NET Core</td><td>İngilizce</td><td>CSS</td></tr>
+      </table>
+    </section>
+
+    <section id="galeri" class="galeri-alani">
+      <h2>Okulumuzdan Kareler</h2>
+      <div class="galeri-grid">
+        <div class="gorsel gorsel-1">Bilişim Laboratuvarı</div>
+        <div class="gorsel gorsel-2">Kütüphane</div>
+        <div class="gorsel gorsel-3">Konferans Salonu</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Anadolu Teknik Lisesi — Bilişim Teknolojileri Bölümü</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>var mı, let mi? — Kapsam (Scope) Deneyi</title>
+</head>
+<body style="font-family:sans-serif; padding:24px; max-width:600px;">
+
+  <h1>var mı, let mi? — Kapsam Deneyi</h1>
+  <p>Bu sayfada kod çalışmıyor gibi görünecek (ekranda bir şey yazmıyoruz) — sonucu <b>konsolda (F12)</b>
+  göreceksiniz. Amaç: <code>var</code> ile <code>let</code>'in döngü içindeki farklı davranışını görmek.</p>
+
+  <script>
+    console.log("--- var ile döngü ---");
+    for (var i = 0; i < 3; i++) {
+      // döngü çalışıyor
+    }
+    // DİKKAT: var, "fonksiyon kapsamlıdır" (function-scoped) — döngü bittikten
+    // SONRA bile i değişkenine döngü dışından erişebiliyoruz. Bu "sızıntıdır"
+    // ve büyük projelerde beklenmedik hatalara yol açabilir.
+    console.log("Döngü bitti, döngü dışında i =", i); // 3 — hâlâ erişilebiliyor!
+
+    console.log("--- let ile döngü ---");
+    for (let j = 0; j < 3; j++) {
+      // döngü çalışıyor
+    }
+    try {
+      console.log("Döngü bitti, döngü dışında j =", j);
+    } catch (hata) {
+      // DİKKAT: let, "blok kapsamlıdır" (block-scoped) — döngü {} bloğunun
+      // dışında j değişkeni artık yoktur, tarayıcı hata verir.
+      console.log("HATA! j döngü dışında tanımlı değil:", hata.message);
+    }
+  </script>
+
+</body>
+</html>

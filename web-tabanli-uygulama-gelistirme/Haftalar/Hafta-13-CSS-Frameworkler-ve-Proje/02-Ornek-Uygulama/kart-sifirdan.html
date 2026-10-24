@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kart Karşılaştırması — Sıfırdan CSS</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f5f7; padding: 24px; }
+    h1 { text-align: center; }
+
+    .satir {
+      display: flex;
+      gap: 20px;
+      max-width: 900px;
+      margin: 24px auto 0;
+    }
+
+    .kart {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #dfe3e8;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .kart h3 { margin-top: 0; }
+    .kart button {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #1c2a38;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 700px) {
+      .satir { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bölümlerimiz (Sıfırdan CSS ile)</h1>
+  <div class="satir">
+    <div class="kart">
+      <h3>Bilişim Teknolojileri</h3>
+      <p>Web tasarım, programlama ve ağ sistemleri üzerine eğitim veren bölümümüz.</p>
+      <button>Detaylar</button>
+    </div>
+    <div class="kart">
+      <h3>Elektrik-Elektronik</h3>
+      <p>Devre tasarımı ve otomasyon sistemleri konularında uygulamalı eğitim sunar.</p>
+      <button>Detaylar</button>
+    </div>
+    <div class="kart">
+      <h3>Makine Teknolojisi</h3>
+      <p>CNC ve bilgisayar destekli tasarım (CAD) üzerine yoğunlaşan bölümümüz.</p>
+      <button>Detaylar</button>
+    </div>
+  </div>
+
+</body>
+</html>

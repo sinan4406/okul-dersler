@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>== mi, === mi?</title>
+</head>
+<body style="font-family:sans-serif; padding:24px; max-width:520px;">
+
+  <h1>== ile === Arasındaki Fark</h1>
+  <p>Bu sayfada ekranda bir şey görünmüyor — sonucu <b>konsolda (F12)</b> inceleyin.</p>
+
+  <script>
+    // DENEY 1: Sayı ile aynı değerdeki string'i karşılaştırma
+    console.log('5 == "5"  →', 5 == "5");    // true  (değer aynıysa tip farkını görmezden gelir)
+    console.log('5 === "5" →', 5 === "5");   // false (tip de aynı olmalı: number !== string)
+
+    // DENEY 2: Bir input her zaman string döndürür, ama biz "sayı 5 mi?"
+    // diye kontrol ediyoruz — == kullanırsak yanılabiliriz.
+    const kullaniciGirdisi = "5"; // input.value'dan gelmiş gibi düşünün
+    console.log('kullaniciGirdisi == 5  →', kullaniciGirdisi == 5);   // true — ama gerçekten "aynı" mı?
+    console.log('kullaniciGirdisi === 5 →', kullaniciGirdisi === 5); // false — tip farkını doğru yakalar
+
+    // DENEY 3: Beklenmedik ama gerçek == davranışları
+    console.log('0 == false      →', 0 == false);      // true!
+    console.log('"" == false     →', "" == false);     // true!
+    console.log('null == undefined →', null == undefined); // true!
+
+    // SONUÇ: == "tip zorlama" (type coercion) yapar, bazen şaşırtıcı
+    // sonuçlar üretir. Bu yüzden bu dersten itibaren HER ZAMAN === ve !==
+    // kullanacağız — "değer ve tip ikisi de aynı olsun" demek çok daha
+    // güvenlidir.
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<section id="hata-avi" class="sl dark tight">
+<div class="hd"><p class="eb">Hata avı · Canlı derleyici</p><h2 class="ttl">Bu kodda 3 hata var. Bul, düzelt, derle</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:860px;gap:12px">
+<textarea class="ed" id="hata-avi-ed" rows="11" spellcheck="false" aria-label="Arduino kodu" style="height:340px"></textarea>
+<div class="stp"><button type="button" class="go" id="hata-avi-btn">Derle ve yükle</button><button type="button" id="hata-avi-orig">Başlangıç kodu</button><button type="button" id="hata-avi-sol">Çözümü yükle</button></div>
+<div class="conso" id="hata-avi-con" style="min-height:170px;max-height:230px"></div>
+<button class="ans-btn alt" type="button">Hataları göster</button>
+<div class="ans" hidden><b>1)</b> <span class="mono">pinMode(8, OUTPUT)</span> sonunda <b>;</b> yok. <b>2)</b> <span class="mono">digitalwrite</span> yanlış: <b>digitalWrite</b> (büyük W). <b>3)</b> Son <span class="mono">delay(1000)</span> satırında <b>;</b> yok.</div>
+</div>
+<div class="col f1" style="gap:12px">
+<div class="ckt" id="hata-avi-ckt" style="max-width:700px"></div>
+<div id="hata-avi-ctl"></div>
+<div id="hata-avi-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:12px 18px"><div id="hata-avi-pins"></div></div>
+</div>
+</div>
+<aside>Eşli çalışma, 10 dakika. Soldaki kodda üç hata var; “Derle ve yükle” (veya Ctrl+Enter) düğmesine basınca derleyici hataları satır numarasıyla listeler. Öğrenciler hatayı düzeltip tekrar derler; hata kalmayınca LED yanıp sönmeye başlar. Not: Gerçek Arduino IDE bazen yalnızca ilk hatayı gösterir; biz hepsini listeledik. İpucu: Hata mesajındaki satır numarası genellikle hatanın kendisini veya bir sonraki satırı işaret eder. Cevap düğmesi hataları açar; “Çözümü yükle” kodu otomatik düzeltir.</aside>
+</section>

@@ -1,0 +1,11 @@
+NTP 10 - 6. Hafta (19-23 Ekim)
+Konu: Mantiksal operatorler ve donguler
+
+Ders plani (Claude Docs, cevrimici):
+https://claude.ai/artifact/6xGJmKaLZhrCtsdKnxFLHC
+
+Sunumun cevrimici kopyasi:
+https://claude.ai/artifact/HwbsYwVaF6ZEyitnnMoEqo
+
+Sunum.html tek basina ve internetsiz calisir. Klasoru istediginiz yere tasiyabilirsiniz.
+Kisayollar: Sag/Sol ok = ileri/geri, N = ogretmen notu, F = tam ekran.

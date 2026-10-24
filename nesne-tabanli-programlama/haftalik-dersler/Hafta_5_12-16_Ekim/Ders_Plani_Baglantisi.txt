@@ -1,0 +1,11 @@
+NTP 10 - 5. Hafta (12-16 Ekim)
+Konu: Ic ice if, switch, && ve ||
+
+Ders plani (Claude Docs, cevrimici):
+https://claude.ai/artifact/Sy7jE6a8p5k9qjth7PRvVk
+
+Sunumun cevrimici kopyasi:
+https://claude.ai/artifact/43XLF7yNQJwf2huaW7ttN7
+
+Sunum.html tek basina ve internetsiz calisir. Klasoru istediginiz yere tasiyabilirsiniz.
+Kisayollar: Sag/Sol ok = ileri/geri, N = ogretmen notu, F = tam ekran.

@@ -1,0 +1,23 @@
+<section id="kurallar" class="sl light tight">
+<div class="hd"><p class="eb">Söz dizimi kuralları · Hatayı gör</p><h2 class="ttl">Beş kural, altı sık hata</h2></div>
+<button class="ans-btn alt" data-all="1" type="button" style="align-self:flex-start">Tüm hataları göster</button>
+<div class="ruled">
+<div class="rule"><h3>1 · Noktalı virgül ;</h3><div class="good">delay(<span class="tip" data-tip="Bu satır bitti işareti: ; koyulmazsa derleyici sonraki satırı da aynı komutun parçası sanır. Örnek: delay(1000);">1000</span>);</div><button class="ans-btn sm" type="button">Unutursan?</button><div class="ans" hidden><div class="bad">delay(1000)
+digitalWrite(8, LOW);
+error: expected ';' before 'digitalWrite'</div></div></div>
+<div class="rule"><h3>2 · Süslü parantez { }</h3><div class="good">void loop() {
+  delay(1000);
+}</div><button class="ans-btn sm" type="button">Unutursan?</button><div class="ans" hidden><div class="bad">void loop() {
+  delay(1000);
+error: expected '}' at end of input</div></div></div>
+<div class="rule"><h3>3 · Büyük / küçük harf</h3><div class="good">digital<b style="color:#FF9F5A">W</b>rite(8, <b style="color:#FF9F5A">HIGH</b>);</div><button class="ans-btn sm" type="button">Yanlış yazarsan?</button><div class="ans" hidden><div class="bad">digitalwrite(8, high);
+error: 'digitalwrite' was not declared in this scope; did you mean 'digitalWrite'?</div></div></div>
+<div class="rule"><h3>4 · Parantez ve virgül ( , )</h3><div class="good">digitalWrite(8, HIGH);</div><button class="ans-btn sm" type="button">Virgül yoksa?</button><div class="ans" hidden><div class="bad">digitalWrite(8 HIGH);
+error: expected ')' before 'HIGH'</div></div></div>
+<div class="rule"><h3>5 · Yorum satırı //</h3><div class="good"><span class="c">// 1 sn bekle</span>
+delay(1000);</div><button class="ans-btn sm" type="button">Ne işe yarar?</button><div class="ans" hidden>// işaretinden sonrasını bilgisayar <b>okumaz</b>. Sadece insanlar içindir: kodun yanına açıklama yaz. Çok satırlı yorum: <span class="mono">/* ... */</span></div></div>
+<div class="rule"><h3>6 · Her şey yerli yerinde</h3><div class="good">void setup() { }
+void loop() { }</div><button class="ans-btn sm" type="button">loop yoksa?</button><div class="ans" hidden><div class="bad">undefined reference to `loop'</div>Arduino her iki fonksiyonu da ister, boş bile olsa.</div></div>
+</div>
+<aside>Her kartı açmadan önce öğrencilerin hatanın ne olacağını tahmin etmesini isteyin. “Tüm hataları göster” bütün kartları açar. Gerçek derleyici mesajlarını İngilizce gösteriyoruz çünkü Arduino IDE bu mesajları İngilizce verir; öğrenciler hata penceresinde bu kelimeleri tanıyacak. Hata avı slaytında aynı hataları canlı derleyicide deneyeceğiz. Ek bilgi: Satır sonunda ; yazmak gerekli, süslü parantezden sonra ; gerekmez.</aside>
+</section>

@@ -1,0 +1,40 @@
+<section id="led-yapisi" class="sl light tight">
+<div class="hd"><p class="eb">Kitap s.60, Görsel 2.12 · LED yapısı</p><h2 class="ttl">LED’in iki ucu vardır: yönü yanlış bağlarsan yanmaz</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:780px;gap:16px">
+<svg viewBox="0 0 780 560" width="780" height="560" role="img" aria-label="LED yapısı" style="background:#16253A;border-radius:20px">
+<path d="M290 310 V190 A100 100 0 0 1 490 190 V310 Z" fill="#E53935" opacity=".92"/><path d="M290 310 V190 A100 100 0 0 1 490 190 V310 Z" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="3"/>
+<path d="M312 180 A80 80 0 0 1 380 112" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="10" stroke-linecap="round"/>
+<rect x="270" y="304" width="240" height="22" rx="6" fill="#B71C1C"/><path d="M510 326 V304 H492 V326 Z" fill="#7F1D1D"/>
+<path d="M330 326 V300 H350 V240 L370 214 H336 V326" fill="none"/>
+<rect x="322" y="214" width="26" height="70" fill="#C9D1D9" opacity=".9"/><path d="M432 214 H460 L450 252 H442 Z" fill="#C9D1D9" opacity=".9"/><rect x="418" y="214" width="62" height="14" rx="3" fill="#C9D1D9" opacity=".9"/>
+<path d="M335 326 V500" stroke="#E8EEF4" stroke-width="12" stroke-linecap="round"/><path d="M445 326 V430" stroke="#E8EEF4" stroke-width="12" stroke-linecap="round"/>
+<text x="335" y="552" text-anchor="middle" font-family="Rubik,Arial" font-weight="700" font-size="26" fill="#FFB74D">ANOT (+)</text><text x="335" y="526" text-anchor="middle" font-family="Rubik,Arial" font-size="20" fill="#BFCAD6">uzun bacak</text>
+<text x="445" y="488" text-anchor="middle" font-family="Rubik,Arial" font-weight="700" font-size="26" fill="#6CB6FF">KATOT (−)</text><text x="445" y="458" text-anchor="middle" font-family="Rubik,Arial" font-size="20" fill="#BFCAD6">kısa bacak</text>
+<line x1="512" y1="316" x2="560" y2="316" stroke="#FFB74D" stroke-width="3" stroke-dasharray="6 6"/><text x="566" y="324" font-family="Rubik,Arial" font-size="22" fill="#FFB74D">yassı kenar = katot</text>
+<line x1="470" y1="226" x2="540" y2="130" stroke="#6CB6FF" stroke-width="3" stroke-dasharray="6 6"/><text x="768" y="124" text-anchor="end" font-family="Rubik,Arial" font-size="22" fill="#6CB6FF">içeride büyük parça = katot</text>
+</svg>
+<div class="card ok" style="padding:14px 22px"><h3 style="font-size:24px">Ayırt etmenin 3 yolu</h3><p style="font-size:22px">1) Uzun bacak anot. 2) Gövdedeki yassı kenar katot. 3) İçindeki büyük metal parça katot.</p></div>
+</div>
+<div class="col f1" style="gap:16px">
+<div class="card dk" style="padding:20px 26px"><h3>Akım yönünü canlı gör</h3><p style="font-size:23px">Düğmelerle LED’i doğru veya ters bağla.</p>
+<div class="stp"><button type="button" class="go" id="ly-ok" aria-pressed="true">Doğru bağla</button><button type="button" id="ly-ters">Ters bağla</button></div></div>
+<svg viewBox="0 0 860 330" width="860" height="330" role="img" aria-label="Basit devre şeması" style="background:#16253A;border-radius:20px">
+<defs><radialGradient id="lyg"><stop offset="0" stop-color="#FF5252" stop-opacity=".95"/><stop offset="1" stop-color="#FF5252" stop-opacity="0"/></radialGradient></defs>
+<text x="40" y="52" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#F2CC60">D8 (5 V)</text>
+<path id="ly-path" d="M40 70 H210" stroke="#F97316" stroke-width="8" fill="none" stroke-linecap="round"/>
+<rect x="210" y="46" width="130" height="48" rx="8" fill="#D9BC8C" stroke="#A98B58" stroke-width="3"/><text x="275" y="78" text-anchor="middle" font-family="Rubik,Arial" font-weight="700" font-size="22" fill="#3D2B12">220 Ω</text>
+<path d="M340 70 H560" stroke="#F97316" stroke-width="8" fill="none" stroke-linecap="round"/>
+<g id="ly-led"><circle id="ly-glow" cx="650" cy="70" r="90" fill="url(#lyg)" opacity=".9"/>
+<g id="ly-sym"><path d="M560 70 H600" stroke="#F97316" stroke-width="8" stroke-linecap="round"/><polygon id="ly-tri" points="600,30 600,110 670,70" fill="#E53935" stroke="#FFCDD2" stroke-width="3"/><line id="ly-bar" x1="670" y1="30" x2="670" y2="110" stroke="#FFCDD2" stroke-width="6"/><path d="M670 70 H760" stroke="#F97316" stroke-width="8" stroke-linecap="round"/></g></g>
+<path d="M760 70 H810 V250 H40" fill="none" stroke="#263238" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="40" y="290" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#BFCAD6">GND (0 V)</text>
+<path id="ly-flow" class="flow" d="M40 70 H210 M340 70 H560 M560 70 H760 H810 V250 H40" stroke="#FFE082" stroke-width="5" fill="none" opacity="1"/>
+<text id="ly-msg" x="430" y="180" text-anchor="middle" font-family="Rubik,Arial" font-weight="700" font-size="28" fill="#9BE38B">Akım akar, LED yanar</text>
+</svg>
+<div class="card warn" style="padding:14px 22px"><p id="ly-x" style="font-size:23px">Üçgenin ucu akımın gideceği yönü gösterir: anottan katota. Ters bağlanırsa akım geçmez.</p></div>
+</div>
+</div>
+<p class="foot">Kitapta: “ters bağlanırsa zarar da görmez.” Doğrusu: ışık vermez; yüksek ters gerilimde zarar görebilir.</p>
+<aside>Önce gerçek bir LED’i elinizde gösterin: uzun ve kısa bacak, yassı kenar. Sonra ekrandaki devre şemasında akımın (sarı kesikli çizgi) anottan katota aktığını gösterin. “Ters bağla” düğmesinde akım durur, LED söner. Kitapta s.60’taki “zarar da görmez” ifadesi her koşulda doğru değildir; 5 V ile çalışan Arduino’da genelde zarar görmez ama yine de ters bağlamamayı öğretin. LED sembolündeki üçgen ve çizgi akım yönünü gösterir.</aside>
+</section>

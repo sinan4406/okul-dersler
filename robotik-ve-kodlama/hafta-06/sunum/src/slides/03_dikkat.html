@@ -1,0 +1,25 @@
+<section id="dikkat" class="sl dark">
+<div class="hd"><p class="eb">Oylama · Dikkat çekme</p><h2 class="ttl">Bir LED’i dirençsiz, doğrudan 5 V’a bağlarsak ne olur?</h2></div>
+<div class="row" style="gap:40px;align-items:flex-start">
+<div class="col f1" style="gap:16px">
+<button type="button" class="opt" data-vote="0"><span class="ab">A</span><span class="tx">Daha parlak yanar, hiçbir sorun olmaz</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<button type="button" class="opt" data-vote="1"><span class="ab">B</span><span class="tx">Hiçbir şey olmaz, LED yanmaz</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<button type="button" class="opt" data-vote="2"><span class="ab">C</span><span class="tx">Aşırı akım geçer, LED ısınır ve bozulabilir</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<p style="font-size:24px;color:#93A3B8">Her seçeneğe tıkla: sınıfın oy sayısı artar. Sayıyı tahtaya yazdır.</p>
+</div>
+<svg viewBox="0 0 520 420" width="520" height="420" role="img" aria-label="Dirençsiz LED bağlantısı" style="flex:none;background:#1F2E40;border-radius:20px">
+<defs><radialGradient id="dkg"><stop offset="0" stop-color="#FF5252" stop-opacity="1"/><stop offset="1" stop-color="#FF5252" stop-opacity="0"/></radialGradient></defs>
+<rect x="40" y="150" width="130" height="90" rx="8" fill="#0E7C86"/><text x="105" y="200" text-anchor="middle" font-family="Rubik,Arial" font-weight="700" font-size="22" fill="#fff">Arduino</text><text x="105" y="226" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" fill="#D5F3F6">5V ● GND ●</text>
+<path d="M170 180 H330 V120" fill="none" stroke="#F97316" stroke-width="8" stroke-linecap="round"/><path d="M170 215 H400 V250 H400" fill="none" stroke="#263238" stroke-width="8" stroke-linecap="round" opacity=".9"/>
+<path d="M400 215 V250" stroke="#263238" stroke-width="8"/>
+<circle class="pop" cx="365" cy="170" r="110" fill="url(#dkg)" opacity=".75"/>
+<path d="M335 160 V120 A30 30 0 0 1 395 120 V160 Z" fill="#E53935" transform="translate(0,40)"/><rect x="326" y="196" width="78" height="10" rx="3" fill="#B71C1C"/>
+<path d="M345 206 V300 M385 206 V290" stroke="#C9D1D9" stroke-width="6" stroke-linecap="round" fill="none"/>
+<text x="260" y="360" text-anchor="middle" font-family="Rubik,Arial" font-size="24" font-weight="600" fill="#FFB4AB">Direnç yok!</text>
+<text x="260" y="392" text-anchor="middle" font-family="Rubik,Arial" font-size="20" fill="#93A3B8">Akımı sınırlayan hiçbir şey görünmüyor</text>
+</svg>
+</div>
+<div class="col" style="gap:14px"><button class="ans-btn" type="button">Oylamadan sonra cevabı göster</button>
+<div class="ans" hidden><b>Cevap: C.</b> LED akım sınırı yaklaşık 20 mA’dir. Direnç olmazsa akımı sınırlayan bir şey kalmaz; LED ve kartın pini zarar görebilir. 220 Ω direnç akımı (5 V − 2 V) / 220 Ω ≈ 13,6 mA’e düşürür. Birazdan “Direnç laboratuvarı” slaytında kendin dene.</div></div>
+<aside>5 dakika. Oylamayı el kaldırtarak da yapabilirsiniz; ekrandaki düğmeler sayımı kolaylaştırır. Cevabı hemen açmayın: oylama sonucunu tahtaya yazın, sonra düğmeye basın. Cevabı “Direnç laboratuvarı” slaytında hesapla doğrulayacağız; ders sonunda kapanış slaytında tekrar döneceğiz. Güdüleme: telefonunuzdaki şarj ışığı, kumanda LED’i, araba göstergeleri; hepsinde LED’in yanında bir direnç veya akım sınırlayıcı vardır.</aside>
+</section>

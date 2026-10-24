@@ -1,0 +1,25 @@
+<section id="direnc-lab" class="sl dark tight">
+<div class="hd"><p class="eb">Canlı uygulama · Direnç laboratuvarı · Oylamanın cevabı</p><h2 class="ttl">Dirençle LED akımını ayarla: I = (5 V − 2 V) / R</h2></div>
+<div class="row" style="gap:32px;align-items:flex-start">
+<div class="col" style="width:760px;gap:16px">
+<svg viewBox="0 0 760 360" width="760" height="360" role="img" aria-label="LED parlaklığı" style="background:#16253A;border-radius:20px">
+<defs><radialGradient id="rlg"><stop offset="0" stop-color="#FF5252" stop-opacity="1"/><stop offset="1" stop-color="#FF5252" stop-opacity="0"/></radialGradient></defs>
+<circle id="rl-glow" cx="380" cy="170" r="170" fill="url(#rlg)" opacity="0.5"/>
+<path d="M320 250 V150 A60 60 0 0 1 440 150 V250 Z" fill="#C62828"/><path id="rl-lit" d="M320 250 V150 A60 60 0 0 1 440 150 V250 Z" fill="#FF8A80" opacity=".5"/><rect x="304" y="246" width="152" height="16" rx="4" fill="#B71C1C"/>
+<path d="M350 262 V330 M410 262 V310" stroke="#E8EEF4" stroke-width="10" stroke-linecap="round"/>
+<text id="rl-ohm" x="380" y="350" text-anchor="middle" font-family="Rubik,Arial" font-weight="700" font-size="30" fill="#D9BC8C">220 Ω</text></svg>
+<div class="card dk" style="padding:16px 24px"><h3 style="font-size:24px">Direnç değeri</h3><input id="rl-sl" type="range" min="0" max="6" step="1" value="3" style="width:100%;height:36px" aria-label="Direnç değeri">
+<div class="row" style="justify-content:space-between;font-family:var(--mono);font-size:19px;color:#93A3B8"><span>0 Ω</span><span>100</span><span>150</span><span>220</span><span>470</span><span>1k</span><span>10k</span></div></div>
+</div>
+<div class="col f1" style="gap:16px">
+<div class="card dk" style="gap:6px;padding:18px 26px"><h3 style="font-size:24px">Hesap</h3><p id="rl-f" class="mono" style="font-size:34px;color:#F6F4EE">I = (5 − 2) / 220 = 13,6 mA</p></div>
+<div style="background:#16253A;border-radius:16px;padding:18px 24px"><p style="font-size:22px;color:#BFCAD6;margin-bottom:8px">Akım göstergesi (mA)</p>
+<svg viewBox="0 0 800 70" width="100%" role="img" aria-label="Akım göstergesi"><rect x="0" y="20" width="400" height="26" fill="#2E8540"/><rect x="400" y="20" width="200" height="26" fill="#D9A400"/><rect x="600" y="20" width="200" height="26" fill="#B42318"/>
+<text x="0" y="66" font-family="JetBrains Mono,monospace" font-size="18" fill="#93A3B8">0</text><text x="400" y="66" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="18" fill="#93A3B8">20</text><text x="800" y="66" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="18" fill="#93A3B8">40+</text>
+<polygon id="rl-ptr" points="0,0 -12,-0 0,16" fill="#FFFFFF"/><rect id="rl-needle" x="13" y="8" width="6" height="52" rx="3" fill="#FFFFFF"/></svg></div>
+<div class="card" id="rl-st" style="background:#E3F4E8"><h3 id="rl-h" style="color:#14301F">İdeal</h3><p id="rl-m" style="color:#14301F;font-size:25px">LED parlak ve güvenli yanar. Bu hafta hep bu değeri kullanıyoruz.</p></div>
+<div class="card dk" style="padding:14px 22px"><h3 style="font-size:23px">Dene</h3><p style="font-size:22px">0 Ω’dan 10 kΩ’a kaydır. Hangi değerden sonra LED soluklaşıyor? 150 Ω neden “sınır” sayılır?</p></div>
+</div>
+</div>
+<aside>Oylamanın cevabı: C. Kaydırıcıyı 0 Ω’a getirin: “kontrolsüz akım” uyarısı çıkar; gerçekte sadece LED’in ve pinin iç direnci akımı sınırlar, değer 40 mA üstüne çıkabilir (Uno pin sınırı 40 mA, güvenli kullanım 20 mA). 150 Ω tam 20 mA verir: (5 − 2) / 150 = 0,020 A. 220 Ω: 13,6 mA, hem parlak hem güvenli. 1 kΩ: 3 mA, soluk. 10 kΩ: 0,3 mA, neredeyse yanmaz. Kırmızı LED için ileri gerilim yaklaşık 2 V alınmıştır; mavi/beyaz LED’de 3 V civarındadır ve akım biraz daha düşük çıkar.</aside>
+</section>

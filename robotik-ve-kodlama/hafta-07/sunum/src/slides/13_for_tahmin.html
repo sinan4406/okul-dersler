@@ -1,0 +1,33 @@
+<section id="for-tahmin" class="sl light tight">
+<div class="hd"><p class="eb">Tahmin et · for döngüsünü oku</p><h2 class="ttl">Hangi LED’ler, hangi sırayla yanar?</h2></div>
+<button class="ans-btn alt" data-all="1" type="button" style="align-self:flex-start">Tüm cevapları göster</button>
+<div class="row" style="gap:22px;align-items:stretch">
+<div class="card f1" style="gap:14px;padding:22px 26px"><span class="pill" style="align-self:flex-start">Soru 1</span>
+<div class="codebox" style="padding:14px 20px"><pre class="code" style="font-size:25px"><span class="k">for</span> (i = <span class="n">3</span>; i &lt;= <span class="n">6</span>; i++) {
+  <span class="t">digitalWrite</span>(i, <span class="k">HIGH</span>);
+  <span class="t">delay</span>(<span class="n">300</span>);
+}</pre></div>
+<p style="font-size:24px">Döngü kaç tur döner? Hangi pinler yanar?</p>
+<button class="ans-btn sm" type="button">Cevabı göster</button>
+<div class="ans" hidden><b>4 tur</b>: i = 3, 4, 5, 6. Pinler D3, D4, D5, D6 sırayla yanar. Süre: 4 × 300 = 1200 ms.</div></div>
+<div class="card f1" style="gap:14px;padding:22px 26px"><span class="pill" style="align-self:flex-start">Soru 2</span>
+<div class="codebox" style="padding:14px 20px"><pre class="code" style="font-size:25px"><span class="k">for</span> (i = <span class="n">8</span>; i &gt;= <span class="n">5</span>; i--) {
+  <span class="t">digitalWrite</span>(i, <span class="k">HIGH</span>);
+  <span class="t">delay</span>(<span class="n">300</span>);
+}</pre></div>
+<p style="font-size:24px">Bu kez i azalıyor. Sıra nasıl olur?</p>
+<button class="ans-btn sm" type="button">Cevabı göster</button>
+<div class="ans" hidden><b>8, 7, 6, 5</b> sırasıyla: D8 → D7 → D6 → D5. i-- her turda i’yi 1 azaltır; koşul i &gt;= 5 olduğu için 4 tur döner.</div></div>
+<div class="card f1" style="gap:14px;padding:22px 26px"><span class="pill" style="align-self:flex-start">Soru 3</span>
+<div class="codebox" style="padding:14px 20px"><pre class="code" style="font-size:25px"><span class="k">for</span> (i = <span class="n">2</span>; i &lt;= <span class="n">8</span>; i = i + <span class="n">2</span>) {
+  <span class="t">digitalWrite</span>(i, <span class="k">HIGH</span>);
+  <span class="t">delay</span>(<span class="n">300</span>);
+}</pre></div>
+<p style="font-size:24px">Artış kuralı i = i + 2. Hangi pinler yanar?</p>
+<button class="ans-btn sm" type="button">Cevabı göster</button>
+<div class="ans" hidden><b>D2, D4, D6, D8</b>: i her turda 2 artar (2, 4, 6, 8). Sonra i = 10 olur, koşul yanlıştır. Yalnız 4 tur.</div></div>
+</div>
+<div class="card info" style="padding:14px 24px"><p style="font-size:23px"><b>Püf noktası:</b> Soruda önce başlangıcı, sonra koşulu, en son artışı oku. i = 9’da koşul yanlış olduğu için döngü orada biter; bunu kâğıda i değerlerini yazarak kontrol et.</p></div>
+<p class="foot">Önce kâğıda i değerlerini yaz, sonra cevabı aç. Tümünü sırayla Tinkercad’de de deneyebilirsin.</p>
+<aside>Öğrenciler üç soruyu defterlerine yazarak çözsün; her soru için i değerlerini alt alta yazmalarını isteyin. Soru 3 i = i + 2 kullanır: i++ aslında i = i + 1 demektir, burada artış miktarını değiştirdik. Soru 2’de azalan döngü Örnek 4’teki geri dönüşü hazırlar. Cevaplar tek tek veya “Tüm cevapları göster” ile açılır.</aside>
+</section>

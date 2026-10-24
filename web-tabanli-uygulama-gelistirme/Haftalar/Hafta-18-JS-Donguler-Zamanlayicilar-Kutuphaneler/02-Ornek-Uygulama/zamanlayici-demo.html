@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>setTimeout / setInterval Demosu</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; }
+    button { padding: 8px 16px; margin: 4px; cursor: pointer; }
+    #sayac { font-size: 32px; font-weight: bold; margin: 16px 0; }
+    #bildirim { color: green; min-height: 24px; }
+  </style>
+</head>
+<body>
+
+  <h1>1) setTimeout — Tek Seferlik Bildirim</h1>
+  <button id="btn-timeout">Bildirim Gönder (3 sn sonra kaybolur)</button>
+  <p id="bildirim"></p>
+
+  <h1>2) setInterval — Sürekli Çalışan Sayaç</h1>
+  <div id="sayac">0</div>
+  <button id="btn-baslat">Sayacı Başlat</button>
+  <button id="btn-durdur">Sayacı Durdur</button>
+
+  <script>
+    // ---- 1) setTimeout ----
+    const bildirim = document.getElementById("bildirim");
+    document.getElementById("btn-timeout").addEventListener("click", function () {
+      bildirim.textContent = "Mesajınız alındı!";
+      setTimeout(function () {
+        bildirim.textContent = "";
+      }, 3000);
+    });
+
+    // ---- 2) setInterval + clearInterval ----
+    let deger = 0;
+    let zamanlayiciId = null;
+    const sayacEl = document.getElementById("sayac");
+
+    document.getElementById("btn-baslat").addEventListener("click", function () {
+      if (zamanlayiciId !== null) return; // zaten çalışıyorsa tekrar başlatma
+      zamanlayiciId = setInterval(function () {
+        deger++;
+        sayacEl.textContent = deger;
+      }, 1000);
+    });
+
+    document.getElementById("btn-durdur").addEventListener("click", function () {
+      clearInterval(zamanlayiciId);
+      zamanlayiciId = null;
+    });
+  </script>
+
+</body>
+</html>

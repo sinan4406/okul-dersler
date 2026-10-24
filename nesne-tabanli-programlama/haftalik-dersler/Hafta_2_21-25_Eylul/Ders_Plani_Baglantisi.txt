@@ -1,0 +1,11 @@
+NTP 10 - 2. Hafta (21-25 Eylul)
+Konu: Isim uzaylari, degiskenler, veri turleri
+
+Ders plani (Claude Docs, cevrimici):
+https://claude.ai/artifact/6TVRXg1FSkT2q15WPhB9pQ
+
+Sunumun cevrimici kopyasi:
+https://claude.ai/artifact/DKkXPQ96u9mH9RaB45tgiH
+
+Sunum.html tek basina ve internetsiz calisir. Klasoru istediginiz yere tasiyabilirsiniz.
+Kisayollar: Sag/Sol ok = ileri/geri, N = ogretmen notu, F = tam ekran.
