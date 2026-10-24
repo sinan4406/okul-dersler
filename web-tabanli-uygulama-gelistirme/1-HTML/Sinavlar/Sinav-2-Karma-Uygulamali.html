@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Sınavı 2 — Karma ve Kod Okuma</title>
+<link rel="stylesheet" href="sinav.css">
+</head>
+<body>
+<div class="wrap" id="intro">
+  <div class="card">
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+    <div class="meta" id="chips"></div>
+    <h2>Sınav kapsamı</h2>
+    <ul class="rules" id="topics"></ul>
+    <h2>Sınav talimatları</h2>
+    <ul class="rules" id="rules"></ul>
+    <label class="name" for="name">Adınız Soyadınız (isteğe bağlı)</label>
+    <input type="text" id="name" autocomplete="name">
+    <div class="nav"><span></span><button class="primary" id="start">Sınava Başla</button></div>
+  </div>
+</div>
+
+<div id="exam" class="hidden">
+  <div class="topbar"><div class="in">
+    <span class="timer" id="timer">00:00</span>
+    <div class="bar"><i id="prog"></i></div>
+    <span id="count" class="sub" style="margin:0"></span>
+    <button class="primary" id="finish">Sınavı Bitir</button>
+  </div></div>
+  <div class="wrap">
+    <div class="card" id="question"></div>
+    <div class="nav">
+      <div class="grp"><button id="prev">← Önceki</button><button id="flagBtn">⚐ Sonra bak</button></div>
+      <button id="next">Sonraki →</button>
+    </div>
+    <div class="card" style="margin-top:16px"><strong>Soru haritası</strong><div class="palette" id="palette"></div></div>
+  </div>
+</div>
+
+<div class="wrap hidden" id="result"></div>
+
+<script>
+window.SINAV = {
+  title: "HTML Sınavı 2 — Karma ve Kod Okuma",
+  subtitle: "Bölüm 1.1 – 1.5: Doğru/Yanlış, boşluk doldurma, çoklu seçim ve kod okuma soruları",
+  minutes: 35,
+  passPercent: 60,
+  topics: [
+    "1.1 Web ve HTML'e Giriş",
+    "1.2 Belge İskeleti ve Temel Sözdizimi",
+    "1.3 Metin ve İçerik Yapısı",
+    "1.4 Listeler ve Gruplama",
+    "1.5 Bağlantılar ve Gezinme"
+  ],
+  rules: [
+    "Sınav <strong>25 soru</strong> içerir ve dört tür soruyu bir arada sunar: <strong>Doğru/Yanlış (8)</strong>, <strong>Boşluk doldurma (8)</strong>, <strong>Çoklu seçim (4)</strong> ve <strong>Kod okuma (5)</strong>.",
+    "Süre <strong>35 dakikadır</strong>. Süre dolunca sınav otomatik biter.",
+    "<strong>Boşluk doldurma</strong> sorularında yalnızca istenen kelimeyi/değeri yazın (örn. <code>ul</code>). Büyük-küçük harf ve boşluklar dikkate alınmaz; açılı parantez yazmak zorunda değilsiniz.",
+    "<strong>Çoklu seçim</strong> sorularında doğru olan <strong>tüm</strong> şıkları işaretlemelisiniz. Eksik veya fazla işaretleme sorunun yanlış sayılmasına yol açar.",
+    "<strong>Kod okuma</strong> sorularında verilen kodu tarayıcı gibi okuyup sonucu tahmin edin; kodu çalıştırmayın.",
+    "Her soru eşit puandır, yanlış cevap puan kırmaz. Boş bırakılan sorular yanlış sayılır.",
+    "Soru haritasından istediğiniz soruya geçebilir, emin olmadıklarınızı <strong>⚐ Sonra bak</strong> ile işaretleyebilirsiniz.",
+    "Sınav sırasında not, sunu ve önceki uygulamalara bakmayın.",
+    "<strong>Sınavı Bitir</strong> ile cevaplar kilitlenir; sonuç, konu analizi ve her sorunun açıklaması gösterilir. Sayfayı yenilemek sınavı sıfırlar.",
+    "Başarı sınırı <strong>%60</strong>'tır."
+  ],
+  questions: [
+    /* ---- Doğru / Yanlış ---- */
+    { topic: "1.1 Web ve HTML", t: "tf",
+      q: "HTML, değişken ve koşul içeren bir programlama dilidir.",
+      ans: 1, exp: "Yanlış. HTML bir işaretleme dilidir; içeriğe anlam kazandırır. Davranış için JavaScript kullanılır." },
+    { topic: "1.2 Belge İskeleti", t: "tf",
+      q: "<code>&lt;!DOCTYPE html&gt;</code> kapanış etiketi olmayan ve içerik almayan bir talimattır.",
+      ans: 0, exp: "Doğru. DOCTYPE bir etiket değil, tarayıcıya standart modda çalışmasını söyleyen bir talimattır; belgenin en üstünde yer alır." },
+    { topic: "1.3 Metin ve İçerik", t: "tf",
+      q: "Başlık küçük görünsün diye <code>&lt;h1&gt;</code> yerine <code>&lt;h5&gt;</code> kullanmak doğru bir yaklaşımdır.",
+      ans: 1, exp: "Yanlış. Başlık seviyesi anlama göre seçilir; boyut CSS ile ayarlanır." },
+    { topic: "1.3 Metin ve İçerik", t: "tf",
+      q: "<code>&lt;br&gt;</code> ve <code>&lt;hr&gt;</code> içerik almadıkları için kapanış etiketi gerektirmez.",
+      ans: 0, exp: "Doğru. Boş (void) elementlerdir: kapanış etiketleri yoktur." },
+    { topic: "1.4 Listeler", t: "tf",
+      q: "<code>&lt;ol type=\"A\" start=\"C\"&gt;</code> yazımı, listeyi C harfinden başlatmak için geçerlidir.",
+      ans: 1, exp: "Yanlış. start her zaman sayı alır: start=\"3\" yazılır ve type=\"A\" ile C görünür." },
+    { topic: "1.4 Listeler", t: "tf",
+      q: "<code>&lt;ol reversed=\"false\"&gt;</code> yazmak azalan numaralandırmayı kapatır.",
+      ans: 1, exp: "Yanlış. reversed boolean bir özniteliktir; değeri değil varlığı önemlidir. Kapatmak için özniteliği tamamen kaldırmak gerekir." },
+    { topic: "1.5 Bağlantılar", t: "tf",
+      q: "Kendi sitenizin sayfaları arasında bağlantı kurarken mutlak URL (https://alanadim.com/...) kullanmak en doğru yöntemdir.",
+      ans: 1, exp: "Yanlış. Kendi sayfalar arasında göreli yol kullanılır; mutlak URL, alan adı değişince bağlantıları kırar. Mutlak URL başka sitelere bağlanırken kullanılır." },
+    { topic: "1.5 Bağlantılar", t: "tf",
+      q: "URL'lerde klasör ayracı olarak Windows'ta olduğu gibi ters eğik çizgi (\\) kullanılır.",
+      ans: 1, exp: "Yanlış. URL'lerde her zaman düz eğik çizgi (/) kullanılır." },
+
+    /* ---- Boşluk doldurma ---- */
+    { topic: "1.2 Belge İskeleti", t: "fill",
+      q: "Belge dilini bildiren <code>&lt;html ___=\"tr\"&gt;</code> ifadesindeki eksik öznitelik adını yazın.",
+      ans: ["lang"], exp: "lang özniteliği belge dilini bildirir; ekran okuyucu, çeviri ve arama motorları bunu kullanır." },
+    { topic: "1.2 Belge İskeleti", t: "fill",
+      q: "Türkçe karakterlerin doğru görünmesi için <code>&lt;meta ___=\"UTF-8\"&gt;</code> ifadesindeki eksik öznitelik adı nedir?",
+      ans: ["charset"], exp: "meta charset karakter kodlamasını belirler." },
+    { topic: "1.4 Listeler", t: "fill",
+      q: "Sırası anlam taşımayan öğeler (alışveriş listesi gibi) için kullanılan liste etiketinin adını yazın (sadece etiket adı).",
+      ans: ["ul", "<ul>"], exp: "ul = unordered list (sırasız liste)." },
+    { topic: "1.4 Listeler", t: "fill",
+      q: "Ad–değer listesinde (<code>dl</code>) terimin <strong>açıklamasını</strong> taşıyan etiketin adı nedir?",
+      ans: ["dd", "<dd>"], exp: "dt terim/ad, dd açıklama/değerdir." },
+    { topic: "1.5 Bağlantılar", t: "fill",
+      q: "Bulunduğunuz klasörden bir üst klasöre çıkmak için yola hangi ifade yazılır?",
+      ans: ["../", ".."], exp: "../ bir üst klasörü gösterir. Örn. ../index.html" },
+    { topic: "1.5 Bağlantılar", t: "fill",
+      q: "E-posta oluşturan bağlantı: <code>&lt;a href=\"___:info@ornek.com\"&gt;</code> — boşluğa gelecek şema adı nedir?",
+      ans: ["mailto", "mailto:"], exp: "mailto: şeması varsayılan e-posta uygulamasını açar." },
+    { topic: "1.5 Bağlantılar", t: "fill",
+      q: "Bağlantıyı yeni sekmede açmak için <code>target=\"___\"</code> boşluğuna ne yazılır?",
+      ans: ["_blank"], exp: "target=\"_blank\" hedefi yeni sekmede açar; güvenlik için rel=\"noopener noreferrer\" eklenir." },
+    { topic: "1.5 Bağlantılar", t: "fill",
+      q: "<code>&lt;a href=\"#iletisim\"&gt;</code> bağlantısının gideceği elementte hangi öznitelik bulunmalıdır? (öznitelik adı)",
+      ans: ["id"], exp: "Hedef element id=\"iletisim\" taşır. id değeri sayfada benzersiz olmalıdır." },
+
+    /* ---- Çoklu seçim ---- */
+    { topic: "1.2 Belge İskeleti", t: "multi",
+      q: "Aşağıdakilerden hangileri <code>&lt;head&gt;</code> içine yazılır?",
+      opts: ["<code>&lt;title&gt;</code>", "<code>&lt;meta charset=\"UTF-8\"&gt;</code>", "<code>&lt;h1&gt;</code>", "<code>&lt;p&gt;</code>"],
+      ans: [0, 1], exp: "title ve meta ayarları head'e yazılır. h1 ve p kullanıcıya gösterilen içeriktir; body'ye yazılır." },
+    { topic: "1.3 Metin ve İçerik", t: "multi",
+      q: "Aşağıdaki elementlerden hangileri <strong>kapanış etiketi olmayan</strong> (boş) elementlerdir?",
+      opts: ["<code>&lt;br&gt;</code>", "<code>&lt;hr&gt;</code>", "<code>&lt;p&gt;</code>", "<code>&lt;li&gt;</code>"],
+      ans: [0, 1], exp: "br ve hr içerik almaz. p ve li içerik taşır; kapanış etiketlerini her zaman yazmayı tercih ederiz." },
+    { topic: "1.5 Bağlantılar", t: "multi",
+      q: "<code>target=\"_blank\"</code> kullanılan bir bağlantıda güvenlik için <code>rel</code> içine hangi değerler yazılır?",
+      opts: ["noopener", "noreferrer", "download", "stylesheet"],
+      ans: [0, 1], exp: "rel=\"noopener noreferrer\" yeni sekmenin eski sayfaya window.opener ile erişmesini ve yönlendiren adresin iletilmesini engeller." },
+    { topic: "1.1 Web ve HTML", t: "multi",
+      q: "HTML yanıtı tarayıcıya ulaştıktan sonra tarayıcının yaptığı işlemler hangileridir?",
+      opts: ["HTML'i ayrıştırıp DOM ağacını oluşturur", "CSS kurallarını elementlere uygular", "Gerekirse JavaScript'i çalıştırır", "Alan adını IP adresine çevirmek için veritabanı sorgular"],
+      ans: [0, 1, 2], exp: "Alan adının IP'ye çevrilmesi (DNS) yanıt gelmeden önce yapılır ve veritabanı sorgusu değildir." },
+
+    /* ---- Kod okuma ---- */
+    { topic: "1.4 Listeler", t: "mc",
+      q: "Aşağıdaki liste tarayıcıda hangi işaretlerle görünür?",
+      code: "<ol type=\"a\" start=\"3\">\n  <li>Kahvaltı</li>\n  <li>Öğle yemeği</li>\n</ol>",
+      opts: ["3, 4", "a, b", "c, d", "iii, iv"],
+      ans: 2, exp: "start=\"3\" üçüncü işaretten başlatır; type=\"a\" küçük harf olduğu için c, d görünür." },
+    { topic: "1.4 Listeler", t: "mc",
+      q: "Aşağıdaki liste nasıl numaralanır?",
+      code: "<ol reversed>\n  <li>Bronz</li>\n  <li>Gümüş</li>\n  <li>Altın</li>\n</ol>",
+      opts: ["1, 2, 3", "3, 2, 1", "Numara görünmez", "0, -1, -2"],
+      ans: 1, exp: "reversed numaralandırmayı azalan sıraya çevirir; öğe sayısı 3 olduğu için 3, 2, 1 görünür." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "<code>sayfalar/iletisim.html</code> dosyasının içinde aşağıdaki bağlantı var ve <code>sayfalar/hakkimizda.html</code> dosyası gerçekten mevcut. Tıklanınca ne olur?",
+      code: "<!-- sayfalar/iletisim.html içinde -->\n<a href=\"sayfalar/hakkimizda.html\">Hakkımızda</a>",
+      opts: ["Hakkımızda sayfası açılır.", "Tarayıcı sayfalar/sayfalar/hakkimizda.html adresini arar; dosya bulunamaz (404).", "Ana sayfa açılır.", "Dosya indirilir."],
+      ans: 1, exp: "Göreli yol, bağlantının yazıldığı dosyanın klasöründen çözülür. Zaten sayfalar klasöründeyiz; doğru yazım yalnızca hakkimizda.html olurdu." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "Aşağıdaki menüde \"Hakkımızda\" öğesi için ne söylenebilir?",
+      code: "<ul>\n  <li><a href=\"index.html\">Ana Sayfa</a></li>\n  <li><a>Hakkımızda</a></li>\n</ul>",
+      opts: ["Tıklanınca hakkimizda.html açılır.", "Kod hata verir ve menü görünmez.", "Hakkımızda bağlantısı kırmızı görünür.", "Hakkımızda bir bağlantı değildir (yer tutucu); mavi/altı çizili değildir ve tıklanamaz."],
+      ans: 3, exp: "href yoksa a bağlantı değildir. Bulunulan sayfanın menüde href'siz bırakılması gerçek projelerde sık kullanılır." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "Aşağıdaki bağlantıya tıklayan ziyaretçi için ne olur?",
+      code: "<a href=\"dosyalar/rapor.pdf\" download=\"aylik-rapor.pdf\">Raporu indir</a>",
+      opts: ["PDF yeni sekmede açılır.", "PDF indirilir ve önerilen dosya adı aylik-rapor.pdf olur.", "Sayfa yenilenir.", "rapor.pdf dosyası silinir."],
+      ans: 1, exp: "download özniteliği hedefin açılmak yerine indirilmesini sağlar; değer olarak verilen ad, kaydedilecek dosya adı olur." }
+  ]
+};
+</script>
+<script src="sinav.js"></script>
+</body>
+</html>

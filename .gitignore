@@ -8,3 +8,9 @@ Thumbs.db
 # Cevap dosyalari repoya/siteye girmesin
 *Cevaplari*
 cevap-anahtari/
+
+# Buyuk/gizli dosyalar
+*.mp4
+ornek-cozum/
+HTML-7-Sohbet-Tam-Metni.md
+Sinav_Sorulari*

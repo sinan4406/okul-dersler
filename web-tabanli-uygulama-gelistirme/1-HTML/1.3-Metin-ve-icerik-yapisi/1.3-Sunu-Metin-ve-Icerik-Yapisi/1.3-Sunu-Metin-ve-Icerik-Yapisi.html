@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metin ve İçerik Yapısı</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --panel:#121b2e;
+    --panel-2:#0e1626;
+    --border:#243252;
+    --text:#e7ecf7;
+    --text-dim:#93a1c2;
+    --accent:#5ac8fa;
+    --accent-2:#7ee8b8;
+    --code-bg:#0a1120;
+    --danger:#ff6b6b;
+    --warn:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    overflow:hidden;
+  }
+  .deck{ position:relative; width:100vw;height:100vh; }
+  .slide{
+    position:absolute; inset:0;
+    display:none; flex-direction:column; justify-content:center;
+    padding:4.5vh 7vw 8vh;
+    opacity:0; transform:translateY(12px);
+    transition:opacity .35s ease, transform .35s ease;
+    overflow-y:auto;
+  }
+  .slide.active{ display:flex; opacity:1; transform:translateY(0); }
+  .slide > *{ flex-shrink:0; }
+  .kicker{ align-self:flex-start; display:inline-flex; align-items:baseline; gap:.45rem; flex-wrap:wrap; background:linear-gradient(135deg,rgba(90,200,250,.18),rgba(126,232,184,.10)); border:1px solid #2f4a72; border-radius:999px; padding:.34rem 1.05rem; font-size:1.12rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.55rem; color:var(--accent); }
+  .kicker .kt{ color:var(--accent-2); }
+  .kicker .kd{ color:#66799e; font-weight:700; }
+  .kicker .ks{ color:var(--accent); }
+  .kicker .en{ text-transform:none; }
+  .bridge{ color:var(--text-dim); font-size:1.1rem; font-style:italic; margin:.1rem 0 1rem; }
+  .kicker + .bridge{ margin-top:0; }
+  h1{ font-size:clamp(1.8rem,4vw,3.2rem); margin:0 0 .3rem 0; font-weight:800; line-height:1.1; letter-spacing:-0.02em; }
+  h2{ font-size:clamp(1.4rem,2.6vw,2.05rem); margin:0 0 .5rem 0; font-weight:800; letter-spacing:-0.01em; }
+  .sub{ color:var(--text-dim); font-size:clamp(1.3rem,1.85vw,1.6rem); max-width:74ch; line-height:1.6; }
+  .sub b{ color:var(--text); }
+  .grid{ display:grid; gap:.85rem; margin-top:1rem; }
+  .grid.cols-2{grid-template-columns:1fr 1fr;}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr);}
+  .card{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:1.2rem 1.35rem; }
+  .card h3{ margin:0 0 .55rem 0; font-size:1.3rem; display:flex; align-items:center; gap:.55rem; }
+  .card p{ margin:0; color:var(--text-dim); font-size:1.25rem; line-height:1.6; }
+  .card p + p{ margin-top:.5rem; }
+  .card ul{ list-style:none; margin:.7rem 0 0; padding:0; display:flex; flex-direction:column; gap:.4rem; }
+  .card ul li{ font-size:1.15rem; color:var(--text-dim); padding-left:1rem; position:relative; line-height:1.5; }
+  .card ul li::before{ content:"–"; position:absolute; left:0; color:var(--accent); }
+  .card ul li b{color:var(--text);}
+  .grid.sik .card{ padding:.7rem .95rem; }
+  .grid.sik .card ul{ margin-top:.5rem; gap:.3rem; }
+  .badge{ display:inline-flex; align-items:center; justify-content:center; width:26px;height:26px; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#06111f; font-weight:800; font-size:.8rem; flex-shrink:0; }
+  .split{ display:grid; grid-template-columns:1fr 1fr; gap:1.15rem; margin-top:.9rem; align-items:stretch; max-height:62vh; }
+  .split.wide-left{ grid-template-columns:1.3fr 1fr; }
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:16px; overflow:hidden; display:flex; flex-direction:column; min-height:0; }
+  .panel-head{ padding:.55rem .95rem; font-size:1rem; font-weight:700; letter-spacing:.04em; color:var(--text-dim); border-bottom:1px solid var(--border); background:var(--panel-2); display:flex; align-items:center; gap:.5rem; }
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--border);}
+  .dots{display:flex;gap:5px;}
+  .dots .d1{background:#ff5f56;} .dots .d2{background:#ffbd2e;} .dots .d3{background:#27c93f;}
+  pre{ margin:0; padding:1rem 1.1rem; font-family:ui-monospace,SFMono-Regular,"Cascadia Code","Fira Code",Consolas,monospace; font-size:clamp(.95rem,1.15vw,1.15rem); line-height:1.55; color:#d7e2f7; background:var(--code-bg); overflow:auto; flex:1; min-height:0; }
+  .tok-tag{color:#7ee8b8;} .tok-attr{color:#ffd166;} .tok-str{color:#5ac8fa;} .tok-punc{color:#93a1c2;} .tok-cmt{color:#5c6b8a;font-style:italic;} .tok-em{color:#f5a3ff;font-weight:700;} .tok-kw{color:#ff9f7a;font-weight:700;}
+  .tok-mine{color:#ff8a8a;} .tok-theirs{color:#7ee8b8;} .tok-marker{color:#ffd166;font-weight:700;}
+  table.cheat{ width:100%; border-collapse:collapse; margin-top:.85rem; font-size:1.25rem; }
+  table.cheat th, table.cheat td{ text-align:left; padding:.4rem .75rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  table.cheat th{ color:var(--text-dim); font-weight:700; font-size:1rem; text-transform:uppercase; letter-spacing:.06em; }
+  table.cheat.sik th, table.cheat.sik td{ padding:.22rem .7rem; }
+  table.cheat code{ background:var(--code-bg); padding:.15rem .4rem; border-radius:6px; color:var(--accent-2); font-family:ui-monospace,SFMono-Regular,"Cascadia Code","Fira Code",Consolas,monospace; font-size:.85em; }
+  .term{ background:var(--code-bg); border-radius:14px; border:1px solid var(--border); overflow:hidden; margin-top:1.1rem; }
+  .term-bar{ background:var(--panel-2); padding:.55rem .95rem; display:flex; gap:6px; border-bottom:1px solid var(--border); }
+  .term-body{ padding:1rem 1.2rem; font-family:ui-monospace,SFMono-Regular,"Cascadia Code","Fira Code",Consolas,monospace; font-size:.82rem; line-height:1.68; color:#d7e2f7; }
+  .prompt{color:var(--accent-2);} .path{color:var(--accent);} .out{color:var(--text-dim);} .out-add{color:var(--accent-2);} .out-warn{color:var(--warn);} .out-del{color:var(--danger);}
+  .callout{ margin-top:.9rem; padding:.85rem 1.1rem; border-radius:12px; border:1px solid #3a2d1a; background:#1c1608; color:#ffd166; font-size:1.15rem; line-height:1.55; }
+  .callout.danger{ border-color:#3a1a1a; background:#1c0808; color:#ff9b9b; }
+  .callout b{color:inherit;}
+  .quote{ margin-top:.9rem; background:var(--panel); border-left:3px solid var(--accent); border-radius:0 14px 14px 0; padding:1.05rem 1.4rem 1.05rem 2.3rem; position:relative; font-size:1.25rem; line-height:1.65; color:var(--text-dim); }
+  .quote::before{ content:"\201C"; position:absolute; left:.5rem; top:.15rem; font-size:2.4rem; font-family:Georgia,serif; color:var(--accent); opacity:.5; }
+  .quote b{ color:var(--text); }
+  .title-slide{ justify-content:center; align-items:flex-start; }
+  .title-badge{ display:inline-block; padding:.4rem .9rem; border-radius:999px; border:1px solid var(--border); background:var(--panel); color:var(--accent); font-size:.8rem; font-weight:700; letter-spacing:.05em; margin-bottom:1.2rem; }
+  .toc{margin-top:1.4rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem 2rem;}
+  .toc-item{display:flex;align-items:center;gap:.7rem;color:var(--text-dim);font-size:1.2rem;}
+  .toc-item .idx{color:var(--accent);font-weight:800;width:1.6rem;}
+  .nav{ position:fixed; bottom:0;left:0;right:0; display:flex; align-items:center; justify-content:space-between; padding:1rem 2rem; z-index:10; }
+  .nav-btn{ background:var(--panel); border:1px solid var(--border); color:var(--text); padding:.5rem 1.05rem; border-radius:999px; cursor:pointer; font-size:.83rem; font-weight:600; display:flex;align-items:center;gap:.4rem; transition:background .15s; }
+  .nav-btn:hover{background:var(--panel-2);} .nav-btn:disabled{opacity:.35;cursor:default;}
+  .progress-wrap{ display:flex;align-items:center;gap:.8rem; color:var(--text-dim); font-size:.78rem; }
+  .progress-bar{ position:fixed; top:0;left:0;right:0; height:3px; background:var(--border); z-index:10; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width .3s ease; width:0%; }
+  footer.tag{ position:fixed; top:1rem;right:2rem; color:var(--text-dim); font-size:.76rem; letter-spacing:.05em; z-index:5; }
+  .diagram-box{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:1.1rem 1.3rem; }
+  .diagram-box .lbl{ font-size:.8rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); margin-bottom:.5rem; }
+  .hash{ font-family:ui-monospace,SFMono-Regular,"Cascadia Code","Fira Code",Consolas,monospace; color:var(--accent-2); }
+  .steps-strip{ display:flex; align-items:stretch; gap:.4rem; margin-top:1.2rem; }
+  .step-card{ flex:1; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:.9rem 1rem; }
+  .step-card .n{ width:22px;height:22px;border-radius:50%; background:var(--panel-2); border:1px solid var(--border); display:flex;align-items:center;justify-content:center; font-size:.72rem;font-weight:800;color:var(--accent); margin-bottom:.5rem; }
+  .step-card p{ margin:0; font-size:1.08rem; color:var(--text-dim); line-height:1.5; }
+  .step-arrow{ display:flex; align-items:center; color:var(--border); font-size:1.2rem; padding:0 .1rem; }
+  .mockup{ background:#fff; border-radius:14px; overflow:hidden; margin-top:1.1rem; border:1px solid var(--border); }
+  .mockup-bar{ background:#f6f8fa; padding:.6rem 1rem; font-size:.78rem; color:#57606a; border-bottom:1px solid #d0d7de; font-weight:600; }
+  .mockup-body{ padding:1.1rem 1.3rem; }
+  .mockup-field{ margin-bottom:.75rem; }
+  .mockup-field label{ display:block; font-size:.72rem; color:#57606a; font-weight:700; margin-bottom:.25rem; }
+  .mockup-input{ border:1px solid #d0d7de; border-radius:6px; padding:.4rem .6rem; font-size:.82rem; color:#1a2333; background:#fff; }
+  .mockup-check{ display:flex; align-items:center; gap:.5rem; font-size:.8rem; color:#1a2333; margin-bottom:.35rem; }
+  .mockup-check .box{ width:14px;height:14px;border:1.5px solid #8b949e; border-radius:3px; display:inline-block; }
+  .mockup-check .box.off{ background:#fff; }
+  .mockup-btn{ display:inline-block; margin-top:.4rem; background:#e5eaf0; color:#8b949e; padding:.4rem 1rem; border-radius:6px; font-size:.82rem; font-weight:700; }
+  @media (max-width:900px){ .split, .grid.cols-2, .grid.cols-3, .grid.cols-4, .toc{grid-template-columns:1fr;} }
+  /* --- 1.3'e özel bileşenler --- */
+  .sub + .sub{ margin-top:.55rem; }
+  .panel-body{ padding:.95rem 1.1rem; font-size:1.2rem; color:var(--text-dim); line-height:1.6; }
+  .panel-body b{color:var(--text);}
+  code.inl{ background:var(--code-bg); padding:.12rem .4rem; border-radius:6px; color:var(--accent-2); font-family:ui-monospace,SFMono-Regular,"Cascadia Code","Fira Code",Consolas,monospace; font-size:.92em; }
+  table.cheat td b{color:var(--text);}
+  .callout.good{ border-color:#173a2a; background:#08190f; color:#9beec6; }
+  .cap{ margin-top:.45rem; font-size:1rem; color:var(--text-dim); text-align:center; line-height:1.5; }
+  .bigrule{ margin-top:1.1rem; background:linear-gradient(135deg,rgba(90,200,250,.12),rgba(126,232,184,.08)); border:1px solid var(--border); border-radius:16px; padding:1rem 1.4rem; font-size:1.3rem; font-weight:700; line-height:1.45; color:var(--text); text-align:center; }
+  .qbox{ margin-top:1rem; background:var(--panel-2); border:1px dashed var(--accent); border-radius:14px; padding:.8rem 1.2rem; text-align:center; font-size:.95rem; font-weight:700; }
+
+  /* tarayıcı önizlemesi */
+  .site{ background:#fff; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+  .site-bar{ background:#f6f8fa; padding:.45rem .8rem; border-bottom:1px solid #d0d7de; display:flex; gap:6px; align-items:center; }
+  .site-bar .u{ margin-left:.5rem; background:#fff; border:1px solid #d0d7de; border-radius:20px; font-size:.66rem; color:#57606a; padding:.12rem .6rem; font-family:ui-monospace,Consolas,monospace; overflow:hidden; white-space:nowrap; }
+  .site-plain{ padding:.9rem 1.1rem; font-family:"Times New Roman",Times,serif; color:#000; }
+  .site-plain h4{ font-size:1.3rem; margin:0 0 .3rem; font-weight:700; }
+  .site-plain h5{ font-size:1.05rem; margin:.7rem 0 .25rem; font-weight:700; }
+  .site-plain a{ color:#0000ee; text-decoration:underline; font-size:.84rem; margin-right:.6rem; }
+  .site-plain a.vis{ color:#551a8b; }
+  .site-plain p{ font-size:.83rem; margin:.45rem 0 0; line-height:1.45; }
+  .site-plain .muted{ color:#666; font-size:.76rem; }
+  .frame{ width:100%; height:180px; border:0; display:block; background:#fff; }
+  .site-bar .reset{ margin-left:auto; font-size:.72rem; line-height:1; color:#57606a; cursor:pointer; border:1px solid #d0d7de; background:#fff; border-radius:6px; padding:.18rem .45rem; font-family:inherit; }
+  .site-bar .reset:hover{ background:#eef1f5; }
+  .site-bar .u{ max-width:60%; text-overflow:ellipsis; }
+
+  /* adres anatomisi */
+  .urlx{ overflow-y:hidden; margin-top:1.1rem; background:var(--code-bg); border:1px solid var(--border); border-radius:14px; padding:1.1rem 1.2rem; overflow-x:auto; }
+  .urlx .line{ font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:1.05rem; letter-spacing:.01em; white-space:nowrap; }
+  .urlx .p1{color:#f5a3ff;} .urlx .p2{color:#7ee8b8;} .urlx .p3{color:#ffd166;} .urlx .p4{color:#5ac8fa;}
+  .urlx .legend{ display:flex; flex-wrap:wrap; gap:.45rem 1.4rem; margin-top:.9rem; }
+  .urlx .lg{ font-size:1rem; color:var(--text-dim); display:flex; align-items:center; gap:.4rem; }
+  .urlx .sw{ width:11px;height:11px;border-radius:3px;display:inline-block; }
+  .urlx .lg b{ color:var(--text); font-weight:700; }
+
+  /* klasör ağacı */
+  .tree{ background:var(--code-bg); border:1px solid var(--border); border-radius:14px; padding:1rem 1.2rem; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:1.12rem; line-height:1.7; color:#d7e2f7; white-space:pre; overflow-x:auto; }
+  .tree .dir{ color:var(--accent); font-weight:700; }
+  .tree .cur{ color:var(--warn); font-weight:700; }
+  .tree .note{ color:#5c6b8a; }
+
+  /* ekran okuyucu bağlantı listesi */
+  .srlist{ background:#101a2e; border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  .srlist .h{ background:var(--panel-2); padding:.5rem .95rem; font-size:.72rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--text-dim); border-bottom:1px solid var(--border); }
+  .srlist ul{ list-style:none; margin:0; padding:.6rem .95rem; display:flex; flex-direction:column; gap:.45rem; }
+  .srlist li{ font-size:1.15rem; color:var(--text-dim); padding-left:1.3rem; position:relative; line-height:1.5; }
+  .srlist li::before{ content:"🔊"; position:absolute; left:0; font-size:.7rem; top:.15rem; }
+  .srlist li b{ color:var(--text); }
+  .srlist.bad li b{ color:#ff9b9b; }
+  .srlist.good li b{ color:#9beec6; }
+
+  /* akış adımları */
+  .steps-strip{ display:flex; align-items:stretch; gap:.4rem; margin-top:1.1rem; }
+  .step-card{ flex:1; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:.85rem 1rem; }
+  .step-card .n{ width:22px;height:22px;border-radius:50%; background:var(--panel-2); border:1px solid var(--border); display:flex;align-items:center;justify-content:center; font-size:.72rem;font-weight:800;color:var(--accent); margin-bottom:.45rem; }
+  .step-card p{ margin:0; font-size:1.08rem; color:var(--text-dim); line-height:1.5; }
+  .step-card p b{color:var(--text);}
+  .step-arrow{ display:flex; align-items:center; color:var(--border); font-size:1.2rem; padding:0 .1rem; }
+
+  /* Network paneli mockup */
+  .net{ background:#fff; border-radius:14px; overflow:hidden; border:1px solid var(--border); }
+  .net-bar{ background:#f6f8fa; padding:.45rem 1rem; font-size:.74rem; color:#57606a; border-bottom:1px solid #d0d7de; font-weight:700; display:flex; gap:1.3rem; }
+  .net-bar .on{ color:#0969da; box-shadow:inset 0 -2px 0 #0969da; padding-bottom:.22rem; }
+  table.net-t{ width:100%; border-collapse:collapse; font-size:.78rem; }
+  table.net-t th{ background:#f6f8fa; color:#57606a; text-align:left; padding:.35rem .9rem; font-size:.66rem; text-transform:uppercase; letter-spacing:.05em; border-bottom:1px solid #d0d7de; }
+  table.net-t td{ padding:.4rem .9rem; color:#1a2333; border-bottom:1px solid #eaeef2; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+  .st-ok{ color:#1a7f37; font-weight:700; }
+  .st-err{ color:#cf222e; font-weight:700; }
+  .net-empty{ padding:1.4rem 1rem; text-align:center; color:#8b949e; font-size:.8rem; font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
+
+  .branches{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:.9rem; }
+  .branch{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:.95rem 1.15rem; }
+  .branch .lbl{ font-size:1.12rem; font-weight:800; margin-bottom:.45rem; letter-spacing:.03em; }
+  .branch.no .lbl{ color:var(--danger); }
+  .branch.yes .lbl{ color:var(--accent-2); }
+  .branch p{ margin:0; font-size:1.15rem; color:var(--text-dim); line-height:1.55; }
+  .branch p + p{ margin-top:.4rem; }
+  .branch code{ background:var(--code-bg); padding:.1rem .35rem; border-radius:5px; color:var(--accent-2); font-family:ui-monospace,Consolas,monospace; font-size:.85em; }
+
+  @media (max-width:900px){ .split, .grid.cols-2, .grid.cols-3, .grid.cols-4, .toc, .branches{grid-template-columns:1fr;} .steps-strip{flex-direction:column;} }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+<footer class="tag">Full-Stack Web Geliştirme Eğitimi · HTML</footer>
+
+<div class="deck" id="deck">
+
+  <!-- 1 — Başlık -->
+  <section class="slide active title-slide">
+    <div class="title-badge">HTML</div>
+    <h1>Metin ve İçerik Yapısı</h1>
+    <p class="sub">Bir sayfadaki metni <b>görünüşüne göre değil, anlamına göre</b> işaretlemek. Bu konu, HTML'in ne işe yaradığı sorusunun asıl cevabıdır.</p>
+    <div class="toc">
+      <div class="toc-item"><span class="idx">01</span> Başlık hiyerarşisi: <code class="inl">h1</code>–<code class="inl">h6</code></div>
+      <div class="toc-item"><span class="idx">02</span> Paragraf: <code class="inl">p</code></div>
+      <div class="toc-item"><span class="idx">03</span> Önem ve vurgu: <code class="inl">strong</code>, <code class="inl">em</code></div>
+      <div class="toc-item"><span class="idx">04</span> Satır sonu ve konu geçişi: <code class="inl">br</code>, <code class="inl">hr</code></div>
+      <div class="toc-item"><span class="idx">05</span> Alıntılar: <code class="inl">blockquote</code>, <code class="inl">q</code>, <code class="inl">cite</code></div>
+      <div class="toc-item"><span class="idx">06</span> Kod ve biçim: <code class="inl">code</code>, <code class="inl">pre</code></div>
+      <div class="toc-item"><span class="idx">07</span> Alt ve üst simge: <code class="inl">sub</code>, <code class="inl">sup</code></div>
+      <div class="toc-item"><span class="idx">08</span> Gerçek projede kullanımı</div>
+    </div>
+  </section>
+
+  <!-- 2 — Temel fikir -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Temel fikir</span></div>
+    <h2>HTML metnin nasıl görüneceğini değil, ne anlama geldiğini belirtir</h2>
+    <div class="branches">
+      <div class="branch no">
+        <div class="lbl">✕ Görünüşe göre seçmek</div>
+        <p>"Bu yazı büyük olsun" → <code>h1</code></p>
+        <p>"Bu yazı kalın olsun" → <code>strong</code></p>
+      </div>
+      <div class="branch yes">
+        <div class="lbl">✓ Anlama göre seçmek</div>
+        <p>"Bu, sayfanın ana konusu" → <code>h1</code></p>
+        <p>"Bu bilgi kritik önemde" → <code>strong</code></p>
+      </div>
+    </div>
+    <div class="bigrule">Etiket anlamı söyler, görünümü CSS belirler.</div>
+    <div class="grid cols-3">
+      <div class="card"><h3><span class="badge">1</span> Ekran okuyucu</h3><p>Görme engelli kullanıcıya yapıyı okur: başlıkları listeler, önemli yerleri vurgular.</p></div>
+      <div class="card"><h3><span class="badge">2</span> Arama motoru</h3><p>Sayfanın neyle ilgili olduğunu başlık hiyerarşisinden çıkarır.</p></div>
+      <div class="card"><h3><span class="badge">3</span> JavaScript</h3><p>İçeriği etiketlerine göre seçer ve işler.</p></div>
+    </div>
+  </section>
+
+  <!-- 3 — Başlık hiyerarşisi -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Başlık hiyerarşisi</span></div>
+    <p class="bridge">İlk yapı taşı: sayfayı bölümlere ayıran başlıklar.</p>
+    <h2>Altı başlık seviyesi, belgenin içerik ağacını oluşturur</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> emlak.html</div>
+        <pre data-code="dh"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">İçerik ağacı</div>
+        <div class="panel-body" style="padding:.7rem .8rem">
+          <div class="tree" style="border:none;padding:.4rem .6rem">
+<span class="cur">h1</span> Emlak İlanları
+ ├─ <span class="dir">h2</span> Satılık Evler
+ │   ├─ h3 İstanbul
+ │   └─ h3 Ankara
+ └─ <span class="dir">h2</span> Kiralık Evler
+     ├─ h3 İstanbul
+     └─ h3 İzmir</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><b>Karar ölçütü:</b> <code>h2</code> burada büyük göründüğü için değil, <code>h1</code> başlığının alt bölümü olduğu için seçildi.</div>
+  </section>
+
+  <!-- 4 — Başlık kuralları -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Başlık kuralları</span></div>
+    <p class="bridge">Ağacın anlamlı olması iki kurala bağlı.</p>
+    <h2>Sayfada tek bir <code class="inl">h1</code> bulunur ve seviyeler atlanmaz</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head">✓ Sıralı</div>
+<pre><span class="tok-punc">&lt;</span><span class="tok-tag">h1</span><span class="tok-punc">&gt;</span>Ana başlık<span class="tok-punc">&lt;/</span><span class="tok-tag">h1</span><span class="tok-punc">&gt;</span>
+<span class="tok-punc">&lt;</span><span class="tok-tag">h2</span><span class="tok-punc">&gt;</span>Alt başlık<span class="tok-punc">&lt;/</span><span class="tok-tag">h2</span><span class="tok-punc">&gt;</span>
+<span class="tok-punc">&lt;</span><span class="tok-tag">h3</span><span class="tok-punc">&gt;</span>Daha alt başlık<span class="tok-punc">&lt;/</span><span class="tok-tag">h3</span><span class="tok-punc">&gt;</span></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">✕ Seviye atlanmış</div>
+<pre><span class="tok-punc">&lt;</span><span class="tok-tag">h1</span><span class="tok-punc">&gt;</span>Ana başlık<span class="tok-punc">&lt;/</span><span class="tok-tag">h1</span><span class="tok-punc">&gt;</span>
+<span class="tok-punc">&lt;</span><span class="tok-tag">h4</span><span class="tok-punc">&gt;</span>Alt başlık<span class="tok-punc">&lt;/</span><span class="tok-tag">h4</span><span class="tok-punc">&gt;</span>
+<span class="tok-cmt">&lt;!-- h2 ve h3 atlandı --&gt;</span></pre>
+      </div>
+    </div>
+    <div class="grid cols-2">
+      <div class="card"><h3><span class="badge">!</span> Tek <code class="inl">h1</code></h3><p>Her sayfada, o sayfanın ana konusunu açıklayan tek bir <code class="inl">h1</code> bulunması yerleşik bir yaklaşımdır.</p></div>
+      <div class="card"><h3><span class="badge">!</span> Görünüm için seviye seçilmez</h3><p>Başlık küçük görünsün diye <code class="inl">h4</code> yazılmaz; boyut CSS ile ayarlanır.</p></div>
+    </div>
+  </section>
+
+  <!-- 5 — Paragraf -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Paragraf: &lt;p&gt;</span></div>
+    <p class="bridge">Başlıklar bölümleri açar; içeriği paragraflar taşır.</p>
+    <h2>Her anlamlı paragraf kendi <code class="inl">&lt;p&gt;</code> etiketine yazılır</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> ilan.html</div>
+        <pre data-code="dp"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dp">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout danger"><b>Yaygın hata:</b> Birden fazla bağımsız paragrafı tek bir <code>&lt;p&gt;</code> içine sıkıştırmak. Tarayıcı bunu tek paragraf sayar; aralarına boşluk koymaz.</div>
+  </section>
+
+  <!-- 6 — strong -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Güçlü önem: &lt;strong&gt;</span></div>
+    <p class="bridge">Bazı bilgiler diğerlerinden daha kritiktir; bunu etiketle söyleriz.</p>
+    <h2><code class="inl">&lt;strong&gt;</code> içeriğin güçlü öneme sahip olduğunu belirtir</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> ilan.html</div>
+        <pre data-code="ds"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="ds">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><b>Dikkat:</b> Tarayıcı bunu kalın gösterir, ama etiketin görevi "kalın yazmak" değildir. Ekran okuyucu da bu bilgiyi ayırt eder.</div>
+  </section>
+
+  <!-- 7 — em -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Vurgu: &lt;em&gt;</span></div>
+    <p class="bridge">Önem ile vurgu farklı şeylerdir.</p>
+    <h2><code class="inl">&lt;em&gt;</code> cümlede vurgulanan bölümü belirtir</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> ilan.html</div>
+        <pre data-code="de"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="de">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="quote">Vurgunun yeri değişince cümlenin anlamı da değişir: "Bu ev <em>satılık</em> değildir" ile "<em>Bu</em> ev satılık değildir" aynı şeyi söylemez.</div>
+  </section>
+
+  <!-- 8 — strong/b, em/i -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Anlam mı, görünüm mü?</span></div>
+    <p class="bridge">Aynı görünümü veren ama farklı anlam taşıyan etiketler de vardır.</p>
+    <h2>Kalın ve italik için iki ayrı etiket çifti bulunur</h2>
+    <table class="cheat">
+      <tr><th style="width:14%">Etiket</th><th style="width:22%">Görünüm</th><th>Anlamı</th></tr>
+      <tr><td><code>&lt;strong&gt;</code></td><td>Kalın</td><td><b>Güçlü önem.</b> "Son başvuru tarihi", "Depozito alınmayacaktır" gibi kritik bilgiler.</td></tr>
+      <tr><td><code>&lt;b&gt;</code></td><td>Kalın</td><td>Önem taşımayan, yalnızca <b>dikkat çekmesi istenen</b> ifade. Örneğin bir ürün adının metin içinde ayrışması.</td></tr>
+      <tr><td><code>&lt;em&gt;</code></td><td>İtalik</td><td><b>Cümle içi vurgu.</b> Okunuşta tonlama değişir.</td></tr>
+      <tr><td><code>&lt;i&gt;</code></td><td>İtalik</td><td>Vurgu değil, <b>farklı bir kip</b>: yabancı terim, teknik isim, düşünce aktarımı.</td></tr>
+    </table>
+    <div class="bigrule">Emin değilsen anlam taşıyanı seç: <code class="inl">strong</code> ve <code class="inl">em</code>.</div>
+  </section>
+
+  <!-- 9 — br -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Satır sonu: &lt;br&gt;</span></div>
+    <p class="bridge">Bazı metinlerde satırın nerede biteceği içeriğin bir parçasıdır.</p>
+    <h2><code class="inl">&lt;br&gt;</code> anlamlı satır kırılması gerektiğinde kullanılır</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> iletisim.html</div>
+        <pre data-code="dbr"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dbr">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame" style="height:135px"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid cols-2" style="margin-top:.7rem;gap:.8rem">
+      <div class="card"><h3><span class="badge">✓</span> Uygun yerler</h3><ul><li>Adresler</li><li>Şiir ve şarkı sözleri</li><li>Aynı paragraf içindeki zorunlu satır sonları</li></ul></div>
+      <div class="card"><h3><span class="badge">✕</span> Uygun olmayan</h3><p>Paragraflar arasında boşluk açmak için art arda <code class="inl">&lt;br&gt;</code> yazmak. Boşluk bir görünüm meselesidir, CSS ile ayarlanır.</p></div>
+    </div>
+      </section>
+
+  <!-- 10 — hr -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Konu geçişi: &lt;hr&gt;</span></div>
+    <p class="bridge">Satır değil, konu değiştiğinde kullanılan bir etiket daha var.</p>
+    <h2><code class="inl">&lt;hr&gt;</code> içerikte konusal bir geçiş olduğunu belirtir</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> ilanlar.html</div>
+        <pre data-code="dhr"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dhr">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><b>Dikkat:</b> Tarayıcı yatay bir çizgi çizer ama etiketin anlamı "dekoratif çizgi" değildir. Süsleme amaçlı çizgiler CSS ile yapılır.</div>
+    <div class="callout"><b>Not:</b> <code>&lt;br&gt;</code> ve <code>&lt;hr&gt;</code> içerik almaz, bu yüzden kapanış etiketleri yoktur.</div>
+  </section>
+
+  <!-- 11 — blockquote -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Uzun alıntı: &lt;blockquote&gt;</span></div>
+    <p class="bridge">Metnin bir bölümü başkasına aitse bunu da belirtmek gerekir.</p>
+    <h2><code class="inl">&lt;blockquote&gt;</code> kendi başına bölüm oluşturan uzun alıntılar içindir</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> hakkimizda.html</div>
+        <pre data-code="dbq"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dbq">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><b><code>cite</code> özniteliği:</b> Kaynağın internet adresi biliniyorsa <code>&lt;blockquote cite="https://..."&gt;</code> yazılır. Bu adres sayfada <b>görünmez</b>; makineler için bir bilgidir.</div>
+  </section>
+
+  <!-- 12 — q -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Satır içi alıntı: &lt;q&gt;</span></div>
+    <p class="bridge">Alıntı bir cümlenin içinde kalıyorsa başka bir etiket kullanılır.</p>
+    <h2><code class="inl">&lt;q&gt;</code> cümle içindeki kısa alıntılar içindir</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> yorumlar.html</div>
+        <pre data-code="dq"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dq">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout danger"><b>Yaygın hata:</b> <code>&lt;q&gt;"Bu bölge gelişiyor"&lt;/q&gt;</code> — tırnak işaretlerini tarayıcı zaten ekler. Elle yazılırsa çift tırnak oluşur.</div>
+  </section>
+
+  <!-- 13 — cite -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Eser adı: <span class="en" lang="en">&lt;CITE&gt;</span></span></div>
+    <p class="bridge">Alıntının kendisi değil, alıntılanan eserin adı da işaretlenebilir.</p>
+    <h2><code class="inl">&lt;cite&gt;</code> bir eserin veya kaynağın adını belirtir</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> blog.html</div>
+        <pre data-code="dc"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dc">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid cols-2">
+      <div class="card"><h3><span class="badge">✓</span> Uygun</h3><p>Kitap, makale, araştırma, film, şarkı, yazılım gibi <b>eser adları</b>.</p></div>
+      <div class="card"><h3><span class="badge">✕</span> Uygun değil</h3><p><b>Kişi adını</b> italik göstermek için kullanmak. <code class="inl">&lt;cite&gt;</code> bir görünüm etiketi değildir.</p></div>
+    </div>
+  </section>
+
+  <!-- 14 — code -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Satır içi kod: &lt;code&gt;</span></div>
+    <p class="bridge">Bir teknik metinde kod parçalarının da kendi etiketi vardır.</p>
+    <h2><code class="inl">&lt;code&gt;</code> metnin içindeki kod parçasını belirtir</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> ders.html</div>
+        <pre data-code="dcode"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dcode">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame" style="height:11vh"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="sub">Sayfada bir HTML etiketini <b>metin olarak</b> göstermek istediğinde sorun çıkar: tarayıcı onu etiket sanar. Çözüm, özel karakterleri <b>karakter varlıklarıyla</b> yazmaktır.</p>
+    <table class="cheat sik" style="margin-top:.6rem">
+      <tr><th style="width:22%">Yazılışı</th><th style="width:18%">Görünen</th><th>Karakterin adı</th></tr>
+      <tr><td><code>&amp;lt;</code></td><td><code>&lt;</code></td><td>Küçüktür — etiket başlangıcı</td></tr>
+      <tr><td><code>&amp;gt;</code></td><td><code>&gt;</code></td><td>Büyüktür — etiket sonu</td></tr>
+      <tr><td><code>&amp;amp;</code></td><td><code>&amp;</code></td><td>Ve işareti — karakter varlıklarının kendisi bu işaretle başlar</td></tr>
+    </table>
+    <div class="callout"><b>Sıra önemli:</b> Karakter varlıkları <code>&amp;</code> ile başlayıp <code>;</code> ile biter. Noktalı virgül unutulursa tarayıcı çoğu zaman metni olduğu gibi gösterir.</div>
+  </section>
+
+  <!-- 15 — pre -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Biçimi korunan metin: &lt;pre&gt;</span></div>
+    <p class="bridge">HTML normalde yazdığın boşlukları korumaz; bunun bir istisnası var.</p>
+    <h2><code class="inl">&lt;pre&gt;</code> metindeki boşlukları ve satır sonlarını korur</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> daire.html</div>
+        <pre data-code="dpre"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dpre">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><b>Karşılaştırma:</b> Normal metinde art arda yazılan boşluklar tek boşluğa iner, satır sonu boşluk sayılır. <code>&lt;pre&gt;</code> içinde yazdığın düzen aynen kalır.</div>
+  </section>
+
+  <!-- 16 — pre + code -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Kod bloğu: &lt;pre&gt; + &lt;code&gt;</span></div>
+    <p class="bridge">Çok satırlı kod göstermek için iki etiket birlikte kullanılır.</p>
+    <h2>Kod blokları <code class="inl">&lt;pre&gt;</code> ve <code class="inl">&lt;code&gt;</code> ile birlikte yazılır</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> ders.html</div>
+        <pre data-code="dpc" style="font-size:clamp(.9rem,1.1vw,1.1rem)"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dpc">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid cols-2">
+      <div class="card"><h3><span class="badge">1</span> <code class="inl">&lt;pre&gt;</code></h3><p>Satırların ve boşlukların korunmasını sağlar — <b>biçim</b> görevi.</p></div>
+      <div class="card"><h3><span class="badge">2</span> <code class="inl">&lt;code&gt;</code></h3><p>İçeriğin bilgisayar kodu olduğunu belirtir — <b>anlam</b> görevi.</p></div>
+    </div>
+  </section>
+
+  <!-- 17 — sub / sup -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Alt ve üst simge</span></div>
+    <p class="bridge">Metrekare ve kimyasal formüller için iki küçük etiket.</p>
+    <h2><code class="inl">&lt;sup&gt;</code> üst simge, <code class="inl">&lt;sub&gt;</code> alt simge oluşturur</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> ilan.html</div>
+        <pre data-code="dsup"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dsup">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><b>Ölçüt:</b> Bu etiketler yazıyı küçük göstermek için kullanılmaz; gerçekten <b>alt veya üst simge anlamı</b> olduğunda kullanılır. Metrekare bir üst simgedir, bu yüzden <code>sup</code> doğru seçimdir.</div>
+  </section>
+
+  <!-- 18 — gerçek proje -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Gerçek projede kullanımı</span></div>
+    <p class="bridge">Öğrenilen etiketler tek bir ilan sayfasında bir araya gelir.</p>
+    <h2>Bir emlak ilan sayfasında hangi etiket nerede kullanılır</h2>
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head" lang="en"><span class="dots"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span> ilan.html</div>
+        <pre data-code="dproje"></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tarayıcıda görünen</div>
+        <div class="panel-body">
+          <div class="site" data-demo="dproje">
+            <div class="site-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="u"></span><button class="reset" title="Başa döndür">&#8635;</button></div>
+            <iframe class="frame" style="height:42vh"></iframe>
+          </div>
+          <p class="cap">Kod ve önizleme alanları uzun olduğunda kendi içlerinde aşağı kaydırılabilir.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 19 — etiket karşılıkları -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Projedeki karşılıkları</span></div>
+    <p class="bridge">Aynı sayfadaki her etiketin projede belirli bir görevi var.</p>
+    <h2>Emlak projesinde her etiket hangi işi üstleniyor</h2>
+    <table class="cheat sik" style="margin-top:.6rem">
+      <tr><th style="width:18%">Etiket</th><th>Projedeki karşılığı</th></tr>
+      <tr><td><code>h1</code></td><td>Sayfanın ana konusu — her sayfada bir tane</td></tr>
+      <tr><td><code>h2</code></td><td>İlan bölümleri: Satılık Evler, Kiralık Evler, Müşteri Görüşleri</td></tr>
+      <tr><td><code>h3</code></td><td>İlan kartı başlıkları: her bir dairenin adı</td></tr>
+      <tr><td><code>p</code></td><td>İlan açıklamaları ve özellik metinleri</td></tr>
+      <tr><td><code>strong</code></td><td>Fiyat ve önemli uyarılar (depozito, son başvuru tarihi)</td></tr>
+      <tr><td><code>em</code></td><td>Özellikle vurgulanan koşullar</td></tr>
+      <tr><td><code>blockquote</code></td><td>Müşteri görüşleri</td></tr>
+      <tr><td><code>br</code></td><td>Adres satırları</td></tr>
+      <tr><td><code>sup</code></td><td>Metrekare gösterimi</td></tr>
+      <tr><td><code>hr</code></td><td>Satılık ve kiralık bölümleri arasındaki konu geçişi</td></tr>
+    </table>
+  </section>
+
+  <!-- 19 — yaygın hatalar -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Yaygın hatalar</span></div>
+    <p class="bridge">Bu konudaki hataların ortak noktası, etiketi anlamına göre değil görünüşüne göre seçmek.</p>
+    <h2>Metin etiketlerinde en sık yapılan hatalar</h2>
+    <table class="cheat">
+      <tr><th style="width:36%">Hatalı kullanım</th><th style="width:32%">Sorun</th><th>Doğrusu</th></tr>
+      <tr><td>Büyük görünsün diye <code>h1</code></td><td>Sayfada birden çok ana konu oluşur, içerik ağacı bozulur.</td><td>Boyut CSS ile ayarlanır.</td></tr>
+      <tr><td><code>h1</code>'den sonra <code>h4</code></td><td>Aradaki seviyeler atlanır, hiyerarşi kopar.</td><td>Seviyeler sırayla iner.</td></tr>
+      <tr><td>Tek <code>p</code> içinde çok paragraf</td><td>Tarayıcı tek paragraf sayar, aralarına boşluk koymaz.</td><td>Her paragraf kendi <code>p</code> etiketine.</td></tr>
+      <tr><td>Boşluk için art arda <code>&lt;br&gt;</code></td><td>Görünüm HTML'e karışır, bakımı zorlaşır.</td><td>Boşluk CSS ile verilir.</td></tr>
+      <tr><td><code>&lt;q&gt;</code> içine elle tırnak</td><td>Tarayıcı da tırnak eklediği için çift tırnak çıkar.</td><td>Tırnak yazılmaz.</td></tr>
+      <tr><td>Kişi adı için <code>&lt;cite&gt;</code></td><td>Etiket eser adı içindir, anlam yanlış olur.</td><td>Eser adlarında kullanılır.</td></tr>
+      <tr><td>Kodu düz metin olarak yazmak</td><td>Tarayıcı <code>&lt;</code> ve <code>&gt;</code> gördüğünde etiket sanar.</td><td><code>&amp;lt;</code> ve <code>&amp;gt;</code> kullanılır.</td></tr>
+    </table>
+  </section>
+
+  <!-- 20 — hızlı referans -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Hızlı referans</span></div>
+    <p class="bridge">Etiket seçerken sorulacak soru her zaman aynı: bu metin ne anlama geliyor?</p>
+    <h2>Hangi durumda hangi etiket</h2>
+    <table class="cheat">
+      <tr><th style="width:18%">Etiket</th><th>Ne zaman kullanılır</th></tr>
+      <tr><td><code>h1</code>–<code>h6</code></td><td>İçerik bir bölümün başlığıysa; seviye, bölümün hiyerarşideki yerine göre seçilir</td></tr>
+      <tr><td><code>p</code></td><td>İçerik bağımsız bir paragraf oluşturuyorsa</td></tr>
+      <tr><td><code>strong</code></td><td>Bilgi kritik önemdeyse (uyarı, son tarih, koşul)</td></tr>
+      <tr><td><code>em</code></td><td>Cümlenin belirli bir bölümü vurgulanıyorsa</td></tr>
+      <tr><td><code>br</code></td><td>Satırın nerede biteceği içeriğin parçasıysa (adres, şiir)</td></tr>
+      <tr><td><code>hr</code></td><td>İçerikte konu değişiyorsa</td></tr>
+      <tr><td><code>blockquote</code></td><td>Alıntı kendi başına bir bölüm oluşturuyorsa</td></tr>
+      <tr><td><code>q</code></td><td>Alıntı bir cümlenin içinde kalıyorsa</td></tr>
+      <tr><td><code>cite</code></td><td>Bir eserin adı yazılıyorsa</td></tr>
+      <tr><td><code>code</code> · <code>pre</code></td><td>İçerik bilgisayar koduysa; çok satırlıysa ikisi birlikte</td></tr>
+      <tr><td><code>sub</code> · <code>sup</code></td><td>Alt veya üst simge anlamı varsa (H<sub>2</sub>O, m<sup>2</sup>)</td></tr>
+    </table>
+  </section>
+
+  <!-- özet 1 -->
+  <section class="slide">
+    <div class="kicker"><span class="kt">Metin ve içerik yapısı</span><span class="kd">—</span><span class="ks">Özet</span></div>
+    <h2>Bu konuda öğrenilenler</h2>
+    <div class="grid cols-2 sik" style="gap:.55rem;margin-top:.5rem">
+      <div class="card">
+        <h3><span class="badge">1</span> Temel ilke</h3>
+        <ul>
+          <li>HTML, metnin görünüşünü değil anlamını belirtir; görünüm CSS'in işidir.</li>
+          <li>Etiket, içeriğin anlamına göre seçilir — büyük, kalın veya italik görünmesi istendiği için değil.</li>
+          <li>Bu ayrım ekran okuyucular, arama motorları ve JavaScript için doğrudan sonuç doğurur.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="badge">2</span> Başlıklar ve paragraflar</h3>
+        <ul>
+          <li>Altı başlık seviyesi belgenin içerik ağacını oluşturur.</li>
+          <li>Her sayfada, sayfanın ana konusunu açıklayan tek bir <code class="inl">h1</code> bulunur.</li>
+          <li>Başlık seviyeleri atlanmadan sırayla iner.</li>
+          <li>Her anlamlı paragraf kendi <code class="inl">p</code> etiketine yazılır.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="badge">3</span> Önem, vurgu ve ayırıcılar</h3>
+        <ul>
+          <li><code class="inl">strong</code> güçlü önemi, <code class="inl">em</code> cümle içi vurguyu belirtir.</li>
+          <li><code class="inl">b</code> ve <code class="inl">i</code> aynı görünümü verir ama anlam taşımaz.</li>
+          <li><code class="inl">br</code> anlamlı satır kırılması, <code class="inl">hr</code> konusal geçiş içindir; ikisi de boşluk açmak için kullanılmaz.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="badge">4</span> Alıntılar, kod ve simgeler</h3>
+        <ul>
+          <li><code class="inl">blockquote</code> bölüm oluşturan alıntılar, <code class="inl">q</code> cümle içi alıntılar içindir.</li>
+          <li><code class="inl">cite</code> eser adını belirtir, kişi adını değil.</li>
+          <li><code class="inl">code</code> kodun kendisini, <code class="inl">pre</code> ise yazılan biçimin korunmasını sağlar.</li>
+          <li>Etiketleri metin olarak göstermek için <code class="inl">&amp;lt;</code> ve <code class="inl">&amp;gt;</code> yazılır.</li>
+          <li><code class="inl">sup</code> üst simge, <code class="inl">sub</code> alt simge anlamı taşır.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" id="prevBtn">← Önceki</button>
+  <div class="progress-wrap"><span id="slideCounter"></span></div>
+  <button class="nav-btn" id="nextBtn">Sonraki →</button>
+</div>
+
+<script>
+/* ---------- örnek sayfalar ---------- */
+var DEMOS = {
+  dh: { show:'x.html', pages:{ 'x.html':[
+    '<h1>Emlak İlanları</h1>',
+    '',
+    '<h2>Satılık Evler</h2>',
+    '<h3>İstanbul</h3>',
+    '<h3>Ankara</h3>',
+    '',
+    '<h2>Kiralık Evler</h2>',
+    '<h3>İstanbul</h3>',
+    '<h3>İzmir</h3>'
+  ]}},
+  dp: { show:'ilan.html', pages:{ 'ilan.html':[
+    '<h3>Daire Özellikleri</h3>',
+    '<p>Daire üç oda ve bir salondan',
+    'oluşmaktadır.</p>',
+    '<p>Binada kapalı otopark ve',
+    'güvenlik sistemi bulunmaktadır.</p>'
+  ]}},
+  ds: { show:'ilan.html', pages:{ 'ilan.html':[
+    '<p>Son başvuru tarihi',
+    '<strong>30 Haziran</strong>.</p>',
+    '<p><strong>Depozito',
+    'alınmayacaktır.</strong></p>'
+  ]}},
+  de: { show:'ilan.html', pages:{ 'ilan.html':[
+    '<p>Bu ilan <em>yalnızca</em>',
+    'bireysel başvurular içindir.</p>',
+    '<p>Bu ev <em>satılık</em>',
+    'değildir.</p>'
+  ]}},
+  dbr: { show:'iletisim.html', pages:{ 'iletisim.html':[
+    '<p>',
+    '  Bağdat Caddesi<br>',
+    '  Kadıköy<br>',
+    '  İstanbul',
+    '</p>'
+  ]}},
+  dhr: { show:'ilanlar.html', pages:{ 'ilanlar.html':[
+    '<p>Satılık ilanlarla ilgili bilgiler...</p>',
+    '<hr>',
+    '<p>Kiralık ilanlarla ilgili bilgiler...</p>'
+  ]}},
+  dbq: { show:'hakkimizda.html', pages:{ 'hakkimizda.html':[
+    '<blockquote',
+    '  cite="https://example.com/makale">',
+    '  İyi tasarlanmış yaşam alanları',
+    '  insanların günlük yaşam',
+    '  kalitesini artırır.',
+    '</blockquote>'
+  ]}},
+  dq: { show:'yorumlar.html', pages:{ 'yorumlar.html':[
+    '<p>Danışman,',
+    '<q>Bu bölge son yıllarda hızla',
+    'gelişiyor</q> dedi.</p>'
+  ]}},
+  dc: { show:'blog.html', pages:{ 'blog.html':[
+    '<p>',
+    '  Ayrıntılı bilgi için',
+    '  <cite>Modern Kent Yaşamı',
+    '  Araştırması</cite>',
+    '  incelenebilir.',
+    '</p>'
+  ]}},
+  dcode: { show:'ders.html', pages:{ 'ders.html':[
+    '<p>Sayfanın ana başlığı',
+    '<code>&lt;h1&gt;</code>',
+    'elementiyle oluşturulur.</p>'
+  ]}},
+  dpre: { show:'daire.html', pages:{ 'daire.html':[
+    '<pre>',
+    'Oda 1      20 m²',
+    'Oda 2      16 m²',
+    'Salon      32 m²',
+    '</pre>'
+  ]}},
+  dpc: { show:'ders.html', pages:{ 'ders.html':[
+    '<pre><code>&lt;h1&gt;Emlak İlanları&lt;/h1&gt;',
+    '&lt;p&gt;Yeni ilanları inceleyin.&lt;/p&gt;</code></pre>'
+  ]}},
+  dsup: { show:'ilan.html', pages:{ 'ilan.html':[
+    '<p>Bahçe alanı 250 m<sup>2</sup>.</p>',
+    '<p>Suyun kimyasal formülü',
+    "H<sub>2</sub>O'dur.</p>"
+  ]}},
+  dproje: { show:'ilan.html', pages:{ 'ilan.html':[
+    '<h1>Emlak İlanları</h1>',
+    '',
+    '<h2>Satılık Evler</h2>',
+    "<h3>Kadıköy'de Deniz Manzaralı",
+    'Daire</h3>',
+    '<p>Daire üç oda ve bir salondan',
+    'oluşmaktadır.</p>',
+    '<p>Fiyat:',
+    '<strong>4.750.000 TL</strong></p>',
+    '<p>Kullanım alanı 120 m<sup>2</sup>.</p>',
+    '<p>Bu ilan <em>yalnızca</em>',
+    'bireysel alıcılar içindir.</p>',
+    '<p>',
+    '  Bağdat Caddesi<br>',
+    '  Kadıköy<br>',
+    '  İstanbul',
+    '</p>',
+    '',
+    '<hr>',
+    '',
+    '<h2>Müşteri Görüşü</h2>',
+    '<blockquote>',
+    '  Süreç boyunca her aşamada',
+    '  bilgilendirildik.',
+    '</blockquote>',
+    '',
+    '<p>Danışman,',
+    '<q>Bu bölge hızla gelişiyor</q>',
+    'dedi.</p>'
+  ]}}
+};
+
+/* ---------- kod vurgulama ---------- */
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function hlTag(t){
+  var m = /^<(\/?)([a-zA-Z][\w-]*)([\s\S]*?)(\/?)>$/.exec(t);
+  if(!m) return esc(t);
+  var out = '<span class="tok-punc">&lt;' + m[1] + '</span><span class="tok-tag">' + m[2] + '</span>';
+  var rest = esc(m[3]).replace(/([a-zA-Z-]+)(=)("[^"]*")/g, function(_, a, eq, v){
+    return '<span class="tok-attr">' + a + '</span><span class="tok-punc">=</span><span class="tok-str">' + v + '</span>';
+  });
+  return out + rest + '<span class="tok-punc">' + m[4] + '&gt;</span>';
+}
+
+function hl(src){
+  var out = '', i = 0;
+  while(i < src.length){
+    if(src.substr(i,4) === '<!--'){
+      var j = src.indexOf('-->', i); j = (j < 0) ? src.length : j + 3;
+      out += '<span class="tok-cmt">' + esc(src.slice(i,j)) + '</span>'; i = j; continue;
+    }
+    if(src.charAt(i) === '<'){
+      var k = src.indexOf('>', i);
+      if(k < 0){ out += esc(src.slice(i)); break; }
+      out += hlTag(src.slice(i, k+1)); i = k + 1; continue;
+    }
+    var n = src.indexOf('<', i); if(n < 0) n = src.length;
+    out += esc(src.slice(i, n)); i = n;
+  }
+  return out;
+}
+
+/* ---------- iframe önizleme motoru ---------- */
+function pageSrc(demo, name){ return DEMOS[demo].pages[name].join('\n'); }
+
+function buildDoc(demo, name){
+  var shim = [
+    '<scr' + 'ipt>',
+    'var DEMO="' + demo + '";',
+    'document.addEventListener("click",function(e){',
+    '  var n=e.target; while(n && n.tagName!=="A"){ n=n.parentNode; }',
+    '  if(!n) return;',
+    '  var h=n.getAttribute("href")||"";',
+    '  if(h.charAt(0)==="#"){',
+    '    e.preventDefault();',
+    '    var id=h.slice(1); var el=id?document.getElementById(id):null;',
+    '    if(el){ el.scrollIntoView(); } else { window.scrollTo(0,0); }',
+    '    parent.postMessage({demo:DEMO,t:"hash",h:h},"*"); return;',
+    '  }',
+    '  if(/^(mailto:|tel:|https?:)/i.test(h)) return;',
+    '  e.preventDefault(); parent.postMessage({demo:DEMO,t:"nav",h:h},"*");',
+    '});',
+    '</scr' + 'ipt>'
+  ].join('\n');
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><style>html{font-size:21px}</style></head><body>\n'
+       + pageSrc(demo, name) + '\n' + shim + '\n</body></html>';
+}
+
+function setUrl(box, text){ box.querySelector('.u').textContent = '127.0.0.1:5500/' + text; }
+
+function loadPage(box, name){
+  var demo = box.getAttribute('data-demo');
+  if(!DEMOS[demo].pages[name]) return;
+  box.querySelector('iframe').srcdoc = buildDoc(demo, name);
+  box.setAttribute('data-page', name);
+  setUrl(box, name);
+}
+
+window.addEventListener('message', function(ev){
+  var d = ev.data; if(!d || !d.demo) return;
+  var box = document.querySelector('.site[data-demo="' + d.demo + '"]');
+  if(!box) return;
+  if(d.t === 'nav'){ loadPage(box, d.h.split('#')[0]); }
+});
+
+(function initDemos(){
+  var codes = document.querySelectorAll('[data-code]');
+  for(var i=0;i<codes.length;i++){
+    var id = codes[i].getAttribute('data-code');
+    if(DEMOS[id]) codes[i].innerHTML = hl(pageSrc(id, DEMOS[id].show));
+  }
+  var boxes = document.querySelectorAll('.site[data-demo]');
+  for(var j=0;j<boxes.length;j++){
+    (function(box){
+      var demo = box.getAttribute('data-demo');
+      loadPage(box, DEMOS[demo].show);
+      var btn = box.querySelector('.reset');
+      if(btn) btn.addEventListener('click', function(){ loadPage(box, DEMOS[demo].show); });
+    })(boxes[j]);
+  }
+})();
+
+/* ---------- slayt gezinme ---------- */
+var slides = document.querySelectorAll('.slide');
+var total = slides.length;
+var current = 0;
+
+function render(){
+  for(var i=0;i<total;i++){ slides[i].classList.toggle('active', i===current); }
+  document.getElementById('slideCounter').textContent = (current+1) + ' / ' + total;
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').disabled = current===total-1;
+  document.getElementById('progressFill').style.width = (((current+1)/total)*100) + '%';
+}
+function go(delta){ var next = current + delta; if(next>=0 && next<total){ current = next; render(); } }
+document.getElementById('prevBtn').addEventListener('click', function(){ go(-1); });
+document.getElementById('nextBtn').addEventListener('click', function(){ go(1); });
+document.addEventListener('keydown', function(e){
+  if(e.key==='ArrowRight' || e.key===' '){ go(1); }
+  if(e.key==='ArrowLeft'){ go(-1); }
+});
+render();
+</script>
+
+</body>
+</html>

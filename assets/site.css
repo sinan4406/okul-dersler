@@ -27,5 +27,11 @@ main{margin-top:-52px;padding-bottom:56px}
 .btns a{padding:7px 14px;border-radius:9px;background:var(--cbg);color:var(--cfg);font-weight:700;font-size:.88rem}
 .btns a:first-child{background:var(--c);color:#fff}
 .btns a:hover{filter:brightness(1.12)}
+details{margin-top:2px;font-size:.9rem}
+summary{cursor:pointer;font-weight:700;color:var(--cfg)}
+.apps{margin:8px 0 0;padding-left:18px;color:var(--mute)}
+.apps li{margin:3px 0}
+.apps a{color:var(--ink)}
+.apps a:hover{color:var(--cfg);text-decoration:underline}
 h2.sec{margin:34px 0 14px;font-size:1.1rem;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
 footer{text-align:center;color:var(--mute);font-size:.85rem;padding:0 20px 36px}

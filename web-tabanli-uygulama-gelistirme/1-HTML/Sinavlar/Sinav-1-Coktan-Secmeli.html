@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Sınavı 1 — Çoktan Seçmeli</title>
+<link rel="stylesheet" href="sinav.css">
+</head>
+<body>
+<div class="wrap" id="intro">
+  <div class="card">
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+    <div class="meta" id="chips"></div>
+    <h2>Sınav kapsamı</h2>
+    <ul class="rules" id="topics"></ul>
+    <h2>Sınav talimatları</h2>
+    <ul class="rules" id="rules"></ul>
+    <label class="name" for="name">Adınız Soyadınız (isteğe bağlı)</label>
+    <input type="text" id="name" autocomplete="name">
+    <div class="nav"><span></span><button class="primary" id="start">Sınava Başla</button></div>
+  </div>
+</div>
+
+<div id="exam" class="hidden">
+  <div class="topbar"><div class="in">
+    <span class="timer" id="timer">00:00</span>
+    <div class="bar"><i id="prog"></i></div>
+    <span id="count" class="sub" style="margin:0"></span>
+    <button class="primary" id="finish">Sınavı Bitir</button>
+  </div></div>
+  <div class="wrap">
+    <div class="card" id="question"></div>
+    <div class="nav">
+      <div class="grp"><button id="prev">← Önceki</button><button id="flagBtn">⚐ Sonra bak</button></div>
+      <button id="next">Sonraki →</button>
+    </div>
+    <div class="card" style="margin-top:16px"><strong>Soru haritası</strong><div class="palette" id="palette"></div></div>
+  </div>
+</div>
+
+<div class="wrap hidden" id="result"></div>
+
+<script>
+window.SINAV = {
+  title: "HTML Sınavı 1 — Çoktan Seçmeli",
+  subtitle: "Bölüm 1.1 – 1.5 genel tekrar: Web, belge iskeleti, metin, listeler, bağlantılar",
+  minutes: 30,
+  passPercent: 60,
+  topics: [
+    "1.1 Web ve HTML'e Giriş",
+    "1.2 Belge İskeleti ve Temel Sözdizimi",
+    "1.3 Metin ve İçerik Yapısı",
+    "1.4 Listeler ve Gruplama",
+    "1.5 Bağlantılar ve Gezinme"
+  ],
+  rules: [
+    "Sınav <strong>25 çoktan seçmeli</strong> sorudan oluşur; her sorunun <strong>tek</strong> doğru cevabı vardır.",
+    "Süre <strong>30 dakikadır</strong>. Sayaç sayfanın üstünde görünür; süre dolunca sınav otomatik biter.",
+    "Soruları istediğiniz sırayla cevaplayabilir, <strong>Soru haritası</strong>ndan atlayabilir ve emin olmadıklarınızı <strong>⚐ Sonra bak</strong> ile işaretleyebilirsiniz.",
+    "Seçiminizi değiştirmek için başka bir şıkka tıklamanız yeterlidir. Sınavı bitirmeden cevaplar değiştirilebilir.",
+    "Yanlış cevaplar puan kırmaz; boş bırakmak yerine tahmin etmeniz avantajlıdır.",
+    "Sınav sırasında ders notlarına, sunulara veya önceki uygulamalara bakmayın; amaç gerçek seviyenizi görmektir.",
+    "<strong>Sınavı Bitir</strong> düğmesine basınca cevaplar kilitlenir; sonuç, konu bazında analiz ve her sorunun açıklaması gösterilir.",
+    "Sayfayı yenilemek veya kapatmak sınavı sıfırlar.",
+    "Başarı sınırı <strong>%60</strong>'tır."
+  ],
+  questions: [
+    { topic: "1.1 Web ve HTML", t: "mc",
+      q: "İnternet ve Web arasındaki ilişki için aşağıdakilerden hangisi doğrudur?",
+      opts: ["İnternet ile Web aynı şeydir.", "İnternet bir altyapıdır, Web bu altyapı üzerinde çalışan bir hizmettir.", "Web bir donanımdır, İnternet bir yazılımdır.", "E-posta Web'in bir parçasıdır, İnternet'in değil."],
+      ans: 1, exp: "İnternet, cihazları bağlayan küresel altyapıdır. Web ise bu altyapı üzerinden tarayıcı ve sunucuların sayfa alışverişi yaptığı hizmettir. E-posta ve oyunlar da İnternet'i kullanır." },
+    { topic: "1.1 Web ve HTML", t: "mc",
+      q: "Tarayıcıya bir adres yazıldığında doğru işlem sırası hangisidir?",
+      opts: ["HTTP isteği → DNS → URL okunur → sunucu → çizim", "DNS → URL okunur → çizim → HTTP yanıtı", "URL okunur → DNS (alan adı IP'ye çevrilir) → HTTP isteği → sunucu yanıtı → tarayıcı çizer", "Sunucu yanıtı → URL okunur → HTTP isteği → DNS → çizim"],
+      ans: 2, exp: "Sıra: URL okunur, DNS alan adını IP'ye çevirir, HTTP isteği gider, sunucu yanıt döndürür, tarayıcı sayfayı çizer." },
+    { topic: "1.1 Web ve HTML", t: "mc",
+      q: "Sunucu \"404\" durum kodu döndürdüğünde ne anlaşılır?",
+      opts: ["İstenen kaynak bulunamadı.", "İstek başarılı oldu.", "Sunucuda hata oluştu.", "Sayfa başka adrese taşındı."],
+      ans: 0, exp: "200 başarılı, 404 kaynak bulunamadı, 500 sunucu hatasıdır." },
+    { topic: "1.1 Web ve HTML", t: "mc",
+      q: "Tıklama, form doğrulama ve sayfa içeriğini değiştirme gibi davranışlardan hangi teknoloji sorumludur?",
+      opts: ["HTML", "CSS", "HTTP", "JavaScript"],
+      ans: 3, exp: "HTML yapı ve anlamı, CSS görünümü, JavaScript davranış ve etkileşimi yönetir." },
+    { topic: "1.1 Web ve HTML", t: "mc",
+      q: "HTML için aşağıdaki tanımlardan hangisi en doğrudur?",
+      opts: ["Bir programlama dilidir.", "Etiketlerle içeriğe anlam kazandıran bir işaretleme dilidir.", "Sayfaya renk ve yerleşim veren stil dilidir.", "Veritabanı sorgulama dilidir."],
+      ans: 1, exp: "HTML (HyperText Markup Language) bir işaretleme dilidir; içeriğin ne olduğunu (başlık, paragraf, düğme...) tarayıcıya söyler." },
+    { topic: "1.2 Belge İskeleti", t: "mc",
+      q: "Belgenin en üstüne <code>&lt;!DOCTYPE html&gt;</code> yazılmazsa ne olabilir?",
+      opts: ["Sayfa hiç açılmaz.", "Sayfa yalnızca mobilde bozulur.", "Tarayıcı eski uyumluluk (quirks) moduna düşebilir ve CSS davranışı değişebilir.", "Türkçe karakterler bozulur."],
+      ans: 2, exp: "DOCTYPE tarayıcıyı standart moda alır. Olmazsa quirks moduna düşülebilir ve kutu genişliği gibi temel hesaplar değişir." },
+    { topic: "1.2 Belge İskeleti", t: "mc",
+      q: "Aşağıdakilerden hangisi <code>&lt;html lang=\"tr\"&gt;</code> özniteliğinin işlevi <strong>değildir</strong>?",
+      opts: ["Ekran okuyucunun metni Türkçe telaffuzla okumasını sağlamak", "Tarayıcının doğru çeviri önerisi sunmasına yardım etmek", "Arama motoruna sayfanın dilini bildirmek", "Sayfanın Türkçe renk temasını belirlemek"],
+      ans: 3, exp: "lang belge dilini bildirir; renk ve görünüm CSS'in işidir." },
+    { topic: "1.2 Belge İskeleti", t: "mc",
+      q: "<code>&lt;meta charset=\"UTF-8\"&gt;</code> satırı unutulursa en olası sonuç nedir?",
+      opts: ["ç, ğ, ş gibi harfler bozuk görünebilir (mojibake).", "Sayfa başlığı görünmez.", "Bağlantılar çalışmaz.", "Mobil ölçek bozulur."],
+      ans: 0, exp: "Karakter kodlaması, byte'ların hangi harfe karşılık geldiğini söyler. Yanlış çözümleme bozuk metne yol açar." },
+    { topic: "1.2 Belge İskeleti", t: "mc",
+      q: "<code>&lt;title&gt;</code> etiketi nereye yazılır ve nerede görünür?",
+      opts: ["body içine; sayfanın en üstünde büyük başlık olarak", "head içine; tarayıcı sekmesinde", "head içine; sayfa gövdesinde h1 gibi", "html dışına; adres çubuğunda"],
+      ans: 1, exp: "title, head içinde yer alır ve sekme başlığı ile arama sonuçlarında görünür; sayfa gövdesinde görünmez." },
+    { topic: "1.3 Metin ve İçerik", t: "mc",
+      q: "Aşağıdaki başlık düzenlerinden hangisi kurallara uygundur?",
+      code: "A) <h1>..</h1> <h4>..</h4>\nB) <h2>..</h2> <h1>..</h1> <h1>..</h1>\nC) <h1>..</h1> <h2>..</h2> <h3>..</h3>\nD) <h3>..</h3> <h5>..</h5>",
+      opts: ["A", "B", "C", "D"],
+      ans: 2, exp: "Sayfada tek h1 olmalı ve seviyeler atlanmamalıdır. Başlık seviyesi görünüşe göre değil, belge yapısına göre seçilir." },
+    { topic: "1.3 Metin ve İçerik", t: "mc",
+      q: "<code>&lt;strong&gt;</code> ile <code>&lt;b&gt;</code> arasındaki fark nedir?",
+      opts: ["Hiçbir fark yoktur.", "strong güçlü önemi belirtir; b yalnızca anlam yüklemeden dikkat çekmek içindir.", "b daha önemlidir.", "strong italik, b kalın gösterir."],
+      ans: 1, exp: "İkisi de kalın görünür; ancak strong anlam taşır (ekran okuyucu da ayırt eder). Emin değilsen strong/em tercih edilir." },
+    { topic: "1.3 Metin ve İçerik", t: "mc",
+      q: "<code>&lt;br&gt;</code> hangi durumda doğru kullanılır?",
+      opts: ["Paragraflar arasında boşluk bırakmak için", "Sayfayı iki bölüme ayırmak için", "Bir başlığı büyütmek için", "Adres veya şiir gibi satır kırılmasının içeriğin parçası olduğu yerlerde"],
+      ans: 3, exp: "br anlamlı satır sonu içindir. Boşluk bırakmak görünüm işidir ve CSS ile yapılır. Konu geçişi için hr kullanılır." },
+    { topic: "1.3 Metin ve İçerik", t: "mc",
+      q: "Kısa, cümle içinde yer alan bir alıntı için hangi etiket kullanılır?",
+      opts: ["&lt;blockquote&gt;", "&lt;cite&gt;", "&lt;q&gt;", "&lt;em&gt;"],
+      ans: 2, exp: "q satır içi kısa alıntıdır (tarayıcı tırnak ekler). blockquote bağımsız bölüm oluşturan uzun alıntılar içindir. cite eser/kaynak adını belirtir." },
+    { topic: "1.4 Listeler", t: "mc",
+      q: "Bir yemek tarifinin hazırlanış adımları için hangi liste uygundur?",
+      opts: ["&lt;ol&gt;, çünkü adımların sırası anlamın parçasıdır", "&lt;ul&gt;, çünkü madde işareti daha güzeldir", "&lt;dl&gt;, çünkü adımlar terimdir", "&lt;div&gt;, çünkü sırası önemli değildir"],
+      ans: 0, exp: "Karar sorusu: öğelerin yerini değiştirince anlam bozuluyor mu? Tarif adımlarında bozulur, bu yüzden ol kullanılır." },
+    { topic: "1.4 Listeler", t: "mc",
+      q: "<code>&lt;ol type=\"A\" start=\"3\"&gt;</code> listesinin ilk öğesi ekranda nasıl görünür?",
+      opts: ["3", "C", "A", "III"],
+      ans: 1, exp: "start her zaman sayıdır; type=\"A\" ile birleşince 3. harf olan C'den başlar (C, D, E...)." },
+    { topic: "1.4 Listeler", t: "mc",
+      q: "Hangi iç içe liste yazımı doğrudur?",
+      code: "A) <ul><li>Frontend</li><ul><li>HTML</li></ul></ul>\nB) <ul><li>Frontend</li></ul><ul><li>HTML</li></ul>\nC) <ul><li>Frontend<ul><li>HTML</li></ul></li></ul>\nD) <ul><li><ul><li>HTML</li></ul>Frontend</li></ul>",
+      opts: ["A", "B", "C", "D"],
+      ans: 2, exp: "Alt liste, ait olduğu li kapanmadan önce o li'nin içine yazılır; böylece \"HTML, Frontend'e aittir\" ilişkisi kurulur." },
+    { topic: "1.4 Listeler", t: "mc",
+      q: "<code>&lt;dl&gt;</code> içinde <code>&lt;dt&gt;</code> ve <code>&lt;dd&gt;</code> ne anlama gelir?",
+      opts: ["dt açıklama, dd terim", "dt satır, dd sütun", "dt başlık, dd paragraf", "dt terim/ad, dd bunun açıklaması/değeri"],
+      ans: 3, exp: "dl ad–değer listesidir: dt terim (ad), dd açıklama (değer). Örn. \"Oda sayısı\" → \"3+1\"." },
+    { topic: "1.4 Listeler", t: "mc",
+      q: "<code>&lt;div&gt;</code> ve <code>&lt;span&gt;</code> için hangisi doğrudur?",
+      opts: ["div blok düzeyinde, span satır içi gruplama yapar; ikisi de anlam katmaz.", "span blok, div satır içidir.", "İkisi de başlık oluşturur.", "div anlamlı, span anlamsızdır."],
+      ans: 0, exp: "Uygun semantik etiket yoksa gruplama için div (blok) ve span (satır içi) kullanılır; ikisi de tek başına anlam taşımaz." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "<code>&lt;a&gt;Hakkımızda&lt;/a&gt;</code> (href yok) için ne söylenebilir?",
+      opts: ["Tıklanınca ana sayfaya gider.", "Gerçek bir bağlantı değil, bağlantı yer tutucusudur; tıklanamaz ve Tab ile odaklanamaz.", "Sayfa içinde en üste kaydırır.", "Sayfa içinde en alta iner."],
+      ans: 1, exp: "href olmadan a tıklanabilir bağlantı değildir (placeholder link). Menüde bulunulan sayfa adı bilinçli olarak href'siz bırakılabilir." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "<code>sayfalar/iletisim.html</code> dosyasından kökteki <code>index.html</code>'e bağlanmak için doğru yol hangisidir?",
+      opts: ["index.html", "/sayfalar/index.html", "../index.html", "sayfalar/../../index.html"],
+      ans: 2, exp: "Göreli yol bağlantının yazıldığı dosyadan hesaplanır. iletisim.html, sayfalar klasöründedir; bir üst klasöre çıkmak için ../ kullanılır." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "Aynı sayfadaki <code>id=\"iletisim\"</code> bölümüne gitmek için hangi bağlantı yazılır?",
+      opts: ["&lt;a href=\"iletisim\"&gt;", "&lt;a href=\"id:iletisim\"&gt;", "&lt;a name=\"#iletisim\"&gt;", "&lt;a href=\"#iletisim\"&gt;"],
+      ans: 3, exp: "Sayfa içi bağlantıda href değeri # ile başlar ve hedef elementin id değerini içerir. id sayfada benzersiz olmalıdır." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "Telefon numarasına dokunulunca arama başlatan bağlantı hangisidir?",
+      opts: ["&lt;a href=\"tel:+905551234567\"&gt;", "&lt;a href=\"phone=905551234567\"&gt;", "&lt;a href=\"mailto:+905551234567\"&gt;", "&lt;a href=\"call/905551234567\"&gt;"],
+      ans: 0, exp: "tel: şeması aramayı, mailto: şeması e-posta oluşturmayı başlatır. Numara ülke koduyla yazılırsa her yerden çalışır." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "<code>target=\"_blank\"</code> kullanılan bağlantıya güvenlik için hangi öznitelik eklenmelidir?",
+      opts: ["download", "rel=\"noopener noreferrer\"", "rel=\"stylesheet\"", "hreflang=\"tr\""],
+      ans: 1, exp: "Yeni sekmede açılan sayfanın window.opener ile eski sayfaya erişmesini engellemek için rel=\"noopener noreferrer\" kullanılır." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "<code>download</code> özniteliği ne yapar?",
+      opts: ["Dosyayı sunucudan siler.", "Bağlantıyı yeni sekmede açar.", "Tıklanınca hedefin açılmak yerine indirilmesini önerir.", "Dosyayı sıkıştırır."],
+      ans: 2, exp: "download, tarayıcıya hedefi açmak yerine indirmesini söyler. Değer verilirse önerilen dosya adı olur: download=\"rapor.pdf\"." },
+    { topic: "1.5 Bağlantılar", t: "mc",
+      q: "Aşağıdaki bağlantı metinlerinden hangisi erişilebilirlik açısından en iyisidir?",
+      opts: ["Buraya tıklayın", "Tıkla", "Devamı", "Kurs programını inceleyin"],
+      ans: 3, exp: "Bağlantı metni, tek başına okunduğunda da hedefi anlatmalıdır. Ekran okuyucular bağlantıları ayrı liste olarak okuyabilir." }
+  ]
+};
+</script>
+<script src="sinav.js"></script>
+</body>
+</html>

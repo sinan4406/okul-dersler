@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uygulama Sorusu 2 — Çok Sayfalı Mini Site</title>
+<link rel="stylesheet" href="../sinav.css">
+<style>
+  .pts{float:right;font-weight:700;color:var(--brand)}
+  .chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+  .chk span.p{margin-left:auto;color:var(--muted);white-space:nowrap}
+  .total{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;text-align:center;font-weight:700}
+  pre.tree{background:var(--bg);border:1px solid var(--line);padding:12px;border-radius:8px;overflow:auto;font:.9rem/1.5 Consolas,monospace}
+  details{margin:10px 0}summary{cursor:pointer;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Uygulama Sorusu 2 — Çok Sayfalı Mini Site</h1>
+    <p class="sub">Kapsam: 1.2 Belge İskeleti · 1.3 Metin · 1.4 Listeler · 1.5 Bağlantılar ve Gezinme (ağırlık)</p>
+    <div class="meta"><span class="chip">Süre: 60 dakika</span><span class="chip">Toplam: 100 puan</span><span class="chip">Teslim: tüm proje klasörü</span></div>
+
+    <h2>Sınav talimatları</h2>
+    <ul class="rules">
+      <li>Boş bir klasör açın (adı <code>fotograf-atolyesi</code>) ve aşağıdaki <strong>klasör yapısını birebir</strong> oluşturun. Dosya ve klasör adlarında Türkçe karakter ve boşluk kullanmayın.</li>
+      <li>Yalnızca <strong>HTML</strong> yazın; CSS ve JavaScript kullanmayın. Değerlendirme, <strong>doğru yol hesabı</strong> ve <strong>doğru etiket seçimi</strong> üzerinedir.</li>
+      <li>Kendi sayfalarınız arasında <strong>göreli yol</strong>, başka sitelere <strong>mutlak URL</strong> kullanın.</li>
+      <li>Her sayfa tam belge iskeletine sahip olmalıdır (<code>DOCTYPE</code>, <code>lang</code>, <code>charset</code>, <code>viewport</code>, <code>title</code>).</li>
+      <li>Bitirince <code>index.html</code>’i tarayıcıda açın ve her bağlantıyı tıklayarak <strong>404 veren hiçbir bağlantı kalmadığını</strong> doğrulayın.</li>
+      <li>Aşağıdaki öz değerlendirme listesiyle puanınızı kontrol edin.</li>
+    </ul>
+
+    <h2>Senaryo</h2>
+    <p>“Işık Fotoğraf Atölyesi” için küçük bir tanıtım sitesi hazırlayacaksınız: ana sayfa, iki alt sayfa, bir blog yazısı ve indirilebilir bir katalog dosyası.</p>
+
+    <h2>Klasör yapısı</h2>
+<pre class="tree">fotograf-atolyesi/
+├── index.html
+├── sayfalar/
+│   ├── hakkimizda.html
+│   └── iletisim.html
+├── blog/
+│   └── yazilar/
+│       └── isik-ve-golge.html
+└── dosyalar/
+    └── katalog.pdf     (boş/örnek dosya olabilir)</pre>
+
+    <h2>Sayfa gereksinimleri</h2>
+    <ol class="rules">
+      <li><strong>Tüm sayfalarda ortak menü:</strong> Ana Sayfa · Hakkımızda · İletişim · Blog yazısı, bir <code>ul</code> içinde. Menü her sayfaya <strong>o sayfanın konumuna göre doğru göreli yolla</strong> bağlansın (<code>../</code>, <code>sayfalar/</code> vb.). <strong>Bulunulan sayfanın</strong> menü öğesi <code>href</code>’siz bırakılsın.</li>
+      <li><strong>index.html:</strong> <code>h1</code>, kısa tanıtım paragrafı (<code>strong</code> ile vurgulu bir bilgi), “Sunduğumuz kurslar” için <code>ol</code> (sıra anlamlı: başlangıç → orta → ileri) ve katalog için <strong>indirme bağlantısı</strong> (<code>download</code>, önerilen ad <code>isik-katalog.pdf</code>).</li>
+      <li><strong>hakkimizda.html:</strong> Atölye hakkında paragraflar; “Ekip” için <code>dl</code> (kişi adı → uzmanlık alanı); bir <code>blockquote</code> + <code>cite</code>.</li>
+      <li><strong>iletisim.html:</strong> Adres (<code>br</code> ile satırlar), <code>mailto:</code> ve <code>tel:</code> bağlantıları, ve harici bir harita/kaynak sitesine bağlantı: <code>https://developer.mozilla.org/</code> gibi bir adres (<code>target</code> + <code>rel</code>).</li>
+      <li><strong>isik-ve-golge.html:</strong> En az üç <code>h2</code> bölümlü bir blog yazısı. Yazının başında <strong>içindekiler</strong> (sayfa içi bağlantılar), sonunda “Yukarı çık” bağlantısı. Ayrıca <strong>ana sayfaya</strong> ve <strong>katalog dosyasına</strong> dönen bağlantılar olsun (yol hesabına dikkat: bu dosya iki klasör derinliğindedir).</li>
+      <li><strong>İç içe liste:</strong> blog yazısında “Fotoğraf ekipmanı” <code>ul</code> içinde “Kamera” maddesinin altında alt liste (ör. Aynasız, DSLR).</li>
+      <li><strong>Sayfalar arası bölüm bağlantısı:</strong> <code>index.html</code>’ten <code>sayfalar/iletisim.html</code> dosyasındaki <code>id="harita"</code> bölümüne doğrudan gidilsin (<code>sayfa.html#id</code>).</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Öz değerlendirme listesi</h2>
+    <p class="sub">Karşıladığınız maddeleri işaretleyin; toplam puan altta hesaplanır.</p>
+    <div id="list"></div>
+    <details><summary>Ders sorumlusu için doğru yol örnekleri</summary>
+<pre class="tree">index.html            →  sayfalar/hakkimizda.html   |  sayfalar/iletisim.html#harita  |  blog/yazilar/isik-ve-golge.html
+sayfalar/*.html       →  ../index.html               |  hakkimizda.html (aynı klasör)  |  ../blog/yazilar/isik-ve-golge.html
+isik-ve-golge.html    →  ../../index.html            |  ../../sayfalar/iletisim.html   |  ../../dosyalar/katalog.pdf
+index.html (indirme)  →  &lt;a href="dosyalar/katalog.pdf" download="isik-katalog.pdf"&gt;</pre>
+    </details>
+  </div>
+</div>
+<div class="total">Toplam: <span id="sum">0</span> / 100</div>
+
+<script>
+const items = [
+  ["Proje yapısı (10)", [
+    ["Klasör ve dosya adları yönergeye uygun (Türkçe karakter/boşluk yok)", 5],
+    ["Beş HTML/PDF dosyasının tümü doğru klasörde", 5]]],
+  ["Belge iskeleti — her sayfa (15)", [
+    ["<code>DOCTYPE</code> ve <code>lang=\"tr\"</code> her sayfada", 5],
+    ["<code>charset</code> ve <code>viewport</code> her sayfada", 5],
+    ["Her sayfada farklı ve anlamlı <code>title</code>", 5]]],
+  ["Metin ve listeler (20)", [
+    ["Tek <code>h1</code>; başlık seviyeleri atlanmamış (blog yazısında <code>h2</code> bölümleri)", 5],
+    ["<code>strong</code> / <code>blockquote</code> + <code>cite</code> / <code>br</code> (adres) doğru kullanılmış", 5],
+    ["<code>ol</code> (sıralı kurslar) ve <code>dl</code> (ekip) doğru", 5],
+    ["İç içe liste doğru kurulmuş (alt liste <code>li</code> içinde)", 5]]],
+  ["Göreli yollar (25)", [
+    ["Menü <code>index.html</code>’te doğru yollarla çalışıyor", 5],
+    ["Menü <code>sayfalar/</code> içindeki sayfalarda <code>../</code> ile doğru çalışıyor", 8],
+    ["Blog yazısındaki ana sayfa ve katalog bağlantıları (<code>../../</code>) doğru", 8],
+    ["Hiçbir bağlantı 404 vermiyor; kendi sayfalar için mutlak URL kullanılmamış", 4]]],
+  ["Diğer bağlantı türleri (30)", [
+    ["Bulunulan sayfanın menü öğesi <code>href</code>’siz bırakılmış", 4],
+    ["<code>mailto:</code> ve <code>tel:</code> doğru yazılmış", 5],
+    ["Dış bağlantı: mutlak URL, <code>target=\"_blank\"</code>, <code>rel=\"noopener noreferrer\"</code>", 6],
+    ["<code>download</code> bağlantısı (önerilen dosya adıyla)", 4],
+    ["Blog yazısında içindekiler + <code>id</code> hedefleri + “Yukarı çık”", 6],
+    ["<code>iletisim.html#harita</code> sayfalar arası bölüm bağlantısı ve hedefte <code>id=\"harita\"</code>", 5]]]
+];
+const root = document.getElementById("list");
+items.forEach(([g, rows]) => {
+  const h = document.createElement("h2"); h.textContent = g; root.appendChild(h);
+  rows.forEach(([t, p]) => {
+    const l = document.createElement("label"); l.className = "chk";
+    l.innerHTML = '<input type="checkbox" data-p="' + p + '"><span>' + t + '</span><span class="p">' + p + ' p</span>';
+    root.appendChild(l);
+  });
+});
+root.addEventListener("change", () => {
+  let s = 0;
+  root.querySelectorAll("input:checked").forEach((i) => (s += +i.dataset.p));
+  document.getElementById("sum").textContent = s;
+});
+</script>
+</body>
+</html>

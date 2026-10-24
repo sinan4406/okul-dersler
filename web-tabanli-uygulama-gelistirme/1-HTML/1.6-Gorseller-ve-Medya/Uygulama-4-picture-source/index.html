@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!--maksimum 600px e kadar source daki resim 600px den sonra img deki resim görünür-->
+    <picture>
+        <source media="(max-width: 600px)" srcset="images/laptop-dikey.jpg" alt="">
+        <img src="images/laptop-yatay.jpg" alt="">
+    </picture>
+    <hr>
+    <!--minimum 600px e kadar source daki resim 600px den sonra img deki resim görünür-->
+    <picture>
+        <source media="(min-width: 600px)" srcset="images/laptop-dikey.jpg" alt="">
+        <img src="images/laptop-yatay.jpg" alt="">
+    </picture>
+</body>
+</html>

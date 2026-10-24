@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HTML tabloları: tablosal veri, table, tr, th, td, scope, caption, thead, tbody, tfoot, colspan ve rowspan konularını işleyen etkileşimli ders sunusu.">
+<title>Tablolar | HTML-8</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --fsp:1px;
+  --bg:#06091a; --surface:rgba(17,24,56,.68); --surface-2:rgba(19,29,68,.92);
+  --text:#f2f4ff; --muted:#a8b2d4; --line:rgba(158,174,235,.18);
+  --cyan:#38d9ff; --blue:#5b7cfa; --violet:#a978ff; --orange:#ff9d5c;
+  --yellow:#ffd45c; --green:#56e6a5; --danger:#ff6b8a;
+  --radius-lg:22px; --radius-md:14px;
+  --shadow:0 20px 60px rgba(0,0,0,.35);
+  --controls:66px;
+  --mono:"DM Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;font-size:14.5px}
+body{
+  margin:0;min-width:320px;overflow:hidden;
+  font-family:"Manrope","Segoe UI",sans-serif;color:var(--text);line-height:1.55;
+  font-size:calc(1rem + var(--fsp));
+  background:
+    radial-gradient(circle at 10% 12%,rgba(46,92,255,.18),transparent 32%),
+    radial-gradient(circle at 88% 84%,rgba(137,70,255,.14),transparent 32%),
+    var(--bg);
+}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+code,pre,kbd{font-family:var(--mono)}
+
+#presentation{position:relative;width:100%;height:100svh}
+.slide{
+  position:absolute;inset:0;display:none;overflow-y:auto;overflow-x:hidden;
+  padding:clamp(22px,3.4vh,44px) clamp(18px,4.2vw,64px) calc(var(--controls) + 26px);
+  opacity:0;transform:translateX(22px);
+}
+.slide.is-active{display:flex;flex-direction:column;animation:slideIn .42s ease forwards}
+@keyframes slideIn{to{opacity:1;transform:none}}
+.fitbox{width:100%;margin:auto;display:flex;justify-content:center}
+.slide-content{max-width:1180px;width:100%;margin:auto;transform-origin:top center}
+.fs-btn{cursor:pointer;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:calc(.95rem + var(--fsp));transition:.18s;flex:none}
+.fs-btn:hover{border-color:var(--cyan);background:rgba(56,217,255,.12)}
+.split>*,.grid-2>*,.grid-3>*,.grid-4>*,.sim>*,.hunt-grid>*,.quiz-grid>*{min-width:0}
+
+h1{font-size:calc(clamp(2rem,4.4vw,3.1rem) + var(--fsp));line-height:1.08;margin:0 0 1rem;font-weight:800;letter-spacing:-.02em}
+h2{font-size:calc(clamp(1.3rem,2.3vw,1.9rem) + var(--fsp));line-height:1.2;margin:0 0 .8rem;font-weight:800}
+h2.topic{font-size:calc(clamp(1.15rem,1.85vw,1.62rem) + var(--fsp));line-height:1.18;margin:0 0 .35rem;letter-spacing:-.01em;
+  background:linear-gradient(92deg,#8be9ff,#b79bff 52%,#ffb3e6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.topicbar{display:flex;align-items:center;gap:.55rem;margin:0 0 .5rem}
+.topicbar .dot{width:9px;height:9px;border-radius:50%;background:var(--gc);box-shadow:0 0 0 4px color-mix(in srgb,var(--gc) 22%,transparent)}
+.topicbar .name{font-size:calc(.76rem + var(--fsp));font-weight:800;letter-spacing:.14em;color:var(--gc)}
+.topicbar .line{flex:1;height:1px;background:linear-gradient(90deg,color-mix(in srgb,var(--gc) 55%,transparent),transparent)}
+.topicbar .idx{font-family:var(--mono);font-size:calc(.72rem + var(--fsp));color:var(--muted)}
+.subtitle{font-size:calc(clamp(.95rem,1.28vw,1.1rem) + var(--fsp));font-weight:600;color:#dbe3fb;margin:0 0 .8rem;max-width:80ch;line-height:1.35}
+h3{font-size:calc(1.02rem + var(--fsp));margin:0 0 .4rem;font-weight:700}
+h4{font-size:calc(.9rem + var(--fsp));margin:0 0 .3rem;font-weight:700}
+p{margin:0 0 .7rem}
+.lead{color:var(--muted);font-size:calc(1rem + var(--fsp));max-width:80ch;margin-bottom:1.1rem}
+.gradient{background:linear-gradient(100deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.muted{color:var(--muted)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;align-items:start}
+.split.wide-left{grid-template-columns:1.12fr .88fr}
+.split.wide-right{grid-template-columns:.88fr 1.12fr}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.05rem 1.15rem;box-shadow:var(--shadow)}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:.9rem}
+.tile b.num{display:block;font-family:var(--mono);color:var(--violet);font-size:calc(.76rem + var(--fsp));margin-bottom:.3rem}
+.tile code{display:block;color:var(--yellow);font-size:calc(.8rem + var(--fsp));margin-bottom:.4rem;word-break:break-word}
+.tile p{font-size:calc(.86rem + var(--fsp));color:var(--muted);margin:0}
+.tile p+p{margin-top:.4rem}
+.note{margin-top:1rem;padding:.8rem 1rem;border-left:3px solid var(--cyan);border-radius:0 var(--radius-md) var(--radius-md) 0;background:rgba(56,217,255,.07);color:#d6e2ff;font-size:calc(.9rem + var(--fsp))}
+.note.warn{border-left-color:var(--danger);background:rgba(255,107,138,.08)}
+.note.ok{border-left-color:var(--green);background:rgba(86,230,165,.07)}
+.note.plain{border-left-color:var(--violet);background:rgba(169,120,255,.08)}
+.note b{color:#fff}
+.note p:last-child{margin-bottom:0}
+.self-study{margin-top:.9rem;font-size:calc(.87rem + var(--fsp));color:var(--muted);border-top:1px dashed var(--line);padding-top:.65rem}
+.self-study b{color:var(--cyan)}
+.check{list-style:none;padding:0;margin:.7rem 0;display:grid;gap:.4rem}
+.check li{position:relative;padding-left:1.45rem;color:#d3dbf2;font-size:calc(.92rem + var(--fsp))}
+.check li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
+.check.cross li::before{content:"×";color:var(--danger)}
+.tag-inline,h2 code,.lead code,li code,p code,dd code,.subtitle code,td code,th code,.note code,.feedback code{color:var(--cyan);background:rgba(56,217,255,.1);padding:.05rem .3rem;border-radius:5px;font-size:.88em}
+
+.code-window{border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:#050913;box-shadow:var(--shadow)}
+.window-bar{display:flex;align-items:center;gap:.4rem;padding:.5rem .8rem;background:rgba(255,255,255,.04);border-bottom:1px solid var(--line);font-size:calc(.76rem + var(--fsp));color:var(--muted)}
+.window-bar i{width:9px;height:9px;border-radius:50%;background:#3d4763;display:block}
+.window-bar i:first-child{background:#ff6b6b}.window-bar i:nth-child(2){background:#ffd45c}.window-bar i:nth-child(3){background:#56e6a5}
+.window-bar span{margin-left:.5rem;font-family:var(--mono)}
+.window-bar .reload{margin-left:auto;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:8px;padding:.05rem .45rem;font-size:calc(.8rem + var(--fsp))}
+.window-bar .reload:hover{border-color:var(--cyan);color:#fff}
+pre{margin:0;padding:.85rem 1rem;overflow:auto;max-height:54vh;font-size:calc(.84rem + var(--fsp));line-height:1.62;color:#dbe4f7}
+pre.tight{max-height:46vh}
+.t-tag{color:#7dd3fc}.t-attr{color:#c4b5fd}.t-str{color:#fca5a5}.t-com{color:#64748b;font-style:italic}
+.code-caption{margin:.45rem 0 0;font-size:calc(.8rem + var(--fsp));color:var(--muted)}
+
+.browser{border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.chrome{display:flex;align-items:center;gap:.4rem;padding:.45rem .7rem;background:#1b2440;border-bottom:1px solid var(--line)}
+.chrome i{width:9px;height:9px;border-radius:50%;background:#3d4763;display:block}
+.chrome .tab{margin-left:.6rem;background:#0f1730;color:#cfe0ff;padding:.2rem .7rem;border-radius:7px;font-size:calc(.74rem + var(--fsp));font-family:var(--mono);flex:none}
+.chrome .addr{flex:1;min-width:0;margin-left:.5rem;background:#0b1426;border:1px solid rgba(158,174,235,.25);border-radius:7px;padding:.16rem .55rem;font-family:var(--mono);font-size:calc(.73rem + var(--fsp));color:#9fb4e8;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:.2s}
+.chrome .addr b{color:#8be9ff;font-weight:500}
+.chrome .addr.hit{border-color:var(--cyan);background:rgba(56,217,255,.12)}
+.chrome .reload{margin-left:auto;cursor:pointer;border:1px solid rgba(158,174,235,.25);background:rgba(255,255,255,.06);color:#cfe0ff;border-radius:8px;padding:.05rem .45rem;font-size:calc(.8rem + var(--fsp))}
+.chrome .reload:hover{border-color:var(--cyan);color:#fff}
+iframe.preview{display:block;width:100%;border:0;background:#fff;height:min(300px,34vh)}
+iframe.preview.short{height:min(210px,26vh)}
+iframe.preview.tall{height:min(360px,40vh)}
+
+.btn{cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);padding:.45rem .9rem;border-radius:10px;font-size:calc(.86rem + var(--fsp));font-weight:600;transition:.18s}
+.btn:hover{border-color:rgba(56,217,255,.5);background:rgba(56,217,255,.1);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(100deg,rgba(56,217,255,.22),rgba(169,120,255,.22));border-color:rgba(56,217,255,.4)}
+.btn.on{background:rgba(56,217,255,.18);border-color:var(--cyan);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:.7rem 0}
+.btn-row.tight{margin:.45rem 0}
+.state-line{font-size:calc(.87rem + var(--fsp));color:var(--cyan);min-height:2.5em;margin:.2rem 0 0}
+
+table{width:100%;border-collapse:collapse;font-size:calc(.88rem + var(--fsp));margin-top:.6rem}
+th,td{text-align:left;padding:.42rem .55rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:calc(.76rem + var(--fsp));letter-spacing:.08em;color:var(--muted);text-transform:none}
+td b{color:#fff}
+td code,th code{white-space:nowrap}
+.yes{color:var(--green)}.no{color:var(--danger)}
+
+/* karşılaştırma / iki kutu */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.vs .box{border:1px solid var(--line);border-radius:var(--radius-md);padding:.85rem .95rem;background:var(--surface)}
+.vs .box.good{border-color:rgba(86,230,165,.4);background:rgba(86,230,165,.07)}
+.vs .box.bad{border-color:rgba(255,107,138,.35);background:rgba(255,107,138,.07)}
+.vs .box h4{font-size:calc(.9rem + var(--fsp));margin:0 0 .35rem}
+.vs .box.good h4{color:var(--green)}
+.vs .box.bad h4{color:var(--danger)}
+.vs .box p{font-size:calc(.85rem + var(--fsp));color:var(--muted);margin:0 0 .35rem}
+.vs .box p:last-child{margin-bottom:0}
+
+/* adım şeridi */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:.7rem 0}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:.75rem .85rem;position:relative}
+.step b{display:block;font-family:var(--mono);font-size:calc(.74rem + var(--fsp));color:var(--cyan);margin-bottom:.25rem}
+.step p{font-size:calc(.84rem + var(--fsp));color:var(--muted);margin:0}
+
+/* ağaç / yapı diyagramı */
+.tree-box{white-space:pre;font-family:var(--mono);font-size:calc(.84rem + var(--fsp));color:#cbd5e1;background:#050913;border:1px solid var(--line);border-radius:var(--radius-md);padding:.8rem 1rem;overflow-x:auto;line-height:1.7}
+.tree-box b{color:var(--cyan)}
+.tree-box i{color:var(--muted);font-style:normal}
+
+/* bölge haritası */
+.regions{display:grid;gap:.35rem;background:#0a1024;border:1px solid var(--line);border-radius:var(--radius-md);padding:.6rem}
+.region{border:1px dashed rgba(158,174,235,.35);border-radius:9px;padding:.5rem .65rem;font-size:calc(.82rem + var(--fsp))}
+.region .lbl{font-family:var(--mono);font-size:calc(.74rem + var(--fsp));display:block;margin-bottom:.15rem}
+.region.r-head{border-color:rgba(56,217,255,.5);background:rgba(56,217,255,.07)}.region.r-head .lbl{color:var(--cyan)}
+.region.r-nav{border-color:rgba(91,124,250,.5);background:rgba(91,124,250,.08)}.region.r-nav .lbl{color:#93a9ff}
+.region.r-main{border-color:rgba(86,230,165,.5);background:rgba(86,230,165,.07)}.region.r-main .lbl{color:var(--green)}
+.region.r-side{border-color:rgba(255,157,92,.5);background:rgba(255,157,92,.08)}.region.r-side .lbl{color:var(--orange)}
+.region.r-foot{border-color:rgba(255,212,92,.5);background:rgba(255,212,92,.07)}.region.r-foot .lbl{color:var(--yellow)}
+.region.r-sec{border-color:rgba(169,120,255,.5);background:rgba(169,120,255,.08)}.region.r-sec .lbl{color:var(--violet)}
+.region .inner{margin-top:.4rem;display:grid;gap:.35rem}
+.region p{margin:0;color:var(--muted);font-size:calc(.8rem + var(--fsp))}
+
+/* seçmeli alıştırma */
+.choices{display:grid;gap:.5rem;margin:.7rem 0}
+.choice{cursor:pointer;text-align:left;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:10px;padding:.55rem .8rem;font-size:calc(.88rem + var(--fsp));transition:.18s}
+.choice:hover{border-color:rgba(56,217,255,.5)}
+.choice.good{border-color:var(--green);background:rgba(86,230,165,.14)}
+.choice.bad{border-color:var(--danger);background:rgba(255,107,138,.12)}
+.feedback{font-size:calc(.88rem + var(--fsp));color:var(--yellow);min-height:3.4em;margin:.3rem 0 0}
+.casebar{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0}
+.casebar button{cursor:pointer;font-size:calc(.8rem + var(--fsp));padding:.35rem .7rem;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.04);transition:.18s}
+.casebar button.on{border-color:var(--cyan);background:rgba(56,217,255,.16);color:#fff}
+.case-text{font-size:calc(.9rem + var(--fsp));color:#dbe3fb;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:.7rem .85rem;margin:.2rem 0 0}
+
+/* eşleştirme alıştırması */
+.match{display:grid;gap:.45rem;margin:.6rem 0}
+.match-row{display:grid;grid-template-columns:1fr auto auto;gap:.6rem;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.4rem .65rem}
+.match-row p{margin:0;font-size:calc(.85rem + var(--fsp))}
+.match-row select{font-family:var(--mono);font-size:calc(.82rem + var(--fsp));background:#0a1024;color:#e6ecff;border:1px solid var(--line);border-radius:8px;padding:.25rem .4rem}
+.match-row .mark{font-family:var(--mono);font-size:calc(.85rem + var(--fsp));width:1.4rem;text-align:center;color:var(--muted)}
+.match-row.ok{border-color:rgba(86,230,165,.45)}.match-row.ok .mark{color:var(--green)}
+.match-row.nope{border-color:rgba(255,107,138,.4)}.match-row.nope .mark{color:var(--danger)}
+
+/* hata avı */
+.hunt-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:1.1rem;margin-top:.8rem}
+.hunt-code{white-space:pre;overflow:auto;max-height:64vh;background:#050913;border:1px solid var(--line);border-radius:var(--radius-lg);padding:.8rem .9rem;font-family:var(--mono);font-size:calc(.83rem + var(--fsp));line-height:1.62}
+.hline{display:block;padding:0 .4rem;border-radius:6px;cursor:pointer;transition:.16s}
+.hline:hover{background:rgba(255,255,255,.06)}
+.hline.found{background:rgba(86,230,165,.14);box-shadow:inset 2px 0 0 var(--green)}
+.hline.miss{background:rgba(255,107,138,.12)}
+.hunt-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1rem}
+.score{font-family:var(--mono);color:var(--green);font-size:calc(.88rem + var(--fsp));margin-bottom:.5rem}
+.hunt-log{list-style:none;margin:.5rem 0 0;padding:0;display:grid;gap:.4rem;font-size:calc(.85rem + var(--fsp));color:#d5dcf2}
+.hunt-log li{padding-left:1.1rem;position:relative}
+.hunt-log li::before{content:"→";position:absolute;left:0;color:var(--green)}
+
+/* landmark dedektörü + ekran okuyucu */
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start}
+.readout{font-family:var(--mono);font-size:calc(.85rem + var(--fsp));color:#d5dcf2;background:#050913;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;margin-top:.6rem;line-height:1.6}
+.readout b{color:var(--green)}
+.lm-list{list-style:none;margin:.5rem 0 0;padding:0;display:grid;gap:.35rem}
+.lm-list li{display:flex;justify-content:space-between;gap:.6rem;font-family:var(--mono);font-size:calc(.8rem + var(--fsp));padding:.35rem .6rem;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#d5dcf2}
+.lm-list li.none{border-color:rgba(255,107,138,.35);color:var(--muted)}
+.lm-list li span:last-child{color:var(--green)}
+.lm-list li.none span:last-child{color:var(--danger)}
+.sr-stage{background:#050913;border:1px solid var(--line);border-radius:var(--radius-md);padding:.7rem .8rem;min-height:5.2em}
+.sr-voice{font-size:calc(.92rem + var(--fsp));color:#eafff5}
+.sr-voice b{color:var(--green)}
+.sr-where{font-family:var(--mono);font-size:calc(.78rem + var(--fsp));color:var(--muted);margin:.35rem 0 0}
+.keycaps{display:flex;flex-wrap:wrap;gap:.4rem;margin:.55rem 0 0}
+.keycaps button{cursor:pointer;font-family:var(--mono);font-size:calc(.82rem + var(--fsp));padding:.35rem .65rem;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.05)}
+.keycaps button:hover{border-color:var(--cyan);background:rgba(56,217,255,.12)}
+
+/* quiz */
+.quiz-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;margin-top:.9rem}
+.quiz-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:.95rem 1.05rem;cursor:pointer}
+.quiz-card>span{font-family:var(--mono);color:var(--violet);font-size:calc(.76rem + var(--fsp))}
+.quiz-card h3{font-size:calc(.96rem + var(--fsp));margin:.25rem 0 0;font-weight:600;line-height:1.4}
+.quiz-answer{max-height:0;overflow:hidden;opacity:0;transition:.3s;font-size:calc(.87rem + var(--fsp));color:#b6f5da;margin:0}
+.quiz-card.revealed .quiz-answer{max-height:260px;opacity:1;margin-top:.6rem}
+
+.task-list{counter-reset:t;list-style:none;padding:0;display:grid;gap:.5rem;margin:.8rem 0}
+.task-list li{counter-increment:t;position:relative;padding-left:1.9rem;font-size:calc(.9rem + var(--fsp));color:#d5dcf2}
+.task-list li::before{content:counter(t);position:absolute;left:0;top:.05rem;width:1.3rem;height:1.3rem;border-radius:50%;background:rgba(56,217,255,.15);border:1px solid rgba(56,217,255,.4);color:var(--cyan);font-size:calc(.72rem + var(--fsp));display:grid;place-items:center;font-family:var(--mono)}
+
+.equation{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.5rem;margin:1.2rem 0}
+.equation span{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:.6rem .9rem;text-align:center;font-size:calc(.8rem + var(--fsp));color:var(--muted)}
+.equation span b{display:block;color:#fff;font-size:calc(.95rem + var(--fsp));margin-bottom:.15rem}
+.equation .res{background:linear-gradient(100deg,rgba(56,217,255,.2),rgba(169,120,255,.2));border-color:rgba(56,217,255,.4)}
+
+.intro{min-height:calc(100svh - var(--controls) - 90px);display:flex;flex-direction:column;justify-content:center;text-align:center;align-items:center}
+.chipline{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-top:1.2rem}
+.chipline span{font-family:var(--mono);font-size:calc(.8rem + var(--fsp));padding:.4rem .75rem;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--cyan)}
+.kb-hint{position:absolute;bottom:calc(var(--controls) + 14px);left:0;right:0;text-align:center;font-size:calc(.79rem + var(--fsp));color:var(--muted)}
+kbd{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:6px;padding:.1rem .4rem;font-size:calc(.8rem + var(--fsp))}
+
+.controls{position:fixed;left:0;right:0;bottom:0;height:var(--controls);display:flex;align-items:center;gap:1rem;padding:0 clamp(14px,3vw,32px);background:rgba(6,9,26,.86);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:20}
+.nav-btn{cursor:pointer;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:calc(1rem + var(--fsp));transition:.18s}
+.nav-btn:hover:not(:disabled){border-color:var(--cyan);background:rgba(56,217,255,.12)}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.progress-wrap{flex:1}
+.slide-meta{display:flex;justify-content:space-between;font-size:calc(.77rem + var(--fsp));color:var(--muted);margin-bottom:.3rem;gap:1rem}
+.slide-meta span:first-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.slide-meta b{color:var(--cyan)}
+.track{height:4px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.track span{display:block;height:100%;width:4%;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .35s ease}
+
+@media (max-height:820px){
+  :root{--controls:58px}
+  .slide{padding-top:14px;padding-bottom:calc(var(--controls) + 16px)}
+  .split,.grid-2,.sim,.hunt-grid,.vs{gap:.9rem}
+  .card,.hunt-panel{padding:.7rem .85rem}
+  .note{margin-top:.6rem;padding:.6rem .75rem}
+  .check{gap:.3rem}.check li{font-size:calc(.88rem + var(--fsp))}
+  .topicbar{margin-bottom:.35rem}
+  h2.topic{margin-bottom:.25rem}
+  .subtitle{margin-bottom:.5rem}
+  .lead{margin-bottom:.7rem}
+  .btn-row{margin:.5rem 0}
+  .quiz-grid,.grid-3,.grid-4,.steps{gap:.6rem}
+  .tile,.step{padding:.7rem}
+  table{font-size:calc(.84rem + var(--fsp))}
+  pre{max-height:46vh;font-size:calc(.8rem + var(--fsp))}
+  iframe.preview{height:min(260px,30vh)}
+}
+@media (max-height:790px){
+  pre{max-height:40vh;font-size:calc(.77rem + var(--fsp));line-height:1.5}
+  .tile p,.card p,.step p{font-size:calc(.82rem + var(--fsp))}
+  .tile h3,.card h3{font-size:calc(.95rem + var(--fsp))}
+  table{font-size:calc(.8rem + var(--fsp))}
+  th,td{padding:.32rem .45rem}
+  .note{font-size:calc(.84rem + var(--fsp));margin-top:.5rem;padding:.5rem .65rem}
+  .self-study{font-size:calc(.82rem + var(--fsp));margin-top:.6rem;padding-top:.5rem}
+  .task-list li{font-size:calc(.86rem + var(--fsp))}
+  .quiz-card h3{font-size:calc(.9rem + var(--fsp))}
+  iframe.preview{height:min(225px,26vh)}
+  iframe.preview.short{height:min(180px,21vh)}
+  .tree-box{font-size:calc(.8rem + var(--fsp));line-height:1.55}
+  .hunt-code{font-size:calc(.79rem + var(--fsp));line-height:1.5;max-height:60vh}
+}
+@media (max-height:730px){
+  .grid-4{gap:.5rem}
+  .tile,.step{padding:.55rem .65rem}
+  .tile p{font-size:calc(.78rem + var(--fsp));line-height:1.45}
+  .subtitle{font-size:calc(.92rem + var(--fsp))}
+  .lead{font-size:calc(.88rem + var(--fsp));margin-bottom:.55rem}
+  .check li{font-size:calc(.83rem + var(--fsp))}
+  .quiz-card{padding:.7rem .8rem}
+  .equation span{padding:.45rem .7rem}
+  .btn-row{margin:.4rem 0}
+  .state-line{min-height:2em;font-size:calc(.82rem + var(--fsp))}
+  .window-bar,.chrome{padding:.35rem .7rem}
+  .code-caption{font-size:calc(.76rem + var(--fsp))}
+  .readout{padding:.45rem .55rem;font-size:calc(.8rem + var(--fsp));line-height:1.5}
+  iframe.preview{height:min(200px,23vh)}
+  .region{padding:.4rem .55rem}
+  pre{max-height:34vh}
+}
+
+@media (max-width:1000px){
+  .split,.split.wide-left,.split.wide-right,.grid-2,.sim,.hunt-grid,.quiz-grid,.vs{grid-template-columns:1fr}
+  .grid-4,.steps{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:640px){
+  html{font-size:13.5px}
+  .grid-3,.grid-4,.steps{grid-template-columns:1fr}
+  .match-row{grid-template-columns:1fr auto}
+}
+
+/* ===== 1.8 tablolar: ek bileşenler ===== */
+/* hücre haritası diyagramı */
+table.diag{width:auto;border-collapse:separate;border-spacing:4px;margin:.2rem 0 0;font-size:calc(.84rem + var(--fsp))}
+table.diag th,table.diag td{border:1px dashed rgba(158,174,235,.35);border-radius:8px;padding:.42rem .7rem;text-align:center;vertical-align:middle;color:#d5dcf2;letter-spacing:0;font-size:inherit;min-width:5.2rem;background:rgba(255,255,255,.03)}
+table.diag th{color:var(--cyan);background:rgba(56,217,255,.08);border-color:rgba(56,217,255,.45);font-weight:700}
+table.diag .span-c{background:rgba(169,120,255,.14);border-color:rgba(169,120,255,.6);color:#e4d6ff}
+table.diag .span-r{background:rgba(255,157,92,.13);border-color:rgba(255,157,92,.6);color:#ffe0c9}
+table.diag .foot{background:rgba(255,212,92,.1);border-color:rgba(255,212,92,.5);color:#fff1c4}
+table.diag .ghost{border-style:dotted;color:var(--muted);background:transparent;font-style:italic}
+table.diag .bad{background:rgba(255,107,138,.14);border-color:var(--danger);color:#ffd0da}
+table.diag caption{caption-side:top;color:var(--muted);font-size:calc(.78rem + var(--fsp));padding-bottom:.2rem;text-align:left}
+.diag-wrap{background:#0a1024;border:1px solid var(--line);border-radius:var(--radius-md);padding:.6rem .7rem;overflow-x:auto}
+.legend{display:flex;flex-wrap:wrap;gap:.8rem;margin:.45rem 0 0;font-size:calc(.78rem + var(--fsp));color:var(--muted)}
+.legend i{display:inline-block;width:.8rem;height:.8rem;border-radius:3px;margin-right:.3rem;vertical-align:-.1rem;border:1px solid}
+.legend .l-h{background:rgba(56,217,255,.15);border-color:var(--cyan)}
+.legend .l-c{background:rgba(169,120,255,.2);border-color:var(--violet)}
+.legend .l-r{background:rgba(255,157,92,.2);border-color:var(--orange)}
+.legend .l-f{background:rgba(255,212,92,.18);border-color:var(--yellow)}
+.legend .l-b{background:rgba(255,107,138,.2);border-color:var(--danger)}
+
+/* bölüm sıralama şeridi */
+.stack{display:grid;gap:.4rem}
+.stack .lay{display:grid;grid-template-columns:8.2rem 1fr;gap:.7rem;align-items:center;border:1px solid var(--line);border-radius:10px;padding:.45rem .7rem;background:var(--surface)}
+.stack .lay code{font-size:calc(.84rem + var(--fsp));color:var(--yellow)}
+.stack .lay p{margin:0;font-size:calc(.84rem + var(--fsp));color:var(--muted)}
+.stack .lay.opt{border-style:dashed}
+
+/* aç/kapa denetimleri */
+.toggles{display:flex;flex-wrap:wrap;gap:.45rem;margin:.55rem 0}
+.toggles label{cursor:pointer;display:flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:calc(.8rem + var(--fsp));padding:.32rem .65rem;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.toggles label.on{border-color:var(--cyan);background:rgba(56,217,255,.14);color:#fff}
+.toggles input{accent-color:#38d9ff}
+.rangebox{display:flex;align-items:center;gap:.7rem;margin:.55rem 0;font-family:var(--mono);font-size:calc(.84rem + var(--fsp))}
+.rangebox input[type=range]{flex:1;accent-color:#a978ff}
+.rangebox b{color:var(--violet);min-width:1.2rem;text-align:center}
+.count-line{font-family:var(--mono);font-size:calc(.84rem + var(--fsp));padding:.45rem .65rem;border-radius:9px;border:1px solid var(--line);background:#050913;margin:.5rem 0 0}
+.count-line.ok{border-color:rgba(86,230,165,.5);color:#bff6dc}
+.count-line.bad{border-color:rgba(255,107,138,.5);color:#ffd0da}
+
+/* hücre denetçisi */
+.sr-out{font-size:calc(.92rem + var(--fsp));color:#eafff5;background:#050913;border:1px solid var(--line);border-radius:var(--radius-md);padding:.7rem .85rem;min-height:6.4em}
+.sr-out .k{display:inline-block;min-width:8.5rem;color:var(--muted);font-family:var(--mono);font-size:calc(.8rem + var(--fsp))}
+.sr-out b{color:var(--green)}
+.sr-out .say{margin-top:.5rem;padding-top:.45rem;border-top:1px dashed var(--line);color:#fff}
+
+/* karar alıştırması */
+.cases{display:grid;gap:.45rem;margin:.6rem 0}
+.case-row{display:grid;grid-template-columns:1fr auto;gap:.8rem;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.45rem .7rem}
+.case-row p{margin:0;font-size:calc(.88rem + var(--fsp))}
+.case-row .opts{display:flex;gap:.35rem}
+.case-row .opts button{cursor:pointer;font-size:calc(.8rem + var(--fsp));padding:.28rem .6rem;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.case-row .opts button.good{border-color:var(--green);background:rgba(86,230,165,.16)}
+.case-row .opts button.bad{border-color:var(--danger);background:rgba(255,107,138,.14)}
+.case-row .why{grid-column:1/-1;font-size:calc(.82rem + var(--fsp));color:var(--yellow);margin:0}
+.case-row .why:empty{display:none}
+
+iframe.preview.mini{height:min(170px,20vh)}
+.code-window pre.short{max-height:30vh}
+@media (max-height:820px){ iframe.preview.mini{height:min(150px,18vh)} .stack .lay{padding:.35rem .6rem} }
+@media (max-height:730px){ table.diag th,table.diag td{padding:.3rem .5rem;min-width:4.4rem} .case-row{padding:.35rem .6rem} }
+@media (max-width:1000px){ .case-row{grid-template-columns:1fr} .stack .lay{grid-template-columns:1fr;gap:.2rem} }
+.tile p code,.tile h3 code,.step p code{display:inline;margin:0;font-size:.88em;color:var(--cyan);background:rgba(56,217,255,.1);padding:.05rem .3rem;border-radius:5px;word-break:normal}
+#huntCode{max-height:none;line-height:1.45}
+iframe.preview.u4{height:min(500px,56vh)}
+iframe.preview.u5{height:min(400px,45vh)}
+@media (max-height:820px){ #huntCode{line-height:1.36} }
+</style>
+</head>
+<body>
+<main id="presentation" aria-live="polite">
+<!-- 01 GİRİŞ -->
+<section class="slide is-active" data-title="Tablolar — Giriş">
+  <div class="slide-content intro">
+    <p class="muted" style="letter-spacing:.16em;font-size:calc(.75rem + var(--fsp));font-weight:700;color:var(--cyan)">FULL-STACK WEB EĞİTİMİ · HTML-8</p>
+    <h1>HTML<br><span class="gradient">Tabloları</span></h1>
+    <p class="lead" style="text-align:center">Bir kursun süresini, bir siparişin tutarını, bir haftanın ders programını satır ve sütunlar hâlinde göstermek istediğimizde tablo kullanırız. Bu konuda tablonun temel yapısını, bölümlerini, başlık hücrelerinin hangi veriyi açıkladığını ve hücrelerin birden fazla sütuna ya da satıra nasıl yayıldığını öğreniyoruz.</p>
+    <div class="chipline">
+      <span>&lt;table&gt;</span><span>&lt;tr&gt;</span><span>&lt;th&gt;</span><span>&lt;td&gt;</span><span>scope</span><span>&lt;caption&gt;</span><span>&lt;thead&gt;</span><span>&lt;tbody&gt;</span><span>&lt;tfoot&gt;</span><span>colspan</span><span>rowspan</span>
+    </div>
+  </div>
+  <p class="kb-hint">İlerlemek için <kbd>→</kbd> · geri gitmek için <kbd>←</kbd> · tam ekran için <kbd>F</kbd></p>
+</section>
+
+<!-- 02 YOL HARİTASI -->
+<section class="slide" data-title="Bu Derste İzleyeceğimiz Yol">
+  <div class="slide-content">
+    <h2 class="topic">BU DERSTE İZLEYECEĞİMİZ YOL</h2>
+    <p class="subtitle">Bir eğitim merkezi ve bir kırtasiye sitesinin tabloları üzerinden, basitten birleşik hücrelere doğru ilerliyoruz.</p>
+    <div class="grid-4">
+      <div class="tile"><b class="num">ADIM 01</b><h3>Temel yapı</h3><p>Tablosal veri nedir; <code>&lt;table&gt;</code>, <code>&lt;tr&gt;</code>, <code>&lt;th&gt;</code>, <code>&lt;td&gt;</code> ve başlığın yönünü bildiren <code>scope</code>.</p></div>
+      <div class="tile"><b class="num">ADIM 02</b><h3>Tablonun bölümleri</h3><p><code>&lt;caption&gt;</code> ile tabloya ad vermek; <code>&lt;thead&gt;</code>, <code>&lt;tbody&gt;</code>, <code>&lt;tfoot&gt;</code> ile satırları görevlerine göre gruplamak.</p></div>
+      <div class="tile"><b class="num">ADIM 03</b><h3>Hücre birleştirme</h3><p><code>colspan</code> ile bir hücreyi birden fazla sütuna, <code>rowspan</code> ile birden fazla satıra yaymak.</p></div>
+      <div class="tile"><b class="num">ADIM 04</b><h3>Başlık ilişkisi</h3><p>Birleşen hücrelerde <code>scope</code> seçimi ve bir ekran okuyucunun hücreyi başlıklarıyla birlikte okuması.</p></div>
+    </div>
+    <div class="note"><b>HTML tabloya çizgi, renk veya boşluk vermez.</b> Tarayıcı hücreleri yalnızca satır ve sütun düzenine yerleştirir. Hücreleri ayırt etmeyi kolaylaştıran küçük bir hazır CSS desteğini konunun ortasında kullanacağız; tablo biçimlendirmenin ayrıntısı CSS aşamasının konusudur.</div>
+  </div>
+</section>
+
+<!-- 03 TABLOSAL VERİ -->
+<section class="slide" data-title="Tablosal Veri Nedir?">
+  <div class="slide-content">
+    <h2 class="topic">TABLOSAL VERİ NEDİR?</h2>
+    <p class="subtitle">Tablosal veri, satır ve sütun ilişkisiyle anlam kazanan veridir: her satır bir kaydı, her sütun aynı türden bir özelliği taşır.</p>
+    <div class="split wide-left">
+      <div>
+        <div class="diag-wrap">
+          <table class="diag">
+            <caption>Üç konutun karşılaştırması</caption>
+            <tr><th>Konut</th><th>Oda sayısı</th><th>Alan</th><th>Fiyat</th></tr>
+            <tr><td>Atakum daire</td><td>2+1</td><td>95 m²</td><td>3.400.000 TL</td></tr>
+            <tr><td>İlkadım daire</td><td>3+1</td><td>130 m²</td><td>4.150.000 TL</td></tr>
+            <tr><td>Canik müstakil</td><td>4+1</td><td>180 m²</td><td>5.900.000 TL</td></tr>
+          </table>
+        </div>
+        <div class="legend"><span><i class="l-h"></i>Sütun başlığı: özelliğin adı</span><span>Satır: tek bir konut</span><span>Sütun: aynı özellik, farklı konutlar</span></div>
+        <p class="lead" style="margin:.8rem 0 0">Kullanıcı "hangisi daha büyük?" diye sorduğunda gözünü <b>Alan</b> sütununda aşağı indirir; "bu konutun fiyatı ne?" diye sorduğunda satırda sağa kayar. Anlam, bir değerin <b>hangi satırın ve hangi sütunun kesişiminde</b> olduğundan gelir.</p>
+      </div>
+      <div>
+        <div class="vs" style="grid-template-columns:1fr">
+          <div class="box good"><h4>Tablo uygundur</h4><p>Birden fazla kaydın <b>aynı özelliklerini karşılaştırıyorsak</b>: ders programı, sipariş özeti, fiyat listesi, sefer saatleri, teslimat seçenekleri.</p></div>
+          <div class="box bad"><h4>Tablo uygun değildir</h4><p><b>Sayfa yerleşimi için:</b> menüyü sola, içeriği sağa almak ya da kartları yan yana dizmek CSS'in işidir. Tablo içeriğin anlamını bildirir, sayfanın düzenini kurmaz.</p><p><b>Tek boyutlu içerik için:</b> yalnızca hizmet adlarını sıralıyorsak <code>&lt;ul&gt;</code> yeterlidir; karşılaştırılacak ikinci bir özellik yoktur.</p></div>
+        </div>
+        <div class="note plain"><b>Karar sorusu:</b> "Bu içeriği satır ve sütun başlıkları olmadan okuyunca anlam kaybolur mu?" Kayboluyorsa tablo, kaybolmuyorsa büyük olasılıkla liste veya paragraf.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 KARAR ALIŞTIRMASI -->
+<section class="slide" data-title="Karar Alıştırması: Tablo mu, Liste mi?">
+  <div class="slide-content">
+    <h2 class="topic">KARAR ALIŞTIRMASI: TABLO MU, LİSTE Mİ?</h2>
+    <p class="subtitle">Her içerik için önce kendi kararını ver, sonra seçeneğe tıkla.</p>
+    <div class="cases" id="caseList">
+      <div class="case-row" data-ans="t" data-why="Her ilan aynı üç özellikle (oda, alan, fiyat) karşılaştırılıyor: satır = ilan, sütun = özellik."><p>Bir emlak sitesinde beş ilanın oda sayısı, alanı ve fiyatı yan yana karşılaştırılacak.</p><div class="opts"><button type="button" data-v="t">Tablo</button><button type="button" data-v="l">Liste</button><button type="button" data-v="y">Hiçbiri: yerleşim</button></div><p class="why"></p></div>
+      <div class="case-row" data-ans="l" data-why="Kayıtların karşılaştırılacağı ikinci bir özellik yok; sıranın önemi de yok. Sırasız liste yeterli."><p>Kursa kayıt için gereken belgeler: kimlik fotokopisi, fotoğraf, diploma.</p><div class="opts"><button type="button" data-v="t">Tablo</button><button type="button" data-v="l">Liste</button><button type="button" data-v="y">Hiçbiri: yerleşim</button></div><p class="why"></p></div>
+      <div class="case-row" data-ans="t" data-why="Her sefer kalkış, varış ve peron bilgisiyle aynı yapıda; kullanıcı sütunda aşağı inerek saatleri karşılaştırır."><p>Otogar sayfasında seferlerin kalkış saati, varış saati ve peron numarası.</p><div class="opts"><button type="button" data-v="t">Tablo</button><button type="button" data-v="l">Liste</button><button type="button" data-v="y">Hiçbiri: yerleşim</button></div><p class="why"></p></div>
+      <div class="case-row" data-ans="y" data-why="Burada bir veri karşılaştırması yok; istenen şey kartların ekrandaki yerleşimi. Bu CSS ile yapılır, tablo ile değil."><p>Ana sayfada üç hizmet kartı ekranda yan yana dizilecek.</p><div class="opts"><button type="button" data-v="t">Tablo</button><button type="button" data-v="l">Liste</button><button type="button" data-v="y">Hiçbiri: yerleşim</button></div><p class="why"></p></div>
+      <div class="case-row" data-ans="l" data-why="Adımların sırası önemli ama karşılaştırılan özellik yok: sıralı liste."><p>Bir kek tarifinin hazırlanış adımları.</p><div class="opts"><button type="button" data-v="t">Tablo</button><button type="button" data-v="l">Liste</button><button type="button" data-v="y">Hiçbiri: yerleşim</button></div><p class="why"></p></div>
+      <div class="case-row" data-ans="t" data-why="Her teslimat seçeneği süre ve ücret bakımından karşılaştırılıyor."><p>Bir mağazanın teslimat seçenekleri: standart ve hızlı teslimatın süresi ve ücreti.</p><div class="opts"><button type="button" data-v="t">Tablo</button><button type="button" data-v="l">Liste</button><button type="button" data-v="y">Hiçbiri: yerleşim</button></div><p class="why"></p></div>
+    </div>
+    <p class="state-line" id="caseScore">0 / 6 doğru</p>
+  </div>
+</section>
+
+<!-- 05 DÖRT TEMEL ETİKET -->
+<section class="slide" data-title="Dört Temel Etiket: table, tr, th, td">
+  <div class="slide-content">
+    <h2 class="topic">DÖRT TEMEL ETİKET: table, tr, th, td</h2>
+    <p class="subtitle">Tabloyu satır satır kurarız: önce satırı <code>&lt;tr&gt;</code> ile açar, hücreleri onun içine yazarız.</p>
+    <div class="grid-4">
+      <div class="tile"><code>&lt;table&gt;</code><h3>Tablonun tamamı</h3><p>Bütün satırları kapsar. Tablo ile ilgili her şey bu etiketin içinde yer alır.</p></div>
+      <div class="tile"><code>&lt;tr&gt;</code><h3>Satır</h3><p><i>table row</i> kısaltmasıdır. Bir satırın hücrelerini bir arada tutar.</p></div>
+      <div class="tile"><code>&lt;th&gt;</code><h3>Başlık hücresi</h3><p><i>table header</i>. Diğer hücrelerdeki verinin neyi ifade ettiğini belirtir.</p></div>
+      <div class="tile"><code>&lt;td&gt;</code><h3>Veri hücresi</h3><p><i>table data</i>. İlgili değeri veya içeriği taşır.</p></div>
+    </div>
+    <div class="split" style="margin-top:.9rem">
+      <div>
+        <div class="tree-box">&lt;<b>table</b>&gt;
+  &lt;<b>tr</b>&gt;          <i>← 1. satır</i>
+    &lt;th&gt;  &lt;th&gt;   <i>← iki başlık hücresi</i>
+  &lt;/tr&gt;
+  &lt;<b>tr</b>&gt;          <i>← 2. satır</i>
+    &lt;td&gt;  &lt;td&gt;   <i>← iki veri hücresi</i>
+  &lt;/tr&gt;
+&lt;/table&gt;</div>
+      </div>
+      <div>
+        <div class="card">
+          <h3>Sütun etiketi neden yok?</h3>
+          <p class="muted" style="font-size:calc(.88rem + var(--fsp));margin-bottom:.5rem">HTML'de satırı biz açarız; sütunlar ise her satırdaki hücrelerin <b>aynı sırada</b> yer almasıyla kendiliğinden oluşur. Her satırın 1. hücresi 1. sütuna, 2. hücresi 2. sütuna yerleşir.</p>
+          <ul class="check cross">
+            <li><code>&lt;td&gt;</code>'yi doğrudan <code>&lt;table&gt;</code> içine yazmak: hücrenin bir satırı olmalı.</li>
+            <li><code>&lt;tr&gt;</code> içine metin yazmak: metin her zaman bir hücrenin içinde durur.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 SÖZDİZİMİ + ÖNİZLEME -->
+<section class="slide" data-title="İlk Tablo: Kod ve Tarayıcı Görünümü">
+  <div class="slide-content">
+    <h2 class="topic">İLK TABLO: KOD VE TARAYICI GÖRÜNÜMÜ</h2>
+    <p class="subtitle">Bir kırtasiye deposunun stok tablosu: başlık satırı dahil üç satır, iki sütun.</p>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>stok.html</span></div>
+        <pre data-src="depo1"></pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">stok.html</span><span class="addr" data-addr data-page="stok.html">stok.html</span><button class="reload" data-reload="depo1" type="button" aria-label="Önizlemeyi yeniden yükle" title="Yeniden yükle">⟲</button></div>
+          <iframe class="preview mini" data-frame="depo1" title="Stok tablosunun tarayıcı görünümü"></iframe>
+        </div>
+        <div class="grid-2" style="margin-top:.8rem">
+          <div class="tile"><h3>Önizlemede görünenler</h3><p>Başlık hücreleri kalın ve ortalı, veri hücreleri sola yaslı. Bu, tarayıcının <b>varsayılan</b> görünümüdür.</p></div>
+          <div class="tile"><h3>Önizlemede görünmeyenler</h3><p>Kenarlık, arka plan rengi, hücreler arasında belirgin boşluk. HTML bunların hiçbirini kendiliğinden eklemez.</p></div>
+        </div>
+        <div class="note warn"><b><code>&lt;th&gt;</code> metni kalın göstermek için seçilmez.</b> Bir hücre, başlık görevi taşıdığı için <code>&lt;th&gt;</code> olur. Kalın bir değer göstermek istiyorsan hücre yine <code>&lt;td&gt;</code> kalır; görünüm CSS ile ayarlanır.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 scope -->
+<section class="slide" data-title="scope: Başlık Hangi Yöndeki Veriyi Açıklar?">
+  <div class="slide-content">
+    <h2 class="topic">scope: BAŞLIK HANGİ YÖNDEKİ VERİYİ AÇIKLAR?</h2>
+    <p class="subtitle"><code>scope</code> özniteliği, bir <code>&lt;th&gt;</code> hücresinin kendi sütunundaki mi yoksa kendi satırındaki mi verilerin başlığı olduğunu bildirir.</p>
+    <div class="split wide-right">
+      <div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>scope="col"</span></div>
+          <pre class="short" data-src="scopeCol"></pre>
+        </div>
+        <p class="code-caption"><code>col</code>, İngilizce <i>column</i> (sütun) kelimesinden gelir. "Stok adedi" başlığı altındaki <code>24</code> ve <code>60</code> değerlerini açıklar.</p>
+      </div>
+      <div>
+        <div class="diag-wrap">
+          <table class="diag">
+            <tr><th>Ürün&nbsp;↓</th><th>Stok adedi&nbsp;↓</th></tr>
+            <tr><td>Defter</td><td class="span-c">24</td></tr>
+            <tr><td>Kalem</td><td class="span-c">60</td></tr>
+          </table>
+        </div>
+        <div class="legend"><span><i class="l-h"></i>Başlık, oklar yönündeki hücreleri açıklar</span><span><i class="l-c"></i>"Stok adedi" başlığına bağlı veriler</span></div>
+        <div class="grid-2" style="margin-top:.8rem">
+          <div class="tile"><h3>Kimin işine yarar?</h3><p>Görünümü değiştirmez. Ekran okuyucu gibi yardımcı teknolojiler, bir hücreyi okurken ona bağlı başlığı da kullanıcıya duyurabilir. Konunun sonunda bunu canlı göreceğiz.</p></div>
+          <div class="tile"><h3>Nerede yazılır?</h3><p>Yalnızca <code>&lt;th&gt;</code> üzerinde. <code>&lt;td&gt;</code> bir başlık olmadığı için <code>scope</code> almaz. Satır başlıkları için kullanılan <code>scope="row"</code> değerini tablonun bölümlerini öğrenince ele alacağız.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 SATIR MI HÜCRE Mİ -->
+<section class="slide" data-title="Satır mı Ekliyorsun, Hücre mi?">
+  <div class="slide-content">
+    <h2 class="topic">SATIR MI EKLİYORSUN, HÜCRE Mİ?</h2>
+    <p class="subtitle">Yeni bir <code>&lt;tr&gt;</code> yeni bir kayıt oluşturur; mevcut satıra eklenen <code>&lt;td&gt;</code> ise o satıra fazladan bir sütun ekler.</p>
+    <div class="btn-row tight">
+      <button class="btn primary" type="button" id="growRow">+ Yeni ürün satırı (tr)</button>
+      <button class="btn" type="button" id="growCell">+ "Kalem" satırına bir td</button>
+      <button class="btn" type="button" id="growReset">Başa dön</button>
+    </div>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>stok.html</span></div>
+        <pre class="tight" id="growCode"></pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">stok.html</span><span class="addr" data-addr data-page="stok.html">stok.html</span></div>
+          <iframe class="preview short" id="growFrame" title="Tablonun değişen görünümü"></iframe>
+        </div>
+        <p class="count-line ok" id="growCount"></p>
+        <p class="state-line" id="growState"></p>
+      </div>
+    </div>
+    <div class="note plain"><b>Kontrol yöntemi:</b> Kodu okurken her <code>&lt;tr&gt;</code> içindeki hücreleri say. Bütün satırlarda aynı sayıyı bulmalısın. Bir satırda fazla hücre varsa tarayıcı hata vermez; tabloyu sessizce genişletir ve diğer satırlarda o sütun boş kalır.</div>
+  </div>
+</section>
+
+<!-- 09 GERÇEK PROJE: TESLİMAT -->
+<section class="slide" data-title="Gerçek Projede Kullanım: Teslimat Seçenekleri">
+  <div class="slide-content">
+    <h2 class="topic">GERÇEK PROJEDE KULLANIM: TESLİMAT SEÇENEKLERİ</h2>
+    <p class="subtitle">Bir e-ticaret sitesinde müşteri, teslimat seçeneklerinin süresini ve ücretini karşılaştırarak seçim yapar.</p>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>odeme.html</span></div>
+        <pre data-src="teslimat"></pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">odeme.html</span><span class="addr" data-addr data-page="odeme.html">odeme.html</span><button class="reload" data-reload="teslimat" type="button" aria-label="Önizlemeyi yeniden yükle" title="Yeniden yükle">⟲</button></div>
+          <iframe class="preview mini" data-frame="teslimat" title="Teslimat tablosunun tarayıcı görünümü"></iframe>
+        </div>
+        <div class="card" style="margin-top:.8rem">
+          <h3>Bu içerik neden tablo?</h3>
+          <ul class="check">
+            <li>Her satır bir teslimat seçeneği; her sütun aynı türden bir bilgi.</li>
+            <li>Müşteri "hangisi daha ucuz?" sorusunun cevabını tek sütuna bakarak bulur.</li>
+            <li>GOV.UK tasarım sistemi de tabloyu, bilgilerin karşılaştırılmasını ve taranarak okunmasını kolaylaştırmak için önerir.</li>
+          </ul>
+        </div>
+        <div class="note"><b>İleride:</b> Bu satırlar veritabanından gelebilir ve sunucuda ya da JavaScript ile üretilebilir. Üretilen HTML'deki başlık–veri ilişkisi yine burada kurduğumuz gibi olur.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 UYGULAMA 1 -->
+<section class="slide" data-title="Uygulama 1: Eğitim Merkezinin Kurs Tablosu">
+  <div class="slide-content">
+    <h2 class="topic">UYGULAMA 1: EĞİTİM MERKEZİNİN KURS TABLOSU</h2>
+    <p class="subtitle">SamTek Akademi'nin sitesinde ziyaretçiler, açılan kursların alanını, süresini ve eğitim biçimini karşılaştıracak.</p>
+    <div class="split">
+      <div>
+        <h3>Gereksinimler</h3>
+        <ol class="task-list">
+          <li>Temel HTML belge iskeletini kur. Akademinin adı <code>&lt;header&gt;</code> içinde, tablo ve sayfa başlığı <code>&lt;main&gt;</code> içinde bulunsun.</li>
+          <li><code>&lt;main&gt;</code> içinde "Akademimizdeki Kurslar" başlığını kullan.</li>
+          <li>Dört sütunlu bir tablo kur: <b>Kurs/Eğitim Alanı</b>, <b>Kurs Adı</b>, <b>Toplam Süre</b>, <b>Eğitim Biçimi</b>.</li>
+          <li>Beş kursu ayrı satırlara yaz (ör. Bilgisayar İşletmenliği – Ofis Programları – 40 saat – Yüz yüze). Eğitim biçimi yüz yüze, çevrim içi veya hibrit olabilir.</li>
+          <li>Başlıklarda <code>&lt;th&gt;</code> ve <code>scope="col"</code>, verilerde <code>&lt;td&gt;</code> kullan.</li>
+          <li>Tarayıcıda her değerin doğru başlığın altında durduğunu kontrol et.</li>
+        </ol>
+        <div class="self-study"><b>Kendini sına:</b> Başlık satırı dahil kaç satır ve kaç sütun oluşturdun? Her <code>&lt;tr&gt;</code> içinde kaç hücre var?</div>
+      </div>
+      <div>
+        <p class="muted" style="margin:0 0 .35rem;font-size:calc(.84rem + var(--fsp))">Hedef görünüm (henüz CSS yok):</p>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">index.html</span><span class="addr" data-addr data-page="index.html">index.html</span></div>
+          <iframe class="preview tall" data-frame="uyg1" title="Uygulama 1 hedef görünümü"></iframe>
+        </div>
+        <div class="note warn"><b>Tuzak:</b> Aynı alandaki iki kursu (Photoshop, After Effects) tek satıra sığdırmaya çalışmak. Her kurs ayrı bir kayıttır; alan adı iki satırda da yazılır.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 BÖLÜMLER -->
+<section class="slide" data-title="caption, thead, tbody ve tfoot: Tablonun Bölümleri">
+  <div class="slide-content">
+    <h2 class="topic">caption, thead, tbody VE tfoot: TABLONUN BÖLÜMLERİ</h2>
+    <p class="subtitle">Bu dört etiket tabloya bir ad verir ve satırları görevlerine göre gruplar; hücrelerin yerini almazlar.</p>
+    <div class="split wide-left">
+      <div>
+        <table>
+          <thead><tr><th scope="col">Etiket</th><th scope="col">Görevi</th><th scope="col">İçine ne yazılır?</th></tr></thead>
+          <tbody>
+            <tr><td><code>&lt;caption&gt;</code></td><td>Tablonun başlığını veya kısa açıklamasını verir.</td><td>Tabloyu tanımlayan metin</td></tr>
+            <tr><td><code>&lt;thead&gt;</code></td><td>Sütun başlıklarını içeren satırları gruplar.</td><td><code>&lt;tr&gt;</code> ile başlık satırları</td></tr>
+            <tr><td><code>&lt;tbody&gt;</code></td><td>Tablonun asıl veri satırlarını gruplar.</td><td><code>&lt;tr&gt;</code> ile veri satırları</td></tr>
+            <tr><td><code>&lt;tfoot&gt;</code></td><td>Sütunlara ilişkin toplam veya özet satırlarını gruplar.</td><td><code>&lt;tr&gt;</code> ile özet satırları</td></tr>
+          </tbody>
+        </table>
+        <div class="note warn"><b>Sık yapılan hata:</b> <code>&lt;thead&gt;</code> ile <code>&lt;th&gt;</code>'yi karıştırmak. <code>&lt;thead&gt;</code> <b>satırları</b> gruplar, <code>&lt;th&gt;</code> tek bir <b>hücredir</b>. <code>&lt;thead&gt;</code> içine doğrudan hücre yazılmaz; arada her zaman <code>&lt;tr&gt;</code> bulunur.</div>
+      </div>
+      <div>
+        <h3>Yazılış sırası</h3>
+        <div class="stack">
+          <div class="lay"><code>&lt;caption&gt;</code><p>Kullanılırsa <code>&lt;table&gt;</code>'ın <b>ilk</b> öğesidir.</p></div>
+          <div class="lay"><code>&lt;thead&gt;</code><p>Sütun başlığı satırları</p></div>
+          <div class="lay"><code>&lt;tbody&gt;</code><p>Veri satırları. Aynı tabloda birden fazla olabilir.</p></div>
+          <div class="lay opt"><code>&lt;tfoot&gt;</code><p>Yalnızca özet gerekiyorsa</p></div>
+        </div>
+        <div class="note ok"><b>Hepsi zorunlu değildir.</b> Bir tabloda özet satırı yoksa <code>&lt;tfoot&gt;</code> yazılmaz. Etiket, içerikte karşılığı olduğu için eklenir.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 caption / thead / tbody ÖRNEK -->
+<section class="slide" data-title="Bölümlü Tablo: Kod ve Tarayıcı Görünümü">
+  <div class="slide-content">
+    <h2 class="topic">BÖLÜMLÜ TABLO: KOD VE TARAYICI GÖRÜNÜMÜ</h2>
+    <p class="subtitle">Stok tablosuna bir ad veriyor, başlık satırını <code>&lt;thead&gt;</code>, ürün satırlarını <code>&lt;tbody&gt;</code> içine alıyoruz.</p>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>stok.html</span></div>
+        <pre data-src="depo2"></pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">stok.html</span><span class="addr" data-addr data-page="stok.html">stok.html</span><button class="reload" data-reload="depo2" type="button" aria-label="Önizlemeyi yeniden yükle" title="Yeniden yükle">⟲</button></div>
+          <iframe class="preview mini" data-frame="depo2" title="Bölümlü tablonun tarayıcı görünümü"></iframe>
+        </div>
+        <p class="code-caption">Tarayıcı <code>&lt;caption&gt;</code> içeriğini varsayılan olarak tablonun üstünde, ortalı gösterir. <code>&lt;thead&gt;</code> ve <code>&lt;tbody&gt;</code> görünür bir değişiklik yapmaz.</p>
+        <h3 style="margin-top:.8rem">Üç farklı "başlık"</h3>
+        <div class="grid-3">
+          <div class="tile"><code>&lt;h1&gt;</code><p>Sayfanın ana konusu. Tablonun dışında durur.</p></div>
+          <div class="tile"><code>&lt;caption&gt;</code><p>Yalnızca bu tablonun neyi gösterdiği: "Depodaki ürünler".</p></div>
+          <div class="tile"><code>&lt;th&gt;</code><p>Tek bir sütunun veya satırın anlamı: "Stok adedi".</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 tfoot GERÇEK PROJE -->
+<section class="slide" data-title="Gerçek Projede tfoot: Sipariş Tutarları">
+  <div class="slide-content">
+    <h2 class="topic">GERÇEK PROJEDE tfoot: SİPARİŞ TUTARLARI</h2>
+    <p class="subtitle">Sipariş ayrıntı sayfasında ürün tutarlarının altındaki genel toplam, tablonun özet satırıdır.</p>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>siparis.html</span></div>
+        <pre data-src="siparis"></pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">siparis.html</span><span class="addr" data-addr data-page="siparis.html">siparis.html</span><button class="reload" data-reload="siparis" type="button" aria-label="Önizlemeyi yeniden yükle" title="Yeniden yükle">⟲</button></div>
+          <iframe class="preview mini" data-frame="siparis" title="Sipariş tablosunun tarayıcı görünümü"></iframe>
+        </div>
+        <div class="grid-2" style="margin-top:.8rem">
+          <div class="tile"><h3><code style="display:inline;margin:0">tfoot</code> hesaplama yapmaz</h3><p><code>200 TL</code> değerini biz yazdık. Bir ürünün tutarını değiştirirsen toplam kendiliğinden değişmez. Bu hesabı ileride JavaScript veya sunucu tarafındaki kod yapacak.</p></div>
+          <div class="tile"><h3><code style="display:inline;margin:0">tfoot</code>, <code style="display:inline;margin:0">footer</code> değildir</h3><p><code>&lt;tfoot&gt;</code> tablonun verilerini özetler. Sitenin telif ve iletişim bilgileri tablonun özeti değildir; onlar sayfanın <code>&lt;footer&gt;</code> bölgesine aittir.</p></div>
+        </div>
+        <div class="note plain"><b>Ne zaman eklenmez?</b> Uygulama 1'deki kurs tablosunda bütün kursların sürelerini toplamak, ziyaretçinin kurs seçmesine yardım etmez. Sırf etiketi kullanmak için <code>&lt;tfoot&gt;</code> eklenmez.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 scope="row" -->
+<section class="slide" data-title="scope=&quot;row&quot;: Satır Başlığı">
+  <div class="slide-content">
+    <h2 class="topic">scope="row": SATIR BAŞLIĞI</h2>
+    <p class="subtitle">Bir <code>&lt;th&gt;</code> kendi satırındaki değerleri açıklıyorsa <code>scope="row"</code> alır; başlık hücreleri yalnızca <code>&lt;thead&gt;</code> içinde bulunmaz.</p>
+    <div class="split">
+      <div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>tfoot içindeki satır başlığı</span></div>
+          <pre class="short" data-src="rowScope"></pre>
+        </div>
+        <p class="code-caption">"Genel toplam" hücresi, sağındaki <b>21</b> ve <b>1250 TL</b> değerlerinin başlığıdır.</p>
+        <div class="vs" style="margin-top:.8rem">
+          <div class="box"><h4 style="color:var(--cyan)">scope="col"</h4><p>Başlık, <b>altındaki</b> sütun hücrelerini açıklar. Genellikle <code>&lt;thead&gt;</code> satırındaki başlıklar.</p></div>
+          <div class="box"><h4 style="color:var(--orange)">scope="row"</h4><p>Başlık, <b>sağındaki</b> satır hücrelerini açıklar. <code>&lt;tbody&gt;</code> veya <code>&lt;tfoot&gt;</code> satırlarının ilk hücresi olabilir.</p></div>
+        </div>
+      </div>
+      <div>
+        <div class="diag-wrap">
+          <table class="diag">
+            <caption>1403 numaralı sipariş özeti</caption>
+            <tr><th>Ürün ↓</th><th>Adet ↓</th><th>Tutar ↓</th></tr>
+            <tr><td>Tükenmez kalem</td><td>6</td><td>350 TL</td></tr>
+            <tr><td>Evrak dosyası</td><td>10</td><td>700 TL</td></tr>
+            <tr><td>Silgi</td><td>5</td><td>200 TL</td></tr>
+            <tr><th class="span-r" style="color:#ffe0c9">Genel toplam →</th><td class="foot">21</td><td class="foot">1250 TL</td></tr>
+          </table>
+        </div>
+        <div class="legend"><span><i class="l-h"></i>Sütun başlığı (<code>col</code>)</span><span><i class="l-r"></i>Satır başlığı (<code>row</code>)</span><span><i class="l-f"></i>Satır başlığına bağlı özet değerleri</span></div>
+        <div class="note"><b>"Adet" sütunundaki 21 değeri iki başlığa birden bağlıdır:</b> sütunda "Adet", satırda "Genel toplam". Bir veri hücresi hem bir sütun başlığına hem bir satır başlığına sahip olabilir.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 UYGULAMA 2 -->
+<section class="slide" data-title="Uygulama 2: Kırtasiye Sipariş Özeti">
+  <div class="slide-content">
+    <h2 class="topic">UYGULAMA 2: KIRTASİYE SİPARİŞ ÖZETİ</h2>
+    <p class="subtitle">Samsun Kırtasiye'nin sipariş ayrıntı sayfasında müşteri, aldığı ürünleri ve siparişin genel toplamını görecek.</p>
+    <div class="split">
+      <div>
+        <h3>Gereksinimler</h3>
+        <ol class="task-list">
+          <li>Yeni bir klasörde <code>index.html</code> oluştur. Mağazanın adı <code>&lt;header&gt;</code>, tablo <code>&lt;main&gt;</code> içinde bulunsun.</li>
+          <li><code>&lt;caption&gt;</code> ile tabloya <b>"1403 numaralı sipariş özeti"</b> adını ver.</li>
+          <li><b>Ürün</b>, <b>Adet</b>, <b>Tutar</b> başlıklarını <code>&lt;thead&gt;</code> içinde <code>&lt;th&gt;</code> ve <code>scope="col"</code> ile oluştur.</li>
+          <li>Üç ürünü <code>&lt;tbody&gt;</code> içine yaz: Tükenmez kalem – 6 – 350 TL, Evrak dosyası – 10 – 700 TL, Silgi – 5 – 200 TL. Tutar, o üründen alınan bütün adetlerin bedelidir.</li>
+          <li><code>&lt;tfoot&gt;</code> içinde tek özet satırı kur: "Genel toplam" başlığı <code>scope="row"</code> ile, ardından adet toplamı ve tutar toplamı.</li>
+          <li>Özet satırında da <b>üç ayrı hücre</b> olsun; toplamları kendin hesaplayıp yaz.</li>
+        </ol>
+      </div>
+      <div>
+        <p class="muted" style="margin:0 0 .35rem;font-size:calc(.84rem + var(--fsp))">Hedef görünüm (henüz CSS yok):</p>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">index.html</span><span class="addr" data-addr data-page="index.html">index.html</span></div>
+          <iframe class="preview" data-frame="uyg2" title="Uygulama 2 hedef görünümü"></iframe>
+        </div>
+        <div class="self-study"><b>Kendini sına:</b> Adet toplamı neden "Adet" sütununun altında duruyor? Özet satırındaki başlık hücresinin <code>&lt;td&gt;</code> değil <code>&lt;th&gt;</code> olmasının sebebini kendi cümlelerinle söyleyebiliyor musun?</div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 16 GÖRÜNÜM DESTEĞİ -->
+<section class="slide" data-title="Tabloyu Okunur Kılan Küçük CSS Desteği">
+  <div class="slide-content">
+    <h2 class="topic">TABLOYU OKUNUR KILAN KÜÇÜK CSS DESTEĞİ</h2>
+    <p class="subtitle">Kenarlık, iç boşluk ve hizalama olmayınca hücreleri ayırt etmek zorlaşır; bu HTML'in hatalı olduğu anlamına gelmez.</p>
+    <div class="toggles" id="cssToggles">
+      <label class="on"><input type="checkbox" data-css="border" checked> border</label>
+      <label class="on"><input type="checkbox" data-css="collapse" checked> border-collapse</label>
+      <label class="on"><input type="checkbox" data-css="padding" checked> padding</label>
+      <label class="on"><input type="checkbox" data-css="align" checked> text-align</label>
+    </div>
+    <div class="split">
+      <div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>head içine, &lt;/head&gt; kapanışından önce</span></div>
+          <pre class="tight" id="cssCode"></pre>
+        </div>
+        <table style="margin-top:.7rem">
+          <tbody>
+            <tr><td><code>border</code></td><td>Her hücreye 1 piksel kalınlığında, düz, koyu eflatun kenarlık çizer.</td></tr>
+            <tr><td><code>border-collapse</code></td><td>Komşu hücrelerin kenarlıklarını tek çizgide birleştirir; kapatınca çift çizgi görürsün.</td></tr>
+            <tr><td><code>padding</code></td><td>Metinle hücre kenarı arasında dört yönde 7 piksel boşluk bırakır. Sıkışık görünümü gideren budur.</td></tr>
+            <tr><td><code>text-align</code></td><td><code>table</code> üzerinde yazıldığında hücrelerdeki metinler ortalanır. Tablonun kendisi sayfada ortalanmaz.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">program.html</span><span class="addr" data-addr data-page="program.html">program.html</span></div>
+          <iframe class="preview tall" id="cssFrame" title="CSS desteğinin tablo üzerindeki etkisi"></iframe>
+        </div>
+        <p class="state-line" id="cssState"></p>
+        <div class="note"><b>Bu kodu şimdilik hazır bir görünüm desteği olarak kullanıyoruz.</b> Seçicilerin ve özelliklerin yazım mantığını CSS aşamasında ayrıntılı öğreneceğiz. Bundan sonraki önizlemelerde tablolar bu destekle gösterilir.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 17 colspan NASIL ÇALIŞIR -->
+<section class="slide" data-title="colspan: Bir Hücreyi Birden Fazla Sütuna Yaymak">
+  <div class="slide-content">
+    <h2 class="topic">colspan: BİR HÜCREYİ BİRDEN FAZLA SÜTUNA YAYMAK</h2>
+    <p class="subtitle"><code>colspan</code>, bir <code>&lt;th&gt;</code> veya <code>&lt;td&gt;</code> hücresinin yatayda <b>toplam</b> kaç sütun kaplayacağını belirtir.</p>
+    <div class="split">
+      <div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>üç sütunlu tabloda iki satır</span></div>
+          <pre class="tight" data-src="colBasic"></pre>
+        </div>
+        <ul class="check" style="margin-top:.8rem">
+          <li><code>colspan="2"</code>: hücre toplam <b>iki</b> sütun kaplar; genişliğine iki sütun <b>eklenmez</b>.</li>
+          <li>Öznitelik yazılmazsa hücre tek sütun kaplar.</li>
+          <li>Hücreleri içerikleriyle birleştirmez; kapsanan konum için hücre yazmamak bizim işimizdir.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="diag-wrap">
+          <table class="diag">
+            <tr><th>1. sütun</th><th>2. sütun</th><th>3. sütun</th></tr>
+            <tr><td>Defter</td><td>2</td><td>160 TL</td></tr>
+            <tr><td class="span-c" colspan="2">Ödenecek toplam &nbsp;<small>(colspan="2")</small></td><td>160 TL</td></tr>
+          </table>
+        </div>
+        <div class="legend"><span><i class="l-c"></i>İki sütunu kaplayan tek hücre</span></div>
+        <div class="equation" style="justify-content:flex-start;margin:.9rem 0 .4rem">
+          <span><b>1 + 1 + 1</b>ilk satır: 3 hücre etiketi</span><i>=</i>
+          <span class="res"><b>3 sütun</b>aynı genişlik</span><i>=</i>
+          <span><b>2 + 1</b>ikinci satır: 2 hücre etiketi</span>
+        </div>
+        <div class="note ok"><b>Kontrol yöntemi değişti:</b> Artık etiketleri değil, <b>kapladıkları sütunları</b> sayıyoruz. Her satırda <code>colspan</code> değerleri (yazılmamışsa 1) toplandığında aynı sayı çıkmalı.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 18 colspan SİMÜLATÖRÜ -->
+<section class="slide" data-title="colspan Denemesi: Kapsanan Hücreyi Silmeyi Unutmak">
+  <div class="slide-content">
+    <h2 class="topic">colspan DENEMESİ: KAPSANAN HÜCREYİ SİLMEYİ UNUTMAK</h2>
+    <p class="subtitle">Toplam satırının başlığını genişlet ve kapsanan eski hücreyi bırakırsan tabloya ne olduğunu gözle.</p>
+    <div class="split">
+      <div>
+        <div class="rangebox"><span>colspan =</span><input type="range" min="1" max="3" value="2" id="colRange" aria-label="colspan değeri"><b id="colVal">2</b></div>
+        <div class="toggles">
+          <label id="colKeepLbl"><input type="checkbox" id="colKeep"> kapsanan eski hücreyi bırak</label>
+        </div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>tfoot</span></div>
+          <pre class="tight" id="colCode"></pre>
+        </div>
+        <p class="count-line" id="colCount"></p>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">siparis.html</span><span class="addr" data-addr data-page="siparis.html">siparis.html</span></div>
+          <iframe class="preview" id="colFrame" title="colspan denemesinin görünümü"></iframe>
+        </div>
+        <p class="state-line" id="colState"></p>
+        <div class="note warn"><b>Sık yapılan hata:</b> <code>colspan="2"</code> ekledikten sonra, artık kapsanan sütun için eski hücreyi de bırakmak. Tarayıcı hata vermez; satır tablodan taşar ve fazladan bir sütun oluşur.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 19 GERÇEK PROJE colspan -->
+<section class="slide" data-title="Gerçek Projede colspan: Ödenecek Toplam">
+  <div class="slide-content">
+    <h2 class="topic">GERÇEK PROJEDE colspan: ÖDENECEK TOPLAM</h2>
+    <p class="subtitle">Sipariş özetinde ürün satırlarında adet gösterilir; en altta ise yalnızca ödenecek tutar gösterilmek istenebilir.</p>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>siparis.html</span></div>
+        <pre data-src="siparisCol"></pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">siparis.html</span><span class="addr" data-addr data-page="siparis.html">siparis.html</span><button class="reload" data-reload="siparisCol" type="button" aria-label="Önizlemeyi yeniden yükle" title="Yeniden yükle">⟲</button></div>
+          <iframe class="preview" data-frame="siparisCol" title="Ödenecek toplam satırının görünümü"></iframe>
+        </div>
+        <div class="vs" style="margin-top:.8rem">
+          <div class="box"><h4 style="color:var(--violet)">colspan="2"</h4><p>Hücrenin <b>kaç sütun kaplayacağını</b> belirtir. Görünümle ilgili değil, tablonun yapısıyla ilgilidir.</p></div>
+          <div class="box"><h4 style="color:var(--orange)">scope="row"</h4><p>Başlığın <b>hangi yöndeki veriyi açıkladığını</b> belirtir: sağındaki 1250 TL.</p></div>
+        </div>
+        <div class="note plain"><b>Birleştirme içerik ihtiyacına göre seçilir.</b> Toplam adet de gösterilecekse Uygulama 2'deki üç ayrı hücre doğrudur. Yalnızca ödeme tutarı özetlenecekse bu düzen kullanılabilir. Sırf görünümü değiştirmek için hücre birleştirilmez.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 20 UYGULAMA 3 -->
+<section class="slide" data-title="Uygulama 3: Haftalık Programda Öğle Arası">
+  <div class="slide-content">
+    <h2 class="topic">UYGULAMA 3: HAFTALIK PROGRAMDA ÖĞLE ARASI</h2>
+    <p class="subtitle">Öğle arası üç gün için de aynı saatte olduğundan, bu bilgi gün sütunlarını kaplayan tek bir hücrede yer alacak.</p>
+    <div class="split">
+      <div>
+        <h3>Gereksinimler</h3>
+        <ol class="task-list">
+          <li>Yeni bir klasörde <code>index.html</code> oluştur; akademinin adı <code>&lt;header&gt;</code>, tablo <code>&lt;main&gt;</code> içinde olsun. Önceki slayttaki görünüm desteği CSS'ini ekle.</li>
+          <li><code>&lt;caption&gt;</code>: <b>Web geliştirme grubu haftalık programı</b>.</li>
+          <li><code>&lt;thead&gt;</code> sütunları: <b>Saat</b>, <b>Pazartesi</b>, <b>Salı</b>, <b>Çarşamba</b> — <code>scope="col"</code> ile.</li>
+          <li>Her satırın saatini <code>&lt;th scope="row"&gt;</code> ile yaz. Saatler: 09.00–10.30 · 10.45–12.15 · 12.15–13.00 · 13.00–14.30.</li>
+          <li>Ders satırları: HTML / CSS / JavaScript, ardından bu derslerin uygulamaları; son satırda Proje çalışması, Proje çalışması, Proje değerlendirmesi.</li>
+          <li>12.15–13.00 satırında saat hücresinin yanına üç gün sütununu kaplayan <b>tek</b> bir <code>&lt;td&gt;</code> yaz: "Öğle arası". Uygun <code>colspan</code> değerini sen belirle.</li>
+          <li>Bu tabloda özet yok; <code>&lt;tfoot&gt;</code> kullanma.</li>
+        </ol>
+      </div>
+      <div>
+        <p class="muted" style="margin:0 0 .35rem;font-size:calc(.84rem + var(--fsp))">Hedef görünüm:</p>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">index.html</span><span class="addr" data-addr data-page="index.html">index.html</span></div>
+          <iframe class="preview tall" data-frame="uyg3" title="Uygulama 3 hedef görünümü"></iframe>
+        </div>
+        <div class="self-study"><b>Kendini sına:</b> Öğle arası satırında kaç hücre etiketi var, bu hücreler toplam kaç sütun kaplıyor? İki sayı neden farklı?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 21 rowspan NASIL ÇALIŞIR -->
+<section class="slide" data-title="rowspan: Bir Hücreyi Birden Fazla Satıra Yaymak">
+  <div class="slide-content">
+    <h2 class="topic">rowspan: BİR HÜCREYİ BİRDEN FAZLA SATIRA YAYMAK</h2>
+    <p class="subtitle"><code>colspan</code> hücreyi yatayda genişletir; <code>rowspan</code> ise bulunduğu satırdan başlayarak aşağıya doğru yayar.</p>
+    <div class="split">
+      <div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>üç sütunlu tabloda iki satır</span></div>
+          <pre class="tight" data-src="rowBasic"></pre>
+        </div>
+        <ul class="check" style="margin-top:.8rem">
+          <li><code>rowspan="2"</code>: hücre, bulunduğu satır dahil <b>toplam iki</b> satır kaplar.</li>
+          <li><code>&lt;td&gt;</code> ve <code>&lt;th&gt;</code> üzerinde kullanılabilir; yazılmazsa hücre tek satır kaplar.</li>
+          <li>Aşağıdaki <code>&lt;tr&gt;</code> satırlarını ortadan kaldırmaz; yalnızca o satırlardaki bir hücre konumunu üstteki hücreyle paylaşır.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="diag-wrap">
+          <table class="diag">
+            <tr><td class="span-r" rowspan="2">A Salonu<br><small>(rowspan="2")</small></td><td>09.00</td><td>HTML eğitimi</td></tr>
+            <tr><td>11.00</td><td>CSS eğitimi</td></tr>
+          </table>
+        </div>
+        <div class="legend"><span><i class="l-r"></i>İki satırı kaplayan tek hücre</span></div>
+        <div class="steps" style="grid-template-columns:1fr;margin-top:.8rem">
+          <div class="step"><b>1. SATIR</b><p>Tarayıcı "A Salonu" hücresi için 1. sütunda iki satırlık yer ayırır, ardından 09.00 ve HTML eğitimi hücrelerini yerleştirir.</p></div>
+          <div class="step"><b>2. SATIR</b><p>1. sütun zaten dolu olduğu için ilk hücreyi (11.00) doğrudan <strong style="color:#fff">2. sütuna</strong> yerleştirir.</p></div>
+        </div>
+        <div class="note ok"><b>İkinci satırda iki hücre etiketi olması burada doğrudur.</b> Üçüncü konumu yukarıdan devam eden hücre doldurur.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 22 rowspan KAYMA -->
+<section class="slide" data-title="rowspan Denemesi: Devam Satırına Hücre Yazmak">
+  <div class="slide-content">
+    <h2 class="topic">rowspan DENEMESİ: DEVAM SATIRINA HÜCRE YAZMAK</h2>
+    <p class="subtitle">Birleşen hücrenin devam ettiği satıra alışkanlıkla boş bir hücre eklersen diğer hücreler sağa kayar.</p>
+    <div class="btn-row tight">
+      <button class="btn on" type="button" data-shift="ok">Doğru: devam satırında hücre yok</button>
+      <button class="btn" type="button" data-shift="bad">Hatalı: devam satırının başına boş td</button>
+    </div>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>oturumlar.html</span></div>
+        <pre id="shiftCode"></pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">oturumlar.html</span><span class="addr" data-addr data-page="oturumlar.html">oturumlar.html</span></div>
+          <iframe class="preview" id="shiftFrame" title="rowspan denemesinin görünümü"></iframe>
+        </div>
+        <p class="count-line" id="shiftCount"></p>
+        <p class="state-line" id="shiftState"></p>
+        <div class="note warn"><b>Hatalı sürümde olan:</b> 1. sütun "A Salonu" ile dolu olduğu için boş hücre 2. sütuna, saat 3. sütuna, eğitim adı da tablonun dışına, yeni bir 4. sütuna yerleşir.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 23 GERÇEK PROJE rowspan -->
+<section class="slide" data-title="Gerçek Projede rowspan: Salon Oturumları">
+  <div class="slide-content">
+    <h2 class="topic">GERÇEK PROJEDE rowspan: SALON OTURUMLARI</h2>
+    <p class="subtitle">Bir etkinlik sitesinde aynı salondaki oturumlar, salon bilgisini paylaşan tek bir hücreyle birlikte gösterilebilir.</p>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>oturumlar.html</span></div>
+        <pre data-src="salon"></pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">oturumlar.html</span><span class="addr" data-addr data-page="oturumlar.html">oturumlar.html</span><button class="reload" data-reload="salon" type="button" aria-label="Önizlemeyi yeniden yükle" title="Yeniden yükle">⟲</button></div>
+          <iframe class="preview short" data-frame="salon" title="Salon oturumları tablosunun görünümü"></iframe>
+        </div>
+        <div class="grid-2" style="margin-top:.8rem">
+          <div class="tile"><h3>Neden <code style="display:inline;margin:0">td</code>?</h3><p>"A Salonu" burada <b>Salon</b> sütununun altındaki bir veridir. Hücreyi genişletmek onu başlık yapmaz; başlık olup olmadığına içeriğin görevi karar verir.</p></div>
+          <div class="tile"><h3>Daha anlamlı bir kullanım</h3><p>Saatlik satırlardan oluşan bir ders programında iki saat süren ders tek hücrede iki satır kaplar. Hücrenin yüksekliği dersin <b>süresini</b> gösterir.</p></div>
+        </div>
+        <div class="note plain"><b>Alternatif:</b> Salon adını her satırda tekrar yazmak da geçerlidir. İleride satırları JavaScript ile sıralamak veya filtrelemek istediğimizde bu düzen daha kolay yönetilir. Birleşik düzende satır sayısı değişirse <code>rowspan</code> değeri de güncellenmelidir.</div>
+        <div class="note warn"><b>Sınır:</b> Yayılma aynı satır grubunda kalmalıdır. <code>&lt;tbody&gt;</code> içinde başlayan bir hücre <code>&lt;tfoot&gt;</code> içine uzanmaz.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 24 BİRLEŞEN BAŞLIKLARDA scope -->
+<section class="slide" data-title="Birleşen Başlık Hücrelerinde scope Seçimi">
+  <div class="slide-content">
+    <h2 class="topic">BİRLEŞEN BAŞLIK HÜCRELERİNDE scope SEÇİMİ</h2>
+    <p class="subtitle"><code>scope</code> hücrenin genişliğini veya yüksekliğini değil, <b>hangi verilerin başlığı olduğunu</b> bildirir.</p>
+    <div class="split">
+      <div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>günü iki oturumu kapsayan başlık</span></div>
+          <pre class="tight" data-src="gunBaslik"></pre>
+        </div>
+        <div class="note ok"><b><code>scope="row"</code> ile <code>rowspan</code> birlikte çalışır.</b> Satır başlığı, <code>rowspan</code> ile kapladığı satırlardaki hücrelerin de başlığıdır. "Cumartesi" başlığı iki oturum satırını birlikte açıklar.</div>
+      </div>
+      <div>
+        <div class="vs" style="grid-template-columns:1fr">
+          <div class="box bad"><h4>Tek tbody içinde scope="rowgroup"</h4><p><code>rowgroup</code>, başlığın bulunduğu <b>satır grubunun</b> (<code>&lt;tbody&gt;</code>) kalan satırlarının tamamını kapsar; kapsamı <code>rowspan</code> ile sınırlanmaz. Cumartesi ve pazar aynı <code>&lt;tbody&gt;</code> içindeyse cumartesi başlığı pazar satırlarına da uzanır.</p><p><b>Kullanılacaksa</b> her gün ayrı bir <code>&lt;tbody&gt;</code> içine alınır. Bu bir alternatiftir, zorunluluk değildir.</p></div>
+          <div class="box bad"><h4>colspan="3" diye scope="colgroup"</h4><p>Üç sütun kaplamak, hücreyi bir <b>sütun grubunun</b> başlığı yapmaz. "Toplam eğitim süresi" sağındaki <b>7 saat</b> değerini açıklar; doğru değer <code>scope="row"</code>.</p></div>
+          <div class="box good"><h4>Karar sorusu</h4><p>"Bu başlığın açıkladığı değerler nerede?" Sağındaysa <code>row</code>, altındaysa <code>col</code>. Hücrenin kaç satır veya sütun kapladığı bu soruyu değiştirmez.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 25 UYGULAMA 4 -->
+<section class="slide" data-title="Uygulama 4: Günlere Göre Gruplanmış Program">
+  <div class="slide-content">
+    <h2 class="topic">UYGULAMA 4: GÜNLERE GÖRE GRUPLANMIŞ PROGRAM</h2>
+    <p class="subtitle">Her gün üç dersten oluşuyor: teorik, uygulama ve değerlendirme. Gün adı, o günün üç ders satırını kapsayan tek bir başlık hücresinde yer alacak.</p>
+    <div class="split">
+      <div>
+        <h3>Gereksinimler</h3>
+        <ol class="task-list">
+          <li>Yeni bir klasörde <code>index.html</code> oluştur; görünüm desteği CSS'ini ekle. Tabloya "Web geliştirme grubu haftalık programı" adını ver.</li>
+          <li>Sütunlar: <b>Gün</b>, <b>Ders</b>, <b>Başlangıç–Bitiş</b>. <code>&lt;thead&gt;</code> içinde <b>yalnızca</b> bu başlık satırı bulunsun.</li>
+          <li>Dokuz ders satırını tek bir <code>&lt;tbody&gt;</code> içine yaz: pazartesi HTML, salı CSS, çarşamba JavaScript; her gün Teorik 08.00–09.00, Uygulama 09.00–10.30, Değerlendirme 10.30–12.00.</li>
+          <li>Her günün adını <code>&lt;th&gt;</code> ile yaz; üç satırı kaplaması için uygun <code>rowspan</code> değerini ve <code>scope</code> değerini sen belirle.</li>
+          <li>Günün devam ettiği iki satırda gün için yeni veya boş hücre oluşturma.</li>
+        </ol>
+        <div class="self-study"><b>Kendini sına:</b> Gün sütununda kaç hücre etiketi, Ders sütununda kaç hücre var? Ders satırlarını <code>&lt;thead&gt;</code> içinde bıraksaydın tarayıcı tabloyu yine gösterirdi; o hâlde sorun ne olurdu?</div>
+      </div>
+      <div>
+        <p class="muted" style="margin:0 0 .35rem;font-size:calc(.84rem + var(--fsp))">Hedef görünüm:</p>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">index.html</span><span class="addr" data-addr data-page="index.html">index.html</span></div>
+          <iframe class="preview u4" data-frame="uyg4" title="Uygulama 4 hedef görünümü"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 26 EKRAN OKUYUCU -->
+<section class="slide" data-title="Başlık İlişkisi: Bir Hücre Nasıl Okunur?">
+  <div class="slide-content">
+    <h2 class="topic">BAŞLIK İLİŞKİSİ: BİR HÜCRE NASIL OKUNUR?</h2>
+    <p class="subtitle">Ekranı görmeyen bir kullanıcı "1,5 saat" değerini tek başına duyarsa ne anlama geldiğini bilemez; başlık ilişkisi bu boşluğu doldurur.</p>
+    <div class="split">
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">program.html</span><span class="addr" data-addr data-page="program.html">program.html</span></div>
+          <iframe class="preview tall" id="srFrame" title="Hücreye tıklanabilen eğitim programı tablosu"></iframe>
+        </div>
+        <p class="code-caption">Tablodaki bir veri hücresine tıkla. Seçilen hücre ve ona bağlı başlıklar vurgulanır.</p>
+      </div>
+      <div>
+        <div class="sr-out" id="srOut"><span class="muted">Henüz bir hücre seçilmedi.</span></div>
+        <div class="card" style="margin-top:.8rem">
+          <h3>Bağlantıyı kuran ne?</h3>
+          <ul class="check">
+            <li>Sütun başlıklarındaki <code>scope="col"</code>: hücrenin hangi özelliğe ait olduğunu verir.</li>
+            <li>Gün başlığındaki <code>scope="row"</code> + <code>rowspan="2"</code>: iki oturum satırının da hangi güne ait olduğunu verir.</li>
+            <li>Toplam başlığındaki <code>scope="row"</code> + <code>colspan="3"</code>: "7 saat" değerinin neyin toplamı olduğunu verir.</li>
+          </ul>
+        </div>
+        <div class="note"><b>Neden önemli?</b> W3C'nin erişilebilir tablo rehberi, başlıkların veri hücreleriyle programatik olarak ilişkilendirilmesini önerir. Yardımcı teknolojiler bu ilişkiyi kullanarak bir hücreyi okurken ilgili başlıkları da duyurabilir; görsel kullanıcı aynı bilgiyi gözüyle satır ve sütunu izleyerek alır.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 27 HATA AVI -->
+<section class="slide" data-title="Hata Avı: Sipariş Tablosunda Altı Hata">
+  <div class="slide-content">
+    <h2 class="topic">HATA AVI: SİPARİŞ TABLOSUNDA ALTI HATA</h2>
+    <p class="subtitle">Aşağıdaki tabloda altı yapı hatası var. Hatalı olduğunu düşündüğün satıra tıkla.</p>
+    <div class="hunt-grid">
+      <div class="hunt-code" id="huntCode"><span class="hline">&lt;table&gt;</span><span class="hline">  &lt;thead&gt;</span><span class="hline" data-bug="1">    &lt;th scope="col"&gt;Ürün&lt;/th&gt;</span><span class="hline">    &lt;th scope="col"&gt;Adet&lt;/th&gt;</span><span class="hline">    &lt;th scope="col"&gt;Tutar&lt;/th&gt;</span><span class="hline">  &lt;/thead&gt;</span><span class="hline" data-bug="2">  &lt;caption&gt;1403 numaralı sipariş&lt;/caption&gt;</span><span class="hline">  &lt;tbody&gt;</span><span class="hline">    &lt;tr&gt;</span><span class="hline">      &lt;td&gt;Tükenmez kalem&lt;/td&gt;</span><span class="hline" data-bug="3">      &lt;td scope="col"&gt;6&lt;/td&gt;</span><span class="hline">      &lt;td&gt;350 TL&lt;/td&gt;</span><span class="hline">    &lt;/tr&gt;</span><span class="hline">    &lt;tr&gt;</span><span class="hline">      &lt;td&gt;Evrak dosyası&lt;/td&gt;</span><span class="hline">      &lt;td&gt;10&lt;/td&gt;</span><span class="hline">      &lt;td&gt;700 TL&lt;/td&gt;</span><span class="hline" data-bug="4">      &lt;td&gt;&lt;/td&gt;</span><span class="hline">    &lt;/tr&gt;</span><span class="hline">  &lt;/tbody&gt;</span><span class="hline">  &lt;tfoot&gt;</span><span class="hline">    &lt;tr&gt;</span><span class="hline" data-bug="5">      &lt;th colspan="2" scope="col"&gt;Genel toplam&lt;/th&gt;</span><span class="hline" data-bug="6">      &lt;td&gt;&lt;/td&gt;</span><span class="hline">      &lt;td&gt;1050 TL&lt;/td&gt;</span><span class="hline">    &lt;/tr&gt;</span><span class="hline">  &lt;/tfoot&gt;</span><span class="hline">&lt;/table&gt;</span></div>
+      <div class="hunt-panel">
+        <p class="score" id="huntScore">0 / 6 bulundu</p>
+        <p class="muted" style="font-size:calc(.86rem + var(--fsp));margin:0">Her satırı okurken iki soruyu sor: "Bu öğe doğru yerde mi?" ve "Bu satırdaki hücreler toplam kaç sütun kaplıyor?"</p>
+        <ul class="hunt-log" id="huntLog"></ul>
+        <p class="state-line" id="huntDone" style="color:var(--green)"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 28 DEĞERLENDİRME -->
+<section class="slide" data-title="Değerlendirme: Sekiz Soru">
+  <div class="slide-content">
+    <h2 class="topic">DEĞERLENDİRME: SEKİZ SORU</h2>
+    <p class="subtitle">Önce kendi cevabını ver, sonra karta tıklayıp karşılaştır.</p>
+    <div class="quiz-grid">
+      <div class="quiz-card"><span>SORU 01</span><h3>Bir değeri kalın göstermek için <code>&lt;td&gt;</code> yerine <code>&lt;th&gt;</code> kullanabilir miyim?</h3><p class="quiz-answer">Hayır. <code>&lt;th&gt;</code> başlık anlamı taşır; yardımcı teknolojiler onu diğer hücrelerin başlığı olarak yorumlar. Kalınlık CSS ile verilir.</p></div>
+      <div class="quiz-card"><span>SORU 02</span><h3>Mevcut bir satıra fazladan <code>&lt;td&gt;</code> eklersem ne olur?</h3><p class="quiz-answer">Yeni bir kayıt oluşmaz; o satır bir sütun uzar. Tarayıcı tabloyu genişletir, diğer satırlarda o sütun boş kalır.</p></div>
+      <div class="quiz-card"><span>SORU 03</span><h3><code>&lt;caption&gt;</code> ile <code>&lt;th&gt;</code> arasındaki fark nedir?</h3><p class="quiz-answer"><code>&lt;caption&gt;</code> bütün tablonun neyi gösterdiğini söyler ve <code>&lt;table&gt;</code>'ın ilk öğesidir. <code>&lt;th&gt;</code> tek bir sütunun veya satırın anlamını açıklar.</p></div>
+      <div class="quiz-card"><span>SORU 04</span><h3>Bir ürünün tutarını değiştirdim; <code>&lt;tfoot&gt;</code> içindeki toplam güncellenir mi?</h3><p class="quiz-answer">Hayır. <code>&lt;tfoot&gt;</code> yalnızca özet satırlarını gruplar, hesaplama yapmaz. Toplamı biz yazarız; ileride JavaScript veya sunucu hesaplar.</p></div>
+      <div class="quiz-card"><span>SORU 05</span><h3>Üç sütunlu tabloda <code>colspan="2"</code> olan başlığın ardından kaç hücre yazılır?</h3><p class="quiz-answer">Bir. Başlık iki sütun kaplar, kalan tek sütun için bir hücre yeterlidir: 2 + 1 = 3.</p></div>
+      <div class="quiz-card"><span>SORU 06</span><h3><code>rowspan="3"</code> olan hücrenin devam ettiği satırlara boş <code>&lt;td&gt;</code> eklersem ne olur?</h3><p class="quiz-answer">O satırlardaki hücreler bir sütun sağa kayar ve tablonun dışına taşan fazladan bir sütun oluşur. Devam satırlarında o konum için hücre yazılmaz.</p></div>
+      <div class="quiz-card"><span>SORU 07</span><h3><code>colspan="3"</code> ile üç sütun kaplayan "Toplam" başlığı neden <code>scope="col"</code> almaz?</h3><p class="quiz-answer">Çünkü açıkladığı değer altında değil, sağında: aynı satırdaki toplam. Hücrenin genişliği <code>scope</code> seçimini belirlemez; doğru değer <code>scope="row"</code>.</p></div>
+      <div class="quiz-card"><span>SORU 08</span><h3>İki günün satırları tek <code>&lt;tbody&gt;</code> içindeyse gün başlıklarında <code>scope="rowgroup"</code> neden sorun olur?</h3><p class="quiz-answer"><code>rowgroup</code> satır grubunun kalanını kapsar ve <code>rowspan</code> ile sınırlanmaz; ilk günün başlığı ikinci günün satırlarını da kapsar. Ya <code>scope="row"</code> kullanılır ya da her gün ayrı <code>&lt;tbody&gt;</code> içine alınır.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 29 KONU SONU UYGULAMASI -->
+<section class="slide" data-title="Konu Sonu Uygulaması: İki Günlük Eğitim Programı">
+  <div class="slide-content">
+    <h2 class="topic">KONU SONU UYGULAMASI: İKİ GÜNLÜK EĞİTİM PROGRAMI</h2>
+    <p class="subtitle">SamTek Akademi, iki gün süren bir eğitimin oturumlarını ve toplam eğitim süresini yayımlayacak: konunun bütün yapıları tek tabloda.</p>
+    <div class="split">
+      <div>
+        <h3>Yapılacaklar</h3>
+        <ol class="task-list">
+          <li>Belge iskeletini kur; akademinin adı <code>&lt;header&gt;</code>, sayfa başlığı <b>"Web geliştirme eğitimi"</b> ve tablo <code>&lt;main&gt;</code> içinde olsun. Görünüm desteği CSS'ini ekle.</li>
+          <li><code>&lt;caption&gt;</code>, <code>&lt;thead&gt;</code>, <code>&lt;tbody&gt;</code> ve <code>&lt;tfoot&gt;</code> kullan; tablo adı <b>"İki günlük eğitim programı"</b>.</li>
+          <li>Sütunlar: <b>Gün</b>, <b>Saat</b>, <b>Konu</b>, <b>Süre</b>.</li>
+          <li>Cumartesi: 09.00–11.00 HTML ile içerik yapısı (2 saat) · 11.15–12.45 Semantik sayfa uygulaması (1,5 saat). Pazar: 09.00–11.00 CSS ile temel biçimlendirme (2 saat) · 11.15–12.45 Uygulama ve değerlendirme (1,5 saat).</li>
+          <li>Her günün adını, o günün iki oturumunu kapsayan tek başlık hücresinde göster.</li>
+          <li><code>&lt;tfoot&gt;</code> içinde "Toplam eğitim süresi" başlığını ilk üç sütuna yay; son hücreye toplamı yaz. Molalar toplama dahil değil.</li>
+        </ol>
+        <div class="card" style="margin-top:.8rem">
+          <h3>Kendi kontrol listen</h3>
+          <ul class="check">
+            <li>Her satırın kapladığı sütunların toplamı 4.</li>
+            <li>Gün başlıkları <code>rowspan</code> ile iki satır kaplıyor; devam satırlarında gün hücresi yok.</li>
+            <li>Her başlığın <code>scope</code> değeri, açıkladığı değerlerin yönüne göre seçildi.</li>
+            <li>Toplam, oturum sürelerinin toplamıyla tutarlı.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <p class="muted" style="margin:0 0 .35rem;font-size:calc(.84rem + var(--fsp))">Hedef görünüm:</p>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab">index.html</span><span class="addr" data-addr data-page="index.html">index.html</span></div>
+          <iframe class="preview u5" data-frame="uyg5" title="Konu sonu uygulamasının hedef görünümü"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 30 ÖZET -->
+<section class="slide" data-title="Özet">
+  <div class="slide-content intro">
+    <p class="muted" style="letter-spacing:.16em;font-size:calc(.75rem + var(--fsp));font-weight:700;color:var(--cyan)">HTML-8 TAMAMLANDI</p>
+    <h2 style="text-align:center">Tablo, bir değerin anlamını<br><span class="gradient">satırı ve sütunuyla birlikte verir.</span></h2>
+    <div class="equation">
+      <span><b>table · tr · th · td</b>Satır satır kurulan yapı</span><i>+</i>
+      <span><b>caption · thead · tbody · tfoot</b>Ad ve satır grupları</span><i>+</i>
+      <span><b>scope="col" · scope="row"</b>Başlığın yönü</span><i>+</i>
+      <span><b>colspan · rowspan</b>Birden fazla konumu kaplayan hücre</span><i>=</i>
+      <span class="res"><b>Anlaşılır, erişilebilir tablo</b></span>
+    </div>
+    <p class="lead" style="text-align:center;max-width:78ch">Tabloyu yalnızca karşılaştırılacak veriler için kullanırız; sayfa yerleşimi CSS'in işidir. Her satırda hücrelerin kapladığı sütunların toplamı aynı olmalıdır. <code>scope</code> değeri hücrenin boyutuna göre değil, açıkladığı verinin yönüne göre seçilir. Kenarlık, boşluk ve hizalama ise HTML'in değil CSS'in görevidir.</p>
+  </div>
+</section>
+</main>
+
+<footer class="controls">
+  <button class="nav-btn" id="prevBtn" type="button" aria-label="Önceki slayt">←</button>
+  <div class="progress-wrap">
+    <div class="slide-meta"><span id="slideTitle">Tablolar</span><span><b id="slideNum">01</b> / <span id="slideTotal">30</span></span></div>
+    <div class="track" role="progressbar" aria-label="Sunu ilerlemesi" aria-valuemin="1" aria-valuenow="1"><span id="progressBar"></span></div>
+  </div>
+  <button class="nav-btn" id="nextBtn" type="button" aria-label="Sonraki slayt">→</button>
+  <button class="fs-btn" id="fsBtn" type="button" aria-label="Tam ekran" title="Tam ekran (F)">⛶</button>
+</footer>
+<script>
+/* ===== tek kaynak: bütün kod örnekleri ===== */
+var SRC={};
+function J(a){return a.join('\n');}
+
+var SUPPORT_CSS = J([
+'table {',
+'    border-collapse: collapse;',
+'    text-align: center;',
+'}',
+'th, td {',
+'    border: 1px solid darkmagenta;',
+'    padding: 7px;',
+'}'
+]);
+
+SRC.depo1 = J([
+'<table>',
+'  <tr>',
+'    <th scope="col">Ürün</th>',
+'    <th scope="col">Stok adedi</th>',
+'  </tr>',
+'  <tr>',
+'    <td>Defter</td>',
+'    <td>24</td>',
+'  </tr>',
+'  <tr>',
+'    <td>Kalem</td>',
+'    <td>60</td>',
+'  </tr>',
+'</table>'
+]);
+
+SRC.scopeCol = J([
+'<tr>',
+'  <th scope="col">Ürün</th>',
+'  <th scope="col">Stok adedi</th>',
+'</tr>',
+'<tr>',
+'  <td>Defter</td>',
+'  <td>24</td>',
+'</tr>'
+]);
+
+SRC.teslimat = J([
+'<table>',
+'  <tr>',
+'    <th scope="col">Teslimat seçeneği</th>',
+'    <th scope="col">Tahmini süre</th>',
+'    <th scope="col">Ücret</th>',
+'  </tr>',
+'  <tr>',
+'    <td>Standart teslimat</td>',
+'    <td>3–5 iş günü</td>',
+'    <td>70 TL</td>',
+'  </tr>',
+'  <tr>',
+'    <td>Hızlı teslimat</td>',
+'    <td>1–2 iş günü</td>',
+'    <td>120 TL</td>',
+'  </tr>',
+'</table>'
+]);
+
+SRC.depo2 = J([
+'<table>',
+'  <caption>Depodaki ürünler</caption>',
+'  <thead>',
+'    <tr>',
+'      <th scope="col">Ürün</th>',
+'      <th scope="col">Stok adedi</th>',
+'    </tr>',
+'  </thead>',
+'  <tbody>',
+'    <tr>',
+'      <td>Defter</td>',
+'      <td>24</td>',
+'    </tr>',
+'    <tr>',
+'      <td>Kalem</td>',
+'      <td>60</td>',
+'    </tr>',
+'  </tbody>',
+'</table>'
+]);
+
+SRC.siparis = J([
+'<table>',
+'  <caption>1042 numaralı siparişin tutarları</caption>',
+'  <thead>',
+'    <tr>',
+'      <th scope="col">Ürün</th>',
+'      <th scope="col">Tutar</th>',
+'    </tr>',
+'  </thead>',
+'  <tbody>',
+'    <tr><td>Çizgili defter</td><td>80 TL</td></tr>',
+'    <tr><td>Kalem seti</td><td>120 TL</td></tr>',
+'  </tbody>',
+'  <tfoot>',
+'    <tr><td>Genel toplam</td><td>200 TL</td></tr>',
+'  </tfoot>',
+'</table>'
+]);
+
+SRC.rowScope = J([
+'<tfoot>',
+'  <tr>',
+'    <th scope="row">Genel toplam</th>',
+'    <td>21</td>',
+'    <td>1250 TL</td>',
+'  </tr>',
+'</tfoot>'
+]);
+
+SRC.colBasic = J([
+'<!-- Üç ayrı hücre: 1 + 1 + 1 = 3 sütun -->',
+'<tr>',
+'  <td>Defter</td>',
+'  <td>2</td>',
+'  <td>160 TL</td>',
+'</tr>',
+'',
+'<!-- İki hücre: 2 + 1 = 3 sütun -->',
+'<tr>',
+'  <th colspan="2" scope="row">Ödenecek toplam</th>',
+'  <td>160 TL</td>',
+'</tr>'
+]);
+
+SRC.siparisCol = J([
+'<table>',
+'  <caption>1403 numaralı sipariş özeti</caption>',
+'  <thead>',
+'    <tr>',
+'      <th scope="col">Ürün</th>',
+'      <th scope="col">Adet</th>',
+'      <th scope="col">Tutar</th>',
+'    </tr>',
+'  </thead>',
+'  <tbody>',
+'    <tr><td>Tükenmez kalem</td><td>6</td><td>350 TL</td></tr>',
+'    <tr><td>Evrak dosyası</td><td>10</td><td>700 TL</td></tr>',
+'    <tr><td>Silgi</td><td>5</td><td>200 TL</td></tr>',
+'  </tbody>',
+'  <tfoot>',
+'    <tr>',
+'      <th colspan="2" scope="row">Ödenecek toplam</th>',
+'      <td>1250 TL</td>',
+'    </tr>',
+'  </tfoot>',
+'</table>'
+]);
+
+SRC.rowBasic = J([
+'<tr>',
+'  <td rowspan="2">A Salonu</td>',
+'  <td>09.00</td>',
+'  <td>HTML eğitimi</td>',
+'</tr>',
+'<tr>',
+'  <td>11.00</td>',
+'  <td>CSS eğitimi</td>',
+'</tr>'
+]);
+
+SRC.salon = J([
+'<table>',
+'  <caption>Eğitim salonlarının oturum programı</caption>',
+'  <thead>',
+'    <tr>',
+'      <th scope="col">Salon</th>',
+'      <th scope="col">Başlangıç saati</th>',
+'      <th scope="col">Oturum</th>',
+'    </tr>',
+'  </thead>',
+'  <tbody>',
+'    <tr>',
+'      <td rowspan="2">A Salonu</td>',
+'      <td>09.00</td>',
+'      <td>HTML eğitimi</td>',
+'    </tr>',
+'    <tr>',
+'      <td>11.00</td>',
+'      <td>CSS eğitimi</td>',
+'    </tr>',
+'    <tr><td>B Salonu</td><td>10.00</td><td>Fotoğrafçılık</td></tr>',
+'  </tbody>',
+'</table>'
+]);
+
+SRC.gunBaslik = J([
+'<tbody>',
+'  <tr>',
+'    <th scope="row" rowspan="2">Cumartesi</th>',
+'    <td>09.00–11.00</td>',
+'    <td>HTML ile içerik yapısı</td>',
+'    <td>2 saat</td>',
+'  </tr>',
+'  <tr>',
+'    <td>11.15–12.45</td>',
+'    <td>Semantik sayfa uygulaması</td>',
+'    <td>1,5 saat</td>',
+'  </tr>',
+'  <!-- Pazar satırları aynı düzende -->',
+'</tbody>',
+'<tfoot>',
+'  <tr>',
+'    <th scope="row" colspan="3">Toplam eğitim süresi</th>',
+'    <td>7 saat</td>',
+'  </tr>',
+'</tfoot>'
+]);
+
+/* uygulamaların hedef görünümleri (kullanıcının uygulama dosyalarından) */
+function fullDoc(style, body){
+  return J(['<head>','<meta charset="UTF-8">','<title>Tablolar</title>'].concat(style?['<style>',style,'</style>']:[]).concat(['</head>',body]));
+}
+function rows(list){ return list.map(function(r){ return '<tr>'+r.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>'; }).join('\n'); }
+
+SRC.uyg1 = fullDoc('', J([
+'<body>',
+'<header><p>SamTek Akademi</p></header>',
+'<main>',
+'<h1>Akademimizdeki Kurslar</h1>',
+'<table>',
+'<tr><th scope="col">Kurs/Eğitim Alanı</th><th scope="col">Kurs Adı</th><th scope="col">Toplam Süre</th><th scope="col">Eğitim Biçimi</th></tr>',
+rows([['Bilgisayar İşletmenliği','Ofis Programları','40 saat','Yüz yüze'],['Web Tasarımı','HTML-CSS-JavaScript','50 saat','Çevrim içi'],['Yazılım Geliştirme','Python','40 saat','Hibrit'],['Grafik Tasarımı','Photoshop','30 saat','Yüz yüze'],['Grafik Tasarımı','After Effects','20 saat','Yüz yüze']]),
+'</table>',
+'</main>',
+'</body>'
+]));
+
+SRC.uyg2 = fullDoc('', J([
+'<body>',
+'<header><h1>Samsun Kırtasiye</h1></header>',
+'<main>',
+'<table>',
+'<caption>1403 numaralı sipariş özeti</caption>',
+'<thead><tr><th scope="col">Ürün</th><th scope="col">Adet</th><th scope="col">Tutar</th></tr></thead>',
+'<tbody>',
+rows([['Tükenmez kalem','6','350 TL'],['Evrak dosyası','10','700 TL'],['Silgi','5','200 TL']]),
+'</tbody>',
+'<tfoot><tr><th scope="row">Genel toplam</th><td>21</td><td>1250 TL</td></tr></tfoot>',
+'</table>',
+'</main>',
+'</body>'
+]));
+
+var PROGRAM_TABLE = J([
+'<table>',
+'<caption>Web geliştirme grubu haftalık programı</caption>',
+'<thead><tr><th scope="col">Saat</th><th scope="col">Pazartesi</th><th scope="col">Salı</th><th scope="col">Çarşamba</th></tr></thead>',
+'<tbody>',
+'<tr><th scope="row">09.00–10.30</th><td>HTML</td><td>CSS</td><td>JavaScript</td></tr>',
+'<tr><th scope="row">10.45–12.15</th><td>HTML uygulaması</td><td>CSS uygulaması</td><td>JavaScript uygulaması</td></tr>',
+'<tr><th scope="row">12.15–13.00</th><td colspan="3">Öğle arası</td></tr>',
+'<tr><th scope="row">13.00–14.30</th><td>Proje çalışması</td><td>Proje çalışması</td><td>Proje değerlendirmesi</td></tr>',
+'</tbody>',
+'</table>'
+]);
+
+SRC.uyg3 = fullDoc(SUPPORT_CSS, J(['<body>','<header><h1>SamTek Akademi</h1></header>','<main>',PROGRAM_TABLE,'</main>','</body>']));
+
+function gunGrubu(gun, ders){
+  return J([
+  '<tr><th scope="row" rowspan="3">'+gun+'</th><td>'+ders+' teorik</td><td>08.00–09.00</td></tr>',
+  '<tr><td>'+ders+' uygulama</td><td>09.00–10.30</td></tr>',
+  '<tr><td>'+ders+' değerlendirme</td><td>10.30–12.00</td></tr>'
+  ]);
+}
+SRC.uyg4 = fullDoc(SUPPORT_CSS, J([
+'<body>','<header><h1>SamTek Akademi</h1></header>','<main>',
+'<table>',
+'<caption>Web geliştirme grubu haftalık programı</caption>',
+'<thead><tr><th scope="col">Gün</th><th scope="col">Ders</th><th scope="col">Başlangıç–Bitiş</th></tr></thead>',
+'<tbody>',
+gunGrubu('Pazartesi','HTML'),gunGrubu('Salı','CSS'),gunGrubu('Çarşamba','JavaScript'),
+'</tbody>',
+'</table>',
+'</main>','</body>'
+]));
+
+var EGITIM_TABLE = J([
+'<table>',
+'<caption>İki günlük eğitim programı</caption>',
+'<thead><tr><th scope="col">Gün</th><th scope="col">Saat</th><th scope="col">Konu</th><th scope="col">Süre</th></tr></thead>',
+'<tbody>',
+'<tr><th scope="row" rowspan="2">Cumartesi</th><td>09.00–11.00</td><td>HTML ile içerik yapısı</td><td>2 saat</td></tr>',
+'<tr><td>11.15–12.45</td><td>Semantik sayfa uygulaması</td><td>1,5 saat</td></tr>',
+'<tr><th scope="row" rowspan="2">Pazar</th><td>09.00–11.00</td><td>CSS ile temel biçimlendirme</td><td>2 saat</td></tr>',
+'<tr><td>11.15–12.45</td><td>Uygulama ve değerlendirme</td><td>1,5 saat</td></tr>',
+'</tbody>',
+'<tfoot><tr><th scope="row" colspan="3">Toplam eğitim süresi</th><td>7 saat</td></tr></tfoot>',
+'</table>'
+]);
+SRC.uyg5 = fullDoc(SUPPORT_CSS, J(['<body>','<header><h1>SamTek Akademi</h1></header>','<main>','<h2>Web geliştirme eğitimi</h2>',EGITIM_TABLE,'</main>','</body>']));
+
+/* görünüm desteği CSS'i ile gösterilen önizlemeler */
+var WITH_CSS={siparisCol:1,salon:1};
+
+/* ===== kod renklendirme ===== */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function highlight(raw){
+  var comments=[];
+  var text=esc(raw).replace(/&lt;!--[\s\S]*?--&gt;/g,function(m){comments.push(m);return '@@COM'+(comments.length-1)+'@@';});
+  text=text.replace(/&lt;(\/?)([a-zA-Z0-9!-]+)((?:(?!&gt;)[\s\S])*?)(\/?)&gt;/g,function(m,slash,name,attrs,selfc){
+    var a=attrs.replace(/([a-zA-Z-]+)(=)(&quot;[^&]*?&quot;)/g,'<span class="t-attr">$1</span>=<span class="t-str">$3</span>');
+    return '<span class="t-tag">&lt;'+slash+name+'</span>'+a+'<span class="t-tag">'+selfc+'&gt;</span>';
+  });
+  text=text.replace(/@@COM(\d+)@@/g,function(m,i){return '<span class="t-com">'+comments[i]+'</span>';});
+  return text;
+}
+function highlightCss(raw){
+  return esc(raw).replace(/^(\s*)([a-z-]+)(:)/gm,'$1<span class="t-attr">$2</span>$3')
+                 .replace(/^([a-z, ]+)(\{)/gm,'<span class="t-tag">$1</span>$2')
+                 .replace(/(\/\*[\s\S]*?\*\/)/g,'<span class="t-com">$1</span>');
+}
+
+/* ===== önizleme belgesi: koddaki metinle aynı kaynaktan üretilir ===== */
+function wrapDoc(src,css){
+  if(src.indexOf('<head')>-1){ return '<!DOCTYPE html>\n<html lang="tr">\n'+src+'\n</html>'; }
+  var body = src.indexOf('<body')>-1 ? src : '<body>\n'+src+'\n</body>';
+  return '<!DOCTYPE html>\n<html lang="tr">\n<head>\n<meta charset="UTF-8">\n<title>Önizleme</title>\n'+(css?'<style>\n'+css+'\n</style>\n':'')+'</head>\n'+body+'\n</html>';
+}
+function fillCode(el,key){ el.innerHTML=highlight(SRC[key]); }
+function fillFrame(el,key){ el.setAttribute('srcdoc',wrapDoc(SRC[key],WITH_CSS[key]?SUPPORT_CSS:'')); }
+
+document.querySelectorAll('[data-src]').forEach(function(el){ fillCode(el,el.getAttribute('data-src')); });
+document.querySelectorAll('[data-frame]').forEach(function(el){ fillFrame(el,el.getAttribute('data-frame')); });
+document.querySelectorAll('[data-reload]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var k=b.getAttribute('data-reload');
+    var f=document.querySelector('[data-frame="'+k+'"]');
+    if(f)fillFrame(f,k);
+  });
+});
+
+/* ===== satır mı hücre mi ===== */
+(function(){
+  var code=document.getElementById('growCode'),frame=document.getElementById('growFrame');
+  if(!code)return;
+  var count=document.getElementById('growCount'),state=document.getElementById('growState');
+  var EXTRA=[['Silgi','45'],['Cetvel','18'],['Makas','12']];
+  var added=0,cell=false,last='';
+  function build(){
+    var L=['<table>','  <tr>','    <th scope="col">Ürün</th>','    <th scope="col">Stok adedi</th>','  </tr>',
+           '  <tr>','    <td>Defter</td>','    <td>24</td>','  </tr>',
+           '  <tr>','    <td>Kalem</td>','    <td>60</td>'];
+    if(cell)L.push('    <td>Kırmızı</td>');
+    L.push('  </tr>');
+    for(var i=0;i<added;i++){L.push('  <tr>','    <td>'+EXTRA[i][0]+'</td>','    <td>'+EXTRA[i][1]+'</td>','  </tr>');}
+    L.push('</table>');
+    return J(L);
+  }
+  function render(){
+    var s=build();
+    code.innerHTML=highlight(s);
+    frame.setAttribute('srcdoc',wrapDoc(s,''));
+    var counts=[2,2,cell?3:2];for(var i=0;i<added;i++)counts.push(2);
+    var same=counts.every(function(c){return c===counts[0];});
+    count.textContent='Satır başına hücre: '+counts.join(' · ')+(same?'  → tutarlı':'  → tutarsız');
+    count.className='count-line '+(same?'ok':'bad');
+    state.textContent= last==='row' ? 'Yeni bir kayıt eklendi: tablo bir satır uzadı, sütun sayısı değişmedi.'
+      : last==='cell' ? 'Yeni kayıt oluşmadı. "Kalem" satırı üçüncü bir sütuna taştı; başlık satırında ve diğer satırlarda bu sütun boş kaldı.'
+      : 'Başlık satırı dahil 3 satır, 2 sütun.';
+    document.getElementById('growRow').disabled=added>=EXTRA.length;
+    document.getElementById('growCell').disabled=cell;
+  }
+  document.getElementById('growRow').addEventListener('click',function(){if(added<EXTRA.length){added++;last='row';render();}});
+  document.getElementById('growCell').addEventListener('click',function(){cell=true;last='cell';render();});
+  document.getElementById('growReset').addEventListener('click',function(){added=0;cell=false;last='';render();});
+  render();
+})();
+
+/* ===== görünüm desteği aç/kapa ===== */
+(function(){
+  var box=document.getElementById('cssToggles');
+  if(!box)return;
+  var code=document.getElementById('cssCode'),frame=document.getElementById('cssFrame'),state=document.getElementById('cssState');
+  var MSG={border:'kenarlık kapalı: hücrelerin sınırı görünmüyor.',collapse:'border-collapse kapalı: her hücre kendi kenarlığını çiziyor, çizgiler çift görünüyor.',padding:'padding kapalı: metinler kenarlığa yapışık.',align:'text-align kapalı: veri hücreleri sola yaslı, başlıklar tarayıcı varsayılanıyla ortalı.'};
+  function on(k){return box.querySelector('[data-css="'+k+'"]').checked;}
+  function render(){
+    var t=[],c=[];
+    if(on('collapse'))t.push('        border-collapse: collapse;');
+    if(on('align'))t.push('        text-align: center;');
+    if(on('border'))c.push('        border: 1px solid darkmagenta;');
+    if(on('padding'))c.push('        padding: 7px;');
+    var css=J(['    table {'].concat(t,['    }','    th, td {'],c,['    }']));
+    code.innerHTML=highlight('<style>')+'\n'+highlightCss(css)+'\n'+highlight('</style>');
+    frame.setAttribute('srcdoc',wrapDoc(PROGRAM_TABLE,css));
+    var off=['border','collapse','padding','align'].filter(function(k){return !on(k);});
+    state.textContent= off.length ? off.map(function(k){return MSG[k];}).join(' ') : 'Dört özellik de açık: hücreler ayrışıyor, metinler nefes alıyor, "Öğle arası" üç sütunun ortasında.';
+    box.querySelectorAll('label').forEach(function(l){l.classList.toggle('on',l.querySelector('input').checked);});
+  }
+  box.addEventListener('change',render);
+  render();
+})();
+
+/* ===== colspan denemesi ===== */
+(function(){
+  var range=document.getElementById('colRange');
+  if(!range)return;
+  var keep=document.getElementById('colKeep'),val=document.getElementById('colVal');
+  var code=document.getElementById('colCode'),frame=document.getElementById('colFrame');
+  var count=document.getElementById('colCount'),state=document.getElementById('colState');
+  function render(){
+    var n=parseInt(range.value,10),k=keep.checked;
+    val.textContent=n;
+    document.getElementById('colKeepLbl').classList.toggle('on',k);
+    var hasAdet = n===1 || k;
+    var foot=['<tfoot>','  <tr>','    <th colspan="'+n+'" scope="row">Ödenecek toplam</th>'];
+    if(hasAdet)foot.push('    <td>16</td>');
+    foot.push('    <td>1050 TL</td>','  </tr>','</tfoot>');
+    var footSrc=J(foot);
+    code.innerHTML=highlight(footSrc);
+    var table=J(['<table>','<thead><tr><th scope="col">Ürün</th><th scope="col">Adet</th><th scope="col">Tutar</th></tr></thead>',
+      '<tbody>','<tr><td>Tükenmez kalem</td><td>6</td><td>350 TL</td></tr>','<tr><td>Evrak dosyası</td><td>10</td><td>700 TL</td></tr>','</tbody>',footSrc,'</table>']);
+    frame.setAttribute('srcdoc',wrapDoc(table,SUPPORT_CSS));
+    var total=n+(hasAdet?1:0)+1;
+    var parts=[n].concat(hasAdet?[1]:[]).concat([1]);
+    count.textContent='Özet satırı: '+parts.join(' + ')+' = '+total+' sütun · diğer satırlar: 3 sütun';
+    count.className='count-line '+(total===3?'ok':'bad');
+    if(total===3){
+      state.textContent= n===1 ? 'colspan="1" yazmakla hiç yazmamak aynıdır: üç ayrı hücre, adet toplamı "Adet" sütununun altında.' : 'Başlık ürün ve adet sütunlarını birlikte kaplıyor; tutar üçüncü sütunda kaldı.';
+    } else if(n===3){
+      state.textContent='Başlık üç sütunun hepsini kapladı; tutar hücresine yer kalmadı ve tablonun dışına, yeni bir sütuna taştı.';
+    } else {
+      state.textContent='Kapsanan konum için eski hücre bırakıldı: "16" üçüncü sütuna, tutar ise tablonun dışına kaydı.';
+    }
+  }
+  range.addEventListener('input',render);
+  keep.addEventListener('change',render);
+  render();
+})();
+
+/* ===== rowspan kayma denemesi ===== */
+(function(){
+  var code=document.getElementById('shiftCode');
+  if(!code)return;
+  var frame=document.getElementById('shiftFrame'),count=document.getElementById('shiftCount'),state=document.getElementById('shiftState');
+  var btns=document.querySelectorAll('[data-shift]');
+  function render(mode){
+    var L=['<table>','  <thead>','    <tr>','      <th scope="col">Salon</th>','      <th scope="col">Saat</th>','      <th scope="col">Oturum</th>','    </tr>','  </thead>','  <tbody>',
+      '    <tr>','      <td rowspan="2">A Salonu</td>','      <td>09.00</td>','      <td>HTML eğitimi</td>','    </tr>','    <tr>'];
+    if(mode==='bad')L.push('      <td></td>');
+    L.push('      <td>11.00</td>','      <td>CSS eğitimi</td>','    </tr>','  </tbody>','</table>');
+    var s=J(L);
+    code.innerHTML=highlight(s);
+    frame.setAttribute('srcdoc',wrapDoc(s,SUPPORT_CSS));
+    if(mode==='bad'){
+      count.textContent='2. veri satırı: 1 (yukarıdan gelen) + 3 yeni hücre = 4 sütun';
+      count.className='count-line bad';
+      state.textContent='Satır, tablonun üç sütununa sığmadı.';
+    } else {
+      count.textContent='2. veri satırı: 1 (yukarıdan gelen) + 2 yeni hücre = 3 sütun';
+      count.className='count-line ok';
+      state.textContent='Saat ve oturum kendi sütunlarında duruyor.';
+    }
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-shift')===mode);});
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){render(b.getAttribute('data-shift'));});});
+  render('ok');
+})();
+
+/* ===== hücre-başlık ilişkisi ===== */
+function tableGrid(table){
+  var grid=[],pos=[];
+  [].forEach.call(table.rows,function(tr,r){
+    grid[r]=grid[r]||[];
+    var c=0;
+    [].forEach.call(tr.cells,function(cell){
+      while(grid[r][c])c++;
+      var w=cell.colSpan||1,h=cell.rowSpan||1;
+      for(var i=0;i<h;i++){grid[r+i]=grid[r+i]||[];for(var j=0;j<w;j++)grid[r+i][c+j]=cell;}
+      pos.push({cell:cell,r:r,c:c,w:w,h:h});
+      c+=w;
+    });
+  });
+  return {grid:grid,pos:pos};
+}
+function headersFor(cell,g){
+  var p=null;g.pos.forEach(function(x){if(x.cell===cell)p=x;});
+  var cols=[],rowsH=[];
+  for(var cc=p.c;cc<p.c+p.w;cc++){
+    for(var rr=0;rr<p.r;rr++){var h=g.grid[rr]&&g.grid[rr][cc];if(h&&h.tagName==='TH'&&h.getAttribute('scope')==='col'&&cols.indexOf(h)<0)cols.push(h);}
+  }
+  for(var r2=p.r;r2<p.r+p.h;r2++){
+    for(var c2=0;c2<p.c;c2++){var h2=g.grid[r2]&&g.grid[r2][c2];if(h2&&h2.tagName==='TH'&&h2.getAttribute('scope')==='row'&&rowsH.indexOf(h2)<0)rowsH.push(h2);}
+  }
+  return {cols:cols,rows:rowsH};
+}
+(function(){
+  var frame=document.getElementById('srFrame');
+  if(!frame)return;
+  var out=document.getElementById('srOut');
+  var css=SUPPORT_CSS+'\n.sel{background:#c9f2dd;outline:3px solid #16a36b;outline-offset:-3px}\n.hdr{background:#ffe7a8}\ntd{cursor:pointer}';
+  frame.addEventListener('load',function(){
+    var doc=frame.contentDocument;if(!doc)return;
+    var table=doc.querySelector('table');var g=tableGrid(table);
+    doc.addEventListener('click',function(e){
+      var cell=e.target.closest?e.target.closest('td,th'):null;
+      if(!cell)return;
+      [].forEach.call(doc.querySelectorAll('.sel,.hdr'),function(x){x.classList.remove('sel','hdr');});
+      var txt=function(el){return el.textContent.trim();};
+      if(cell.tagName==='TH'){
+        cell.classList.add('hdr');
+        var sc=cell.getAttribute('scope');
+        out.innerHTML='<div><span class="k">hücre türü</span><b>başlık</b> (th)</div><div><span class="k">scope</span>'+sc+'</div><div class="say">"'+txt(cell)+'" bir başlık: '+(sc==='col'?'altındaki':'sağındaki')+' veri hücrelerini açıklıyor. Bir veri hücresine tıkla.</div>';
+        return;
+      }
+      cell.classList.add('sel');
+      var h=headersFor(cell,g);
+      h.cols.concat(h.rows).forEach(function(x){x.classList.add('hdr');});
+      var rowT=h.rows.map(txt).join(', ')||'—', colT=h.cols.map(txt).join(', ')||'—';
+      var parts=h.rows.map(txt).concat(h.cols.map(txt));
+      out.innerHTML='<div><span class="k">veri</span><b>'+esc(txt(cell))+'</b></div>'+
+        '<div><span class="k">satır başlığı</span>'+esc(rowT)+'</div>'+
+        '<div><span class="k">sütun başlığı</span>'+esc(colT)+'</div>'+
+        '<div class="say">Başlıklarıyla birlikte: “'+esc(parts.join(', '))+(parts.length?': ':'')+esc(txt(cell))+'”</div>';
+    });
+  });
+  frame.setAttribute('srcdoc',wrapDoc(EGITIM_TABLE,css));
+})();
+
+/* ===== karar alıştırması ===== */
+(function(){
+  var list=document.getElementById('caseList');
+  if(!list)return;
+  var score=document.getElementById('caseScore');
+  var rowsEl=list.querySelectorAll('.case-row'),done={};
+  rowsEl.forEach(function(row,i){
+    row.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click',function(){
+        row.querySelectorAll('button').forEach(function(x){x.classList.remove('good','bad');});
+        var ok=b.getAttribute('data-v')===row.getAttribute('data-ans');
+        b.classList.add(ok?'good':'bad');
+        row.querySelector('.why').textContent= ok ? row.getAttribute('data-why') : 'Tekrar düşün: içerikte karşılaştırılan özellikler var mı, yoksa istenen şey ekrandaki düzen mi?';
+        if(ok)done[i]=1;else delete done[i];
+        score.textContent=Object.keys(done).length+' / '+rowsEl.length+' doğru';
+      });
+    });
+  });
+})();
+
+/* ===== hata avı ===== */
+(function(){
+  var code=document.getElementById('huntCode');
+  if(!code)return;
+  var score=document.getElementById('huntScore'),log=document.getElementById('huntLog'),done=document.getElementById('huntDone');
+  var BUGS={
+    '1':'<code>thead</code> içinde <code>tr</code> yok. Başlık hücreleri de bir satırın içinde durur: <code>thead &gt; tr &gt; th</code>.',
+    '2':'<code>caption</code>, kullanıldığında <code>table</code> öğesinin ilk öğesidir; <code>thead</code>\'den önce yazılır.',
+    '3':'<code>scope</code> yalnızca <code>th</code> üzerinde anlamlıdır. <code>td</code> bir başlık değildir; öznitelik kaldırılmalı.',
+    '4':'Satırda fazladan boş hücre var: bu satır 4 sütun kaplıyor, tablonun geri kalanı 3 sütun.',
+    '5':'"Genel toplam" sağındaki tutarı açıklıyor; sütun başlığı değil, satır başlığı: <code>scope="row"</code>.',
+    '6':'<code>colspan="2"</code> ikinci sütunu zaten kaplıyor; kapsanan konum için bırakılan boş hücre satırı 4 sütuna çıkarıyor.'
+  };
+  var found={},miss=0;
+  code.querySelectorAll('.hline').forEach(function(l){
+    l.addEventListener('click',function(){
+      var b=l.getAttribute('data-bug');
+      if(b){
+        if(found[b])return;
+        found[b]=1;l.classList.add('found');
+        var li=document.createElement('li');li.innerHTML=BUGS[b];log.appendChild(li);
+      } else {
+        if(l.classList.contains('miss'))return;
+        l.classList.add('miss');miss++;
+        setTimeout(function(){l.classList.remove('miss');},900);
+      }
+      var n=Object.keys(found).length;
+      score.textContent=n+' / 6 bulundu'+(miss?' · '+miss+' yanlış deneme':'');
+      if(n===6)done.textContent='Altı hatayı da buldun. Tarayıcı bunların hiçbiri için hata mesajı göstermez; tabloyu sessizce bozar ya da başlık ilişkisini yanlış kurar.';
+    });
+  });
+})();
+
+/* ===== değerlendirme kartları ===== */
+document.querySelectorAll('.quiz-card').forEach(function(c){
+  c.addEventListener('click',function(){c.classList.toggle('revealed');});
+});
+
+/* ===== gezinme ===== */
+var slides=[].slice.call(document.querySelectorAll('.slide'));
+var prevBtn=document.getElementById('prevBtn'),nextBtn=document.getElementById('nextBtn');
+var slideTitle=document.getElementById('slideTitle'),slideNum=document.getElementById('slideNum');
+var slideTotal=document.getElementById('slideTotal'),progressBar=document.getElementById('progressBar');
+var track=document.querySelector('.track');var idx=0;
+slideTotal.textContent=String(slides.length).padStart(2,'0');
+track.setAttribute('aria-valuemax',String(slides.length));
+function show(n){
+  idx=Math.max(0,Math.min(n,slides.length-1));
+  slides.forEach(function(s,i){s.classList.toggle('is-active',i===idx);if(i===idx){s.removeAttribute('aria-hidden');s.scrollTop=0;}else{s.setAttribute('aria-hidden','true');}});
+  var t=slides[idx].getAttribute('data-title');
+  slideTitle.textContent=t;slideNum.textContent=String(idx+1).padStart(2,'0');
+  progressBar.style.width=((idx+1)/slides.length*100)+'%';
+  track.setAttribute('aria-valuenow',String(idx+1));
+  prevBtn.disabled=idx===0;nextBtn.disabled=idx===slides.length-1;
+  document.title=String(idx+1).padStart(2,'0')+' · '+t+' | HTML-8';
+  try{history.replaceState(null,'','#slayt-'+(idx+1));}catch(e){}
+  if(typeof fitSlide==='function'){fitSlide(slides[idx]);requestAnimationFrame(function(){fitSlide(slides[idx]);});}
+}
+prevBtn.addEventListener('click',function(){show(idx-1);});
+nextBtn.addEventListener('click',function(){show(idx+1);});
+document.addEventListener('keydown',function(e){
+  var tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea'||tag==='select')return;
+  if(['ArrowRight','PageDown',' '].indexOf(e.key)>-1){e.preventDefault();show(idx+1);}
+  if(['ArrowLeft','PageUp'].indexOf(e.key)>-1){e.preventDefault();show(idx-1);}
+  if(e.key==='Home'){e.preventDefault();show(0);}
+  if(e.key==='End'){e.preventDefault();show(slides.length-1);}
+});
+var tX=0;
+document.addEventListener('touchstart',function(e){tX=e.changedTouches[0].screenX;},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].screenX-tX;if(Math.abs(d)<60)return;if(e.target.closest&&e.target.closest('input'))return;show(d<0?idx+1:idx-1);},{passive:true});
+
+/* ===== otomatik sığdırma ===== */
+var MIN_SCALE=0.92;
+slides.forEach(function(sl){
+  var c=sl.querySelector('.slide-content'); if(!c)return;
+  var box=document.createElement('div'); box.className='fitbox';
+  sl.insertBefore(box,c); box.appendChild(c);
+});
+function fitSlide(sl){
+  var box=sl.querySelector('.fitbox'), c=sl.querySelector('.slide-content');
+  if(!box||!c)return;
+  c.style.transform='';box.style.height='';
+  var cs=getComputedStyle(sl);
+  var avail=sl.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  var h=c.offsetHeight;
+  if(h<=0||avail<=0)return;
+  var s=Math.min(1,avail/h);
+  if(s>=0.995){c.style.transform='';box.style.height='';return;}
+  s=Math.max(s,MIN_SCALE);
+  c.style.transform='scale('+s+')';
+  box.style.height=(h*s)+'px';
+}
+function fitCurrent(){ fitSlide(slides[idx]); }
+var fitTimer;
+function fitSoon(){clearTimeout(fitTimer);fitTimer=setTimeout(fitCurrent,60);}
+window.addEventListener('resize',fitSoon);
+document.addEventListener('click',fitSoon,true);
+document.addEventListener('input',fitSoon,true);
+document.addEventListener('change',fitSoon,true);
+if(window.ResizeObserver){
+  slides.forEach(function(sl){
+    var c=sl.querySelector('.slide-content'); if(!c)return;
+    new ResizeObserver(function(){ if(sl.classList.contains('is-active'))fitSoon(); }).observe(c);
+  });
+}
+window.addEventListener('load',fitSoon);
+
+/* ===== tam ekran ===== */
+var fsBtn=document.getElementById('fsBtn');
+if(fsBtn){
+  fsBtn.addEventListener('click',function(){
+    if(document.fullscreenElement){document.exitFullscreen();}
+    else{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}
+  });
+  document.addEventListener('fullscreenchange',function(){
+    fsBtn.textContent=document.fullscreenElement?'⤢':'⛶';
+    fitSoon();
+  });
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toLowerCase();
+    if(t==='input'||t==='textarea'||t==='select')return;
+    if(e.key==='f'||e.key==='F'){e.preventDefault();fsBtn.click();}
+  });
+}
+
+/* ===== ana konu şeridi ===== */
+var GROUPS=[
+ [0,'HTML-8 · TABLOLAR','#38d9ff'],
+ [2,'TABLOSAL VERİ','#38d9ff'],
+ [4,'TEMEL YAPI: table, tr, th, td','#56e6a5'],
+ [10,'TABLONUN BÖLÜMLERİ','#a978ff'],
+ [15,'GÖRÜNÜM DESTEĞİ','#ffd45c'],
+ [16,'HÜCRE BİRLEŞTİRME: colspan','#5b7cfa'],
+ [20,'HÜCRE BİRLEŞTİRME: rowspan','#ff9d5c'],
+ [25,'ERİŞİLEBİLİRLİK','#56e6a5'],
+ [26,'UYGULAMA VE DEĞERLENDİRME','#ff6b8a'],
+ [29,'ÖZET','#38d9ff']
+];
+function groupOf(i){var g=GROUPS[0];GROUPS.forEach(function(x){if(i>=x[0])g=x;});return g;}
+slides.forEach(function(sl,i){
+  var c=sl.querySelector('.slide-content');if(!c)return;
+  var g=groupOf(i);
+  var bar=document.createElement('div');
+  bar.className='topicbar';bar.style.setProperty('--gc',g[2]);
+  bar.innerHTML='<span class="dot"></span><span class="name">'+g[1]+'</span><span class="line"></span><span class="idx">'+String(i+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0')+'</span>';
+  c.insertBefore(bar,c.firstChild);
+});
+
+var hashMatch=(location.hash||'').match(/slayt-(\d+)/);
+show(hashMatch?parseInt(hashMatch[1],10)-1:0);
+</script>
+</body>
+</html>

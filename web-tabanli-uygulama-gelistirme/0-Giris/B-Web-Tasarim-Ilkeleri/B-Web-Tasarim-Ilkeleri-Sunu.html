@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Öğrenme Birimi 2 — Web Tasarım İlkeleri</title>
+<style>
+:root{
+  --bg:#0b1020;
+  --bg2:#121a33;
+  --ink:#e8edf7;
+  --ink-dim:#a9b6d0;
+  --ink-soft:#8695b4;
+  --line:rgba(255,255,255,.12);
+  --line-soft:rgba(255,255,255,.07);
+  --accent:#8ab4ff;
+  --accent-2:#5eead4;
+  --bad:#ff8095;
+  --good:#5eead4;
+  --warn:#ffcf6b;
+  --card:rgba(255,255,255,.045);
+  --card2:rgba(255,255,255,.075);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 700px at 15% -10%, #1b2650 0%, transparent 60%),
+    radial-gradient(1000px 600px at 100% 110%, #10304a 0%, transparent 55%),
+    var(--bg);
+  color:var(--ink);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  overflow:hidden;
+}
+
+/* ---------- slayt kabuğu ---------- */
+.deck{position:fixed;inset:0}
+.slide{
+  position:absolute;inset:0;
+  display:none;
+  flex-direction:column;
+  gap:.55rem;
+  padding:2.1rem 2.6rem 3.1rem;
+  opacity:0;
+  transform:translateY(10px);
+  transition:opacity .28s ease, transform .28s ease;
+}
+.slide.on{display:flex}
+.slide.show{opacity:1;transform:none}
+.slide.mid{justify-content:center}
+.slide > *{flex-shrink:0}
+
+/* ---------- kicker ---------- */
+.kicker{
+  display:inline-flex;align-items:center;gap:.5rem;
+  align-self:flex-start;
+  font-size:.95rem;font-weight:700;letter-spacing:.02em;
+  text-transform:none;
+  padding:.34rem .8rem;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
+}
+.kicker .kt{color:var(--accent-2)}
+.kicker .kd{color:var(--ink-soft);opacity:.7}
+.kicker .ks{color:var(--accent)}
+.kicker .en{text-transform:none}
+
+.bridge{
+  margin:.15rem 0 0;
+  font-size:.92rem;
+  color:var(--ink-soft);
+  font-style:italic;
+}
+h2{
+  margin:.1rem 0 0;
+  font-size:clamp(1.15rem,2.1vw,1.62rem);
+  line-height:1.22;
+  font-weight:750;
+  letter-spacing:-.01em;
+}
+.sub{
+  margin:.15rem 0 0;
+  font-size:clamp(1.05rem,1.5vw,1.28rem);
+  line-height:1.5;
+  color:var(--ink-dim);
+  max-width:105ch;
+}
+.sub strong{color:var(--ink);font-weight:700}
+
+/* ---------- kartlar ---------- */
+.cards{display:grid;gap:.7rem;margin-top:.25rem}
+.c2{grid-template-columns:repeat(2,1fr)}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:.8rem .9rem;
+}
+.card-h{
+  font-size:1.06rem;font-weight:700;margin:0 0 .3rem;
+  color:var(--accent);display:flex;align-items:center;gap:.45rem;
+}
+.card-h .n{
+  min-width:1.5rem;height:1.5rem;flex:0 0 auto;
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:0 .4rem;white-space:nowrap;
+  border-radius:8px;font-size:.85rem;
+  background:rgba(138,180,255,.16);color:var(--accent);
+}
+.card-t{font-size:1rem;line-height:1.45;color:var(--ink-dim);margin:0}
+.card-l{font-size:.95rem;line-height:1.5;color:var(--ink-dim);margin:.35rem 0 0;padding-left:1.05rem}
+.card-l li{margin:.16rem 0}
+.card.g .card-h{color:var(--good)}
+.card.b .card-h{color:var(--bad)}
+
+/* ---------- tablo ---------- */
+table.t{
+  width:100%;border-collapse:collapse;font-size:1rem;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+}
+table.t th{
+  font-size:.85rem;font-weight:700;letter-spacing:.03em;
+  color:var(--accent-2);
+  background:rgba(255,255,255,.06);
+  text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line);
+}
+table.t td{
+  padding:.46rem .7rem;border-bottom:1px solid var(--line-soft);
+  color:var(--ink-dim);vertical-align:top;line-height:1.4;
+}
+table.t tr:last-child td{border-bottom:0}
+table.t td strong{color:var(--ink)}
+.ok{color:var(--good);font-weight:700}
+table.t td.lvl2,table.t.tight td.lvl2{padding-left:2.5rem;position:relative}
+table.t td.lvl2::before{content:"";position:absolute;left:1.15rem;top:.45rem;width:.6rem;height:.55rem;border-left:1px solid var(--ink-soft);border-bottom:1px solid var(--ink-soft);opacity:.6}
+table.t tr.grp td{background:rgba(255,255,255,.05)}
+table.t.tight td{padding:.33rem .7rem}
+table.t.tight th{padding:.4rem .7rem}
+table.t td.ok,table.t td.no,table.t td.part{font-size:1.05rem}
+table.t td.ok{background:rgba(94,234,212,.13)}
+table.t td.no{background:rgba(255,128,149,.13)}
+table.t td.part{background:rgba(255,207,107,.15);font-size:.9rem}
+.no{color:var(--bad);font-weight:700}
+.part{color:var(--warn);font-weight:700}
+
+/* ---------- kutular ---------- */
+.warn{
+  font-size:.95rem;line-height:1.45;
+  border-left:3px solid var(--warn);
+  background:rgba(255,207,107,.09);
+  border-radius:0 10px 10px 0;
+  padding:.55rem .8rem;color:var(--ink-dim);
+}
+.warn b{color:var(--warn)}
+.quote{
+  font-size:1rem;line-height:1.5;
+  border-left:3px solid var(--accent-2);
+  background:rgba(94,234,212,.08);
+  border-radius:0 10px 10px 0;
+  padding:.55rem .8rem;color:var(--ink-dim);font-style:italic;
+}
+.bigrule{
+  font-size:1.06rem;line-height:1.45;font-weight:650;
+  border:1px solid rgba(138,180,255,.35);
+  background:linear-gradient(180deg,rgba(138,180,255,.14),rgba(138,180,255,.05));
+  border-radius:12px;padding:.6rem .9rem;color:var(--ink);
+}
+.cap{font-size:.85rem;color:var(--ink-soft);margin:.25rem 0 0;line-height:1.4}
+code.k{
+  font-family:"Cascadia Mono",Consolas,"Courier New",monospace;
+  font-size:.92em;background:rgba(255,255,255,.09);
+  border:1px solid var(--line);border-radius:6px;padding:.05em .35em;
+  color:var(--accent-2);
+}
+
+/* ---------- panel / önizleme ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;max-height:62vh;flex:1;min-height:0}
+.panel{
+  display:flex;flex-direction:column;min-height:0;
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  background:rgba(0,0,0,.22);
+}
+.panel-head{
+  font-size:.88rem;font-weight:700;letter-spacing:.02em;text-transform:none;
+  padding:.4rem .7rem;display:flex;align-items:center;gap:.4rem;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.05);color:var(--ink-dim);
+}
+.panel.bad .panel-head{color:var(--bad);background:rgba(255,128,149,.11)}
+.panel.good .panel-head{color:var(--good);background:rgba(94,234,212,.11)}
+.panel-body{font-size:.98rem;line-height:1.45;color:var(--ink-dim);padding:.7rem .8rem;overflow:auto;min-height:0}
+pre{
+  margin:0;flex:1;min-height:0;overflow:auto;
+  font-family:"Cascadia Mono",Consolas,"Courier New",monospace;
+  font-size:clamp(.8rem,.95vw,.95rem);line-height:1.5;
+  padding:.7rem .8rem;color:#dbe6ff;white-space:pre;
+}
+pre .t{color:#7ee7c7}
+pre .a{color:#ffc48a}
+pre .c{color:#7f8db0;font-style:italic}
+
+.frame{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;background:#fff}
+.chrome{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.3rem .55rem;background:#e9edf5;border-bottom:1px solid #cfd6e4;flex:0 0 auto;
+}
+.chrome .dots{display:flex;gap:.22rem}
+.chrome .dots i{width:.5rem;height:.5rem;border-radius:50%;background:#c3ccdb;display:block}
+.chrome .url{
+  flex:1;background:#fff;border:1px solid #d3dae7;border-radius:999px;
+  font-size:.72rem;color:#5b6880;padding:.12rem .55rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:"Segoe UI",system-ui,sans-serif;
+}
+.frame iframe{flex:1;width:100%;border:0;background:#fff;min-height:0}
+.reset{
+  position:absolute;top:.28rem;right:.4rem;z-index:3;
+  width:1.5rem;height:1.5rem;border-radius:50%;
+  border:1px solid #cfd6e4;background:#fff;color:#5b6880;
+  font-size:.85rem;line-height:1;cursor:pointer;
+}
+.reset:hover{background:#f1f4fa;color:#1f2a44}
+
+/* ---------- duyarlı üç çerçeve ---------- */
+.rwd{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;flex:1;min-height:0;align-items:stretch}
+.rwd .panel{height:100%;min-height:0}
+.vp{position:relative;flex:1;min-height:0;overflow:hidden;background:#fff}
+.vp iframe{position:absolute;top:0;left:0;border:0;background:#fff;transform-origin:top left}
+
+/* ---------- kontrast örnekleri ---------- */
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+.chip{border-radius:12px;padding:.75rem .8rem;border:1px solid var(--line);min-height:6.4rem;display:flex;flex-direction:column;gap:.3rem}
+.chip .cx{font-size:1.06rem;font-weight:700;line-height:1.25}
+.chip .cy{font-size:.95rem;line-height:1.35}
+.chip .cr{margin-top:auto;font-size:.85rem;font-weight:700;letter-spacing:.02em;font-family:"Cascadia Mono",Consolas,monospace}
+.verdict{display:inline-block;border-radius:999px;padding:.05rem .45rem;font-size:.78rem;font-weight:700}
+.v-no{background:#fee2e2;color:#991b1b}
+.v-ok{background:#dcfce7;color:#14532d}
+
+/* ---------- kapak ---------- */
+.cover{justify-content:center;align-items:flex-start;gap:.9rem;padding-left:3.4rem}
+.cover .eyebrow{font-size:1rem;font-weight:700;letter-spacing:.16em;color:var(--accent-2)}
+.cover h1{
+  margin:0;font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.05;font-weight:800;letter-spacing:-.02em;
+  background:linear-gradient(100deg,#ffffff 15%,#8ab4ff 60%,#5eead4 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.cover .lede{font-size:clamp(1.05rem,1.5vw,1.28rem);color:var(--ink-dim);max-width:70ch;line-height:1.5}
+.pill-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.3rem}
+.pill{font-size:.95rem;border:1px solid var(--line);border-radius:999px;padding:.28rem .7rem;color:var(--ink-dim);background:var(--card)}
+
+/* ---------- alt bar ---------- */
+.bar{position:fixed;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.08);z-index:9}
+.bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0;transition:width .28s ease}
+.hud{
+  position:fixed;right:1rem;bottom:.6rem;z-index:10;
+  display:flex;align-items:center;gap:.5rem;
+  font-size:.85rem;color:var(--ink-soft);
+}
+.hud button{
+  width:1.7rem;height:1.7rem;border-radius:8px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);color:var(--ink-dim);font-size:.9rem;line-height:1;
+}
+.hud button:hover{background:var(--card2);color:var(--ink)}
+.tag{position:fixed;left:1.1rem;bottom:.6rem;z-index:10;font-size:.85rem;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- 1 KAPAK -->
+<section class="slide cover">
+  <div class="kicker"><span class="kt">WEB TASARIMININ TEMELLERİ</span></div>
+  <div class="eyebrow">ÖĞRENME BİRİMİ 2</div>
+  <h1>Web Tasarım İlkeleri</h1>
+  <p class="lede">Bir web sitesini “güzel” yapan şey rastgele bir zevk meselesi değildir. Ziyaretçinin aradığını bulabilmesi, okuyabilmesi ve kullanabilmesi için uyulan ilkeler vardır. Bu birimde o ilkeleri tek tek, ekranda görerek inceleyeceğiz.</p>
+  <div class="pill-row">
+    <span class="pill">2.1 İçerik</span>
+    <span class="pill">2.2 Tasarım</span>
+    <span class="pill">2.3 Biçimsellik</span>
+    <span class="pill">2.4 İşlevsellik ve Kullanılabilirlik</span>
+    <span class="pill">2.5 Güncellik</span>
+    <span class="pill">2.6 Uygunluk ve Güvenilirlik</span>
+    <span class="pill">2.7 Uyumluluk</span>
+  </div>
+</section>
+
+<!-- 2 YOL HARİTASI -->
+<section class="slide">
+  <div class="kicker"><span class="kt">WEB TASARIM İLKELERİ</span><span class="kd">—</span><span class="ks">YOL HARİTASI</span></div>
+  <p class="bridge">Yedi ilkenin her biri, ziyaretçinin sorduğu farklı bir soruya cevap verir.</p>
+  <h2>Yedi ilke, ziyaretçinin yedi sorusu</h2>
+  <div class="cards c4">
+    <div class="card"><p class="card-h"><span class="n">2.1</span>İçerik</p><p class="card-t">“Aradığım bilgi burada var mı?”</p></div>
+    <div class="card"><p class="card-h"><span class="n">2.2</span>Tasarım</p><p class="card-t">“Neye önce bakacağımı anlıyor muyum?”</p></div>
+    <div class="card"><p class="card-h"><span class="n">2.3</span>Biçimsellik</p><p class="card-t">“Yazıları rahat okuyabiliyor muyum?”</p></div>
+    <div class="card"><p class="card-h"><span class="n">2.4</span>İşlevsellik</p><p class="card-t">“Yapmak istediğim şeyi yapabiliyor muyum?”</p></div>
+  </div>
+  <div class="cards c3">
+    <div class="card"><p class="card-h"><span class="n">2.5</span>Güncellik</p><p class="card-t">“Buradaki bilgi bugün hâlâ doğru mu?”</p></div>
+    <div class="card"><p class="card-h"><span class="n">2.6</span>Uygunluk ve Güvenilirlik</p><p class="card-t">“Bu siteye güvenebilir miyim?”</p></div>
+    <div class="card"><p class="card-h"><span class="n">2.7</span>Uyumluluk</p><p class="card-t">“Kendi telefonumda ve tarayıcımda düzgün açılıyor mu?”</p></div>
+  </div>
+  <div class="bigrule">Bu ilkeler bir sıralama değil, bir kontrol listesidir: yedisinden biri eksik olduğunda ziyaretçi siteyi terk eder.</div>
+</section>
+
+<!-- 3 HOOK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">WEB TASARIM İLKELERİ</span><span class="kd">—</span><span class="ks">NEDEN İLKE GEREKİR?</span></div>
+  <p class="bridge">Aşağıdaki iki sayfada aynı spor salonunun aynı bilgileri yer alıyor; tek fark, ilkelere uyulup uyulmaması.</p>
+  <h2>Aynı içerik, iki farklı sonuç</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ İlkelere uyulmamış sayfa</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">yildizsporsalonu.com.tr/index.html</span></div><iframe data-demo="hook-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ İlkelere uyulmuş sayfa</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">yildizsporsalonu.com.tr/index.html</span></div><iframe data-demo="hook-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Soldaki sayfada bilgi eksik değil; ama hangi bilginin önemli olduğu, nereye tıklanacağı ve yazının nerede bittiği belli değil.</p>
+</section>
+
+<!-- 4 İÇERİK NEDİR -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.1 İÇERİK</span></div>
+  <p class="bridge">Ziyaretçi bir siteye tasarımını beğenmek için değil, bir bilgiye ulaşmak için girer.</p>
+  <h2>İçerik: sitenin var oluş sebebi</h2>
+  <p class="sub"><strong>İçerik</strong>, bir web sayfasındaki metin, görsel, video, ses, tablo ve belgelerin tamamıdır. Tasarım içeriği sunar; içeriğin yerini tutmaz. Bu yüzden ilkelerin listesinde içerik birinci sıradadır.</p>
+  <div class="cards c3">
+    <div class="card"><p class="card-h">Ziyaretçi ne arar?</p><ul class="card-l"><li>Bir soruya cevap</li><li>Bir işlemi tamamlama (kayıt, sipariş, randevu)</li><li>Bir kararı destekleyecek bilgi</li></ul></div>
+    <div class="card"><p class="card-h">İçerik yoksa</p><ul class="card-l"><li>En iyi tasarım bile ziyaretçiyi tutamaz</li><li>Ziyaretçi geri tuşuna basıp başka siteye gider</li><li>Arama motorunda geriye düşülür</li></ul></div>
+    <div class="card"><p class="card-h">İçerik fazlaysa</p><ul class="card-l"><li>Önemli bilgi kalabalıkta kaybolur</li><li>Sayfa yavaşlar</li><li>Ziyaretçi hangisinin doğru olduğunu bilemez</li></ul></div>
+  </div>
+  <div class="quote">Bir web sitesi bir mağaza vitrinine benzer: vitrinin camı ne kadar temiz olursa olsun, içeride ürün yoksa kimse kapıdan girmez.</div>
+</section>
+
+<!-- 5 TARANABİLİR METİN -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.1 İÇERİK</span><span class="kd">—</span><span class="ks">EKRANDA OKUNAN METİN</span></div>
+  <p class="bridge">İnsanlar web sayfasını kitap gibi baştan sona okumaz; gözüyle tarar ve aradığını yakalamaya çalışır.</p>
+  <h2>Aynı bilgi: okunmayan blok ve taranabilir metin</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Tek blok hâlinde yazılmış içerik</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">okul.meb.k12.tr/kayit</span></div><iframe data-demo="icerik-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Başlıklara ve maddelere ayrılmış içerik</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">okul.meb.k12.tr/kayit</span></div><iframe data-demo="icerik-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">İki sayfadaki kelimeler neredeyse aynıdır. Sağdaki sayfada başlık, madde listesi ve kalın vurgu, gözün duracağı yerleri belirlediği için bilgi saniyeler içinde bulunur.</p>
+</section>
+
+<!-- 6 İÇERİK ÖLÇÜTLERİ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.1 İÇERİK</span><span class="kd">—</span><span class="ks">İYİ İÇERİĞİN ÖLÇÜTLERİ</span></div>
+  <p class="bridge">“İyi içerik” belirsiz bir övgü değildir; ölçülebilir beş özelliği vardır.</p>
+  <h2>Bir içeriği neye göre iyi sayarız?</h2>
+  <table class="t">
+    <tr><th style="width:16%">Ölçüt</th><th style="width:38%">Ne demek?</th><th>Sayfada nasıl görünür?</th></tr>
+    <tr><td><strong>Doğruluk</strong></td><td>Verilen bilgi gerçeğe uygundur ve kaynağı bellidir.</td><td>Fiyat, tarih, adres gerçek değerleriyle yazılır; alıntının kaynağı belirtilir.</td></tr>
+    <tr><td><strong>Amaca uygunluk</strong></td><td>Sayfa, ziyaretçinin o sayfada aradığı bilgiyi verir.</td><td>“İletişim” sayfasında şirketin tarihçesi değil, adres, telefon ve harita bulunur.</td></tr>
+    <tr><td><strong>Özgünlük</strong></td><td>İçerik başka siteden kopyalanmamıştır.</td><td>Ürün açıklaması üreticinin metninin aynısı değil, siteye özel yazılmış metindir.</td></tr>
+    <tr><td><strong>Taranabilirlik</strong></td><td>Metin, göz gezdirerek de anlaşılacak biçimde bölünmüştür.</td><td>Başlık, alt başlık, kısa paragraf, madde listesi, kalın vurgu kullanılır.</td></tr>
+    <tr><td><strong>Anlaşılırlık</strong></td><td>Dil, hedef kitlenin seviyesindedir.</td><td>Gereken yerde terim kullanılır, ilk geçtiği yerde tek cümleyle açıklanır.</td></tr>
+  </table>
+  <div class="warn"><b>Sık yapılan hata:</b> Sayfayı arama motorunda yükseltmek için aynı kelimeyi metne defalarca sıkıştırmak. Bu yöntem bugün işe yaramaz; arama motorları bunu tespit eder ve sayfayı geriye düşürür. Doğru yol, ziyaretçinin sorduğu soruya gerçekten cevap veren bir metin yazmaktır.</div>
+</section>
+
+<!-- 7 TASARIM NEDİR -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.2 TASARIM</span></div>
+  <p class="bridge">Tasarım, sayfayı süslemek değil; içeriği ziyaretçinin anlayacağı bir düzene yerleştirmektir.</p>
+  <h2>Tasarım: içeriğin sayfadaki düzeni</h2>
+  <p class="sub"><strong>Tasarım</strong>, sayfadaki öğelerin hangi boyutta, nerede ve hangi sırayla duracağına karar verme işidir. İyi bir tasarım, ziyaretçiye “önce şuraya bak, sonra şuraya” demeyi başarır.</p>
+  <div class="cards c4">
+    <div class="card"><p class="card-h"><span class="n">1</span>Görsel hiyerarşi</p><p class="card-t">Önemli olan büyük, koyu ve üstte; ayrıntı küçük ve altta durur.</p></div>
+    <div class="card"><p class="card-h"><span class="n">2</span>Hizalama</p><p class="card-t">Öğeler ortak çizgilere oturur; sayfa dağınık görünmez.</p></div>
+    <div class="card"><p class="card-h"><span class="n">3</span>Boşluk</p><p class="card-t">Öğelerin arasındaki boşluk, gözün dinlendiği ve grupları ayırdığı yerdir.</p></div>
+    <div class="card"><p class="card-h"><span class="n">4</span>Tutarlılık</p><p class="card-t">Aynı işi yapan öğe, her sayfada aynı görünür ve aynı yerde durur.</p></div>
+  </div>
+  <div class="quote">Bir sınıf panosunu düşünün: kâğıtlar aynı hizaya asıldığında, aralarında düzenli boşluk bırakıldığında ve başlıklar aynı puntoyla yazıldığında pano düzenli görünür. Kâğıtların hepsi aynı kâğıttır; değişen tek şey yerleşimdir.</div>
+</section>
+
+<!-- 8 GÖRSEL HİYERARŞİ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.2 TASARIM</span><span class="kd">—</span><span class="ks">GÖRSEL HİYERARŞİ</span></div>
+  <p class="bridge">Sayfada her şey aynı derecede önemliyse, ziyaretçi için hiçbir şey önemli değildir.</p>
+  <h2>Göz önce nereye gidiyor?</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Her öğe aynı ağırlıkta</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">kampus-teknoloji.com/etkinlik</span></div><iframe data-demo="hiyerarsi-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Boyut, renk ve konumla kurulmuş sıra</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">kampus-teknoloji.com/etkinlik</span></div><iframe data-demo="hiyerarsi-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Hiyerarşiyi kuran üç araç: <strong>boyut</strong> (büyük olan önce okunur), <strong>renk ve koyuluk</strong> (kontrastı yüksek olan öne çıkar) ve <strong>konum</strong> (üstte ve solda olan önce görülür).</p>
+</section>
+
+<!-- 9 HİZALAMA VE BOŞLUK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.2 TASARIM</span><span class="kd">—</span><span class="ks">HİZALAMA VE BOŞLUK</span></div>
+  <p class="bridge">Dağınık görünen sayfaların çoğunda sorun renklerde değil, ortak bir hizanın olmamasındadır.</p>
+  <h2>Ortak hizalar ve nefes alacak boşluk</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Hizasız, sıkışık yerleşim</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">defnekitabevi.com/kitaplar</span></div><iframe data-demo="hizalama-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Aynı hizaya oturmuş, boşluklu yerleşim</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">defnekitabevi.com/kitaplar</span></div><iframe data-demo="hizalama-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Sağdaki sayfada kartlar aynı genişlikte, başlıklar aynı sol çizgide ve aralarındaki boşluk eşittir. Boşluk “boşa giden yer” değildir; grupları birbirinden ayıran görünmez çizgidir.</p>
+</section>
+
+<!-- 10 YAKINLIK VE TUTARLILIK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.2 TASARIM</span><span class="kd">—</span><span class="ks">YAKINLIK VE TUTARLILIK</span></div>
+  <p class="bridge">Göz, birbirine yakın duran öğeleri otomatik olarak “aynı gruptan” sayar.</p>
+  <h2>Birbirine ait olan öğeler birlikte durur</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Etiketler yanlış öğeye yakın</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">gencfest.org/basvuru</span></div><iframe data-demo="yakinlik-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Etiket kendi alanıyla gruplanmış</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">gencfest.org/basvuru</span></div><iframe data-demo="yakinlik-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Soldaki formda “E-posta” etiketi kendi kutusundan uzak, bir üstteki kutuya yakın durduğu için hangi etiketin hangi kutuya ait olduğu karışır. Tutarlılık ise aynı düzenin her satırda tekrar etmesidir.</p>
+</section>
+
+<!-- 11 BİÇİMSELLİK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3 BİÇİMSELLİK</span></div>
+  <p class="bridge">İçerik “ne söylediğimiz”, tasarım “nereye koyduğumuz”, biçimsellik ise “nasıl göründüğü”dür.</p>
+  <h2>Biçimsellik: içeriğin görünüş kuralları</h2>
+  <p class="sub"><strong>Biçimsellik</strong>, sayfadaki içeriğin yazı, renk ve düzen bakımından hangi kurallara göre biçimlendirileceğini belirler. Üç alt başlıkta incelenir: <strong>tipografi</strong>, <strong>içerik–tasarım ilişkisi</strong> ve <strong>renk düzeni ile okunabilirlik</strong>.</p>
+  <div class="cards c3">
+    <div class="card"><p class="card-h"><span class="n">2.3.1</span>Tipografi</p><p class="card-t">Yazı tipi, punto, satır yüksekliği, satır uzunluğu ve başlık düzeni ile ilgilenir.</p><p class="card-t" style="margin-top:.35rem"><em>Sorusu:</em> Bu metin rahat okunuyor mu?</p></div>
+    <div class="card"><p class="card-h"><span class="n">2.3.2</span>İçerik–tasarım ilişkisi</p><p class="card-t">Seçilen düzenin, taşıdığı içeriğin türüne uyup uymadığı ile ilgilenir.</p><p class="card-t" style="margin-top:.35rem"><em>Sorusu:</em> Bu içerik için doğru kalıbı mı seçtim?</p></div>
+    <div class="card"><p class="card-h"><span class="n">2.3.3</span>Renk ve okunabilirlik</p><p class="card-t">Renk paletinin kurulması ve yazı–zemin kontrastı ile ilgilenir.</p><p class="card-t" style="margin-top:.35rem"><em>Sorusu:</em> Yazı zeminden yeterince ayrılıyor mu?</p></div>
+  </div>
+  <div class="bigrule">Biçimsellik, sayfanın “süslenmesi” değildir. Yanlış biçimlendirilmiş doğru bir içerik, ziyaretçi tarafından okunmadığı için yok hükmündedir.</div>
+</section>
+
+<!-- 12 TİPOGRAFİ TERİMLER -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.1 TİPOGRAFİ</span><span class="kd">—</span><span class="ks">TEMEL KAVRAMLAR</span></div>
+  <p class="bridge">Tipografiyi konuşabilmek için önce yazıyı tarif eden beş ölçüyü adlandıralım.</p>
+  <h2>Bir metni tarif eden beş ölçü</h2>
+  <table class="t">
+    <tr><th style="width:20%">Kavram</th><th style="width:42%">Tanım</th><th>Neyi etkiler?</th></tr>
+    <tr><td><strong>Yazı tipi ailesi</strong></td><td>Harflerin biçimini belirleyen takım. Uçlarında küçük tırnaklar bulunanlara <em>tırnaklı</em> (serif), bulunmayanlara <em>tırnaksız</em> (sans-serif) denir.</td><td>Sayfanın tonu ve ekranda okunma kolaylığı.</td></tr>
+    <tr><td><strong>Punto (yazı boyutu)</strong></td><td>Harflerin büyüklüğü. Web'de genellikle piksel (<code class="k">px</code>) veya <code class="k">rem</code> ile verilir.</td><td>Okunabilirlik ve hiyerarşi.</td></tr>
+    <tr><td><strong>Satır yüksekliği</strong></td><td>Alt alta iki satırın taban çizgileri arasındaki mesafe.</td><td>Gözün satır sonundan bir sonraki satırın başına doğru atlaması.</td></tr>
+    <tr><td><strong>Satır uzunluğu</strong></td><td>Bir satıra sığan karakter sayısı.</td><td>Satır çok uzunsa göz kaybolur, çok kısaysa okuma sürekli kesilir.</td></tr>
+    <tr><td><strong>Yazı kalınlığı</strong></td><td>Harflerin kalınlık derecesi (ince, normal, kalın).</td><td>Başlık ile gövde metnini birbirinden ayırmak.</td></tr>
+  </table>
+</section>
+
+<!-- 13 TİPOGRAFİ CANLI -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.1 TİPOGRAFİ</span><span class="kd">—</span><span class="ks">EKRANDA KARŞILAŞTIRMA</span></div>
+  <p class="bridge">Aşağıdaki iki metin birebir aynıdır; yalnızca tipografi ayarları değiştirilmiştir.</p>
+  <h2>Aynı metin, iki tipografi ayarı</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Küçük punto, sıkışık satır, çok uzun satır</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">bilimyolu.com/makale/karadelik</span></div><iframe data-demo="tipo-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Yeterli punto, ferah satır, sınırlı satır uzunluğu</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">bilimyolu.com/makale/karadelik</span></div><iframe data-demo="tipo-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Soldaki metinde üç sorun aynı anda var: gövde yazısı 11 piksel, satır yüksekliği 1,1 ve satırlar sayfanın tamamı boyunca uzuyor. Sağdaki metinde bu üç değer düzeltilmiştir; kelimeler değişmemiştir.</p>
+</section>
+
+<!-- 14 TİPOGRAFİ ÖLÇÜLER -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.1 TİPOGRAFİ</span><span class="kd">—</span><span class="ks">UYGULAMADA KULLANILAN DEĞERLER</span></div>
+  <p class="bridge">Tipografide “doğru” tek bir sayı yoktur, ama uygulamada güvenli kabul edilen aralıklar vardır.</p>
+  <h2>Gövde metni için başlangıç değerleri</h2>
+  <table class="t">
+    <tr><th style="width:22%">Ayar</th><th style="width:24%">Yaygın aralık</th><th>Gerekçesi</th></tr>
+    <tr><td><strong>Gövde metni boyutu</strong></td><td>16–18 piksel</td><td>Tarayıcıların varsayılan yazı boyutu 16 pikseldir. Bunun altına inmek, okuyucuyu yakınlaştırma yapmaya zorlar.</td></tr>
+    <tr><td><strong>Satır yüksekliği</strong></td><td>Punto boyutunun 1,5–1,7 katı</td><td>Göz, satır sonundan bir alt satırın başına hatasız atlayabilsin diye. WCAG erişilebilirlik kılavuzu paragraf metni için en az 1,5 katını önerir.</td></tr>
+    <tr><td><strong>Satır uzunluğu</strong></td><td>50–75 karakter</td><td>Daha uzun satırlarda okuyucu satır atlar; daha kısa satırlarda okuma ritmi sürekli bölünür.</td></tr>
+    <tr><td><strong>Yazı tipi sayısı</strong></td><td>En çok 2 aile</td><td>Biri başlıklar, biri gövde için yeter. Fazlası sayfayı dağınık gösterir ve yüklenmeyi yavaşlatır.</td></tr>
+    <tr><td><strong>Başlık kademeleri</strong></td><td>Gövdenin 1,25–2 katı</td><td>Başlık ile gövde arasındaki fark, bakışta anlaşılacak kadar belirgin olmalıdır.</td></tr>
+  </table>
+  <div class="warn"><b>Sık yapılan hata:</b> Metnin tamamını büyük harfle yazmak. Büyük harflerin dış hatları birbirine benzediği için kelimeler siluetinden tanınamaz ve okuma yavaşlar. Büyük harf, kısa etiketlerde ve rozetlerde kullanılabilir; paragraflarda kullanılmaz.</div>
+</section>
+
+<!-- 15 İÇERİK-TASARIM İLİŞKİSİ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.2 İÇERİK–TASARIM İLİŞKİSİ</span></div>
+  <p class="bridge">Aynı tasarım kalıbı her içeriğe uymaz; içeriğin türü, hangi kalıbın kullanılacağını belirler.</p>
+  <h2>Kalıbı içerik seçer, tasarımcının zevki değil</h2>
+  <p class="sub"><strong>İçerik–tasarım ilişkisi</strong>, sayfada kullanılan yerleşim biçiminin taşıdığı içeriğin yapısına uygun olmasıdır. Karşılaştırılacak veriler tablo ister, benzer öğeler kart ızgarası ister, uzun bir yazı tek sütun ister.</p>
+  <table class="t">
+    <tr><th style="width:26%">İçerik türü</th><th style="width:26%">Uygun kalıp</th><th>Neden?</th></tr>
+    <tr><td>Uzun makale, haber, blog yazısı</td><td>Tek sütun, sınırlı genişlik</td><td>Okuma kesintisiz ilerlemeli; göz sütun değiştirmek zorunda kalmamalı.</td></tr>
+    <tr><td>Ürünler, ilanlar, projeler</td><td>Kart ızgarası</td><td>Öğeler birbirinin aynı yapıdadır; yan yana karşılaştırılarak taranır.</td></tr>
+    <tr><td>Ders programı, fiyat listesi, teknik özellikler</td><td>Tablo</td><td>Değerler satır ve sütun olarak karşılaştırılır; sıra ve hizalama anlam taşır.</td></tr>
+    <tr><td>Sıralı bir işlem (kayıt, sipariş)</td><td>Adım adım form</td><td>Kullanıcı hangi adımda olduğunu ve kaç adım kaldığını görmelidir.</td></tr>
+    <tr><td>Az sayıda ama önemli seçenek</td><td>Geniş, ayrı bölümler</td><td>Seçenekler kalabalık görünmemeli; her biri kendi alanında anlatılmalıdır.</td></tr>
+  </table>
+  <div class="quote">Bir bilgiyi hangi kaba koyacağımızı bilginin kendisi söyler: alışveriş listesi alt alta maddelerle, ders programı ise satır ve sütunlarla yazılır. İkisini değiştirdiğimizde bilgi kaybolmaz ama okunması zorlaşır.</div>
+</section>
+
+<!-- 16 İÇERİK-TASARIM CANLI -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.2 İÇERİK–TASARIM İLİŞKİSİ</span><span class="kd">—</span><span class="ks">EKRANDA KARŞILAŞTIRMA</span></div>
+  <p class="bridge">Aşağıda aynı ders programı verisi iki farklı kalıba yerleştirilmiştir.</p>
+  <h2>Karşılaştırılacak veri kart ızgarasına konursa</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Tablo verisi kartlara dağıtılmış</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">okul.meb.k12.tr/ders-programi</span></div><iframe data-demo="iliski-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Aynı veri tablo olarak</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">okul.meb.k12.tr/ders-programi</span></div><iframe data-demo="iliski-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Soldaki sayfada “Salı günü 2. ders nedir?” sorusunu cevaplamak için kartları tek tek okumak gerekir. Sağdaki tabloda aynı soru, satır ile sütunun kesiştiği yere bakılarak cevaplanır. Veri aynıdır; değişen tek şey kalıptır.</p>
+</section>
+
+<!-- 17 RENK DÜZENİ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.3 RENK DÜZENİ VE OKUNABİLİRLİK</span><span class="kd">—</span><span class="ks">PALET KURMA</span></div>
+  <p class="bridge">Renk seçimi “hangi renk güzel” sorusu değil, “hangi renk hangi işi yapacak” sorusudur.</p>
+  <h2>Renkleri sayıyla değil, görevle seçmek</h2>
+  <div class="cards c3">
+    <div class="card"><p class="card-h">Zemin rengi (~%60)</p><p class="card-t">Sayfanın en geniş alanını kaplar. Genellikle beyaz veya çok açık bir tondur; gözü yormaz.</p></div>
+    <div class="card"><p class="card-h">Ana renk (~%30)</p><p class="card-t">Sitenin kendini tanıttığı renktir; genellikle kurumun logosundaki renk seçilir. Üst menüde, başlıklarda ve bölüm zeminlerinde tekrar ettiği için ziyaretçi siteyi bu renkten hatırlar. Bir okul sitesinde okulun lacivertine, bir spor salonu sitesinde logodaki yeşile karşılık gelir.</p></div>
+    <div class="card"><p class="card-h">Vurgu rengi (~%10)</p><p class="card-t">Yalnızca dikkat çekilecek yerde kullanılır: ana buton, indirim etiketi, uyarı.</p></div>
+  </div>
+  <div class="cards c2">
+    <div class="card"><p class="card-h">Rengin taşıdığı anlam</p><ul class="card-l"><li>Yeşil: onay, başarı, “işlem tamam”</li><li>Kırmızı: hata, silme, geri alınamaz işlem</li><li>Sarı/turuncu: uyarı, dikkat</li><li>Mavi: bağlantı, bilgi, kurumsal güven</li></ul><p class="card-t" style="margin-top:.35rem">Bu anlamlar kültüre göre değişebilir; hedef kitle yurt dışıysa kontrol edilmelidir.</p></div>
+    <div class="card"><p class="card-h">Sık yapılan hatalar</p><ul class="card-l"><li>Çok sayıda canlı rengi aynı anda kullanmak</li><li>Vurgu rengini her yerde kullanmak (vurgu olmaktan çıkar)</li><li>Bağlantıları gövde metniyle aynı renkte bırakmak</li><li>Rengi tek başına bilgi taşıyıcı yapmak</li></ul></div>
+  </div>
+  <div class="bigrule">Vurgu rengi sayfada ne kadar az kullanılırsa o kadar güçlü olur. Her şey vurguluysa hiçbir şey vurgulu değildir.</div>
+</section>
+
+<!-- 18 KONTRAST NEDİR -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.3 RENK DÜZENİ VE OKUNABİLİRLİK</span><span class="kd">—</span><span class="ks">KONTRAST ORANI</span></div>
+  <p class="bridge">Okunabilirlik bir görüş meselesi değildir; ölçülebilir ve sayıyla ifade edilir.</p>
+  <h2>Kontrast oranı: yazı ile zemin arasındaki ölçülebilir fark</h2>
+  <p class="sub"><strong>Kontrast oranı</strong>, yazı rengi ile zemin renginin parlaklıklarının birbirine bölünmesiyle bulunan sayıdır. En düşük değeri <strong>1:1</strong>'dir (iki renk aynıdır, yazı görünmez); en yüksek değeri <strong>21:1</strong>'dir (siyah üzerine beyaz). Uluslararası erişilebilirlik kılavuzu WCAG, hangi durumda en az kaç olması gerektiğini belirler.</p>
+  <table class="t">
+    <tr><th style="width:26%">Ne için?</th><th style="width:18%">En az oran</th><th>Açıklama</th></tr>
+    <tr><td><strong>Normal gövde metni</strong></td><td class="ok">4,5 : 1</td><td>Sayfadaki paragrafların, etiketlerin ve bağlantı metinlerinin çoğu bu gruptadır (AA düzeyi).</td></tr>
+    <tr><td><strong>Büyük yazı</strong></td><td class="ok">3 : 1</td><td>24 pikselden büyük yazılar ile 18,66 pikselden büyük kalın yazılar. Harfler kalın olduğu için daha düşük oran yeter.</td></tr>
+    <tr><td><strong>Buton kenarı, form çerçevesi, ikon</strong></td><td class="ok">3 : 1</td><td>Yazı olmayan ama anlam taşıyan öğeler de zeminden ayırt edilebilmelidir.</td></tr>
+    <tr><td><strong>Yüksek düzey hedef</strong></td><td class="ok">7 : 1</td><td>Az gören kullanıcıların da rahat okuyabilmesi için önerilen üst düzey (AAA).</td></tr>
+    <tr><td>Süs amaçlı öğe, devre dışı buton</td><td>—</td><td>Bilgi taşımayan öğeler için alt sınır aranmaz.</td></tr>
+  </table>
+  <div class="warn"><b>Neden bir eşik gerekir?</b> Sayfayı tasarlayan kişi genç, ekranı kaliteli ve odası loştur. Ziyaretçi ise güneş altında, ucuz bir telefon ekranında veya gözlüğü olmadan bakıyor olabilir. Eşik, tasarımcının kendi gözünü ölçü almasını engeller.</div>
+</section>
+
+<!-- 19 KONTRAST ÖRNEKLERİ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.3 RENK DÜZENİ VE OKUNABİLİRLİK</span><span class="kd">—</span><span class="ks">ÖLÇÜLMÜŞ ÖRNEKLER</span></div>
+  <p class="bridge">Aşağıdaki dört örneğin kontrast oranı hesaplanmıştır; hangisinin eşiği geçtiğine gözle değil sayıyla karar veriyoruz.</p>
+  <h2>Dört renk çiftinin ölçülen kontrast oranı</h2>
+  <div class="chips">
+    <div class="chip" style="background:#ffffff">
+      <div class="cx" style="color:#111827">Kayıt Formu</div>
+      <div class="cy" style="color:#aaaaaa">Açık gri yazı, beyaz zemin</div>
+      <div class="cr" style="color:#111827">2,32 : 1 &nbsp;<span class="verdict v-no">4,5 eşiğinin altında</span></div>
+    </div>
+    <div class="chip" style="background:#ffffff">
+      <div class="cx" style="color:#111827">Kayıt Formu</div>
+      <div class="cy" style="color:#767676">Orta gri yazı, beyaz zemin</div>
+      <div class="cr" style="color:#111827">4,54 : 1 &nbsp;<span class="verdict v-ok">gövde metni için yeterli</span></div>
+    </div>
+    <div class="chip" style="background:#ffc107">
+      <div class="cx" style="color:#ffffff">Hemen Başvur</div>
+      <div class="cy" style="color:#ffffff">Beyaz yazı, sarı buton</div>
+      <div class="cr" style="color:#3a2c00">1,63 : 1 &nbsp;<span class="verdict v-no">buton yazısı okunmuyor</span></div>
+    </div>
+    <div class="chip" style="background:#ffc107">
+      <div class="cx" style="color:#000000">Hemen Başvur</div>
+      <div class="cy" style="color:#1a1400">Siyah yazı, aynı sarı buton</div>
+      <div class="cr" style="color:#1a1400">12,88 : 1 &nbsp;<span class="verdict v-ok">rahatlıkla okunuyor</span></div>
+    </div>
+  </div>
+  <div class="cards c2">
+    <div class="card b"><p class="card-h">Buradan çıkan kural</p><p class="card-t">Sarı, turuncu ve açık yeşil gibi parlak renklerin üzerine beyaz yazı yazılmaz. Bu renklerin parlaklığı beyaza yakın olduğu için oran 3'ün bile altına düşer. Bu renklerin üzerine koyu yazı yazılır.</p></div>
+    <div class="card g"><p class="card-h">Nasıl ölçülür?</p><p class="card-t">Tarayıcının geliştirici araçlarında bir yazı öğesi seçilip renk kutusuna tıklandığında kontrast oranı ve eşiği geçip geçmediği doğrudan gösterilir. Ayrıca ücretsiz kontrast denetleyici siteleri de aynı hesabı yapar.</p></div>
+  </div>
+</section>
+
+<!-- 20 RENK TEK BAŞINA -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.3.3 RENK DÜZENİ VE OKUNABİLİRLİK</span><span class="kd">—</span><span class="ks">RENK TEK BAŞINA BİLGİ TAŞIMAZ</span></div>
+  <p class="bridge">Erkeklerin yaklaşık %8'i renk körlüğünün bir biçimini taşır; kırmızı ile yeşili ayırt edemeyen kullanıcı için renkle verilen uyarı yok demektir.</p>
+  <h2>Uyarıyı yalnızca renkle vermek</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Hata yalnızca kırmızı çerçeveyle belirtilmiş</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">kutuphane.gov.tr/uye-ol</span></div><iframe data-demo="renk-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Renk + simge + açıklama metni birlikte</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">kutuphane.gov.tr/uye-ol</span></div><iframe data-demo="renk-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Kural şudur: renk bir bilgiyi <strong>güçlendirebilir</strong>, ama o bilgiyi <strong>tek başına taşıyamaz</strong>. Rengin yanında mutlaka bir simge, bir metin veya bir biçim farkı bulunmalıdır.</p>
+</section>
+
+<!-- 21 İŞLEVSELLİK VS KULLANILABİLİRLİK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.4 İŞLEVSELLİK VE KULLANILABİLİRLİK</span></div>
+  <p class="bridge">Bunlar birbirine benzeyen ama aynı olmayan iki kavramdır; ayrımı bilmek, hatayı doğru yerde aramayı sağlar.</p>
+  <h2>“Çalışıyor mu?” ile “Kolay mı?” aynı soru değildir</h2>
+  <div class="cards c2">
+    <div class="card"><p class="card-h">İşlevsellik</p><p class="card-t">Sitedeki özelliklerin <strong>teknik olarak çalışması</strong>dır.</p><ul class="card-l"><li>Bağlantılar hedefine gidiyor mu?</li><li>Form gönderildiğinde veri ulaşıyor mu?</li><li>Arama kutusu sonuç döndürüyor mu?</li><li>Görseller yükleniyor mu?</li></ul><p class="card-t" style="margin-top:.35rem"><em>Cevabı evet/hayırdır.</em></p></div>
+    <div class="card"><p class="card-h">Kullanılabilirlik</p><p class="card-t">Çalışan bu özelliklerin <strong>kullanıcı tarafından kolayca kullanılabilmesi</strong>dir.</p><ul class="card-l"><li>Kullanıcı aradığını kaç adımda buluyor?</li><li>Ne yapacağını anlamak için düşünmesi gerekiyor mu?</li><li>Hata yaptığında nasıl düzelteceğini anlıyor mu?</li><li>İşlemi yarıda bırakıyor mu?</li></ul><p class="card-t" style="margin-top:.35rem"><em>Cevabı derece bildirir.</em></p></div>
+  </div>
+  <div class="bigrule">Bir form teknik olarak kusursuz çalışıyor olabilir; ama kullanıcı hangi alana ne yazacağını anlamıyorsa o form kullanılabilir değildir. İşlevsellik gerekli şarttır, yeterli şart değildir.</div>
+  <div class="quote">Bir kapı düşünün: kolu çevirince açılıyorsa kapı işlevseldir. Ama üzerinde “itiniz” yazarken çekilerek açılıyorsa, herkes önce yanlış yönde denediği için kullanılabilir değildir.</div>
+</section>
+
+<!-- 22 FORM KULLANILABİLİRLİĞİ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.4 İŞLEVSELLİK VE KULLANILABİLİRLİK</span><span class="kd">—</span><span class="ks">FORM KULLANILABİLİRLİĞİ</span></div>
+  <p class="bridge">Aşağıdaki iki form da teknik olarak çalışır; ikisi de veriyi gönderir.</p>
+  <h2>Çalışan ama kullanılamayan form</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Etiketsiz, açıklamasız, hatası anlaşılmayan form</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">randevu.saglik.gov.tr/basvuru</span></div><iframe data-demo="form-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Etiketli, biçimi açıklanmış, hatası tarif edilmiş form</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">randevu.saglik.gov.tr/basvuru</span></div><iframe data-demo="form-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Soldaki formda etiket yerine kutunun içine yazılmış ipucu metni kullanılmıştır; kullanıcı yazmaya başlayınca bu metin kaybolur ve o alanın ne olduğu unutulur. Ayrıca hata mesajı yalnızca “Hatalı giriş” der, hangi alanın neden hatalı olduğunu söylemez.</p>
+</section>
+
+<!-- 23 GEZİNME VE TIKLAMA HEDEFİ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.4 İŞLEVSELLİK VE KULLANILABİLİRLİK</span><span class="kd">—</span><span class="ks">GEZİNME VE TIKLAMA HEDEFİ</span></div>
+  <p class="bridge">Kullanılabilirliğin ölçülebilen bir yanı da vardır: tıklanacak alanın parmakla isabet ettirilebilecek büyüklükte olması.</p>
+  <h2>Menü bağlantıları parmakla tutulabiliyor mu?</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Küçük ve bitişik bağlantılar</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">belediye.gov.tr/hizmetler</span></div><iframe data-demo="hedef-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Yeterli büyüklükte ve aralıklı bağlantılar</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">belediye.gov.tr/hizmetler</span></div><iframe data-demo="hedef-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <div class="cards c3">
+    <div class="card"><p class="card-h">Ölçü</p><p class="card-t">WCAG 2.2, tıklanabilir alanın en az <strong>24×24 piksel</strong> olmasını şart koşar; dokunmatik ekranlar için yaygın olarak <strong>44×44 piksel</strong> önerilir.</p></div>
+    <div class="card"><p class="card-h">Tutarlı menü</p><p class="card-t">Menü her sayfada aynı yerde, aynı sırada ve aynı adlarla bulunur. Kullanıcı hangi sayfada olduğunu menüde işaretli görmelidir.</p></div>
+    <div class="card"><p class="card-h">Çıkmaz sokak bırakma</p><p class="card-t">404 sayfası boş bırakılmaz; ana sayfaya dönüş, arama kutusu ve popüler bağlantılar sunar.</p></div>
+  </div>
+</section>
+
+<!-- 24 HIZ VE KARARLILIK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.4 İŞLEVSELLİK VE KULLANILABİLİRLİK</span><span class="kd">—</span><span class="ks">HIZ VE GÖRSEL KARARLILIK</span></div>
+  <p class="bridge">Kullanılabilirliği bozan en sinsi hatalardan biri, sayfa yüklenirken içeriğin yer değiştirmesidir.</p>
+  <h2>Sayfa yüklenirken içerik kayarsa</h2>
+  <div class="split">
+    <div class="panel">
+      <div class="panel-head">Ölçülebilir üç performans göstergesi</div>
+      <div class="panel-body">
+        <table class="t" style="margin-bottom:.5rem">
+          <tr><th style="width:30%">Gösterge</th><th style="width:22%">İyi kabul edilen</th><th>Neyi ölçer?</th></tr>
+          <tr><td><strong>LCP</strong></td><td class="ok">2,5 saniye ve altı</td><td>Sayfadaki en büyük içeriğin (genellikle ana görsel veya başlık) ekranda görünme süresi.</td></tr>
+          <tr><td><strong>INP</strong></td><td class="ok">200 milisaniye ve altı</td><td>Kullanıcı tıkladıktan sonra sayfanın tepki verme süresi.</td></tr>
+          <tr><td><strong>CLS</strong></td><td class="ok">0,1 ve altı</td><td>Sayfa yüklenirken içeriğin ne kadar kaydığı.</td></tr>
+        </table>
+        <p style="margin:0">Bu üç ölçü, Google'ın <strong>Core Web Vitals</strong> adını verdiği ve arama sıralamasında da dikkate aldığı göstergelerdir. Sağdaki örnekte üçüncüsünü, yani içerik kaymasını görüyoruz.</p>
+      </div>
+    </div>
+    <div class="panel bad">
+      <div class="panel-head">✕ Yer ayrılmamış reklam alanı içeriği aşağı itiyor</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">haberakisi.com/gundem</span></div><iframe data-demo="cls"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <p class="cap">Sağdaki sayfa açıldıktan yaklaşık bir saniye sonra üstteki banner yüklenir ve altındaki her şeyi aşağı iter. Kullanıcı tam o anda bir bağlantıya tıklıyorsa yanlış bağlantıya basar. Çözüm: yüklenecek öğe için baştan yer ayırmaktır.</p>
+</section>
+
+<!-- 25 GÜNCELLİK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.5 GÜNCELLİK</span></div>
+  <p class="bridge">Bir sitenin en son ne zaman elden geçtiği, ziyaretçinin oradaki bilgiye güvenip güvenmeyeceğini belirler.</p>
+  <h2>Ziyaretçi güncelliği nereden anlar?</h2>
+  <div class="split">
+    <div class="panel bad">
+      <div class="panel-head">✕ Yıllardır güncellenmemiş sayfa</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">kultursanatmerkezi.org/etkinlikler</span></div><iframe data-demo="guncel-bad"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Düzenli güncellenen sayfa</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">kultursanatmerkezi.org/etkinlikler</span></div><iframe data-demo="guncel-good"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <div class="cards c4">
+    <div class="card"><p class="card-h">Geçmiş tarihler</p><p class="card-t">Süresi dolmuş kampanya ve etkinlikler sayfada durmaya devam ediyor.</p></div>
+    <div class="card"><p class="card-h">Telif yılı</p><p class="card-t">Alt bilgideki yıl geride kalmış. Ziyaretçinin ilk baktığı işaretlerden biridir.</p></div>
+    <div class="card"><p class="card-h">Ölü bağlantılar</p><p class="card-t">Tıklandığında 404 veren bağlantılar sitenin bakımsız olduğunu gösterir.</p></div>
+    <div class="card"><p class="card-h">Eskimiş bilgi</p><p class="card-t">Değişmiş fiyat, adres, telefon veya çalışma saati düzeltilmemiş.</p></div>
+  </div>
+</section>
+
+<!-- 26 UYGUNLUK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.6 UYGUNLUK VE GÜVENİLİRLİK</span><span class="kd">—</span><span class="ks">HEDEF KİTLEYE UYGUNLUK</span></div>
+  <p class="bridge">“Uygunluk”, sitenin kime hitap ettiğine göre dilini, görselini ve düzenini seçmesidir.</p>
+  <h2>Aynı konu, farklı kitle, farklı site</h2>
+  <table class="t">
+    <tr><th style="width:22%">Hedef kitle</th><th style="width:26%">Dil ve anlatım</th><th>Tasarımda karşılığı</th></tr>
+    <tr><td><strong>İlkokul öğrencisi</strong></td><td>Kısa cümleler, günlük kelimeler, bol görsel</td><td>Büyük punto, canlı renkler, az metin, büyük butonlar</td></tr>
+    <tr><td><strong>Lise öğrencisi ve veli</strong></td><td>Açık ve resmî ama ağır olmayan dil</td><td>Net başlıklar, duyuru listesi, takvim, indirilebilir belgeler</td></tr>
+    <tr><td><strong>Kurumsal müşteri</strong></td><td>Ölçülü, kanıt ve rakam içeren dil</td><td>Sade renk paleti, referanslar, teknik belgeler, iletişim formu</td></tr>
+    <tr><td><strong>Kamu kurumu ziyaretçisi</strong></td><td>Resmî, tek anlamlı, kısaltmasız dil</td><td>Yüksek erişilebilirlik, büyük punto seçeneği, açık gezinme</td></tr>
+  </table>
+  <div class="cards c2">
+    <div class="card b"><p class="card-h">Uygunsuz örnek</p><p class="card-t">Bir anaokulu sitesinde koyu gri zemin üzerine ince gri yazı ve kurumsal terimler kullanmak. İçerik doğru olsa bile hedef kitleye ulaşmaz.</p></div>
+    <div class="card b"><p class="card-h">Uygunsuz örnek</p><p class="card-t">Bir hastane randevu sayfasında hareketli animasyonlar, otomatik oynayan video ve kayan yazılar kullanmak. Ziyaretçi acele ve endişelidir; sade ve hızlı bir akış bekler.</p></div>
+  </div>
+</section>
+
+<!-- 28 UYUMLULUK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.7 UYUMLULUK</span></div>
+  <p class="bridge">Site sizin bilgisayarınızda düzgün görünüyor olabilir; asıl soru başkalarının cihazında ne olduğudur.</p>
+  <h2>Uyumluluğun iki ayağı</h2>
+  <p class="sub"><strong>Uyumluluk</strong>, bir web sitesinin farklı tarayıcılarda ve farklı ekran boyutlarında amacına uygun biçimde çalışmasıdır. İki alt başlıkta incelenir.</p>
+  <div class="cards c2">
+    <div class="card"><p class="card-h"><span class="n">2.7.1</span>Tarayıcı uyumluluğu</p><p class="card-t">Sayfanın Chrome, Firefox, Safari, Edge gibi <strong>farklı tarayıcılarda</strong> aynı şekilde çalışması.</p><p class="card-t" style="margin-top:.35rem"><em>Soru:</em> Kullandığım özelliği bütün tarayıcılar destekliyor mu?</p></div>
+    <div class="card"><p class="card-h"><span class="n">2.7.2</span>Duyarlı tasarım</p><p class="card-t">Sayfanın telefon, tablet ve masaüstü gibi <strong>farklı ekran genişliklerinde</strong> düzgün görünmesi.</p><p class="card-t" style="margin-top:.35rem"><em>Soru:</em> Ekran daraldığında düzen bozuluyor mu?</p></div>
+  </div>
+  <div class="bigrule">Bugün internet trafiğinin yarıdan fazlası telefonlardan gelmektedir. Bu yüzden uyumluluk, tasarımın sonuna eklenen bir ayrıntı değil, en başta verilen bir karardır.</div>
+  <div class="quote">Bir yazıyı düşünün: aynı metni A4 kâğıda, defter sayfasına ve yapışkanlı nota yazacak olsanız satırları farklı bölerdiniz. Web sayfası da her ekranda kendini yeniden bölebilmelidir.</div>
+</section>
+
+<!-- 29 TARAYICI MOTORLARI -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.7.1 TARAYICI UYUMLULUĞU</span><span class="kd">—</span><span class="ks">FARKLILIK NEDEN OLUŞUR?</span></div>
+  <p class="bridge">Aynı HTML ve CSS dosyası, tarayıcılarda neden birebir aynı görünmeyebilir?</p>
+  <h2>Sayfayı çizen şey tarayıcının motorudur</h2>
+  <p class="sub">Her tarayıcının içinde, HTML ve CSS'i okuyup ekrana çizen bir <strong>tarayıcı motoru</strong> bulunur. Farklı motorlar aynı standardı uygular, ama yeni bir özelliği farklı zamanlarda ve bazen küçük farklarla eklerler.</p>
+  <div class="cards c3">
+    <div class="card"><p class="card-h">Blink</p><p class="card-t">Chrome, Edge, Opera, Brave, Samsung Internet</p><p class="card-t" style="margin-top:.35rem">Masaüstü ve Android'de en yaygın kullanılan motordur.</p></div>
+    <div class="card"><p class="card-h">Gecko</p><p class="card-t">Firefox</p><p class="card-t" style="margin-top:.35rem">Bağımsız geliştirilen, standartlara bağlılığıyla bilinen motordur.</p></div>
+    <div class="card"><p class="card-h">WebKit</p><p class="card-t">Safari (macOS ve iOS)</p><p class="card-t" style="margin-top:.35rem">iPhone ve iPad'de karşılaşılan motor genellikle budur.</p></div>
+  </div>
+  <div class="warn"><b>Kritik nokta:</b> Bir web sitesini yalnızca kendi bilgisayarınızdaki tek bir tarayıcıda denemek, o sitenin test edildiği anlamına gelmez. Chrome ile Edge aynı motoru (Blink) kullandığı için ikisinde denemek de tek başına yeterli değildir; farklı motorlardan en az birer tarayıcıda daha bakılmalıdır.</div>
+  <div class="quote">Aynı yemek tarifini üç ayrı aşçıya verdiğinizi düşünün. Tarife hepsi uyar, yemek hepsinde çıkar; ama biri tuzu erken atar, diğeri tencereyi farklı seçer. Sonuç birbirine çok benzer ama birebir aynı olmaz.</div>
+</section>
+
+<!-- 30 UYUMLULUK TABLOSU -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.7.1 TARAYICI UYUMLULUĞU</span><span class="kd">—</span><span class="ks">DESTEK DURUMU NASIL ÖĞRENİLİR?</span></div>
+  <p class="bridge">Bir özelliği kullanmadan önce, o özelliğin hangi tarayıcılarda çalıştığı kontrol edilir.</p>
+  <h2>Uyumluluk tablosu okuma</h2>
+  <table class="t">
+    <tr>
+      <th style="width:26%">CSS/HTML özelliği</th>
+      <th style="text-align:center">Chrome / Edge</th>
+      <th style="text-align:center">Firefox</th>
+      <th style="text-align:center">Safari</th>
+      <th style="text-align:center">Android</th>
+      <th style="width:24%">Durum</th>
+    </tr>
+    <tr><td><strong>Flexbox</strong></td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td>Yıllardır her yerde çalışır</td></tr>
+    <tr><td><strong>CSS Grid</strong></td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td>Yıllardır her yerde çalışır</td></tr>
+    <tr><td><strong>Konteyner sorguları</strong></td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="ok">✓</td><td>Yeni; eski sürümlerde yok</td></tr>
+    <tr><td><strong>Yeni bir deneysel özellik</strong></td><td style="text-align:center" class="ok">✓</td><td style="text-align:center" class="part">kısmen</td><td style="text-align:center" class="no">✕</td><td style="text-align:center" class="part">kısmen</td><td>Henüz kullanılmamalı</td></tr>
+  </table>
+  <div class="cards c2">
+    <div class="card"><p class="card-h">Nereden bakılır?</p><ul class="card-l"><li><strong>caniuse.com</strong> — özelliği yazınca tarayıcı tarayıcı destek tablosu verir</li><li><strong>MDN</strong> — her özelliğin sayfasının altında aynı tablo bulunur</li><li><strong>Baseline</strong> — bir özelliğin bütün büyük tarayıcılarda desteklenip desteklenmediğini tek bir etiketle gösterir</li></ul></div>
+    <div class="card"><p class="card-h">Bir özellik desteklenmiyorsa</p><ul class="card-l"><li><strong>Aşamalı geliştirme:</strong> önce her yerde çalışan sade sürümü kur, destekleyen tarayıcıda ek özelliği devreye al</li><li>Sayfanın <em>ana işi</em> desteklenmeyen özelliğe bağlı olmamalıdır</li><li>Destek yeterli değilse o özellik şimdilik kullanılmaz</li></ul></div>
+  </div>
+</section>
+
+<!-- 31 DUYARLI TASARIM -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.7.2 DUYARLI TASARIM</span><span class="kd">—</span><span class="ks">ÜÇ BİLEŞENİ</span></div>
+  <p class="bridge">Duyarlı tasarım tek bir ayar değil, birlikte çalışan üç parçadır.</p>
+  <h2>Aynı sayfanın ekrana göre kendini düzenlemesi</h2>
+  <div class="split">
+    <div class="panel">
+      <div class="panel-head">Sağdaki sayfanın kaynağından iki bölüm</div>
+      <pre id="code-rwd"></pre>
+    </div>
+    <div class="panel good">
+      <div class="panel-head">✓ Bu panelin genişliğine göre yerleşen sayfa</div>
+      <div class="frame"><div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">gezirehberi.com/rotalar</span></div><iframe data-demo="rwd"></iframe><button class="reset" title="Başa döndür">⟲</button></div>
+    </div>
+  </div>
+  <div class="cards c3">
+    <div class="card"><p class="card-h"><span class="n">1</span>Görüntü alanı etiketi</p><p class="card-t">Sayfanın telefonda gerçek genişlikte açılmasını sağlar. Bu satır yoksa telefon sayfayı masaüstü genişliğinde açıp küçültür ve yazılar okunmaz olur.</p></div>
+    <div class="card"><p class="card-h"><span class="n">2</span>Esnek düzen ve görseller</p><p class="card-t">Genişlikler sabit piksel yerine yüzde ve esnek birimlerle verilir; görsellere <code class="k">max-width:100%</code> uygulanır.</p></div>
+    <div class="card"><p class="card-h"><span class="n">3</span>Ortam sorguları</p><p class="card-t">Belirlenen genişlik eşiklerinde (kırılma noktası) düzen değişir: sütun sayısı azalır, menü katlanır.</p></div>
+  </div>
+</section>
+
+<!-- 32 ÜÇ GENİŞLİK -->
+<section class="slide">
+  <div class="kicker"><span class="kt">2.7.2 DUYARLI TASARIM</span><span class="kd">—</span><span class="ks">ÜÇ EKRAN GENİŞLİĞİNDE AYNI SAYFA</span></div>
+  <p class="bridge">Aşağıdaki üç çerçevede aynı adres, aynı HTML ve aynı CSS dosyası açıktır; yalnızca pencere genişliği farklıdır.</p>
+  <h2>360, 768 ve 1200 pikselde aynı sayfa</h2>
+  <div class="rwd">
+    <div class="panel">
+      <div class="panel-head">Telefon — 360 piksel</div>
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">gezirehberi.com/rotalar</span></div>
+      <div class="vp"><iframe data-demo="rwd" data-w="360"></iframe></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">Tablet — 768 piksel</div>
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">gezirehberi.com/rotalar</span></div>
+      <div class="vp"><iframe data-demo="rwd" data-w="768"></iframe></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">Masaüstü — 1200 piksel</div>
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">gezirehberi.com/rotalar</span></div>
+      <div class="vp"><iframe data-demo="rwd" data-w="1200"></iframe></div>
+    </div>
+  </div>
+  <p class="cap">Değişenler: kart ızgarası üç sütundan iki, sonra tek sütuna düşer; üst menü yatay listeden katlanır menü düğmesine dönüşür; kenar boşlukları daralır. Kaybolan bilgi yoktur — yalnızca yerleşim değişir.</p>
+</section>
+
+<!-- 33 ESKİMİŞ BİLGİLER -->
+<section class="slide">
+  <div class="kicker"><span class="kt">WEB TASARIM İLKELERİ</span><span class="kd">—</span><span class="ks">ARTIK GEÇERLİ OLMAYAN UYGULAMALAR</span></div>
+  <p class="bridge">Web hızlı değişen bir alandır; birkaç yıl önce doğru olan bazı uygulamalar bugün kullanılmamaktadır.</p>
+  <h2>Eski kaynaklarda geçen ama bugün kullanılmayan yöntemler</h2>
+  <table class="t">
+    <tr><th style="width:33%">Eski yaklaşım</th><th style="width:33%">Bugünkü durumu</th><th>Bunun yerine</th></tr>
+    <tr><td>Internet Explorer uyumluluğu için ayrı kod yazmak</td><td>Internet Explorer 2022'de tamamen emekliye ayrıldı ve desteği bitti.</td><td>Kendini otomatik güncelleyen güncel tarayıcılar hedeflenir.</td></tr>
+    <tr><td>Sayfayı 1024 piksel gibi sabit genişlikte tasarlamak</td><td>Ekran genişlikleri 320 pikselden 4K'ya kadar değişiyor; sabit genişlik telefonda yatay kaydırma üretir.</td><td>Esnek düzen, <code class="k">max-width</code> ve ortam sorguları kullanılır.</td></tr>
+    <tr><td>Telefon için ayrı bir mobil site kurmak (<code class="k">m.site.com</code>)</td><td>İki ayrı site iki kat bakım demektir; içerikler ayrışır, adresler bölünür.</td><td>Tek adres, tek kod, duyarlı tasarım kullanılır.</td></tr>
+    <tr><td>Sayfa yerleşimini tablo etiketleriyle kurmak</td><td>Tablo yalnızca veri içindir; yerleşim için kullanıldığında ekran okuyucular sayfayı yanlış okur.</td><td>Yerleşim Flexbox ve Grid ile kurulur.</td></tr>
+    <tr><td>216 renklik “web güvenli renk” paletiyle sınırlı kalmak</td><td>Bu sınır, 256 renk gösterebilen eski ekranlar içindi; bugün ekranlar milyonlarca renk gösteriyor.</td><td>Renk özgürce seçilir, ölçüt kontrast oranıdır.</td></tr>
+    <tr><td>Yalnızca birkaç “web güvenli yazı tipi” kullanmak</td><td>Yazı tipi dosyaları artık siteyle birlikte yüklenebiliyor.</td><td>Web yazı tipi kullanılır, yanına yedek aile yazılır.</td></tr>
+  </table>
+  <div class="warn"><b>Bu tablo neden var?</b> Bir kaynakta okuduğunuz bilginin ne zaman yazıldığına bakmak, web geliştirmede öğrenilmesi gereken alışkanlıklardan biridir. Bir yöntemin güncel olup olmadığı, MDN ve caniuse gibi kaynaklardan doğrulanır.</div>
+</section>
+
+<!-- 34 ÖZET -->
+<section class="slide">
+  <div class="kicker"><span class="kt">WEB TASARIM İLKELERİ</span><span class="kd">—</span><span class="ks">ÖĞRENME BİRİMİ ÖZETİ</span></div>
+  <p class="bridge">Yedi ilkenin her biri, bir siteyi teslim etmeden önce sorulacak bir kontrol sorusuna dönüşür.</p>
+  <h2>Teslim öncesi kontrol listesi</h2>
+  <table class="t tight">
+    <tr><th style="width:30%">İlke</th><th>Kontrol sorusu</th></tr>
+    <tr><td><strong>2.1 İçerik</strong></td><td>Her sayfa, ziyaretçinin o sayfada aradığı bilgiyi doğru, özgün ve taranabilir biçimde veriyor mu?</td></tr>
+    <tr><td><strong>2.2 Tasarım</strong></td><td>Sayfaya ilk bakışta neyin önemli olduğu anlaşılıyor; öğeler ortak hizalara oturuyor ve gruplar boşlukla ayrılıyor mu?</td></tr>
+    <tr class="grp"><td><strong>2.3 Biçimsellik</strong></td><td>İçerik yazı, renk ve düzen bakımından doğru biçimlendirilmiş mi?</td></tr>
+    <tr><td class="lvl2">2.3.1 Tipografi</td><td>Gövde metni en az 16 piksel, satır yüksekliği punto boyutunun 1,5 katı ve satırlar 75 karakterden kısa mı?</td></tr>
+    <tr><td class="lvl2">2.3.2 İçerik–tasarım ilişkisi</td><td>Her içerik türü kendi kalıbında mı sunuluyor: makale tek sütunda, karşılaştırmalı veri tabloda, benzer öğeler kart ızgarasında?</td></tr>
+    <tr><td class="lvl2">2.3.3 Renk düzeni ve okunabilirlik</td><td>Gövde metninin kontrast oranı en az 4,5:1 mi ve hiçbir bilgi yalnızca renkle mi veriliyor?</td></tr>
+    <tr><td><strong>2.4 İşlevsellik ve kullanılabilirlik</strong></td><td>Bütün bağlantı ve formlar çalışıyor; kullanıcı ne yapacağını düşünmeden anlıyor ve hata mesajları yol gösteriyor mu?</td></tr>
+    <tr><td><strong>2.5 Güncellik</strong></td><td>Geçmiş tarihli duyurular kaldırıldı, ölü bağlantılar düzeltildi, alt bilgideki yıl güncel mi?</td></tr>
+    <tr><td><strong>2.6 Uygunluk ve güvenilirlik</strong></td><td>Dil ve görseller hedef kitleye uygun; adres HTTPS ve kurum kimliği ile iletişim bilgileri açık mı?</td></tr>
+    <tr class="grp"><td><strong>2.7 Uyumluluk</strong></td><td>Site, geliştirildiği bilgisayardan başka ortamlarda da denendi mi?</td></tr>
+    <tr><td class="lvl2">2.7.1 Tarayıcı uyumluluğu</td><td>Sayfa, farklı motorlara sahip en az iki tarayıcıda (örneğin Chrome ve Firefox) açılıp kontrol edildi mi?</td></tr>
+    <tr><td class="lvl2">2.7.2 Duyarlı tasarım</td><td>Sayfa 360, 768 ve 1200 piksel genişliklerinde denendi; yatay kaydırma çıkmadan düzen yeniden yerleşiyor mu?</td></tr>
+  </table>
+</section>
+
+</div>
+<div class="bar"><i id="barfill"></i></div>
+<div class="tag">Öğrenme Birimi 2 — Web Tasarım İlkeleri</div>
+<div class="hud">
+  <button id="prev" title="Önceki">‹</button>
+  <span id="counter">1 / 1</span>
+  <button id="next" title="Sonraki">›</button>
+</div>
+
+<!-- ==================== ÖNİZLEME KAYNAKLARI ==================== -->
+
+<script type="text/plain" data-src="hook-bad">
+<style>
+body{font-family:"Times New Roman",serif;background:#d8e6c8;text-align:center}
+h1{font-size:1.5rem;color:#c00;margin:.2rem 0}
+p{font-size:.72rem;color:#8a8a8a;margin:.15rem 6px}
+.m{color:#0000cd;font-size:.72rem}
+.b{background:#ffff00;color:#f0f;font-size:.8rem;padding:1px}
+img{border:3px ridge #999}
+</style>
+<h1>YILDIZ SPOR SALONU'NA HOŞGELDİNİZ !!!</h1>
+<p class="b">*** YENİ AÇILDIK *** KAMPANYA *** ÜCRETSİZ DENEME ***</p>
+<p><span class="m">Anasayfa</span> | <span class="m">Hakkımızda</span> | <span class="m">Fiyatlar</span> | <span class="m">Ders Programı</span> | <span class="m">Eğitmenler</span> | <span class="m">Galeri</span> | <span class="m">Blog</span> | <span class="m">SSS</span> | <span class="m">İletişim</span> | <span class="m">Kariyer</span></p>
+<p>Salonumuz 2004 yılında kurulmuştur ve o günden bu yana spor severlere hizmet vermektedir. Modern aletlerimiz, deneyimli eğitmen kadromuz ve hijyenik ortamımız ile sizleri bekliyoruz. Aylık üyelik 750 TL, öğrenci üyeliği 550 TL, yıllık üyelik 7500 TL'dir. Sabah 07:00 ile gece 23:00 arası açığız, pazar günleri 09:00-18:00 arası hizmet veriyoruz. Adresimiz Cumhuriyet Mahallesi Spor Caddesi No 42 Merkez, telefonumuz 0312 000 00 00, ayrıca pilates, yoga, spinning, kickboks ve yüzme dersleri de mevcuttur, detaylı bilgi için lütfen bizi arayınız veya salonumuza uğrayınız.</p>
+<p class="b">ÜYE OLMAK İÇİN TIKLAYINIZ</p>
+<p>Bizi sosyal medyadan takip edin</p>
+</script>
+
+<script type="text/plain" data-src="hook-good">
+<style>
+body{color:#1f2937;line-height:1.55}
+header{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.1rem;border-bottom:1px solid #e5e7eb}
+.logo{font-weight:800;font-size:1.02rem;color:#0f766e;letter-spacing:-.01em}
+nav a{margin-left:.85rem;font-size:.82rem;color:#374151;text-decoration:none}
+.hero{padding:1.3rem 1.1rem;background:linear-gradient(180deg,#f0fdfa,#ffffff)}
+.hero h1{margin:0 0 .4rem;font-size:1.6rem;line-height:1.15;color:#0f172a;letter-spacing:-.02em}
+.hero p{margin:0 0 .8rem;font-size:.94rem;color:#475569;max-width:34ch}
+.cta{display:inline-block;background:#0f766e;color:#fff;text-decoration:none;font-weight:700;font-size:.9rem;padding:.55rem 1.1rem;border-radius:9px}
+.info{display:flex;gap:.7rem;padding:1rem 1.1rem}
+.box{flex:1;border:1px solid #e5e7eb;border-radius:11px;padding:.6rem .7rem}
+.box h3{margin:0 0 .2rem;font-size:.84rem;color:#0f766e}
+.box p{margin:0;font-size:.86rem;color:#475569}
+</style>
+<header><span class="logo">Yıldız Spor Salonu</span><nav><a href="#">Fiyatlar</a><a href="#">Dersler</a><a href="#">İletişim</a></nav></header>
+<div class="hero">
+  <h1>Ücretsiz deneme dersiyle başlayın</h1>
+  <p>Merkez'de, sabah 07:00'den gece 23:00'e kadar açık. Pilates, yoga ve spinning dersleri haftanın altı günü.</p>
+  <a class="cta" href="#">Deneme dersi al</a>
+</div>
+<div class="info">
+  <div class="box"><h3>Aylık üyelik</h3><p>750 TL · Öğrenci 550 TL</p></div>
+  <div class="box"><h3>Çalışma saatleri</h3><p>Hafta içi 07.00–23.00</p></div>
+  <div class="box"><h3>Adres</h3><p>Spor Caddesi No 42, Merkez</p></div>
+</div>
+</script>
+
+<script type="text/plain" data-src="icerik-bad">
+<style>
+body{padding:.9rem 1rem;color:#374151;line-height:1.5;font-size:.9rem}
+h1{font-size:1rem;margin:0 0 .5rem}
+</style>
+<h1>Kayıt</h1>
+<p>Okulumuza 2026-2027 eğitim öğretim yılı için yapılacak kayıtlar 1 Temmuz 2026 Çarşamba günü başlayacak olup 15 Ağustos 2026 Cuma günü mesai bitiminde sona erecektir, kayıt işlemleri için velilerin öğrencinin nüfus cüzdanı fotokopisi, ikametgâh belgesi, iki adet vesikalık fotoğraf, ilkokul diploması veya mezuniyet belgesi ve sağlık raporu ile birlikte okulumuz öğrenci işleri bürosuna şahsen başvurmaları gerekmektedir, başvurular hafta içi her gün 09.00 ile 16.00 saatleri arasında alınacak olup öğle arası 12.00-13.00 saatleri arasında işlem yapılmayacaktır, nakil başvuruları ise e-Okul sistemi üzerinden yapılmakta olup şahsen başvuru gerektirmemektedir, kontenjan dolduğu takdirde başvurular sıraya alınacak ve velilere telefonla bilgi verilecektir, ayrıntılı bilgi için 0312 000 00 00 numaralı telefondan öğrenci işlerine ulaşabilirsiniz.</p>
+</script>
+
+<script type="text/plain" data-src="icerik-good">
+<style>
+body{padding:.9rem 1rem;color:#374151;line-height:1.6;font-size:.9rem}
+h1{font-size:1.1rem;margin:0 0 .1rem;color:#0f172a}
+.lead{margin:0 0 .7rem;color:#0f766e;font-weight:700;font-size:.9rem}
+h2{font-size:.9rem;margin:.8rem 0 .3rem;color:#0f172a}
+ul{margin:.2rem 0;padding-left:1.15rem}
+li{margin:.14rem 0}
+.note{margin-top:.7rem;border-left:3px solid #0f766e;background:#f0fdfa;padding:.4rem .6rem;font-size:.86rem}
+</style>
+<h1>2026-2027 Kayıt Rehberi</h1>
+<p class="lead">Kayıtlar 1 Temmuz – 15 Ağustos 2026 tarihleri arasında yapılacaktır.</p>
+<h2>Gerekli belgeler</h2>
+<ul>
+  <li>Nüfus cüzdanı fotokopisi</li>
+  <li>İkametgâh belgesi</li>
+  <li>2 adet vesikalık fotoğraf</li>
+  <li>Diploma veya mezuniyet belgesi</li>
+  <li>Sağlık raporu</li>
+</ul>
+<h2>Başvuru saatleri</h2>
+<ul>
+  <li>Hafta içi <b>09.00 – 16.00</b></li>
+  <li>Öğle arası 12.00 – 13.00 arasında işlem yapılmaz</li>
+</ul>
+<div class="note"><b>Nakil başvurusu yapacaklar:</b> Nakiller e-Okul üzerinden yapılır, okula gelmeniz gerekmez.</div>
+</script>
+
+<script type="text/plain" data-src="hiyerarsi-bad">
+<style>
+body{padding:.9rem 1rem;color:#333;font-size:.88rem;line-height:1.5}
+p{margin:.3rem 0}
+a{color:#333}
+</style>
+<p>Kampüs Teknoloji Günleri</p>
+<p>Etkinlik takvimi ve kayıt bilgileri</p>
+<p>12 Mayıs 2026 Salı</p>
+<p>Mühendislik Fakültesi Konferans Salonu</p>
+<p>Yapay zekâ, siber güvenlik ve robotik alanlarında sekiz oturum düzenlenecektir.</p>
+<p>Katılım ücretsizdir ancak kayıt zorunludur.</p>
+<p>Kayıt ol</p>
+<p>Programı indir</p>
+<p>Geçen yılın fotoğrafları</p>
+<p>Sponsorlarımız</p>
+<p>Ulaşım bilgisi</p>
+</script>
+
+<script type="text/plain" data-src="hiyerarsi-good">
+<style>
+body{padding:1rem 1.1rem;color:#334155;font-size:.88rem;line-height:1.55}
+.kicker{font-size:.74rem;font-weight:800;letter-spacing:.09em;color:#7c3aed;margin:0 0 .25rem}
+h1{font-size:1.5rem;line-height:1.15;margin:0 0 .35rem;color:#0f172a;letter-spacing:-.02em}
+.meta{font-size:.92rem;font-weight:700;color:#0f172a;margin:0 0 .5rem}
+.desc{margin:0 0 .8rem;color:#475569;max-width:42ch}
+.btn{display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;font-weight:700;font-size:.88rem;padding:.5rem 1rem;border-radius:9px}
+.btn2{display:inline-block;margin-left:.5rem;color:#7c3aed;font-weight:600;font-size:.86rem;text-decoration:none}
+.small{margin-top:.9rem;font-size:.78rem;color:#94a3b8}
+.small a{color:#94a3b8;margin-right:.7rem}
+</style>
+<p class="kicker">ETKİNLİK</p>
+<h1>Kampüs Teknoloji Günleri</h1>
+<p class="meta">12 Mayıs 2026 · Mühendislik Fakültesi Konferans Salonu</p>
+<p class="desc">Yapay zekâ, siber güvenlik ve robotik alanlarında sekiz oturum. Katılım ücretsizdir, kayıt zorunludur.</p>
+<a class="btn" href="#">Kayıt ol</a><a class="btn2" href="#">Programı indir</a>
+<p class="small"><a href="#">Geçen yılın fotoğrafları</a><a href="#">Sponsorlarımız</a><a href="#">Ulaşım</a></p>
+</script>
+
+<script type="text/plain" data-src="hizalama-bad">
+<style>
+body{padding:.6rem;background:#fff;color:#334155;font-size:.82rem}
+h1{font-size:1rem;margin:0 0 .3rem 14px}
+.k{border:1px solid #cbd5e1;padding:5px;margin:2px 0 3px 0;display:inline-block;vertical-align:top}
+.k h3{margin:0 0 1px;font-size:.84rem;color:#0f172a}
+.k p{margin:0;font-size:.76rem;color:#64748b}
+.a{width:47%;margin-left:9px}
+.b{width:44%;margin-left:3px}
+.c{width:52%;margin-left:22px}
+.d{width:38%;margin-left:6px}
+</style>
+<h1>Yeni Çıkanlar</h1>
+<div class="k a"><h3>Kayıp Zaman</h3><p>Roman · 240 sayfa · 145 TL</p></div>
+<div class="k b"><h3>Deniz Feneri</h3><p>Roman · 312 sayfa · 165 TL</p></div>
+<div class="k c"><h3>Şehrin Sesleri</h3><p>Öykü · 180 sayfa · 120 TL</p></div>
+<div class="k d"><h3>Uzak Adalar</h3><p>Gezi · 205 sayfa</p></div>
+</script>
+
+<script type="text/plain" data-src="hizalama-good">
+<style>
+body{padding:1rem;background:#fff;color:#334155;font-size:.82rem}
+h1{font-size:1.05rem;margin:0 0 .8rem;color:#0f172a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.k{border:1px solid #e2e8f0;border-radius:10px;padding:.6rem .7rem}
+.k h3{margin:0 0 .2rem;font-size:.88rem;color:#0f172a}
+.k p{margin:0;font-size:.78rem;color:#64748b}
+.k .pr{margin-top:.35rem;font-weight:700;color:#0f172a;font-size:.82rem}
+</style>
+<h1>Yeni Çıkanlar</h1>
+<div class="grid">
+  <div class="k"><h3>Kayıp Zaman</h3><p>Roman · 240 sayfa</p><p class="pr">145 TL</p></div>
+  <div class="k"><h3>Deniz Feneri</h3><p>Roman · 312 sayfa</p><p class="pr">165 TL</p></div>
+  <div class="k"><h3>Şehrin Sesleri</h3><p>Öykü · 180 sayfa</p><p class="pr">120 TL</p></div>
+  <div class="k"><h3>Uzak Adalar</h3><p>Gezi · 205 sayfa</p><p class="pr">135 TL</p></div>
+</div>
+</script>
+
+<script type="text/plain" data-src="yakinlik-bad">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:1rem;margin:0 0 .8rem;color:#0f172a}
+label{display:block;font-size:.82rem;color:#475569}
+label{margin-bottom:1.5rem}
+input{display:block;width:92%;padding:.35rem .5rem;border:1px solid #cbd5e1;border-radius:6px;font-size:.85rem;margin-bottom:.12rem}
+</style>
+<h1>Festival Başvuru Formu</h1>
+<label>Ad Soyad</label>
+<input value="">
+<label>E-posta</label>
+<input value="">
+<label>Telefon</label>
+<input value="">
+</script>
+
+<script type="text/plain" data-src="yakinlik-good">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:1rem;margin:0 0 .8rem;color:#0f172a}
+.f{margin-bottom:.9rem}
+label{display:block;font-size:.82rem;color:#475569;margin-bottom:.22rem;font-weight:600}
+input{display:block;width:92%;padding:.4rem .5rem;border:1px solid #cbd5e1;border-radius:6px;font-size:.85rem}
+</style>
+<h1>Festival Başvuru Formu</h1>
+<div class="f"><label>Ad Soyad</label><input value=""></div>
+<div class="f"><label>E-posta</label><input value=""></div>
+<div class="f"><label>Telefon</label><input value=""></div>
+</script>
+
+<script type="text/plain" data-src="tipo-bad">
+<style>
+body{padding:.7rem .8rem;color:#4b5563;font-family:"Times New Roman",serif}
+h1{font-size:.95rem;margin:0 0 .2rem;color:#4b5563;font-weight:normal}
+p{font-size:11px;line-height:1.1;margin:0 0 .35rem;text-align:justify}
+</style>
+<h1>Kara delikler nasıl oluşur?</h1>
+<p>Bir yıldız, çekirdeğindeki nükleer yakıtı tükettiğinde kendi ağırlığını taşıyamaz hâle gelir. Yıldızın dış katmanları merkeze doğru çöker ve bu çöküş, yıldızın kütlesine bağlı olarak farklı sonuçlar doğurur. Güneş kütlesinin yaklaşık yirmi katından daha ağır yıldızlarda çöküş hiçbir kuvvet tarafından durdurulamaz ve madde giderek küçülen bir hacme sıkışır.</p>
+<p>Bu sıkışma sonucunda öyle bir sınır oluşur ki, bu sınırın içine giren hiçbir şey — ışık bile — dışarı çıkamaz. Olay ufku adı verilen bu sınır, kara deliğin görünen büyüklüğünü belirler. Olay ufkunun içinde kalan bölge hakkında doğrudan gözlem yapmak mümkün değildir; çünkü oradan bize hiçbir bilgi ulaşmaz.</p>
+<p>Kara delikleri yine de gözleyebiliriz. Çevresindeki gaz, kara deliğe doğru çekilirken hızlanır, ısınır ve güçlü ışıma yayar. Astronomlar bu ışımayı ve yakındaki yıldızların olağan dışı yörüngelerini ölçerek kara deliğin yerini ve kütlesini hesaplayabilir.</p>
+</script>
+
+<script type="text/plain" data-src="tipo-good">
+<style>
+body{padding:1rem 1.1rem;color:#1f2937}
+.wrap{max-width:36em}
+h1{font-size:1.25rem;line-height:1.2;margin:0 0 .55rem;color:#0f172a;letter-spacing:-.015em}
+p{font-size:1rem;line-height:1.65;margin:0 0 .75rem}
+</style>
+<div class="wrap">
+<h1>Kara delikler nasıl oluşur?</h1>
+<p>Bir yıldız, çekirdeğindeki nükleer yakıtı tükettiğinde kendi ağırlığını taşıyamaz hâle gelir. Yıldızın dış katmanları merkeze doğru çöker ve bu çöküş, yıldızın kütlesine bağlı olarak farklı sonuçlar doğurur. Güneş kütlesinin yaklaşık yirmi katından daha ağır yıldızlarda çöküş hiçbir kuvvet tarafından durdurulamaz ve madde giderek küçülen bir hacme sıkışır.</p>
+<p>Bu sıkışma sonucunda öyle bir sınır oluşur ki, bu sınırın içine giren hiçbir şey — ışık bile — dışarı çıkamaz. Olay ufku adı verilen bu sınır, kara deliğin görünen büyüklüğünü belirler. Olay ufkunun içinde kalan bölge hakkında doğrudan gözlem yapmak mümkün değildir; çünkü oradan bize hiçbir bilgi ulaşmaz.</p>
+<p>Kara delikleri yine de gözleyebiliriz. Çevresindeki gaz, kara deliğe doğru çekilirken hızlanır, ısınır ve güçlü ışıma yayar. Astronomlar bu ışımayı ve yakındaki yıldızların olağan dışı yörüngelerini ölçerek kara deliğin yerini ve kütlesini hesaplayabilir.</p>
+</div>
+</script>
+
+<script type="text/plain" data-src="iliski-bad">
+<style>
+body{padding:.8rem;color:#334155;font-size:.82rem}
+h1{font-size:1rem;margin:0 0 .6rem;color:#0f172a}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.c{border:1px solid #e2e8f0;border-radius:10px;padding:.5rem .6rem}
+.c h3{margin:0 0 .25rem;font-size:.86rem;color:#2563eb}
+.c p{margin:.1rem 0;font-size:.78rem;color:#475569}
+</style>
+<h1>9-A Ders Programı</h1>
+<div class="g">
+  <div class="c"><h3>Pazartesi</h3><p>1. Matematik</p><p>2. Türk Dili</p><p>3. Fizik</p><p>4. Programlama</p></div>
+  <div class="c"><h3>Salı</h3><p>1. Programlama</p><p>2. Programlama</p><p>3. İngilizce</p><p>4. Beden Eğitimi</p></div>
+  <div class="c"><h3>Çarşamba</h3><p>1. Kimya</p><p>2. Matematik</p><p>3. Tarih</p><p>4. Web Tasarım</p></div>
+  <div class="c"><h3>Perşembe</h3><p>1. Web Tasarım</p><p>2. Web Tasarım</p><p>3. Biyoloji</p><p>4. Coğrafya</p></div>
+  <div class="c"><h3>Cuma</h3><p>1. İngilizce</p><p>2. Fizik</p><p>3. Matematik</p><p>4. Görsel Sanatlar</p></div>
+</div>
+</script>
+
+<script type="text/plain" data-src="iliski-good">
+<style>
+body{padding:.9rem;color:#334155;font-size:.82rem}
+h1{font-size:1rem;margin:0 0 .6rem;color:#0f172a}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th,td{border:1px solid #e2e8f0;padding:.32rem .4rem;text-align:left}
+th{background:#f1f5f9;color:#0f172a;font-size:.75rem}
+th.saat{width:3.4rem}
+td.saat{background:#f8fafc;font-weight:700;color:#0f172a}
+</style>
+<h1>9-A Ders Programı</h1>
+<table>
+  <tr><th class="saat">Saat</th><th>Pazartesi</th><th>Salı</th><th>Çarşamba</th><th>Perşembe</th><th>Cuma</th></tr>
+  <tr><td class="saat">1.</td><td>Matematik</td><td>Programlama</td><td>Kimya</td><td>Web Tasarım</td><td>İngilizce</td></tr>
+  <tr><td class="saat">2.</td><td>Türk Dili</td><td>Programlama</td><td>Matematik</td><td>Web Tasarım</td><td>Fizik</td></tr>
+  <tr><td class="saat">3.</td><td>Fizik</td><td>İngilizce</td><td>Tarih</td><td>Biyoloji</td><td>Matematik</td></tr>
+  <tr><td class="saat">4.</td><td>Programlama</td><td>Beden Eğitimi</td><td>Web Tasarım</td><td>Coğrafya</td><td>Görsel Sanatlar</td></tr>
+</table>
+</script>
+
+<script type="text/plain" data-src="renk-bad">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:1rem;margin:0 0 .7rem;color:#0f172a}
+.f{margin-bottom:.75rem}
+label{display:block;font-size:.8rem;color:#475569;margin-bottom:.2rem;font-weight:600}
+input{width:92%;padding:.4rem .5rem;border:1px solid #cbd5e1;border-radius:6px;font-size:.85rem}
+input.err{border:2px solid #dc2626}
+button{background:#2563eb;color:#fff;border:0;border-radius:7px;padding:.45rem 1rem;font-size:.85rem;font-weight:700}
+</style>
+<h1>Üye Ol</h1>
+<div class="f"><label>Ad Soyad</label><input value="Elif Yılmaz"></div>
+<div class="f"><label>E-posta</label><input class="err" value="elif.yilmaz@"></div>
+<div class="f"><label>Doğum Tarihi</label><input class="err" value="31/02/2009"></div>
+<button>Kaydı Tamamla</button>
+</script>
+
+<script type="text/plain" data-src="renk-good">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:1rem;margin:0 0 .7rem;color:#0f172a}
+.f{margin-bottom:.75rem}
+label{display:block;font-size:.8rem;color:#475569;margin-bottom:.2rem;font-weight:600}
+input{width:92%;padding:.4rem .5rem;border:1px solid #cbd5e1;border-radius:6px;font-size:.85rem}
+input.err{border:2px solid #b91c1c;background:#fef2f2}
+.msg{display:flex;gap:.3rem;align-items:flex-start;margin-top:.22rem;font-size:.78rem;color:#b91c1c;font-weight:600}
+.msg span.i{flex:0 0 auto;font-weight:800}
+button{background:#2563eb;color:#fff;border:0;border-radius:7px;padding:.45rem 1rem;font-size:.85rem;font-weight:700}
+</style>
+<h1>Üye Ol</h1>
+<div class="f"><label>Ad Soyad</label><input value="Elif Yılmaz"></div>
+<div class="f"><label>E-posta</label><input class="err" value="elif.yilmaz@"><p class="msg"><span class="i">⚠</span><span>E-posta adresi eksik. Örnek: elif.yilmaz@ornek.com</span></p></div>
+<div class="f"><label>Doğum Tarihi</label><input class="err" value="31/02/2009"><p class="msg"><span class="i">⚠</span><span>Şubat ayı 31 gün çekmez. Tarihi GG/AA/YYYY biçiminde yazın.</span></p></div>
+<button>Kaydı Tamamla</button>
+</script>
+
+<script type="text/plain" data-src="form-bad">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:1rem;margin:0 0 .6rem;color:#0f172a}
+input{display:block;width:92%;padding:.4rem .5rem;border:1px solid #cbd5e1;border-radius:6px;font-size:.85rem;margin-bottom:.5rem}
+.e{background:#fee2e2;color:#7f1d1d;padding:.35rem .5rem;border-radius:6px;font-size:.8rem;margin-bottom:.6rem}
+button{background:#64748b;color:#fff;border:0;border-radius:7px;padding:.45rem 1rem;font-size:.85rem}
+</style>
+<h1>Randevu Başvurusu</h1>
+<p class="e">Hatalı giriş. Lütfen kontrol ediniz.</p>
+<input placeholder="Ad Soyad">
+<input placeholder="TC">
+<input placeholder="Tarih">
+<input placeholder="Tel">
+<button>Gönder</button>
+</script>
+
+<script type="text/plain" data-src="form-good">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:1rem;margin:0 0 .15rem;color:#0f172a}
+.step{font-size:.76rem;color:#0f766e;font-weight:700;margin:0 0 .6rem}
+.f{margin-bottom:.65rem}
+label{display:block;font-size:.8rem;color:#334155;font-weight:600;margin-bottom:.2rem}
+.hint{font-size:.73rem;color:#64748b;margin:.15rem 0 0}
+input{display:block;width:92%;padding:.42rem .5rem;border:1px solid #cbd5e1;border-radius:6px;font-size:.85rem}
+input.err{border:2px solid #b91c1c;background:#fef2f2}
+.msg{font-size:.75rem;color:#b91c1c;font-weight:600;margin:.2rem 0 0}
+button{background:#0f766e;color:#fff;border:0;border-radius:7px;padding:.5rem 1.1rem;font-size:.85rem;font-weight:700}
+</style>
+<h1>Randevu Başvurusu</h1>
+<p class="step">Adım 1 / 2 — Kişisel bilgiler</p>
+<div class="f"><label>Ad Soyad</label><input value="Mehmet Kaya"></div>
+<div class="f"><label>T.C. Kimlik Numarası</label><input class="err" value="1234567"><p class="msg">⚠ Kimlik numarası 11 haneli olmalıdır. 7 hane girdiniz.</p></div>
+<div class="f"><label>Randevu Tarihi</label><input value="12.05.2026"><p class="hint">GG.AA.YYYY biçiminde yazınız.</p></div>
+<div class="f"><label>Cep Telefonu</label><input value="0555 000 00 00"><p class="hint">Onay kodu bu numaraya gönderilecektir.</p></div>
+<button>Devam Et</button>
+</script>
+
+<script type="text/plain" data-src="hedef-bad">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:.95rem;margin:0 0 .5rem;color:#0f172a}
+a{display:block;color:#1d4ed8;font-size:11px;line-height:15px;text-decoration:underline}
+.w{border:1px dashed #cbd5e1;display:inline-block;padding:.3rem .4rem;margin-top:.5rem;font-size:.72rem;color:#64748b}
+</style>
+<h1>Hizmetler</h1>
+<a href="#">Su Faturası Ödeme</a>
+<a href="#">Emlak Vergisi</a>
+<a href="#">Evlendirme İşlemleri</a>
+<a href="#">İmar Durumu Sorgulama</a>
+<a href="#">Beyaz Masa Başvurusu</a>
+<a href="#">Nöbetçi Eczaneler</a>
+<div class="w">Her bağlantının yüksekliği yaklaşık 15 piksel</div>
+</script>
+
+<script type="text/plain" data-src="hedef-good">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:.95rem;margin:0 0 .55rem;color:#0f172a}
+a{display:block;color:#1d4ed8;font-size:.86rem;min-height:44px;line-height:44px;padding:0 .6rem;text-decoration:none;border-bottom:1px solid #e2e8f0}
+a:first-of-type{border-top:1px solid #e2e8f0}
+.w{border:1px dashed #cbd5e1;display:inline-block;padding:.3rem .4rem;margin-top:.55rem;font-size:.72rem;color:#64748b}
+</style>
+<h1>Hizmetler</h1>
+<a href="#">Su Faturası Ödeme</a>
+<a href="#">Emlak Vergisi</a>
+<a href="#">Evlendirme İşlemleri</a>
+<a href="#">İmar Durumu Sorgulama</a>
+<a href="#">Beyaz Masa Başvurusu</a>
+<div class="w">Her bağlantının yüksekliği 44 piksel</div>
+</script>
+
+<script type="text/plain" data-src="cls">
+<style>
+body{padding:0;color:#334155;font-size:.85rem}
+.ad{height:0;background:#fde68a;color:#78350f;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;overflow:hidden;animation:gel 0s linear 1.2s forwards}
+@keyframes gel{to{height:74px}}
+.wrap{padding:.8rem 1rem}
+h1{font-size:1.05rem;margin:0 0 .4rem;color:#0f172a}
+p{margin:0 0 .6rem;line-height:1.55;font-size:.84rem}
+a.btn{display:inline-block;background:#1d4ed8;color:#fff;text-decoration:none;font-weight:700;font-size:.84rem;padding:.45rem 1rem;border-radius:8px}
+.after{margin-top:.7rem;font-size:.78rem;color:#64748b}
+</style>
+<div class="ad">REKLAM ALANI</div>
+<div class="wrap">
+  <h1>Bugünün gündem özeti</h1>
+  <p>Sayfa açıldığında bu metin en üstte görünür ve okuyucu okumaya başlar. Ancak sayfa için ayrılmamış bir alan sonradan yüklenir.</p>
+  <a class="btn" href="#">Haberin devamını oku</a>
+  <p class="after">Yaklaşık bir saniye sonra üstteki banner geldiğinde bu butonun ekrandaki yeri değişir.</p>
+</div>
+</script>
+
+<script type="text/plain" data-src="guncel-bad">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:1rem;margin:0 0 .6rem;color:#0f172a}
+.e{border:1px solid #e2e8f0;border-radius:9px;padding:.5rem .6rem;margin-bottom:.45rem}
+.e h3{margin:0 0 .15rem;font-size:.86rem;color:#0f172a}
+.e p{margin:0;font-size:.78rem;color:#64748b}
+.b{display:inline-block;background:#fee2e2;color:#7f1d1d;font-size:.7rem;font-weight:700;padding:.05rem .35rem;border-radius:5px;margin-top:.25rem}
+footer{margin-top:.8rem;font-size:.75rem;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:.4rem}
+</style>
+<h1>Yaklaşan Etkinlikler</h1>
+<div class="e"><h3>Yaz Konserleri</h3><p>18 Temmuz 2021 · Açık Hava Sahnesi</p><span class="b">Bilet al</span></div>
+<div class="e"><h3>Çocuk Tiyatrosu Şenliği</h3><p>3 Nisan 2020 · Küçük Salon</p><span class="b">Bilet al</span></div>
+<div class="e"><h3>Fotoğraf Sergisi</h3><p>12 Aralık 2019 · Fuaye</p><span class="b">Bilet al</span></div>
+<footer>© 2019 Kültür Sanat Merkezi · Son güncelleme: 04.11.2019</footer>
+</script>
+
+<script type="text/plain" data-src="guncel-good">
+<style>
+body{padding:.9rem 1rem;color:#334155;font-size:.85rem}
+h1{font-size:1rem;margin:0 0 .6rem;color:#0f172a}
+.e{border:1px solid #e2e8f0;border-radius:9px;padding:.5rem .6rem;margin-bottom:.45rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.e h3{margin:0 0 .15rem;font-size:.86rem;color:#0f172a}
+.e p{margin:0;font-size:.78rem;color:#64748b}
+.b{background:#0f766e;color:#fff;font-size:.76rem;font-weight:700;padding:.3rem .6rem;border-radius:6px;white-space:nowrap}
+.past{background:#f1f5f9;color:#64748b}
+footer{margin-top:.8rem;font-size:.75rem;color:#64748b;border-top:1px solid #e2e8f0;padding-top:.4rem}
+</style>
+<h1>Yaklaşan Etkinlikler</h1>
+<div class="e"><div><h3>Yaz Konserleri</h3><p>18 Temmuz 2026 · Açık Hava Sahnesi</p></div><span class="b">Bilet al</span></div>
+<div class="e"><div><h3>Çocuk Tiyatrosu Şenliği</h3><p>26 Eylül 2026 · Küçük Salon</p></div><span class="b">Bilet al</span></div>
+<div class="e"><div><h3>Fotoğraf Sergisi</h3><p>2 Mart 2026 · Fuaye</p></div><span class="b past">Sona erdi</span></div>
+<footer>© 2026 Kültür Sanat Merkezi · Son güncelleme: 01.09.2026</footer>
+</script>
+
+
+
+<script type="text/plain" data-src="rwd">
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+html{font-size:17px}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;color:#334155}
+img{max-width:100%}
+.bar{display:flex;align-items:center;justify-content:space-between;
+     padding:.6rem .9rem;border-bottom:1px solid #e2e8f0}
+.logo{font-weight:800;color:#0f766e;font-size:.95rem}
+.menu{display:none;list-style:none;margin:0;padding:0;gap:1rem}
+.menu a{color:#334155;text-decoration:none;font-size:.85rem}
+.hamb{font-size:1.1rem;border:1px solid #cbd5e1;border-radius:7px;
+      padding:.15rem .45rem;background:#fff}
+.hero{padding:1rem .9rem;background:#f0fdfa}
+.hero h1{margin:0 0 .3rem;font-size:1.15rem;color:#0f172a;line-height:1.2}
+.hero p{margin:0;font-size:.85rem;color:#475569}
+.grid{display:grid;grid-template-columns:1fr;gap:.7rem;padding:.9rem}
+.card{border:1px solid #e2e8f0;border-radius:11px;overflow:hidden}
+.ph{height:64px;background:linear-gradient(120deg,#99f6e4,#a5b4fc)}
+.card h3{margin:.45rem .6rem .15rem;font-size:.88rem;color:#0f172a}
+.card p{margin:0 .6rem .55rem;font-size:.78rem;color:#64748b}
+/*KOD*/
+@media (min-width: 600px){
+  .grid{ grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 900px){
+  .grid{ grid-template-columns: 1fr 1fr 1fr; }
+  .menu{ display: flex; }
+  .hamb{ display: none; }
+  .hero h1{ font-size: 1.6rem; }
+}
+/*KOD-SON*/
+</style>
+</head>
+<body>
+<div class="bar">
+  <span class="logo">Gezi Rehberi</span>
+  <ul class="menu"><li><a href="#">Rotalar</a></li><li><a href="#">Şehirler</a></li><li><a href="#">Rehberler</a></li><li><a href="#">İletişim</a></li></ul>
+  <button class="hamb">☰</button>
+</div>
+<div class="hero">
+  <h1>Hafta sonu rotaları</h1>
+  <p>İki günde tamamlanabilen, toplu taşımayla ulaşılabilen gezi önerileri.</p>
+</div>
+<div class="grid">
+  <div class="card"><div class="ph"></div><h3>Safranbolu</h3><p>Tarihî konaklar · 2 gün</p></div>
+  <div class="card"><div class="ph"></div><h3>Amasra</h3><p>Sahil ve kale · 2 gün</p></div>
+  <div class="card"><div class="ph"></div><h3>Beypazarı</h3><p>Sokak dokusu · 1 gün</p></div>
+  <div class="card"><div class="ph"></div><h3>Göynük</h3><p>Ahşap evler · 1 gün</p></div>
+  <div class="card"><div class="ph"></div><h3>Eğirdir</h3><p>Göl kıyısı · 2 gün</p></div>
+  <div class="card"><div class="ph"></div><h3>Kula</h3><p>Volkanik araziler · 2 gün</p></div>
+</div>
+</body>
+</html>
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- önizleme kaynakları: tek kaynak ilkesi ---------- */
+  var SRC = {};
+  Array.prototype.forEach.call(
+    document.querySelectorAll('script[type="text/plain"][data-src]'),
+    function(el){ SRC[el.getAttribute('data-src')] = el.textContent.replace(/^\s+/, ''); }
+  );
+
+  var BASE =
+    '<!doctype html><html lang="tr"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<style>html{font-size:17px}*{box-sizing:border-box}' +
+    'body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;' +
+    'color:#111827;background:#fff}img{max-width:100%}</style></head><body>';
+
+  function build(name){
+    var s = SRC[name] || '';
+    if (/^<!doctype/i.test(s)) return s;
+    return BASE + s + '</body></html>';
+  }
+
+  /* ---------- kod paneli: rwd kaynağından üretilir ---------- */
+  function esc(t){
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  (function fillCode(){
+    var pre = document.getElementById('code-rwd');
+    if(!pre) return;
+    var s = SRC['rwd'] || '';
+    var meta = s.match(/<meta name="viewport"[^>]*>/);
+    var blok = s.match(/\/\*KOD\*\/([\s\S]*?)\/\*KOD-SON\*\//);
+    var out = '';
+    if(meta){
+      out += '<span class="c">&lt;!-- 1. Görüntü alanı etiketi --&gt;</span>\n';
+      out += '<span class="t">' + esc(meta[0]) + '</span>\n\n';
+    }
+    if(blok){
+      out += '<span class="c">/* 3. Ortam sorguları */</span>\n';
+      out += esc(blok[1].replace(/^\n+|\n+$/g,''))
+               .replace(/(@media[^{]*)/g,'<span class="a">$1</span>');
+    }
+    pre.innerHTML = out;
+  })();
+
+  /* ---------- iframe doldurma ---------- */
+  function fill(iframe){
+    iframe.srcdoc = build(iframe.getAttribute('data-demo'));
+  }
+  function fillSlide(slide){
+    Array.prototype.forEach.call(slide.querySelectorAll('iframe[data-demo]'), fill);
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.reset'), function(btn){
+    btn.addEventListener('click', function(){
+      var f = btn.parentNode.querySelector('iframe[data-demo]');
+      if(f) fill(f);
+    });
+  });
+
+  /* ---------- duyarlı çerçevelerin ölçeklenmesi ---------- */
+  function layoutVp(slide){
+    Array.prototype.forEach.call(slide.querySelectorAll('.vp'), function(vp){
+      var f = vp.querySelector('iframe');
+      if(!f) return;
+      var w = parseInt(f.getAttribute('data-w'), 10);
+      var cw = vp.clientWidth, ch = vp.clientHeight;
+      if(!w || !cw || !ch) return;
+      var k = cw / w;
+      f.style.width  = w + 'px';
+      f.style.height = (ch / k) + 'px';
+      f.style.transform = 'scale(' + k + ')';
+    });
+  }
+
+  /* ---------- az icerikli slaytlarda dikey dengeleme ---------- */
+  function balance(slide){
+    slide.classList.remove('mid');
+    if(slide.classList.contains('cover')) return;
+    var h = 0, kids = slide.children;
+    for(var i=0;i<kids.length;i++){ h += kids[i].getBoundingClientRect().height; }
+    var gap = parseFloat(getComputedStyle(slide).rowGap) || 0;
+    h += gap * Math.max(0, kids.length - 1);
+    if(h < slide.clientHeight * 0.82) slide.classList.add('mid');
+  }
+
+  /* ---------- slayt gezinme ---------- */
+  var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var counter = document.getElementById('counter');
+  var barfill = document.getElementById('barfill');
+  var cur = -1;
+
+  function show(i){
+    if(i < 0 || i >= slides.length || i === cur) return;
+    if(cur >= 0){ slides[cur].classList.remove('show','on'); }
+    cur = i;
+    var s = slides[cur];
+    s.classList.add('on');
+    fillSlide(s);
+    void s.offsetWidth;
+    s.classList.add('show');
+    counter.textContent = (cur + 1) + ' / ' + slides.length;
+    barfill.style.width = ((cur + 1) / slides.length * 100) + '%';
+    balance(s);
+    layoutVp(s);
+    setTimeout(function(){ balance(s); layoutVp(s); }, 60);
+    if(location.hash !== '#' + (cur + 1)){
+      history.replaceState(null, '', '#' + (cur + 1));
+    }
+  }
+
+  document.getElementById('next').addEventListener('click', function(){ show(cur + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ show(cur - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); show(cur + 1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); show(cur - 1); }
+    else if(e.key === 'Home'){ e.preventDefault(); show(0); }
+    else if(e.key === 'End'){ e.preventDefault(); show(slides.length - 1); }
+  });
+
+  window.addEventListener('resize', function(){
+    if(cur >= 0) layoutVp(slides[cur]);
+  });
+
+  var start = parseInt((location.hash || '').replace('#',''), 10);
+  show(start >= 1 && start <= slides.length ? start - 1 : 0);
+})();
+</script>
+</body>
+</html>

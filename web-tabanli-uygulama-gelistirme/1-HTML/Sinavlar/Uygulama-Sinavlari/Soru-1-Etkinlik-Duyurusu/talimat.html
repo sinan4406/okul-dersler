@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uygulama Sorusu 1 — Etkinlik Duyurusu</title>
+<link rel="stylesheet" href="../sinav.css">
+<style>
+  .pts{float:right;font-weight:700;color:var(--brand)}
+  .chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+  .chk span.p{margin-left:auto;color:var(--muted);white-space:nowrap}
+  .total{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;text-align:center;font-weight:700}
+  pre.tree{background:var(--bg);border:1px solid var(--line);padding:12px;border-radius:8px;overflow:auto}
+  details{margin:10px 0}summary{cursor:pointer;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Uygulama Sorusu 1 — Etkinlik Duyurusu Sayfası</h1>
+    <p class="sub">Kapsam: 1.2 Belge İskeleti · 1.3 Metin ve İçerik · 1.4 Listeler · 1.5 Bağlantılar</p>
+    <div class="meta"><span class="chip">Süre: 45 dakika</span><span class="chip">Toplam: 100 puan</span><span class="chip">Teslim: tek dosya <code>index.html</code></span></div>
+
+    <h2>Sınav talimatları</h2>
+    <ul class="rules">
+      <li>Boş bir klasör açın ve içine <code>index.html</code> adlı tek bir dosya oluşturun. Kodu bir metin/kod düzenleyicide <strong>kendiniz yazın</strong>.</li>
+      <li>Yalnızca <strong>HTML</strong> kullanın. CSS ve JavaScript yazmayın; görünüm değil <strong>doğru etiket seçimi</strong> değerlendirilir.</li>
+      <li>Etiketleri görünüşe göre değil <strong>anlamına</strong> göre seçin (ör. başlık küçük görünsün diye <code>h5</code> kullanmayın).</li>
+      <li>Her açılan etiketi kapatın (kapanış gerektirenleri), iç içe yerleşimi girintiyle düzenleyin.</li>
+      <li>Sınav bitince dosyayı tarayıcıda açıp tüm bağlantıları tek tek deneyin.</li>
+      <li>Aşağıdaki <strong>öz değerlendirme listesini</strong> kullanarak kendinizi puanlayabilirsiniz; ders sorumlusu aynı listeyle değerlendirir.</li>
+    </ul>
+
+    <h2>Senaryo</h2>
+    <p>Kadıköy Kitap Kulübü, bu ayki buluşması için bir duyuru sayfası istiyor. Aşağıdaki içeriği kullanarak sayfayı hazırlayın. Metinleri aynen yazmanız şart değil; ancak belirtilen <strong>yapıları</strong> eksiksiz kurun.</p>
+
+    <h2>İçerik</h2>
+    <ul class="rules">
+      <li><strong>Sayfa başlığı (sekmede):</strong> Kadıköy Kitap Kulübü — Mart Buluşması</li>
+      <li><strong>Ana başlık:</strong> Kadıköy Kitap Kulübü Mart Buluşması</li>
+      <li><strong>Bölümler:</strong> Hakkında · Program · Katılım · İletişim</li>
+      <li><strong>Hakkında:</strong> iki paragraf. İlkinde kulübün tanıtımı, ikincisinde “Kayıt için son tarih 10 Mart’tır” cümlesi; <em>son tarih</em> ifadesi <strong>güçlü önem</strong>, “bu ay” kelimesi <strong>vurgu</strong> ile işaretlensin. Bir de kısa bir <strong>uzun alıntı</strong> (kaynağı belli bir kitap sözü, kaynak adı <code>cite</code> ile) ve cümle içinde <strong>kısa alıntı</strong> bulunsun.</li>
+      <li><strong>Program:</strong> Etkinliğin saat saat akışı (5 adım, sıra önemli) — numaralandırma <code>3</code>’ten başlasın (önceki sayfadaki 2 adımın devamı).</li>
+      <li><strong>Katılım:</strong> “Getirmeniz gerekenler” (sıra önemsiz), bunlardan birinin altında iç içe alt liste; ayrıca <strong>ad–değer</strong> biçiminde Tarih, Yer, Ücret bilgisi. Salon büyüklüğü “45 m²” (üst simge), havalandırma notunda “CO₂” (alt simge) etiketlerle yazılsın.</li>
+      <li><strong>İletişim:</strong> Adres (satır sonlarıyla), e-posta ve telefon bağlantısı, kulübün dış sitesine bağlantı, kayıt formu PDF’ine indirme bağlantısı.</li>
+    </ul>
+
+    <h2>Zorunlu gereksinimler</h2>
+    <ol class="rules">
+      <li>Sayfanın en üstünde bir <strong>İçindekiler</strong> bulunsun; her bölüme <strong>sayfa içi bağlantı</strong> ile gidilsin.</li>
+      <li>Sayfa sonunda “Başa dön” bağlantısı olsun.</li>
+      <li>Bölümler arasında <strong>konu geçişi</strong> belirtilsin.</li>
+      <li>Dış site bağlantısı <strong>yeni sekmede</strong> açılsın ve güvenli olsun.</li>
+      <li>Kayıt formu bağlantısı tıklanınca <strong>indirilsin</strong> (<code>kayit-formu.pdf</code> dosyası olmasa da bağlantı doğru yazılmalıdır).</li>
+      <li>Bağlantı metinleri anlamlı olsun (“buraya tıklayın” yazmayın).</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Öz değerlendirme listesi</h2>
+    <p class="sub">Karşıladığınız maddeleri işaretleyin; toplam puan altta hesaplanır.</p>
+    <div id="list"></div>
+    <details><summary>Ders sorumlusu için ipuçları (örnek çözüm iskeleti)</summary>
+<pre class="code">&lt;!DOCTYPE html&gt;
+&lt;html lang="tr"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Kadıköy Kitap Kulübü — Mart Buluşması&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1 id="baslangic"&gt;Kadıköy Kitap Kulübü Mart Buluşması&lt;/h1&gt;
+  &lt;nav&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href="#hakkinda"&gt;Hakkında&lt;/a&gt;&lt;/li&gt; ...
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+  &lt;h2 id="program"&gt;Program&lt;/h2&gt;
+  &lt;ol start="3"&gt; &lt;li&gt;...&lt;/li&gt; &lt;/ol&gt;
+  &lt;dl&gt; &lt;dt&gt;Tarih&lt;/dt&gt; &lt;dd&gt;...&lt;/dd&gt; &lt;/dl&gt;
+  &lt;address&gt;...&lt;br&gt;...&lt;/address&gt;
+  &lt;a href="mailto:kulup@ornek.com"&gt;E-posta gönderin&lt;/a&gt;
+  &lt;a href="tel:+905551234567"&gt;Bizi arayın&lt;/a&gt;
+  &lt;a href="https://ornek.com" target="_blank" rel="noopener noreferrer"&gt;Kulüp sitesi&lt;/a&gt;
+  &lt;a href="kayit-formu.pdf" download&gt;Kayıt formunu indirin&lt;/a&gt;
+  &lt;a href="#baslangic"&gt;Başa dön&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+      Not: <code>address</code> 1.7 konusudur; kullanılmasa da <code>p</code> + <code>br</code> ile tam puan verilir.
+    </details>
+  </div>
+</div>
+<div class="total">Toplam: <span id="sum">0</span> / 100</div>
+
+<script>
+const items = [
+  ["Belge iskeleti (15)", [
+    ["<code>&lt;!DOCTYPE html&gt;</code> en üstte", 3],
+    ["<code>&lt;html lang=\"tr\"&gt;</code>", 3],
+    ["<code>meta charset=\"UTF-8\"</code> head içinde", 3],
+    ["<code>meta viewport</code> head içinde", 3],
+    ["Anlamlı <code>&lt;title&gt;</code> head içinde; içerik body içinde", 3]]],
+  ["Başlıklar (8)", [
+    ["Tek <code>h1</code>", 3],
+    ["Bölümler <code>h2</code>; seviye atlanmamış", 3],
+    ["Başlık seviyesi görünüşe göre değil yapıya göre seçilmiş", 2]]],
+  ["Metin ve içerik (17)", [
+    ["Her paragraf ayrı <code>&lt;p&gt;</code>", 2],
+    ["<code>strong</code> ve <code>em</code> doğru yerde kullanılmış", 4],
+    ["<code>blockquote</code> + <code>cite</code> ile uzun alıntı", 3],
+    ["Cümle içinde <code>&lt;q&gt;</code>", 2],
+    ["Adreste anlamlı <code>&lt;br&gt;</code> (paragraflar arası boşluk için değil)", 2],
+    ["Bölümler arasında <code>&lt;hr&gt;</code>", 2],
+    ["<code>sup</code> ve <code>sub</code> doğru kullanılmış", 2]]],
+  ["Listeler (20)", [
+    ["Program için <code>ol</code> ve <code>start=\"3\"</code>", 5],
+    ["Sırasız <code>ul</code> (getirilecekler)", 4],
+    ["İç içe liste: alt liste <code>li</code> kapanmadan içinde", 5],
+    ["<code>dl / dt / dd</code> ile Tarih, Yer, Ücret", 6]]],
+  ["Bağlantılar (30)", [
+    ["İçindekiler: <code>href=\"#id\"</code> ve hedeflerde benzersiz <code>id</code>", 6],
+    ["“Başa dön” çalışıyor", 2],
+    ["<code>mailto:</code> bağlantısı", 4],
+    ["<code>tel:</code> bağlantısı (ülke koduyla)", 4],
+    ["Dış bağlantı: mutlak URL + <code>target=\"_blank\"</code>", 4],
+    ["<code>rel=\"noopener noreferrer\"</code>", 4],
+    ["<code>download</code> özniteliği", 3],
+    ["Anlamlı bağlantı metinleri", 3]]],
+  ["Kod kalitesi (10)", [
+    ["Girintili, okunabilir kod", 3],
+    ["Tüm etiketler doğru kapatılmış ve iç içe yerleşim doğru", 4],
+    ["Anlam yerine görünüm için etiket seçilmemiş (<code>br</code> ile boşluk, <code>h5</code> ile küçük yazı vb.)", 3]]]
+];
+const root = document.getElementById("list");
+let n = 0;
+items.forEach(([g, rows]) => {
+  const h = document.createElement("h2"); h.textContent = g; root.appendChild(h);
+  rows.forEach(([t, p]) => {
+    const l = document.createElement("label"); l.className = "chk";
+    l.innerHTML = '<input type="checkbox" data-p="' + p + '"><span>' + t + '</span><span class="p">' + p + ' p</span>';
+    root.appendChild(l);
+  });
+});
+root.addEventListener("change", () => {
+  let s = 0;
+  root.querySelectorAll("input:checked").forEach((i) => (s += +i.dataset.p));
+  document.getElementById("sum").textContent = s;
+});
+</script>
+</body>
+</html>

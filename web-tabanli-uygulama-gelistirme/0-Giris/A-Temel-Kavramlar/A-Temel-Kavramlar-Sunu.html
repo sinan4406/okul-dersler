@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Öğrenme Birimi 1 — Temel Kavramlar</title>
+<style>
+:root{
+  --bg:#0b1220; --bg2:#0e1729; --panel:#111c31; --panel2:#0d1728;
+  --line:#22334f; --line2:#2c4a72;
+  --txt:#e8eefb; --muted:#a9b8d4; --dim:#7d8fb0;
+  --accent:#5eb0ff; --accent-2:#5fe3c0; --warn:#ffc46b; --bad:#ff8080;
+  --code:#0a1322;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--txt);
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  overflow:hidden;
+}
+.deck{position:relative; height:100vh; width:100vw;}
+.slide{
+  position:absolute; inset:0; display:none;
+  flex-direction:column; gap:.5rem;
+  padding:2.2vh 3vw 5.2vh;
+  background:radial-gradient(1200px 600px at 12% -10%, #16233c 0%, transparent 60%),
+             radial-gradient(900px 500px at 105% 110%, #10283a 0%, transparent 55%),
+             var(--bg);
+  overflow:hidden;
+}
+.slide.on{display:flex; animation:fade .28s ease}
+@keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+.slide > *{flex-shrink:0}
+
+/* ---------- kicker ---------- */
+.kicker{
+  display:inline-flex; align-items:center; gap:.45rem;
+  align-self:flex-start;
+  font-size:.95rem; font-weight:700; letter-spacing:.02em;
+  background:#0e1c30; border:1px solid var(--line);
+  padding:.3rem .7rem; border-radius:999px;
+  text-transform:none;
+}
+.kicker .kt{color:var(--accent-2)}
+.kicker .kd{color:var(--dim)}
+.kicker .ks{color:var(--accent)}
+.kicker .en{text-transform:none}
+
+.bridge{font-size:.92rem; color:var(--muted); margin:.25rem 0 0; max-width:110ch}
+h1{font-size:clamp(1.7rem,3.6vw,2.9rem); line-height:1.12; margin:.2rem 0}
+h2{font-size:clamp(1.15rem,2.1vw,1.62rem); line-height:1.2; margin:.15rem 0 .1rem; color:#fff}
+h3{font-size:1.06rem; margin:0 0 .35rem}
+p{margin:.3rem 0}
+.sub{font-size:clamp(1.05rem,1.5vw,1.28rem); color:var(--muted); line-height:1.45; max-width:105ch}
+.sub b,.sub strong{color:#fff}
+.cap{font-size:.85rem; color:var(--dim)}
+code,kbd{font-family:"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace}
+.ic{color:var(--accent-2); background:#0d1b2e; border:1px solid var(--line);
+    padding:.02em .34em; border-radius:5px; font-size:.92em; text-transform:none}
+
+/* ---------- layout helpers ---------- */
+.row{display:flex; gap:1rem; align-items:stretch}
+.row.g2>*{flex:1 1 0; min-width:0}
+.grow{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; gap:.7rem; justify-content:center}
+.center{align-items:center; justify-content:center; text-align:center}
+
+/* ---------- cards ---------- */
+.cards{display:grid; gap:.75rem; grid-template-columns:repeat(3,1fr)}
+.cards.c2{grid-template-columns:repeat(2,1fr)}
+.cards.c4{grid-template-columns:repeat(4,1fr)}
+.card{
+  background:linear-gradient(180deg,#12203a,#0f1a2e);
+  border:1px solid var(--line); border-radius:14px; padding:.8rem .9rem;
+}
+.card h3{color:var(--accent); font-size:1.06rem}
+.card p{font-size:1rem; color:var(--muted); line-height:1.4}
+.card ul{margin:.35rem 0 0; padding-left:1.05rem}
+.card li{font-size:.95rem; color:var(--muted); margin:.18rem 0; line-height:1.35}
+.cbtn{margin-top:.5rem; background:#16294a; border:1px solid var(--line); color:var(--accent-2);
+  border-radius:8px; padding:.28rem .7rem; font-size:.9rem; cursor:pointer; font-family:inherit; text-transform:none}
+.cbtn:hover{background:#1d3763; color:#fff}
+.cev{display:none; margin-top:.5rem; background:#0f2a22; border:1px solid #1d5546; border-left:3px solid var(--accent-2);
+  border-radius:8px; padding:.5rem .65rem; font-size:.95rem; color:#c6f0e3; line-height:1.4}
+.cev.acik{display:block}
+.card .tag{display:inline-block; font-size:.8rem; color:var(--accent-2);
+  border:1px solid var(--line); border-radius:999px; padding:.05rem .5rem; margin-bottom:.35rem; text-transform:none}
+
+/* ---------- table ---------- */
+table{width:100%; border-collapse:collapse; font-size:1rem}
+th,td{border:1px solid var(--line); padding:.42rem .6rem; text-align:left; vertical-align:top}
+th{background:#152442; color:var(--accent-2); font-size:.85rem; letter-spacing:.03em; text-transform:none}
+td{color:var(--muted)}
+td b{color:#fff}
+tr:nth-child(even) td{background:#0f1a2e}
+
+/* ---------- boxes ---------- */
+.warn{background:#2a1f0d; border:1px solid #5c4413; border-left:4px solid var(--warn);
+  border-radius:10px; padding:.6rem .8rem; font-size:.95rem; color:#f3ddb3}
+.warn b{color:var(--warn)}
+.good{background:#0f2a22; border:1px solid #1d5546; border-left:4px solid var(--accent-2);
+  border-radius:10px; padding:.6rem .8rem; font-size:.95rem; color:#c6f0e3}
+.good b{color:var(--accent-2)}
+.quote{background:#101d33; border:1px solid var(--line); border-left:4px solid var(--accent);
+  border-radius:10px; padding:.65rem .85rem; font-size:1rem; color:#d6e3fa; line-height:1.45}
+.bigrule{background:linear-gradient(90deg,#152a45,#101d33); border:1px solid var(--line);
+  border-radius:12px; padding:.65rem .9rem; font-size:1.06rem; color:#fff; text-align:center}
+.bigrule b{color:var(--accent-2)}
+
+/* ---------- steps ---------- */
+.steps{display:flex; gap:.5rem; align-items:stretch}
+.steps .st{flex:1 1 0; min-width:0; background:#101d33; border:1px solid var(--line);
+  border-radius:12px; padding:.6rem .7rem; position:relative}
+.steps .st .n{display:inline-flex; width:1.5rem; height:1.5rem; align-items:center; justify-content:center;
+  border-radius:50%; background:var(--accent); color:#04101f; font-weight:800; font-size:.85rem; margin-bottom:.3rem}
+.steps .st h4{margin:0 0 .2rem; font-size:1rem; color:#fff}
+.steps .st p{margin:0; font-size:.95rem; color:var(--muted); line-height:1.35}
+.arrowdown{text-align:center; color:var(--accent); font-size:1.2rem; line-height:1}
+
+/* ---------- split code + preview ---------- */
+.split{display:flex; gap:.8rem; max-height:70vh; flex:1 1 auto; min-height:0}
+.split > *{flex:1 1 0; min-width:0}
+.panel{background:var(--panel2); border:1px solid var(--line); border-radius:12px;
+  display:flex; flex-direction:column; min-height:0; overflow:hidden}
+.panel-head{display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+  padding:.35rem .6rem; background:#132340; border-bottom:1px solid var(--line);
+  font-size:.88rem; color:var(--muted); text-transform:none}
+.panel-head .dot{width:.55rem; height:.55rem; border-radius:50%; background:#3a4f74; display:inline-block; margin-right:.28rem}
+.panel-body{font-size:.98rem; padding:.6rem .7rem; overflow:auto; min-height:0; color:var(--muted)}
+pre{margin:0; flex:1; min-height:0; overflow:auto; padding:.6rem .7rem;
+  background:var(--code); font-size:clamp(.8rem,.95vw,.95rem); line-height:1.45; color:#d8e6ff}
+pre .t{color:#7fd1ff} pre .a{color:#ffc46b} pre .v{color:#a5f3c8} pre .c{color:#6b7f9e; font-style:italic}
+.urlbar{display:flex; align-items:center; gap:.4rem; padding:.28rem .5rem; background:#0b1526;
+  border-bottom:1px solid var(--line); font-size:.82rem; color:var(--dim)}
+.urlbar .u{flex:1; background:#101d33; border:1px solid var(--line); border-radius:999px;
+  padding:.12rem .6rem; color:#cfe0fb; text-transform:none; overflow:hidden; white-space:nowrap; text-overflow:ellipsis}
+.reset{background:#16294a; border:1px solid var(--line); color:var(--accent-2); border-radius:8px;
+  cursor:pointer; font-size:.85rem; padding:.05rem .42rem; line-height:1.3}
+.reset:hover{background:#1d3763}
+iframe{border:0; width:100%; flex:1; min-height:0; background:#fff}
+
+/* ---------- misc diagram ---------- */
+.chip{display:inline-block; background:#132340; border:1px solid var(--line); border-radius:999px;
+  padding:.18rem .6rem; font-size:.92rem; color:#cfe0fb; margin:.15rem .2rem .15rem 0; text-transform:none}
+.chip.a{color:var(--accent-2); border-color:#1d5546}
+.anat{display:flex; gap:.35rem; flex-wrap:wrap; align-items:flex-end; justify-content:center; margin:.4rem 0}
+.anat .part{text-align:center}
+.anat .part .val{font-family:"Cascadia Mono",Consolas,monospace; font-size:clamp(1.1rem,2.3vw,1.8rem);
+  background:#101d33; border:1px solid var(--line); border-radius:10px; padding:.25rem .6rem; display:block; text-transform:none}
+.anat .part .lbl{display:block; font-size:.85rem; color:var(--dim); margin-top:.3rem}
+.anat .part.hl .val{color:var(--accent-2); border-color:#1d5546; background:#0f2a22}
+.anat .sep{font-size:clamp(1.1rem,2.3vw,1.8rem); color:var(--dim); padding-bottom:1.5rem}
+
+/* ---------- footer ---------- */
+.hud{position:fixed; left:0; right:0; bottom:0; height:3.6vh; min-height:26px;
+  display:flex; align-items:center; gap:.8rem; padding:0 1.2vw;
+  background:#091120; border-top:1px solid var(--line); font-size:.78rem; color:var(--dim); z-index:10}
+.hud .t{flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis}
+.bar{position:fixed; left:0; bottom:calc(3.6vh); height:3px; background:var(--accent); z-index:11; transition:width .25s}
+.navbtn{background:#132340; border:1px solid var(--line); color:var(--muted); border-radius:6px;
+  cursor:pointer; padding:.05rem .45rem; font-size:.8rem}
+.navbtn:hover{color:#fff}
+
+/* ---------- cover ---------- */
+.cover{justify-content:center; align-items:center; text-align:center; gap:.9rem}
+.cover .eyebrow{color:var(--accent-2); font-size:1.05rem; letter-spacing:.16em; text-transform:none}
+.cover .line{width:min(560px,60vw); height:2px; background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.cover .meta{color:var(--dim); font-size:.95rem}
+.toc{display:grid; grid-template-columns:repeat(5,1fr); gap:.7rem; width:100%}
+.toc .it{background:#101d33; border:1px solid var(--line); border-radius:12px; padding:.7rem .75rem; text-align:left}
+.toc .it .no{color:var(--accent); font-weight:800; font-size:1.05rem}
+.toc .it .nm{color:#fff; font-size:1rem; margin:.15rem 0 .2rem; font-weight:600}
+.toc .it .ds{color:var(--muted); font-size:.9rem; line-height:1.3}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ============ 1 KAPAK ============ -->
+<section class="slide cover on">
+  <div class="eyebrow">WEB TASARIMI VE PROGRAMLAMA</div>
+  <h1>ÖĞRENME BİRİMİ 1<br>Temel Kavramlar</h1>
+  <div class="line"></div>
+  <p class="sub" style="max-width:70ch">Bir web sitesi tam olarak nedir, internette nasıl bir adres alır,
+  hangi bilgisayarda durur ve onu kimler, hangi araçlarla yapar?</p>
+  <div class="meta">Bilişim Teknolojileri — Yazılım Geliştirme</div>
+</section>
+
+<!-- ============ 2 YOL HARİTASI ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">TEMEL KAVRAMLAR</span><span class="kd">—</span><span class="ks">Yol Haritası</span></div>
+  <p class="bridge">Bu öğrenme biriminde beş ana başlık var; her biri bir öncekinin üzerine biniyor.</p>
+  <h2>Bu birimde neyi, hangi sırayla öğreneceğiz?</h2>
+  <div class="grow" style="justify-content:center">
+    <div class="toc">
+      <div class="it"><div class="no">1.1</div><div class="nm">Yayınlama Kavramları</div>
+        <div class="ds">Web sayfası, web sitesi, alan adı, uzantılar, alan adı alma, hosting.</div></div>
+      <div class="it"><div class="no">1.2</div><div class="nm">Yazılımcı Rolleri</div>
+        <div class="ds">Ön uç, arka uç ve full stack yazılımcı ne iş yapar?</div></div>
+      <div class="it"><div class="no">1.3</div><div class="nm">HTML</div>
+        <div class="ds">Sayfanın iskeletini kuran işaretleme dili ve editörleri.</div></div>
+      <div class="it"><div class="no">1.4</div><div class="nm">CSS</div>
+        <div class="ds">Aynı iskeleti giydiren, görünümü belirleyen stil dili.</div></div>
+      <div class="it"><div class="no">1.5</div><div class="nm">WYSIWYG</div>
+        <div class="ds">Kod yazmadan, sürükle-bırak ile site kuran editörler.</div></div>
+    </div>
+    <div class="bigrule" style="margin-top:.6rem">Sıra tesadüf değil: <b>önce "site nedir ve nerede durur"</b>, sonra <b>"kim yapar"</b>, en sonda <b>"hangi dille ve hangi araçla yapar"</b>.</div>
+  </div>
+</section>
+
+<!-- ============ 3 1.1 GİRİŞ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1 YAYINLAMA KAVRAMLARI</span><span class="kd">—</span><span class="ks">Genel Bakış</span></div>
+  <p class="bridge">Bilgisayarında hazırladığın bir sayfayı dünyanın görebilmesi için üç ayrı şeye ihtiyacın var.</p>
+  <h2>Bir siteyi yayınlamak için gereken üç parça</h2>
+  <div class="grow">
+    <div class="cards">
+      <div class="card"><span class="tag">1 — İÇERİK</span><h3>Dosyalar</h3>
+        <p>Sitenin kendisi: HTML, CSS, görseller. Bunları sen yazarsın. Şu an bilgisayarındaki klasörde duruyorlar.</p></div>
+      <div class="card"><span class="tag">2 — ADRES</span><h3>Alan adı</h3>
+        <p>İnsanların tarayıcıya yazacağı isim: <span class="ic">okulum.com.tr</span>. Yıllık olarak kiralanır.</p></div>
+      <div class="card"><span class="tag">3 — MEKÂN</span><h3>Hosting</h3>
+        <p>Dosyaların 7/24 açık duracağı bilgisayar (sunucu). Kendi bilgisayarını kapatınca site kapanmasın diye.</p></div>
+    </div>
+    <div class="quote">Yeni açılan bir kırtasiyeyi düşün: elindeki <b>ürünler</b> dosyalar, dükkânın <b>adresi</b> alan adı, kirasını ödediğin <b>dükkân</b> ise hosting. Ürünlerin evinde durduğu sürece kimse gelip alamaz.</div>
+    <div class="warn"><b>Sık karıştırılır:</b> Alan adı ile hosting ayrı şeylerdir ve genelde ayrı ayrı ücretlendirilir. Alan adını almak sana bir yer vermez; hosting almak da sana bir isim vermez.</div>
+  </div>
+</section>
+
+<!-- ============ 4 1.1.1 WEB SAYFASI ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1 YAYINLAMA KAVRAMLARI</span><span class="kd">—</span><span class="ks">1.1.1 Web Sayfası</span></div>
+  <p class="bridge">En küçük birimden başlayalım: tarayıcıda açtığın tek bir ekran.</p>
+  <h2>Web sayfası: tarayıcının tek seferde açtığı tek bir belge</h2>
+  <div class="grow">
+    <div class="cards c2">
+      <div class="card"><h3>Tanım</h3>
+        <p>Web sayfası, tarayıcıda tek bir adreste açılan <b>tek bir belgedir</b>. Diskte çoğunlukla
+        <span class="ic">.html</span> uzantılı bir dosya olarak durur.</p>
+        <ul>
+          <li>Metin, başlık, görsel, bağlantı, form içerebilir.</li>
+          <li>Kendi adresi (URL) vardır.</li>
+          <li>Görselleri ve stilleri <b>içinde taşımaz</b>, adreslerini yazar; tarayıcı onları ayrıca ister.</li>
+        </ul></div>
+      <div class="card"><h3>Gerçek hayattan</h3>
+        <p>Bunların her biri <b>birer web sayfasıdır</b>:</p>
+        <ul>
+          <li>Okul sitesindeki "İletişim" sayfası</li>
+          <li>Bir haber sitesinde okuduğun tek bir haber</li>
+          <li>E-ticaret sitesinde tek bir ürünün sayfası</li>
+          <li>Öğrenci giriş ekranı</li>
+        </ul>
+        <p style="margin-top:.4rem">Hepsinin ortak noktası: adres çubuğunda <b>bir tane</b> adres vardır.</p></div>
+    </div>
+    <div class="bigrule">Dosya sayısı ≠ sayfa sayısı. <b>Bir web sayfası, tarayıcıda tek adres olarak açılan belgedir</b>; o belge çalışırken onlarca görsel dosyasını yanına çağırabilir.</div>
+  </div>
+</section>
+
+<!-- ============ 5 SAYFA CANLI ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1.1 WEB SAYFASI</span><span class="kd">—</span><span class="ks">Dosyadan Ekrana</span></div>
+  <p class="bridge">Soldaki, bir metin dosyasının içine yazdığımız kod; sağdaki, tarayıcının aynı koddan ürettiği görüntü.</p>
+  <h2>Tek bir <span class="ic">.html</span> dosyası, tarayıcıda bir sayfa olur</h2>
+  <div class="split">
+    <div class="panel">
+      <div class="panel-head"><span><span class="dot"></span>iletisim.html — kaynak kod</span></div>
+      <pre id="code-a"></pre>
+    </div>
+    <div class="panel">
+      <div class="urlbar"><span>&#128274;</span><span class="u">okulum.com.tr/iletisim.html</span>
+        <button class="reset" data-reset="fr-a">&#10226;</button></div>
+      <iframe id="fr-a" title="onizleme"></iframe>
+    </div>
+  </div>
+  <p class="cap">Dosyanın adı ne olursa olsun tarayıcı içindekini okur; uzantıyı <span class="ic">.html</span> yapmamızın sebebi, tarayıcının bunu bir web sayfası olarak yorumlamasıdır.</p>
+</section>
+
+<!-- ============ 6 1.1.2 WEB SİTESİ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1 YAYINLAMA KAVRAMLARI</span><span class="kd">—</span><span class="ks">1.1.2 Web Sitesi</span></div>
+  <p class="bridge">Sayfaları tek tek yapmak yetmez; onları bir arada tutan şeye bakalım.</p>
+  <h2>Web sitesi: aynı alan adı altında toplanmış, birbirine bağlı sayfalar bütünü</h2>
+  <div class="grow">
+    <div class="cards">
+      <div class="card"><span class="tag">ORTAK ADRES</span><h3>Tek alan adı</h3>
+        <p>Bütün sayfalar <span class="ic">okulum.com.tr</span> altındadır. Sayfalar sadece adresin sonunda ayrışır.</p></div>
+      <div class="card"><span class="tag">ORTAK GEZİNME</span><h3>Aynı menü</h3>
+        <p>Her sayfada aynı menü bulunur; kullanıcı bir sayfada sıkışıp kalmaz, diğerlerine geçebilir.</p></div>
+      <div class="card"><span class="tag">ORTAK KİMLİK</span><h3>Aynı görünüm</h3>
+        <p>Aynı renkler, aynı yazı tipi, aynı üst-alt bölüm. Kullanıcı hâlâ aynı sitede olduğunu anlar.</p></div>
+    </div>
+    <div class="row g2" style="margin-top:.2rem">
+      <div class="good"><b>Web sitesi:</b> okulum.com.tr → Anasayfa + Alanlar + Ders Programı + İletişim. Hepsi birbirine menüyle bağlı.</div>
+      <div class="warn"><b>Web sitesi değil:</b> masaüstünde duran, birbirine hiç bağlanmayan üç ayrı <span class="ic">.html</span> dosyası. Bunlar üç ayrı sayfadır, site değildir.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7 SİTE CANLI ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1.2 WEB SİTESİ</span><span class="kd">—</span><span class="ks">Sayfalar Arası Geçiş</span></div>
+  <p class="bridge">Aşağıdaki menüye tıkladığında adres çubuğunun nasıl değiştiğine dikkat et: alan adı sabit kalıyor, yalnızca sonu değişiyor.</p>
+  <h2>Üç sayfa, tek site: menü sayfaları birbirine bağlar</h2>
+  <div class="split" style="max-height:64vh">
+    <div class="panel">
+      <div class="urlbar"><span>&#128274;</span><span class="u" id="url-b">okulum.com.tr/index.html</span>
+        <button class="reset" data-reset="fr-b">&#10226;</button></div>
+      <iframe id="fr-b" title="onizleme-site"></iframe>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span><span class="dot"></span>Sitenin klasör yapısı</span></div>
+      <div class="panel-body">
+        <div style="white-space:pre; font-family:Consolas,monospace; font-size:.95rem; color:#cfe0fb; line-height:1.6">okulum-sitesi/
+├── index.html        <span style="color:#6b7f9e">← Anasayfa</span>
+├── alanlar.html      <span style="color:#6b7f9e">← Alanlar sayfası</span>
+├── iletisim.html     <span style="color:#6b7f9e">← İletişim sayfası</span>
+└── gorseller/
+    └── logo.png</div>
+        <div class="bigrule" style="margin-top:.7rem; font-size:1rem">Üç ayrı dosya = üç ayrı <b>sayfa</b>.<br>Aynı klasörde ve birbirine bağlı olmaları = bir <b>site</b>.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8 SAYFA-SİTE KARŞILAŞTIRMA ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1.2 WEB SİTESİ</span><span class="kd">—</span><span class="ks">Sayfa mı, Site mi?</span></div>
+  <p class="bridge">İki kavramı yan yana koyduğumuzda fark netleşiyor.</p>
+  <h2>Web sayfası ile web sitesi arasındaki fark</h2>
+  <div class="grow">
+    <table>
+      <tr><th style="width:20%">Ölçüt</th><th>Web sayfası</th><th>Web sitesi</th></tr>
+      <tr><td><b>Kapsam</b></td><td>Tek belge</td><td>Birden çok sayfanın bütünü</td></tr>
+      <tr><td><b>Adres</b></td><td>Tek bir URL: <span class="ic">okulum.com.tr/iletisim.html</span></td><td>Bir alan adı altındaki tüm adresler: <span class="ic">okulum.com.tr</span></td></tr>
+      <tr><td><b>Dosya</b></td><td>Genelde bir <span class="ic">.html</span> dosyası</td><td>Onlarca dosya + klasör (sayfalar, görseller, stil dosyaları)</td></tr>
+      <tr><td><b>Gezinme</b></td><td>Kendi içinde bölümler arasında</td><td>Menü ile sayfalar arasında</td></tr>
+      <tr><td><b>Örnek</b></td><td>Bir haber sitesinde okuduğun tek haber</td><td>O haber sitesinin tamamı</td></tr>
+    </table>
+    <div class="quote">Bir kitabı düşün: <b>web sayfası</b> tek bir sayfadır, <b>web sitesi</b> ciltlenmiş kitabın tamamıdır. İçindekiler bölümü de menüdür — hangi sayfaya nereden gideceğini gösterir.</div>
+    <div class="bigrule">Soru: Instagram'da tek bir profil ekranı sayfa mıdır, site midir? <b>Sayfadır</b> — Instagram'ın kendisi sitedir.</div>
+  </div>
+</section>
+
+<!-- ============ 9 1.1.3 ALAN ADI ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1 YAYINLAMA KAVRAMLARI</span><span class="kd">—</span><span class="ks">1.1.3 Alan Adı (Domain)</span></div>
+  <p class="bridge">İnternetteki her bilgisayarın bir numarası vardır; alan adı, o numaranın akılda kalan takma adıdır.</p>
+  <h2>Alan adı, sunucunun IP numarası yerine yazdığımız okunabilir addır</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><span class="tag">MAKİNENİN DİLİ</span><h3>IP adresi</h3>
+        <p>Sunucuya ulaşmak için gereken gerçek numara:</p>
+        <div class="bigrule" style="margin:.4rem 0; font-family:Consolas,monospace">104.18.32.7</div>
+        <p>Bilgisayarlar birbirini böyle bulur. Ama kimse bunu ezberleyemez ve sunucu değişince numara da değişir.</p></div>
+      <div class="card"><span class="tag">İNSANIN DİLİ</span><h3>Alan adı</h3>
+        <p>Aynı sunucuya karşılık gelen isim:</p>
+        <div class="bigrule" style="margin:.4rem 0; font-family:Consolas,monospace">meb.gov.tr</div>
+        <p>Akılda kalır, kartvizite yazılır, sunucu değişse bile <b>isim aynı kalır</b> — sadece işaret ettiği numara güncellenir.</p></div>
+    </div>
+    <div class="quote">Telefon rehberi gibi: kimse numarayı ezberlemez, "Ali Öğretmen" yazıp arar. Ali numarasını değiştirdiğinde rehberdeki kayıt güncellenir, sen aramaya aynı isimle devam edersin.</div>
+    <div class="warn"><b>Dikkat:</b> Alan adı <b>satın alınmaz, kiralanır.</b> Genelde 1 yıllığına tahsis edilir; süresi dolduğunda yenilenmezse serbest kalır ve başkası alabilir.</div>
+  </div>
+</section>
+
+<!-- ============ 10 ALAN ADI ANATOMİ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1.3 ALAN ADI</span><span class="kd">—</span><span class="ks">Adresin Yapısı</span></div>
+  <p class="bridge">Tarayıcıya yazdığımız adres tek parça değildir; her parçanın ayrı bir görevi vardır.</p>
+  <h2>Bir web adresinin parçaları</h2>
+  <div class="grow" style="justify-content:center">
+    <div class="anat">
+      <div class="part"><span class="val">https://</span><span class="lbl">Protokol<br>(şema)</span></div>
+      <div class="part"><span class="val">www.</span><span class="lbl">Alt alan adı<br>(subdomain)</span></div>
+      <div class="part hl"><span class="val">okulum</span><span class="lbl">Alan adı<br>(sen seçersin)</span></div>
+      <div class="sep">.</div>
+      <div class="part hl"><span class="val">com.tr</span><span class="lbl">Uzantı<br>(TLD)</span></div>
+      <div class="part"><span class="val">/iletisim.html</span><span class="lbl">Yol<br>(hangi sayfa)</span></div>
+    </div>
+    <div class="cards" style="margin-top:.5rem">
+      <div class="card"><h3>Protokol</h3><p><span class="ic">https</span>, tarayıcı ile sunucu arasındaki konuşmanın şifreli yapılacağını söyler. Bugün <b>standart budur</b>; şifresiz <span class="ic">http</span> tarayıcılarda "güvenli değil" uyarısı alır.</p></div>
+      <div class="card"><h3>Alt alan adı</h3><p><span class="ic">www</span> zorunlu değildir, bir gelenektir. Aynı alan adı altında farklı bölümler açmak için kullanılır: <span class="ic">obs.universite.edu.tr</span></p></div>
+      <div class="card"><h3>Alan adı + uzantı</h3><p><b>Kiraladığın kısım burasıdır.</b> Alan adı senin seçtiğin isim, uzantı ise ismin hangi havuzda yer aldığını belirler.</p></div>
+    </div>
+    <div class="warn"><b>Sık yapılan hata:</b> <span class="ic">okulum.com.tr</span> bir alan adıdır; <span class="ic">okulum.com.tr/iletisim.html</span> ise bir <b>URL</b> (tam adres). Alan adı adresin sadece bir parçasıdır.</div>
+  </div>
+</section>
+
+<!-- ============ 11 DNS ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1.3 ALAN ADI</span><span class="kd">—</span><span class="ks">Adres Nasıl Bulunur? (DNS)</span></div>
+  <p class="bridge">Adres çubuğuna adı yazıp Enter'a bastığında, sayfa gelmeden önce görünmeyen bir arama yapılır.</p>
+  <h2>DNS, alan adını IP adresine çeviren sistemdir</h2>
+  <div class="grow">
+    <div class="steps">
+      <div class="st"><span class="n">1</span><h4>Sen yazarsın</h4><p>Tarayıcıya <span class="ic">okulum.com.tr</span> yazıp Enter'a basarsın.</p></div>
+      <div class="st"><span class="n">2</span><h4>Tarayıcı sorar</h4><p>DNS sunucusuna sorar: "Bu ismin IP adresi nedir?"</p></div>
+      <div class="st"><span class="n">3</span><h4>DNS cevaplar</h4><p>"104.18.32.7" cevabı döner. Buraya kadar sayfa henüz istenmedi.</p></div>
+      <div class="st"><span class="n">4</span><h4>Sayfa istenir</h4><p>Tarayıcı o IP'deki sunucuya bağlanır ve sayfayı ister.</p></div>
+      <div class="st"><span class="n">5</span><h4>Sayfa gelir</h4><p>Sunucu HTML dosyasını gönderir, tarayıcı ekrana çizer.</p></div>
+    </div>
+    <div class="quote">DNS internetin telefon rehberidir. Sen ismi bilirsin, rehber numarayı verir, aramayı yine sen yaparsın — rehber senin yerine konuşmaz.</div>
+    <div class="row g2">
+      <div class="good"><b>Neden bilmemiz gerekiyor?</b> Yeni bir siteyi yayına aldığında adres bazen hemen açılmaz. Sebebi çoğunlukla DNS kaydının internete yayılmasının zaman almasıdır.</div>
+      <div class="warn"><b>Not:</b> DNS cevapları bir süre bilgisayarında ve modeminde saklanır (önbellek). Bu yüzden bir değişiklik senin bilgisayarında geç, başkasında erken görünebilir.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12 1.1.4 UZANTILAR ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1 YAYINLAMA KAVRAMLARI</span><span class="kd">—</span><span class="ks">1.1.4 Alan Adı Uzantıları</span></div>
+  <p class="bridge">Uzantı, alan adının sonundaki kısımdır ve sitenin ne tür bir kuruma ait olduğunu ima eder.</p>
+  <h2>Uzantılar ikiye ayrılır: genel uzantılar ve ülke uzantıları</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><span class="tag">gTLD — GENEL</span><h3>Ülkeye bağlı olmayan uzantılar</h3>
+        <table style="margin-top:.35rem; font-size:.95rem">
+          <tr><td style="width:26%"><b>.com</b></td><td>Ticari kuruluşlar. Bugün fiilen herkesin kullandığı en yaygın uzantı.</td></tr>
+          <tr><td><b>.org</b></td><td>Dernek, vakıf, kâr amacı gütmeyen kuruluşlar.</td></tr>
+          <tr><td><b>.net</b></td><td>Ağ ve altyapı hizmetleri veren kuruluşlar.</td></tr>
+          <tr><td><b>.edu</b> / <b>.gov</b></td><td>ABD'deki eğitim kurumları ve devlet kurumları. Kayıt kısıtlıdır.</td></tr>
+          <tr><td><b>.dev</b>, <b>.app</b>, <b>.io</b></td><td>Son yıllarda yazılım dünyasında yaygınlaşan yeni uzantılar.</td></tr>
+        </table></div>
+      <div class="card"><span class="tag">ccTLD — ÜLKE</span><h3>Ülke koduna dayalı uzantılar</h3>
+        <table style="margin-top:.35rem; font-size:.95rem">
+          <tr><td style="width:26%"><b>.tr</b></td><td>Türkiye</td></tr>
+          <tr><td><b>.de</b> / <b>.fr</b> / <b>.uk</b></td><td>Almanya / Fransa / Birleşik Krallık</td></tr>
+          <tr><td><b>.jp</b> / <b>.ru</b></td><td>Japonya / Rusya</td></tr>
+        </table>
+        <p style="margin-top:.5rem">Ülke uzantıları o ülkenin yetkili kurumu tarafından yönetilir.
+        <b>.tr</b> uzantılarını Türkiye'de <b>BTK bünyesindeki TRABİS</b> yönetir.</p></div>
+    </div>
+    <div class="warn"><b>Uzantı bir garanti değildir.</b> <span class="ic">.com</span> uzantılı bir adresin ticari olması zorunlu değildir; kayıt sırasında kimse "sen gerçekten şirket misin" diye sormaz. Sadece <b>belgeli</b> uzantılarda gerçek bir denetim vardır.</div>
+  </div>
+</section>
+
+<!-- ============ 13 .TR ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1.4 UZANTILAR</span><span class="kd">—</span><span class="ks">Türkiye Uzantıları (.tr)</span></div>
+  <p class="bridge">Türkiye'deki uzantılar, belge istenip istenmemesine göre ikiye ayrılır.</p>
+  <h2>.tr uzantıları: belgesiz alınanlar ve belge gerektirenler</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><span class="tag">BELGESİZ — İLK GELEN İLK ALIR</span><h3>Herkes başvurabilir</h3>
+        <p style="margin-bottom:.4rem"><span class="chip">com.tr</span><span class="chip">net.tr</span><span class="chip">org.tr</span><span class="chip">web.tr</span><span class="chip">gen.tr</span><span class="chip">biz.tr</span><span class="chip">info.tr</span><span class="chip">tv.tr</span><span class="chip">name.tr</span></p>
+        <p>Belge sunmadan, boşta olması şartıyla alınabilir. Doğrudan <span class="ic">.tr</span> uzantısı da (ör. <span class="ic">okulum.tr</span>) bu gruba dâhildir.</p></div>
+      <div class="card"><span class="tag">BELGELİ — DENETİMLİ</span><h3>Yalnızca hak sahibi alabilir</h3>
+        <table style="margin-top:.2rem; font-size:.95rem">
+          <tr><td style="width:22%"><b>gov.tr</b></td><td>Kamu kurum ve kuruluşları</td></tr>
+          <tr><td><b>edu.tr</b></td><td>Yükseköğretim kurumları (üniversiteler)</td></tr>
+          <tr><td><b>k12.tr</b></td><td>Okul öncesi, ilköğretim ve liseler</td></tr>
+          <tr><td><b>av.tr</b> / <b>dr.tr</b></td><td>Avukatlar / tıp doktorları</td></tr>
+          <tr><td><b>bel.tr</b> / <b>pol.tr</b> / <b>tsk.tr</b></td><td>Belediyeler / Emniyet / TSK</td></tr>
+        </table></div>
+    </div>
+    <div class="good"><b>Öğrenciye somut örnek:</b> Okulunuzun adresi büyük ihtimalle <span class="ic">k12.tr</span> ile biter. Bunu bir marka veya kişi alamaz; başvururken okul olduğunuzu belgelemeniz gerekir. Bu yüzden <b>.k12.tr ile biten bir adres gördüğünüzde bunun gerçekten bir okul olduğuna güvenebilirsiniz.</b></div>
+  </div>
+</section>
+
+<!-- ============ 14 1.1.5 ALMA İŞLEMİ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1 YAYINLAMA KAVRAMLARI</span><span class="kd">—</span><span class="ks">1.1.5 Alan Adı Alma İşlemi</span></div>
+  <p class="bridge">Alan adı doğrudan bir kurumdan değil, yetkilendirilmiş aracı firmalardan alınır.</p>
+  <h2>Alan adı alma süreci beş adımda</h2>
+  <div class="grow">
+    <div class="steps">
+      <div class="st"><span class="n">1</span><h4>İsim belirle</h4><p>Kısa, akılda kalıcı, yazılması kolay bir isim seç.</p></div>
+      <div class="st"><span class="n">2</span><h4>Müsaitlik sorgula</h4><p>Kayıt kuruluşunun sorgu ekranında ismin boşta olup olmadığına bak.</p></div>
+      <div class="st"><span class="n">3</span><h4>Kayıt kuruluşu seç</h4><p>Yetkili bir firma üzerinden başvuru yap. <span class="ic">.tr</span> için TRABİS'e kayıtlı olmalı.</p></div>
+      <div class="st"><span class="n">4</span><h4>Bilgi + ödeme</h4><p>Kişi/kurum bilgileri verilir, ücret ödenir; belgeli uzantıda belge yüklenir.</p></div>
+      <div class="st"><span class="n">5</span><h4>Yenile</h4><p>Süre dolmadan yenile. Yenilenmeyen alan adı serbest kalır.</p></div>
+    </div>
+    <div class="split" style="max-height:38vh">
+      <div class="panel">
+        <div class="panel-head"><span><span class="dot"></span>Kayıt kuruluşu — alan adı sorgu ekranı (temsilî)</span></div>
+        <div class="panel-body" style="font-size:1rem">
+          <div style="background:#0b1526;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem">
+            <div style="display:flex;gap:.4rem;margin-bottom:.6rem">
+              <div style="flex:1;background:#101d33;border:1px solid var(--line);border-radius:8px;padding:.3rem .6rem;font-family:Consolas,monospace;color:#cfe0fb">okulum</div>
+              <div style="background:#16294a;border:1px solid var(--line);border-radius:8px;padding:.3rem .7rem;color:var(--accent-2)">Sorgula</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.28rem .5rem;border-bottom:1px solid var(--line)"><span style="font-family:Consolas,monospace">okulum.com.tr</span><span style="color:#ff8080">Alınmış</span></div>
+            <div style="display:flex;justify-content:space-between;padding:.28rem .5rem;border-bottom:1px solid var(--line)"><span style="font-family:Consolas,monospace">okulum.com</span><span style="color:#ff8080">Alınmış</span></div>
+            <div style="display:flex;justify-content:space-between;padding:.28rem .5rem;border-bottom:1px solid var(--line)"><span style="font-family:Consolas,monospace">okulum.net.tr</span><span style="color:var(--accent-2)">Müsait &#183; 1 yıl</span></div>
+            <div style="display:flex;justify-content:space-between;padding:.28rem .5rem"><span style="font-family:Consolas,monospace">okulum.tr</span><span style="color:var(--accent-2)">Müsait &#183; 1 yıl</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span><span class="dot"></span>İsim seçerken</span></div>
+        <div class="panel-body">
+          <div class="good" style="margin-bottom:.45rem"><b>İyi:</b> kısa; telefonda söylenince doğru yazılabiliyor; tire ve rakam içermiyor; kurumun adıyla ilgili.</div>
+          <div class="warn" style="margin-bottom:.45rem"><b>Riskli:</b> başkasının markasını içeren isimler. Marka hakkı sahibi itiraz ederse alan adı elinden alınabilir.</div>
+          <div class="quote" style="font-size:.95rem">Alan adı kiralamak, dükkânın tabelasını kiralamaya benzer: kirayı ödediğin sürece tabela senindir, ödemeyi kestiğin gün tabelayı başkası asar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 15 1.1.6 HOSTING ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1 YAYINLAMA KAVRAMLARI</span><span class="kd">—</span><span class="ks">1.1.6 Hosting (Barındırma)</span></div>
+  <p class="bridge">İsim aldın; peki dosyalar hangi bilgisayarda duracak?</p>
+  <h2>Hosting, site dosyalarının 7/24 açık bir sunucuda barındırılması hizmetidir</h2>
+  <div class="grow">
+    <div class="cards">
+      <div class="card"><span class="tag">SORUN</span><h3>Kendi bilgisayarın yetmez</h3>
+        <p>Bilgisayarını kapattığında, internetin kesildiğinde veya elektrik gittiğinde site erişilemez olur. Ayrıca ev bağlantısı çok sayıda ziyaretçiyi kaldıramaz.</p></div>
+      <div class="card"><span class="tag">ÇÖZÜM</span><h3>Sunucu</h3>
+        <p>Veri merkezinde duran, kesintisiz elektrik ve hızlı internete bağlı, hiç kapatılmayan bir bilgisayar. Dosyalarını oraya yüklersin.</p></div>
+      <div class="card"><span class="tag">SONUÇ</span><h3>Sürekli erişim</h3>
+        <p>Sen uyurken de ziyaretçi sayfayı isteyebilir; sunucu isteği karşılar ve dosyayı gönderir.</p></div>
+    </div>
+    <div class="quote">Alan adı <b>adres</b>, hosting ise <b>bina</b>dır. Adresi kartvizite yazabilirsin ama o adreste bir bina yoksa gelen kişi boş arsa bulur.</div>
+    <div class="bigrule">Sunucu sihirli bir kutu değildir: <b>o da bir bilgisayardır.</b> Farkı, hiç kapanmaması ve gelen istekleri karşılamak üzere yapılandırılmış olmasıdır.</div>
+  </div>
+</section>
+
+<!-- ============ 16 HOSTING TÜRLERİ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1.6 HOSTING</span><span class="kd">—</span><span class="ks">Barındırma Türleri</span></div>
+  <p class="bridge">Bütün siteler aynı büyüklükte değildir; bu yüzden farklı barındırma seçenekleri vardır.</p>
+  <h2>Hosting türleri ve hangi durumda hangisi seçilir</h2>
+  <div class="grow">
+    <table>
+      <tr><th style="width:18%">Tür</th><th style="width:34%">Nasıl çalışır</th><th>Ne zaman tercih edilir</th></tr>
+      <tr><td><b>Paylaşımlı<br>(shared)</b></td><td>Tek sunucuyu yüzlerce site paylaşır.</td><td>Küçük kurumsal siteler, kişisel siteler, bloglar. <b>En ucuz seçenek.</b> Aynı sunucudaki başka bir site yoğunlaşırsa seninki de yavaşlayabilir.</td></tr>
+      <tr><td><b>VPS</b></td><td>Bir sunucu, birbirinden yalıtılmış sanal parçalara bölünür; parçalardan biri senindir.</td><td>Trafiği artan, kendi ayarlarını yapması gereken siteler.</td></tr>
+      <tr><td><b>Dedicated</b></td><td>Sunucunun tamamı tek bir müşteriye ayrılır.</td><td>Yüksek trafikli, özel gereksinimleri olan büyük sistemler. En pahalısı.</td></tr>
+      <tr><td><b>Bulut<br>(cloud)</b></td><td>Kaynak tek makineye bağlı değildir; ihtiyaç arttıkça otomatik büyür.</td><td>Trafiği dalgalanan siteler (kampanya dönemi, sınav sonucu açıklama günü).</td></tr>
+      <tr><td><b>Statik<br>barındırma</b></td><td>Yalnızca HTML/CSS/JS dosyalarını yayınlar; sunucu tarafında program çalıştırmaz.</td><td><b>Bizim şu an yaptığımız türden siteler.</b> GitHub Pages, Netlify, Cloudflare Pages gibi hizmetlerde çoğu zaman ücretsizdir.</td></tr>
+    </table>
+    <div class="good"><b>Sınıfta uygulanabilir:</b> Yazdığınız HTML sayfalarını GitHub'a yükleyip GitHub Pages ile ücretsiz yayınlayabilirsiniz. Alan adı satın almadan, <span class="ic">kullaniciadi.github.io</span> gibi hazır bir adresle gerçekten internette yayınlanmış olur.</div>
+  </div>
+</section>
+
+<!-- ============ 17 BİRLEŞTİRME ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.1 YAYINLAMA KAVRAMLARI</span><span class="kd">—</span><span class="ks">Parçaları Birleştirmek</span></div>
+  <p class="bridge">Alan adı bir firmadan, hosting başka bir firmadan alınabilir. Peki ikisi nasıl birbirini bulur?</p>
+  <h2>Adres ile sunucu, DNS kaydıyla birbirine bağlanır</h2>
+  <div class="grow">
+    <div class="steps">
+      <div class="st"><span class="n">1</span><h4>Alan adını alırsın</h4><p><span class="ic">okulum.com.tr</span> senin adına tahsis edilir.</p></div>
+      <div class="st"><span class="n">2</span><h4>Hosting alırsın</h4><p>Sağlayıcı sana sunucunun adresini verir.</p></div>
+      <div class="st"><span class="n">3</span><h4>Yönlendirirsin</h4><p>Alan adı panelinde, adın hosting sunucusunu göstermesini sağlarsın.</p></div>
+      <div class="st"><span class="n">4</span><h4>Dosyaları yüklersin</h4><p>HTML/CSS/görselleri sunucuya kopyalarsın.</p></div>
+      <div class="st"><span class="n">5</span><h4>Site yayında</h4><p>Adı yazan herkes sayfaya ulaşır.</p></div>
+    </div>
+    <div class="row g2">
+      <div class="warn"><b>Sık karşılaşılan durum:</b> Alan adını aldın, hosting de aldın ama site açılmıyor. Çoğu zaman 3. adım eksiktir: alan adı hâlâ hiçbir sunucuyu göstermiyordur.</div>
+      <div class="good"><b>Ana fikir:</b> Alan adı, hosting ve dosyalar birbirinden bağımsız üç parçadır. Site ancak <b>üçü birbirine bağlandığında</b> yayına girer.</div>
+    </div>
+    <div class="bigrule">Adres + bina + eşyalar. <b>Üçü bir arada olmadan taşınma tamamlanmaz.</b></div>
+  </div>
+</section>
+
+<!-- ============ 18 1.2 ROLLER GİRİŞ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.2 WEB YAZILIMCISI ROLLERİ</span><span class="kd">—</span><span class="ks">Genel Bakış</span></div>
+  <p class="bridge">Bir web uygulaması iki farklı yerde çalışır; bu ayrım meslek adlarının da kaynağıdır.</p>
+  <h2>İşin iki tarafı vardır: kullanıcının tarayıcısı ve sunucu</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card" style="border-color:#1d5546"><span class="tag">İSTEMCİ TARAFI &#183; CLIENT-SIDE</span><h3>Tarayıcıda çalışan kısım</h3>
+        <p>Kullanıcının gördüğü ve tıkladığı her şey. Kod, kullanıcının kendi bilgisayarında çalışır.</p>
+        <p style="margin-top:.4rem"><span class="chip a">HTML</span><span class="chip a">CSS</span><span class="chip a">JavaScript</span></p></div>
+      <div class="card" style="border-color:#3a5f8f"><span class="tag">SUNUCU TARAFI &#183; SERVER-SIDE</span><h3>Sunucuda çalışan kısım</h3>
+        <p>Verinin saklandığı, kuralların işletildiği, kullanıcının hiç göremediği kısım.</p>
+        <p style="margin-top:.4rem"><span class="chip">Node.js</span><span class="chip">PHP</span><span class="chip">Python</span><span class="chip">Veritabanı</span></p></div>
+    </div>
+    <div class="quote">Bir restoran: <b>salon</b> istemci tarafıdır — masalar, menü, garson, müşterinin gördüğü her şey. <b>Mutfak</b> sunucu tarafıdır — malzemeler, tarifler, pişirme. Müşteri mutfağa giremez ama sipariş vererek mutfağı çalıştırır.</div>
+    <div class="bigrule">Bu ayrım yüzünden üç meslek tanımı doğdu: <b>ön uç (frontend)</b>, <b>arka uç (backend)</b> ve ikisini birden yapan <b>full stack</b>.</div>
+  </div>
+</section>
+
+<!-- ============ 19 FRONTEND ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.2 YAZILIMCI ROLLERİ</span><span class="kd">—</span><span class="ks">1.2.1 Ön Uç (Frontend)</span></div>
+  <p class="bridge">Kullanıcının gördüğü, dokunduğu, kullandığı her şeyden sorumlu olan roldür.</p>
+  <h2>Ön uç yazılımcı, tasarımı çalışan bir arayüze dönüştürür</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><h3>Ne yapar?</h3>
+        <ul>
+          <li>Tasarımcının hazırladığı görsel tasarımı HTML ve CSS ile gerçek sayfaya çevirir.</li>
+          <li>Sayfanın telefon, tablet ve masaüstünde düzgün görünmesini sağlar (responsive).</li>
+          <li>Menü açılması, form doğrulaması, filtreleme gibi etkileşimleri JavaScript ile yazar.</li>
+          <li>Sunucudan gelen veriyi ekranda listeler.</li>
+          <li>Sayfanın hızlı açılmasını ve erişilebilir olmasını gözetir.</li>
+        </ul></div>
+      <div class="card"><h3>Somut örnek: bir e-ticaret sitesinde</h3>
+        <ul>
+          <li>Ürün kartlarının ekranda dizilişi</li>
+          <li>"Sepete ekle" butonuna basınca sepet sayısının anında artması</li>
+          <li>Arama kutusuna yazarken önerilerin açılması</li>
+          <li>Mobilde menünün hamburger simgesine dönüşmesi</li>
+        </ul>
+        <p style="margin-top:.45rem"><b>Ama:</b> ürünün fiyatının nereden geldiği, siparişin nereye kaydedildiği ön ucun işi değildir.</p></div>
+    </div>
+    <div class="warn"><b>Yanlış bilinen:</b> "Ön uç, sitenin kolay tarafıdır." Doğru değil. Farklı tarayıcılar, farklı ekran boyutları, erişilebilirlik ve performans, ön ucu başlı başına bir uzmanlık alanı yapar.</div>
+  </div>
+</section>
+
+<!-- ============ 20 BACKEND ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.2 YAZILIMCI ROLLERİ</span><span class="kd">—</span><span class="ks">1.2.2 Arka Uç (Backend)</span></div>
+  <p class="bridge">Kullanıcının hiç görmediği ama her tıklamasının arkasında çalışan roldür.</p>
+  <h2>Arka uç yazılımcı, veriyi ve kuralları yönetir</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><h3>Ne yapar?</h3>
+        <ul>
+          <li>Sunucuda çalışan programı yazar; gelen istekleri karşılar.</li>
+          <li>Veritabanını tasarlar: hangi bilgi nerede, hangi tabloda tutulacak?</li>
+          <li>Ön ucun veri alıp gönderebilmesi için API yazar.</li>
+          <li>Kullanıcı girişi, yetki ve parola güvenliğini sağlar.</li>
+          <li>İş kurallarını uygular: "stokta yoksa sipariş alınamaz" gibi.</li>
+        </ul></div>
+      <div class="card"><h3>Somut örnek: aynı e-ticaret sitesinde</h3>
+        <ul>
+          <li>Ürünlerin ve fiyatların veritabanında saklanması</li>
+          <li>Siparişin kaydedilmesi ve stoktan düşülmesi</li>
+          <li>Kullanıcının parolasının şifrelenerek saklanması</li>
+          <li>"Bu siparişi yalnızca sahibi görebilir" kuralının uygulanması</li>
+        </ul>
+        <p style="margin-top:.45rem"><b>Ama:</b> ürün kartının rengi, yazı tipi veya dizilişi arka ucun işi değildir.</p></div>
+    </div>
+    <div class="warn"><b>Kritik kural:</b> Tarayıcıda yapılan kontroller güvenlik sağlamaz — kullanıcı onları devre dışı bırakabilir. Bu yüzden <b>güvenlikle ilgili her kontrol sunucu tarafında yeniden yapılmalıdır.</b></div>
+  </div>
+</section>
+
+<!-- ============ 21 AKIŞ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.2 YAZILIMCI ROLLERİ</span><span class="kd">—</span><span class="ks">İki Taraf Nasıl Birlikte Çalışır?</span></div>
+  <p class="bridge">Tek bir "Giriş yap" tıklamasını takip edersek iki rolün nerede devreye girdiği net görünür.</p>
+  <h2>Bir tıklamanın yolculuğu: giriş yapma işlemi</h2>
+  <div class="grow">
+    <div class="steps">
+      <div class="st" style="border-color:#1d5546"><span class="n" style="background:var(--accent-2)">1</span><h4>Form doldurulur</h4><p>Kullanıcı e-posta ve parolayı yazar, butona basar. <b style="color:var(--accent-2)">Ön uç</b></p></div>
+      <div class="st" style="border-color:#1d5546"><span class="n" style="background:var(--accent-2)">2</span><h4>İstek gönderilir</h4><p>Bilgiler sunucuya iletilir. <b style="color:var(--accent-2)">Ön uç</b></p></div>
+      <div class="st"><span class="n">3</span><h4>Kontrol edilir</h4><p>Sunucu veritabanına bakar: bu kullanıcı var mı, parola doğru mu? <b style="color:var(--accent)">Arka uç</b></p></div>
+      <div class="st"><span class="n">4</span><h4>Cevap döner</h4><p>"Doğru, giriş yapıldı" veya "Hatalı bilgi" cevabı gönderilir. <b style="color:var(--accent)">Arka uç</b></p></div>
+      <div class="st" style="border-color:#1d5546"><span class="n" style="background:var(--accent-2)">5</span><h4>Ekran güncellenir</h4><p>Ya panele geçilir ya da hata mesajı gösterilir. <b style="color:var(--accent-2)">Ön uç</b></p></div>
+    </div>
+    <div class="row g2">
+      <div class="good"><b>Dikkat:</b> Parolanın doğru olup olmadığına <b>her zaman sunucu</b> karar verir. Ön uç yalnızca "boş bırakma", "e-posta biçimi yanlış" gibi kullanım kolaylığı kontrolleri yapar.</div>
+      <div class="quote">Ön uç garsondur: siparişi alır, mutfağa iletir, gelen tabağı masaya koyar. Yemeğin gerçekten pişip pişmediğine mutfak karar verir.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 22 FULL STACK ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.2 YAZILIMCI ROLLERİ</span><span class="kd">—</span><span class="ks">1.2.3 Full Stack</span></div>
+  <p class="bridge">Bazı yazılımcılar iki tarafı da yapabilecek kadar bilir; onlara full stack denir.</p>
+  <h2>Full stack yazılımcı, bir uygulamayı baştan sona tek başına ayağa kaldırabilir</h2>
+  <div class="grow">
+    <div class="cards">
+      <div class="card"><span class="tag">NE DEMEK?</span><h3>Yığının tamamı</h3>
+        <p>"Stack" yığın demektir: arayüz + sunucu + veritabanı. Full stack, bu katmanların hepsinde çalışabilen kişidir.</p></div>
+      <div class="card"><span class="tag">AVANTAJ</span><h3>Bütünü görebilme</h3>
+        <p>Bir hatanın hangi katmandan geldiğini hızlı ayırt eder. Küçük ekiplerde ve kendi projesini kuranlarda çok değerlidir.</p></div>
+      <div class="card"><span class="tag">SINIR</span><h3>Her katmanda en derin değil</h3>
+        <p>Büyük ekiplerde uzmanlaşmış ön uç ve arka uç geliştiriciler bulunur. Full stack genişlik sağlar, her alanda en derin uzmanlığı değil.</p></div>
+    </div>
+    <div class="good"><b>Bizim yolumuz da budur:</b> Bu derste HTML ve CSS ile ön uçtan başlıyoruz; ilerleyen öğrenme birimlerinde JavaScript, ardından sunucu tarafı ve veritabanı gelecek. Yani sırayla full stack yığınının katmanlarını çıkıyoruz.</div>
+    <div class="warn"><b>Gerçekçi olalım:</b> "Full stack" bir başlangıç seviyesi değildir. Önce bir tarafta sağlam temel kurulur, diğer taraf zamanla eklenir.</div>
+  </div>
+</section>
+
+<!-- ============ 23 ROL TABLO ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.2 YAZILIMCI ROLLERİ</span><span class="kd">—</span><span class="ks">Karşılaştırma</span></div>
+  <p class="bridge">Üç rolü aynı ölçütlerle yan yana koyalım.</p>
+  <h2>Ön uç, arka uç ve full stack rollerinin karşılaştırması</h2>
+  <div class="grow">
+    <table>
+      <tr><th style="width:16%">Ölçüt</th><th>Ön uç (Frontend)</th><th>Arka uç (Backend)</th><th>Full stack</th></tr>
+      <tr><td><b>Kod nerede çalışır</b></td><td>Kullanıcının tarayıcısında</td><td>Sunucuda</td><td>Her ikisinde</td></tr>
+      <tr><td><b>Kullanıcı görür mü</b></td><td>Evet, gördüğü her şey budur</td><td>Hayır, yalnızca sonucunu görür</td><td>—</td></tr>
+      <tr><td><b>Temel diller</b></td><td>HTML, CSS, JavaScript</td><td>Node.js, PHP, Python, Java, C#</td><td>İkisinden de</td></tr>
+      <tr><td><b>Veri saklama</b></td><td>Sorumlu değil</td><td>Veritabanını tasarlar ve yönetir</td><td>Yönetir</td></tr>
+      <tr><td><b>Güvenlik</b></td><td>Yardımcı kontroller</td><td><b>Asıl sorumluluk burada</b></td><td>Her iki tarafta</td></tr>
+      <tr><td><b>Tipik soru</b></td><td>"Bu buton mobilde nasıl görünmeli?"</td><td>"Bu veriyi kim görebilmeli?"</td><td>"Bu özelliği baştan sona nasıl kurarım?"</td></tr>
+    </table>
+    <div class="bigrule">Aynı özelliğin iki yüzü vardır: <b>"nasıl görünüyor"</b> ön uçtur, <b>"gerçekte ne oluyor"</b> arka uçtur.</div>
+  </div>
+</section>
+
+<!-- ============ 24 1.3 HTML ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.3 İŞARETLEME DİLİ</span><span class="kd">—</span><span class="ks">HTML Nedir?</span></div>
+  <p class="bridge">Şimdi ön ucun ilk ve en temel dilini tanıyoruz.</p>
+  <h2>HTML, sayfanın içeriğini etiketlerle anlamlandıran bir işaretleme dilidir</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><h3>Açılımı ve anlamı</h3>
+        <p><b>HTML</b> = <span class="ic">HyperText Markup Language</span> — Bağlantılı Metin İşaretleme Dili.</p>
+        <ul>
+          <li><b>HyperText:</b> Metnin içinden başka bir belgeye atlayabilme (bağlantılar).</li>
+          <li><b>Markup (İşaretleme):</b> Metnin parçalarını "bu bir başlıktır", "bu bir paragraftır" diye <b>etiketlemek</b>.</li>
+        </ul>
+        <p style="margin-top:.4rem">HTML sayfanın <b>iskeletini ve anlamını</b> kurar. Rengi, boşluğu, yerleşimi kurmaz — o CSS'in işidir.</p></div>
+      <div class="card"><h3>HTML bir programlama dili midir?</h3>
+        <p><b>Hayır.</b> Programlama dillerinde karar (koşul), tekrar (döngü) ve hesaplama vardır. HTML'de bunlar yoktur.</p>
+        <p style="margin-top:.4rem">HTML tarayıcıya <b>ne yapacağını değil, elindekinin ne olduğunu</b> söyler:
+        "Bu bir başlık", "bu bir liste", "bu bir görsel".</p>
+        <div class="quote" style="margin-top:.5rem; font-size:.95rem">Bir ödev kâğıdında başlığı büyük yazıp altını çizmen gibi. Kâğıda bir iş yaptırmıyorsun; parçaların ne olduğunu işaretliyorsun.</div></div>
+    </div>
+    <div class="warn"><b>Bu neden önemli?</b> Etiketi doğru seçmek estetik bir tercih değildir. Ekran okuyucular, arama motorları ve tarayıcının kendi davranışları, <b>etiketin anlamına göre</b> çalışır.</div>
+  </div>
+</section>
+
+<!-- ============ 25 HTML CANLI ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.3 HTML</span><span class="kd">—</span><span class="ks">Etiketten Ekrana</span></div>
+  <p class="bridge">Soldaki kodun sağdaki görüntüyü nasıl ürettiğini satır satır izleyelim.</p>
+  <h2>Aynı metin, farklı etiketlerle farklı anlam kazanır</h2>
+  <div class="split">
+    <div class="panel">
+      <div class="panel-head"><span><span class="dot"></span>index.html</span></div>
+      <pre id="code-c"></pre>
+    </div>
+    <div class="panel">
+      <div class="urlbar"><span>&#128274;</span><span class="u">okulum.com.tr/index.html</span>
+        <button class="reset" data-reset="fr-c">&#10226;</button></div>
+      <iframe id="fr-c" title="onizleme-html"></iframe>
+    </div>
+  </div>
+  <p class="cap">Hiç CSS yazmadık; buradaki büyüklük ve kalınlıklar tarayıcının <b>etiketin anlamına göre</b> uyguladığı varsayılan görünümdür.</p>
+</section>
+
+<!-- ============ 26 ETİKET ANATOMİ + SÜRÜM ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.3 HTML</span><span class="kd">—</span><span class="ks">Etiket Yapısı ve Sürümler</span></div>
+  <p class="bridge">Her etiketin kendine göre bir kalıbı vardır; ayrıca "HTML5" adının bugün ne anlama geldiğine bakalım.</p>
+  <h2>Etiketin parçaları ve HTML'in bugünkü sürüm durumu</h2>
+  <div class="grow">
+    <div class="anat" style="margin:.2rem 0 .4rem">
+      <div class="part"><span class="val">&lt;a</span><span class="lbl">Açılış etiketi</span></div>
+      <div class="part hl"><span class="val">href="iletisim.html"</span><span class="lbl">Öznitelik (attribute)<br>ad="değer"</span></div>
+      <div class="part"><span class="val">&gt;</span><span class="lbl"></span></div>
+      <div class="part"><span class="val">Bize ulaşın</span><span class="lbl">İçerik</span></div>
+      <div class="part"><span class="val">&lt;/a&gt;</span><span class="lbl">Kapanış etiketi</span></div>
+    </div>
+    <div class="row g2">
+      <div class="card"><h3>Kurallar</h3>
+        <ul>
+          <li>Etiketler <b>açılır ve kapanır</b>; içerik ikisinin arasına yazılır.</li>
+          <li>Bazı etiketlerin içeriği yoktur, kapanışı da yoktur: <span class="ic">&lt;img&gt;</span>, <span class="ic">&lt;br&gt;</span>.</li>
+          <li>Öznitelikler <b>yalnızca açılış etiketine</b> yazılır.</li>
+          <li>İç içe etiketler <b>ters sırada</b> kapanır: <span class="ic">&lt;p&gt;&lt;b&gt;...&lt;/b&gt;&lt;/p&gt;</span></li>
+        </ul></div>
+      <div class="card"><span class="tag">GÜNCEL BİLGİ</span><h3>HTML'in sürümü var mı?</h3>
+        <p>Eskiden HTML 4.01, XHTML, HTML5 gibi numaralı sürümler yayımlanırdı. <b>Bugün böyle bir numaralandırma yok.</b></p>
+        <p style="margin-top:.4rem">HTML artık <b>WHATWG</b> tarafından yürütülen ve sürekli güncellenen tek bir <b>"Yaşayan Standart" (Living Standard)</b> olarak yayımlanır. "HTML6 ne zaman çıkacak?" sorusunun bir karşılığı yoktur.</p>
+        <p style="margin-top:.4rem">"HTML5" bugün hâlâ kullanılır ama <b>bir sürüm numarasından çok, modern HTML anlamında</b> kullanılır.</p></div>
+    </div>
+    <div class="warn"><b>Sık yapılan hata:</b> Öznitelik değerini tırnak içine almamak veya kapanış etiketini unutmak. Tarayıcı çoğu zaman hata mesajı vermez; sayfayı <b>tahmin ederek</b> çizer ve sonuç beklediğinden farklı çıkar.</div>
+  </div>
+</section>
+
+<!-- ============ 27 EDİTÖRLER ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.3 HTML</span><span class="kd">—</span><span class="ks">1.3.1 HTML Editörleri</span></div>
+  <p class="bridge">HTML düz metindir; teknik olarak Not Defteri bile yeterlidir. Peki neden özel editör kullanıyoruz?</p>
+  <h2>Kod editörleri, yazmayı hızlandırır ve hatayı yazarken yakalar</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><h3>Kod editörünün sağladıkları</h3>
+        <ul>
+          <li><b>Renklendirme:</b> Etiket, öznitelik ve metin farklı renkte görünür; yanlış yazımı gözle yakalarsın.</li>
+          <li><b>Otomatik tamamlama:</b> Etiket yazmaya başlayınca devamını önerir, kapanışı kendi ekler.</li>
+          <li><b>Hata uyarısı:</b> Kapanmamış etiketi çalıştırmadan önce gösterir.</li>
+          <li><b>Canlı önizleme:</b> Dosyayı kaydettiğinde tarayıcı kendi kendine yenilenir.</li>
+          <li><b>Klasör yönetimi:</b> Projenin tüm dosyaları tek pencerede durur.</li>
+        </ul></div>
+      <div class="card"><span class="tag">GÜNCEL DURUM</span><h3>Bugün hangileri kullanılıyor?</h3>
+        <table style="font-size:.95rem; margin-top:.2rem">
+          <tr><td style="width:36%"><b>Visual Studio Code</b></td><td>Ücretsiz. Bugün <b>en yaygın</b> kullanılan editör; sınıfta da bunu kullanıyoruz.</td></tr>
+          <tr><td><b>Sublime Text</b></td><td>Çok hızlı, hafif. Ücretli (süresiz denenebilir).</td></tr>
+          <tr><td><b>Notepad++</b></td><td>Ücretsiz, Windows. Hızlı düzeltmeler için pratik.</td></tr>
+          <tr><td><b>WebStorm</b></td><td>Güçlü, ücretli. Öğrencilere ücretsiz lisans verilebiliyor.</td></tr>
+        </table>
+        <div class="warn" style="margin-top:.5rem"><b>Artık önerilmiyor:</b> <b>Atom</b> 2022'de kapatıldı; <b>Brackets</b>'in geliştiricisi desteği bıraktı. Eski kaynaklarda bu iki isim hâlâ önerilir — güncel değildir.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 28 1.4 CSS ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.4 CSS</span><span class="kd">—</span><span class="ks">Neden Ayrı Bir Dil?</span></div>
+  <p class="bridge">HTML sayfanın ne olduğunu söylüyordu; görünümü kim belirliyor?</p>
+  <h2>CSS, HTML ile işaretlenmiş içeriğin nasıl görüneceğini belirleyen stil dilidir</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><h3>Açılımı</h3>
+        <p><b>CSS</b> = <span class="ic">Cascading Style Sheets</span> — Basamaklı Stil Şablonları.</p>
+        <ul>
+          <li><b>Style (Stil):</b> Renk, yazı tipi, boyut, boşluk, yerleşim.</li>
+          <li><b>Sheet (Şablon):</b> Kurallar ayrı bir dosyada toplanır.</li>
+          <li><b>Cascading (Basamaklı):</b> Aynı öğeye birden fazla kural denk gelirse hangisinin geçerli olacağı belirli bir sıraya göre çözülür.</li>
+        </ul></div>
+      <div class="card"><h3>Neden HTML'in içine gömmüyoruz?</h3>
+        <p>Bir sitede 40 sayfa varsa ve renk her sayfaya ayrı ayrı yazılmışsa, kurumsal renk değiştiğinde <b>40 dosyayı tek tek düzenlemen</b> gerekir.</p>
+        <p style="margin-top:.4rem">Stiller tek bir <span class="ic">stil.css</span> dosyasında toplandığında, <b>tek bir satırı değiştirmek 40 sayfayı birden günceller.</b></p>
+        <div class="good" style="margin-top:.5rem"><b>Temel ilke:</b> İçerik ile görünümü ayır. HTML "ne", CSS "nasıl görünecek" sorusunu cevaplar.</div></div>
+    </div>
+    <div class="quote">Aynı insan, aynı bedenle farklı kıyafetler giyebilir. <b>HTML bedendir, CSS kıyafettir.</b> Kıyafeti değiştirmek için insanı değiştirmek gerekmez.</div>
+  </div>
+</section>
+
+<!-- ============ 29 CSS'SİZ vs CSS'Lİ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.4 CSS</span><span class="kd">—</span><span class="ks">CSS'siz ve CSS'li Aynı Sayfa</span></div>
+  <p class="bridge">Aşağıdaki iki pencerede <b>birebir aynı HTML</b> var; tek fark, sağdakine bir stil dosyasının bağlı olması.</p>
+  <h2>Aynı HTML, CSS olmadan ve CSS ile</h2>
+  <div class="split" style="max-height:70vh">
+    <div class="panel">
+      <div class="urlbar"><span style="color:#ff8080">&#9679;</span><span class="u">CSS bağlı DEĞİL</span>
+        <button class="reset" data-reset="fr-d1">&#10226;</button></div>
+      <iframe id="fr-d1" title="cssiz"></iframe>
+    </div>
+    <div class="panel">
+      <div class="urlbar"><span style="color:#5fe3c0">&#9679;</span><span class="u">stil.css bağlı</span>
+        <button class="reset" data-reset="fr-d2">&#10226;</button></div>
+      <iframe id="fr-d2" title="cssli"></iframe>
+    </div>
+  </div>
+  <div class="row g2" style="margin-top:.35rem">
+    <div class="warn" style="font-size:.92rem"><b>Soldaki bozuk değil.</b> İçerik, başlıklar, sıralama ve bağlantılar yerli yerinde — HTML görevini yapıyor. Eksik olan tek şey görünüm.</div>
+    <div class="good" style="font-size:.92rem"><b>Sağdaki yeni içerik eklemiyor.</b> Aynı metni farklı renk, boşluk ve düzenle gösteriyor. Tek satır HTML değişmedi.</div>
+  </div>
+</section>
+
+<!-- ============ 30 CSS KURAL ANATOMİ ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.4 CSS</span><span class="kd">—</span><span class="ks">Kuralın Yapısı ve Yazım Yerleri</span></div>
+  <p class="bridge">Sağdaki sayfayı biçimlendiren kuralların nasıl yazıldığına bakalım.</p>
+  <h2>Bir CSS kuralının parçaları</h2>
+  <div class="grow">
+    <div class="anat" style="margin:.2rem 0 .3rem">
+      <div class="part hl"><span class="val">h1</span><span class="lbl">Seçici (selector)<br>hangi öğeler?</span></div>
+      <div class="part"><span class="val">{</span><span class="lbl"></span></div>
+      <div class="part hl"><span class="val">color</span><span class="lbl">Özellik (property)<br>neyi?</span></div>
+      <div class="part"><span class="val">:</span><span class="lbl"></span></div>
+      <div class="part hl"><span class="val">navy</span><span class="lbl">Değer (value)<br>nasıl?</span></div>
+      <div class="part"><span class="val">;</span><span class="lbl">Kural sonu</span></div>
+      <div class="part"><span class="val">}</span><span class="lbl"></span></div>
+    </div>
+    <div class="row g2">
+      <div class="card"><h3>CSS'i sayfaya bağlamanın üç yolu</h3>
+        <table style="font-size:.95rem">
+          <tr><th style="width:24%">Yol</th><th>Nasıl</th><th style="width:32%">Ne zaman</th></tr>
+          <tr><td><b>Harici<br>(external)</b></td><td>Ayrı <span class="ic">stil.css</span> dosyası, sayfaya <span class="ic">&lt;link&gt;</span> ile bağlanır.</td><td><b>Gerçek projelerde kullanılan yöntem budur.</b> Tüm sayfalar aynı dosyayı paylaşır.</td></tr>
+          <tr><td><b>Dâhili<br>(internal)</b></td><td>Sayfanın <span class="ic">&lt;head&gt;</span> bölümüne <span class="ic">&lt;style&gt;</span> içine yazılır.</td><td>Yalnızca tek sayfaya özel, küçük denemelerde.</td></tr>
+          <tr><td><b>Satır içi<br>(inline)</b></td><td>Etiketin kendi <span class="ic">style</span> özniteliğine yazılır.</td><td>Neredeyse hiç. Tekrar üretir, bakımı zordur.</td></tr>
+        </table></div>
+      <div class="card"><h3>"Basamaklı" ne demek?</h3>
+        <p>Aynı öğeye birden fazla kural denk gelebilir. Tarayıcı hangisini uygulayacağına şu sıraya bakarak karar verir:</p>
+        <ul>
+          <li>Kuralın <b>ne kadar özel</b> olduğu (bir sınıfa yazılan kural, tüm etikete yazılandan güçlüdür).</li>
+          <li>Özellik aynı güçteyse <b>sonra yazılan</b> kazanır.</li>
+        </ul>
+        <div class="warn" style="margin-top:.45rem"><b>Bu yüzden:</b> "CSS'imi yazdım ama uygulanmıyor" şikâyetinin sebebi çoğu zaman kuralın yanlış olması değil, <b>başka bir kuralın onu ezmesidir.</b></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 31 1.5 WYSIWYG ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.5 WYSIWYG</span><span class="kd">—</span><span class="ks">Nedir?</span></div>
+  <p class="bridge">Kod yazmadan da site kurulabilir; bu araçlara WYSIWYG editörler denir.</p>
+  <h2>WYSIWYG: ekranda düzenlediğin şey, yayında göreceğin şeydir</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><h3>Açılımı</h3>
+        <p><b>WYSIWYG</b> = <span class="ic">What You See Is What You Get</span> — "Ne görüyorsan onu alırsın." (Okunuşu: <i>vizivig</i>.)</p>
+        <p style="margin-top:.4rem">Kod yazmak yerine sayfayı doğrudan görsel olarak düzenlersin: metni tıklayıp yazarsın, görseli sürükleyip bırakırsın, butonun rengini bir menüden seçersin.</p>
+        <p style="margin-top:.4rem">Arka planda HTML ve CSS <b>yine üretilir</b> — sadece onu sen yazmazsın, araç yazar.</p></div>
+      <div class="card"><h3>Zaten tanıdığın bir örnek</h3>
+        <p>Word'de yazı yazarken kod yazmıyorsun; metni seçip <b>kalın</b> yapıyorsun ve ekranda anında kalın görünüyor. Yazdırdığında da aynı görünüyor. <b>Word bir WYSIWYG editördür.</b></p>
+        <div class="quote" style="margin-top:.5rem; font-size:.95rem">Otomatik vitesli araba gibi: vites değiştirme işi yine yapılıyor, ama sen yapmıyorsun. Kolay ve hızlı; ama arıza çıktığında ne olup bittiğini anlamak zor.</div></div>
+    </div>
+    <div class="bigrule">WYSIWYG bir <b>dil değildir</b>, bir <b>çalışma biçimidir</b>: kodu yazmak yerine sonucu düzenlersin.</div>
+  </div>
+</section>
+
+<!-- ============ 32 WYSIWYG ARAÇLAR ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.5 WYSIWYG</span><span class="kd">—</span><span class="ks">Güncel Araçlar</span></div>
+  <p class="bridge">Bu alan hızlı değişiyor; eski kaynaklardaki isimlerin çoğu artık kullanılmıyor.</p>
+  <h2>Bugün kullanılan görsel site kurma araçları</h2>
+  <div class="grow">
+    <div class="row g2">
+      <div class="card"><span class="tag">GÜNCEL &#183; YAYGIN</span><h3>Bugün kullanılanlar</h3>
+        <table style="font-size:.95rem">
+          <tr><td style="width:30%"><b>WordPress</b></td><td>İnternetteki sitelerin çok büyük bir bölümünü çalıştırır. Görsel düzenleyicisi ve eklentileriyle kod yazmadan site kurulabilir.</td></tr>
+          <tr><td><b>Wix</b></td><td>Sürükle-bırak mantığıyla, tarayıcıdan site kurma. Kurulum gerektirmez.</td></tr>
+          <tr><td><b>Webflow</b></td><td>Görsel arayüzde çalışır ama HTML/CSS kavramlarını doğrudan kullanır. Tasarımcılar arasında yaygın.</td></tr>
+          <tr><td><b>Framer</b></td><td>Tasarımdan yayına geçişi hızlandıran, son yıllarda hızla yaygınlaşan araç.</td></tr>
+          <tr><td><b>Canva</b> / <b>Google Sites</b></td><td>Basit tanıtım sayfaları için hızlı ve ücretsiz seçenekler. Okul projeleri için pratiktir.</td></tr>
+        </table></div>
+      <div class="card"><span class="tag">ESKİMİŞ &#183; DİKKAT</span><h3>Eski kaynaklarda geçen isimler</h3>
+        <table style="font-size:.95rem">
+          <tr><td style="width:36%"><b>Adobe Dreamweaver</b></td><td>Hâlâ satılıyor ve güncelleniyor, ancak uzun süredir yeni özellik almıyor ve eski yaygınlığını kaybetti.</td></tr>
+          <tr><td><b>Adobe Muse</b></td><td>2020'de tamamen bırakıldı.</td></tr>
+          <tr><td><b>Microsoft Expression Web</b></td><td>Geliştirilmesi 2012'de durdu.</td></tr>
+          <tr><td><b>NVU / KompoZer</b></td><td>Yıllardır güncellenmiyor.</td></tr>
+          <tr><td><b>FrontPage</b></td><td>Çok eski; artık kullanılmıyor.</td></tr>
+        </table>
+        <div class="warn" style="margin-top:.5rem"><b>Öğrencilere not:</b> Bir aracın adını duymanız yetmez; <b>hâlâ geliştirilip geliştirilmediğine</b> bakmak gerekir. Bu, meslek hayatı boyunca kullanacağınız bir alışkanlıktır.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 33 NEDEN KOD ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">1.5 WYSIWYG</span><span class="kd">—</span><span class="ks">Kod Yazmak mı, Araç Kullanmak mı?</span></div>
+  <p class="bridge">İkisi rakip değil; hangisinin nerede işe yaradığını bilmek gerekiyor.</p>
+  <h2>WYSIWYG ile kod yazmanın karşılaştırması</h2>
+  <div class="grow">
+    <table>
+      <tr><th style="width:18%">Ölçüt</th><th>WYSIWYG editör</th><th>Kod yazmak</th></tr>
+      <tr><td><b>Başlangıç hızı</b></td><td>Çok hızlı; birkaç saatte yayında bir site</td><td>Yavaş; önce dili öğrenmek gerekir</td></tr>
+      <tr><td><b>Esneklik</b></td><td>Aracın izin verdiği kadar</td><td>Sınırsız; aklına geleni yapabilirsin</td></tr>
+      <tr><td><b>Üretilen kod</b></td><td>Genelde gereğinden şişkin ve karmaşık</td><td>Sade ve kontrol sende</td></tr>
+      <tr><td><b>Hata çözme</b></td><td>Zor; sorunun nereden geldiğini göremezsin</td><td>Kod senin; nereye bakacağını bilirsin</td></tr>
+      <tr><td><b>Taşınabilirlik</b></td><td>Araca bağımlı kalabilirsin</td><td>Dosyalar senindir, her yere taşınır</td></tr>
+      <tr><td><b>Kimin için</b></td><td>Hızlı tanıtım sitesi isteyen işletme, blog yazarı</td><td>Yazılım geliştirici, özel çözüm gereken projeler</td></tr>
+    </table>
+    <div class="good"><b>Bu dersin cevabı:</b> WYSIWYG araçları kullanmak kötü değildir; ama <b>önce kodu öğrenen kişi, aracın ürettiğini okuyabilir, düzeltebilir ve gerektiğinde aracın sınırını aşabilir.</b> Tersi mümkün değildir.</div>
+    <div class="quote">Hesap makinesi kullanmak yanlış değildir; ama dört işlemi bilmeyen biri, hesap makinesi yanlış sonuç verdiğinde bunu fark edemez.</div>
+  </div>
+</section>
+
+<!-- ============ 34 ÖZET ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">ÖĞRENME BİRİMİ 1</span><span class="kd">—</span><span class="ks">Özet</span></div>
+  <p class="bridge">Bu birimde öğrendiklerimizi tek ekranda toplayalım.</p>
+  <h2>Temel kavramların özeti</h2>
+  <div class="grow">
+    <div class="cards c2">
+      <div class="card"><span class="tag">1.1</span><h3>Yayınlama</h3>
+        <ul>
+          <li>Web sayfası, tarayıcıda tek adres olarak açılan tek bir belgedir.</li>
+          <li>Web sitesi, aynı alan adı altında toplanmış ve birbirine bağlı sayfalar bütünüdür.</li>
+          <li>Alan adı, sunucunun IP adresi yerine yazdığımız okunabilir isimdir ve DNS ile IP'ye çevrilir.</li>
+          <li>Alan adı satın alınmaz, süreli olarak kiralanır.</li>
+          <li>Hosting, site dosyalarının 7/24 açık bir sunucuda barındırılmasıdır.</li>
+          <li>Site ancak alan adı, hosting ve dosyalar birbirine bağlandığında yayına girer.</li>
+        </ul></div>
+      <div class="card"><span class="tag">1.2</span><h3>Roller</h3>
+        <ul>
+          <li>Ön uç yazılımcı, kullanıcının tarayıcısında çalışan arayüzü geliştirir.</li>
+          <li>Arka uç yazılımcı, sunucudaki veriyi ve kuralları yönetir.</li>
+          <li>Full stack yazılımcı, her iki katmanda da çalışabilir.</li>
+          <li>Güvenlikle ilgili kontrollerin asıl sorumlusu her zaman sunucu tarafıdır.</li>
+        </ul></div>
+      <div class="card"><span class="tag">1.3 &#183; 1.4</span><h3>HTML ve CSS</h3>
+        <ul>
+          <li>HTML bir işaretleme dilidir; içeriğin ne olduğunu etiketlerle belirtir.</li>
+          <li>HTML bir programlama dili değildir; karar ve döngü içermez.</li>
+          <li>CSS, aynı içeriğin nasıl görüneceğini belirler.</li>
+          <li>Stiller ayrı bir dosyada toplandığında tek değişiklik tüm siteyi günceller.</li>
+        </ul></div>
+      <div class="card"><span class="tag">1.5</span><h3>WYSIWYG</h3>
+        <ul>
+          <li>WYSIWYG, kod yazmak yerine sonucu görsel olarak düzenleme biçimidir.</li>
+          <li>Arka planda HTML ve CSS yine üretilir; onu araç yazar.</li>
+          <li>Hızlıdır ama esnekliği ve hata çözme imkânı sınırlıdır.</li>
+          <li>Kodu bilen kişi aracı da kullanabilir; tersi geçerli değildir.</li>
+        </ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 35 KONTROL ============ -->
+<section class="slide">
+  <div class="kicker"><span class="kt">ÖĞRENME BİRİMİ 1</span><span class="kd">—</span><span class="ks">Kontrol Soruları</span></div>
+  <p class="bridge">Kavramları gerçekten anladığımızı sınamak için altı soru.</p>
+  <h2>Öğrendiklerimizi sınayalım</h2>
+  <div class="grow">
+    <div class="cards" style="overflow:auto; min-height:0; align-content:start; padding-right:.2rem">
+      <div class="card"><h3>1</h3><p>Bir haber sitesinde okuduğun tek bir haber, web sayfası mıdır yoksa web sitesi midir? Cevabını gerekçesiyle açıkla.</p>
+        <button class="cbtn">Cevabı göster</button>
+        <div class="cev"><b>Web sayfasıdır.</b> Tarayıcıda tek bir adres olarak açılan tek bir belgedir. Haber sitesinin tamamı — anasayfası, kategorileri ve bütün haberleri birlikte — web sitesidir.</div></div>
+      <div class="card"><h3>2</h3><p>Alan adı ile hosting arasındaki farkı, adres ve bina benzetmesini kullanmadan kendi cümlelerinle anlat.</p>
+        <button class="cbtn">Cevabı göster</button>
+        <div class="cev"><b>Alan adı</b>, kullanıcının tarayıcıya yazdığı ve DNS aracılığıyla bir IP adresine karşılık gelen isimdir. <b>Hosting</b> ise site dosyalarının durduğu ve gelen istekleri karşılayan sunucu hizmetidir. Biri sitenin <b>ismi</b>, diğeri dosyalarının <b>bulunduğu yerdir</b>.</div></div>
+      <div class="card"><h3>3</h3><p>Bir sitenin adresi <span class="ic">k12.tr</span> ile bitiyor. Bu adresin sahibi hakkında hangi bilgiye güvenle sahip olabiliriz, neden?</p>
+        <button class="cbtn">Cevabı göster</button>
+        <div class="cev">Sahibinin <b>okul öncesi, ilköğretim veya lise düzeyinde bir eğitim kurumu</b> olduğuna. Çünkü <span class="ic">k12.tr</span> <b>belgeli</b> bir uzantıdır; başvuran, okul olduğunu belgelemek zorundadır. Belgesiz uzantılarda böyle bir güvence yoktur.</div></div>
+      <div class="card"><h3>4</h3><p>Kullanıcının girdiği parolanın doğruluğu neden ön uçta değil, arka uçta kontrol edilir?</p>
+        <button class="cbtn">Cevabı göster</button>
+        <div class="cev">Ön uçtaki kod <b>kullanıcının kendi bilgisayarında</b> çalışır; kullanıcı onu değiştirebilir veya devre dışı bırakabilir. Ayrıca parolanın doğruluğu ancak veritabanındaki kayıtla karşılaştırılarak anlaşılır ve o kayıt <b>sunucudadır</b>. Bu yüzden güvenlik kararını her zaman sunucu verir.</div></div>
+      <div class="card"><h3>5</h3><p>"HTML bir programlama dili değildir" cümlesini, bir programlama dilinde olup HTML'de olmayan iki özelliği söyleyerek gerekçelendir.</p>
+        <button class="cbtn">Cevabı göster</button>
+        <div class="cev"><b>Karar (koşul)</b> ve <b>tekrar (döngü)</b>. HTML'de "eğer şu doğruysa şunu yap" veya "bunu on kez tekrarla" diyemezsin. Hesaplama ve değişken de yoktur. HTML yalnızca içeriğin <b>ne olduğunu</b> işaretler.</div></div>
+      <div class="card"><h3>6</h3><p>Kurumsal renk değiştiğinde 40 sayfalık bir sitede yalnızca tek bir dosyayı düzenlemek için CSS'i hangi yöntemle bağlamış olmamız gerekir?</p>
+        <button class="cbtn">Cevabı göster</button>
+        <div class="cev"><b>Harici (external) yöntemle.</b> Stiller ayrı bir <span class="ic">stil.css</span> dosyasında tutulur ve 40 sayfanın her birine <span class="ic">&lt;link&gt;</span> ile bağlanır. Böylece o tek dosyadaki bir satır değişince bütün sayfalar birden güncellenir.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 36 KAPANIŞ ============ -->
+<section class="slide cover">
+  <div class="eyebrow">ÖĞRENME BİRİMİ 1</div>
+  <h1>Temel Kavramlar</h1>
+  <div class="line"></div>
+  <p class="sub" style="max-width:78ch">Artık bir web sitesinin nelerden oluştuğunu, internette nasıl bir adres ve yer edindiğini,
+  onu kimlerin hangi rollerle geliştirdiğini ve HTML ile CSS'in görev paylaşımını biliyoruz.</p>
+  <div class="bigrule" style="max-width:80ch">HTML <b>ne olduğunu</b> söyler, CSS <b>nasıl görüneceğini</b> söyler,<br>alan adı <b>nereden bulunacağını</b>, hosting <b>nerede duracağını</b> söyler.</div>
+</section>
+
+</div>
+
+<div class="bar" id="bar"></div>
+<div class="hud">
+  <button class="navbtn" id="prev">&#8592;</button>
+  <button class="navbtn" id="next">&#8594;</button>
+  <span class="t" id="hudtitle"></span>
+  <span id="counter"></span>
+</div>
+
+<script>
+/* ============ ORTAK ÖNİZLEME ÇERÇEVESİ ============ */
+var BASE = 'html{font-size:17px}body{font-family:Segoe UI,system-ui,Arial,sans-serif;margin:0;padding:14px 16px;color:#1b2333;line-height:1.5}';
+
+function doc(head, body){
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">'
+       + '<style>' + BASE + (head||'') + '</style></head><body>' + body + '</body></html>';
+}
+
+/* ---------- DEMO A: tek web sayfası ---------- */
+var SRC_A =
+'<!DOCTYPE html>\n' +
+'<html lang="tr">\n' +
+'<head>\n' +
+'  <meta charset="utf-8">\n' +
+'  <title>İletişim | Okulum</title>\n' +
+'</head>\n' +
+'<body>\n' +
+'  <h1>İletişim</h1>\n' +
+'  <p>Bize aşağıdaki bilgilerden\n' +
+'     ulaşabilirsiniz.</p>\n' +
+'  <h2>Adres</h2>\n' +
+'  <p>Cumhuriyet Mah. Okul Cad. No: 12\n' +
+'     Merkez / Kayseri</p>\n' +
+'  <h2>Telefon</h2>\n' +
+'  <p>0352 000 00 00</p>\n' +
+'  <p>\n' +
+'    <a href="index.html">Anasayfaya dön</a>\n' +
+'  </p>\n' +
+'</body>\n' +
+'</html>';
+
+/* ---------- DEMO C: etiketler ---------- */
+var SRC_C =
+'<h1>Bilişim Teknolojileri Alanı</h1>\n' +
+'\n' +
+'<p>Alanımızda iki dal bulunmaktadır.</p>\n' +
+'\n' +
+'<h2>Dallarımız</h2>\n' +
+'<ul>\n' +
+'  <li>Yazılım Geliştirme</li>\n' +
+'  <li>Ağ İşletmenliği</li>\n' +
+'</ul>\n' +
+'\n' +
+'<h2>Ders Saatleri</h2>\n' +
+'<table border="1">\n' +
+'  <tr>\n' +
+'    <th>Gün</th><th>Saat</th>\n' +
+'  </tr>\n' +
+'  <tr>\n' +
+'    <td>Pazartesi</td><td>09.00</td>\n' +
+'  </tr>\n' +
+'  <tr>\n' +
+'    <td>Çarşamba</td><td>11.00</td>\n' +
+'  </tr>\n' +
+'</table>\n' +
+'\n' +
+'<p><strong>Not:</strong> Kayıtlar\n' +
+'   <em>eylül ayında</em> yapılır.</p>\n' +
+'\n' +
+'<p>\n' +
+'  <a href="iletisim.html">İletişim</a>\n' +
+'</p>';
+
+/* ---------- DEMO D: aynı HTML, CSS'siz ve CSS'li ---------- */
+var D_BODY =
+'<header class="ust">' +
+'  <h1>Anadolu Teknik Lisesi</h1>' +
+'  <nav><a href="#">Anasayfa</a> <a href="#">Alanlar</a> <a href="#">Duyurular</a> <a href="#">İletişim</a></nav>' +
+'</header>' +
+'<section class="hero">' +
+'  <h2>Geleceğin teknoloji üreticileri burada yetişiyor</h2>' +
+'  <p>Yazılım geliştirme ve ağ işletmenliği dallarında uygulamalı eğitim.</p>' +
+'  <p><a class="btn" href="#">Kayıt bilgileri</a></p>' +
+'</section>' +
+'<section class="kartlar">' +
+'  <article class="kart"><h3>Yazılım Geliştirme</h3><p>Web ve mobil uygulama geliştirme üzerine uygulamalı atölye dersleri.</p></article>' +
+'  <article class="kart"><h3>Ağ İşletmenliği</h3><p>Ağ kurulumu, sistem yönetimi ve siber güvenlik temelleri.</p></article>' +
+'  <article class="kart"><h3>Staj ve İş Birliği</h3><p>Sektördeki firmalarla yürütülen beceri eğitimi programı.</p></article>' +
+'</section>' +
+'<footer class="alt"><p>Anadolu Teknik Lisesi &#183; Merkez / Kayseri</p></footer>';
+
+var D_CSS =
+'body{margin:0;padding:0;background:#f4f6fb;color:#1b2333}' +
+'.ust{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;' +
+'background:#123a6b;color:#fff;padding:14px 20px}' +
+'.ust h1{font-size:1.15rem;margin:0}' +
+'.ust nav a{color:#cfe0fb;text-decoration:none;margin-left:14px;font-size:.9rem}' +
+'.ust nav a:hover{color:#fff;text-decoration:underline}' +
+'.hero{background:linear-gradient(135deg,#1c4f96,#2a7fc4);color:#fff;padding:30px 20px;text-align:center}' +
+'.hero h2{margin:0 0 8px;font-size:1.35rem;line-height:1.25}' +
+'.hero p{margin:0 0 12px;color:#dfeaff;font-size:.95rem}' +
+'.btn{display:inline-block;background:#ffb43d;color:#3a2600;text-decoration:none;' +
+'padding:9px 20px;border-radius:999px;font-weight:700;font-size:.9rem}' +
+'.kartlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;padding:20px}' +
+'.kart{background:#fff;border:1px solid #dde4f0;border-radius:12px;padding:14px 16px;' +
+'box-shadow:0 2px 10px rgba(18,58,107,.07)}' +
+'.kart h3{margin:0 0 6px;font-size:1rem;color:#123a6b}' +
+'.kart p{margin:0;font-size:.9rem;color:#5a6478}' +
+'.alt{background:#0f2a4d;color:#a9bcd8;text-align:center;padding:12px;font-size:.85rem}' +
+'.alt p{margin:0}';
+
+/* ---------- DEMO B: çok sayfalı site ---------- */
+var SRC_B = doc(
+  'body{margin:0;padding:0}' +
+  '.ust{background:#123a6b;color:#fff;padding:10px 14px}' +
+  '.ust h1{margin:0 0 6px;font-size:1.05rem}' +
+  '.ust a{color:#cfe0fb;text-decoration:none;margin-right:12px;font-size:.9rem;cursor:pointer}' +
+  '.ust a.aktif{color:#ffd479;font-weight:700;text-decoration:underline}' +
+  '.icerik{padding:14px 16px}' +
+  '.icerik h2{margin:0 0 8px;color:#123a6b;font-size:1.1rem}' +
+  '.icerik p{margin:0 0 8px;font-size:.95rem;color:#3c4557}' +
+  '.alt{background:#eef2f9;color:#5a6478;padding:9px 16px;font-size:.82rem}',
+
+  '<header class="ust"><h1>Anadolu Teknik Lisesi</h1>' +
+  '<nav>' +
+  '<a data-p="index.html" class="aktif">Anasayfa</a>' +
+  '<a data-p="alanlar.html">Alanlar</a>' +
+  '<a data-p="iletisim.html">İletişim</a>' +
+  '</nav></header>' +
+  '<main class="icerik">' +
+  '<div data-s="index.html"><h2>Hoş geldiniz</h2><p>Okulumuz Bilişim Teknolojileri alanında yazılım geliştirme ve ağ işletmenliği dallarında eğitim vermektedir.</p><p>Menüden diğer sayfalara geçebilirsiniz.</p></div>' +
+  '<div data-s="alanlar.html" hidden><h2>Alanlarımız</h2><p>Bilişim Teknolojileri &#183; Yazılım Geliştirme</p><p>Bilişim Teknolojileri &#183; Ağ İşletmenliği</p><p>Elektrik-Elektronik Teknolojisi</p></div>' +
+  '<div data-s="iletisim.html" hidden><h2>İletişim</h2><p>Cumhuriyet Mah. Okul Cad. No: 12, Merkez / Kayseri</p><p>Telefon: 0352 000 00 00</p></div>' +
+  '</main>' +
+  '<footer class="alt">Anadolu Teknik Lisesi &#183; Tüm sayfalar aynı alan adı altındadır.</footer>' +
+  '<script>' +
+  'document.querySelectorAll(".ust a").forEach(function(a){' +
+  ' a.addEventListener("click",function(){' +
+  '  var p=a.getAttribute("data-p");' +
+  '  document.querySelectorAll(".ust a").forEach(function(x){x.classList.remove("aktif")});' +
+  '  a.classList.add("aktif");' +
+  '  document.querySelectorAll("[data-s]").forEach(function(s){s.hidden=(s.getAttribute("data-s")!==p)});' +
+  '  parent.postMessage({tip:"sayfa",ad:p},"*");' +
+  ' });' +
+  '});' +
+  '<\/script>'
+);
+
+/* ============ KOD PANELİ (basit renklendirme) ============ */
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function boya(s){
+  var h = esc(s);
+  h = h.replace(/([a-zA-Z-]+)="([^"]*)"/g, '\u0001a\u0002$1\u0001/\u0002=\u0001v\u0002"$2"\u0001/\u0002');
+  h = h.replace(/(&lt;\/?)([a-zA-Z0-9]+)/g, '$1\u0001t\u0002$2\u0001/\u0002');
+  h = h.replace(/\u0001\/\u0002/g, '</span>').replace(/\u0001([atv])\u0002/g, '<span class="$1">');
+  return h;
+}
+function kod(id, src){ var e=document.getElementById(id); if(e) e.innerHTML = boya(src); }
+
+kod('code-a', SRC_A);
+kod('code-c', SRC_C);
+
+/* ============ ÖNİZLEMELER ============ */
+var FRAMES = {
+  'fr-a' : function(){ return SRC_A; },
+  'fr-b' : function(){ return SRC_B; },
+  'fr-c' : function(){ return doc('', SRC_C); },
+  'fr-d1': function(){ return doc('', D_BODY); },
+  'fr-d2': function(){ return doc(D_CSS, D_BODY); }
+};
+
+function yukle(id){
+  var f = document.getElementById(id);
+  if(!f || !FRAMES[id]) return;
+  f.srcdoc = FRAMES[id]();
+  if(id === 'fr-b'){ var u=document.getElementById('url-b'); if(u) u.textContent='okulum.com.tr/index.html'; }
+}
+Object.keys(FRAMES).forEach(yukle);
+
+document.querySelectorAll('.reset').forEach(function(b){
+  b.addEventListener('click', function(){ yukle(b.getAttribute('data-reset')); });
+});
+
+window.addEventListener('message', function(e){
+  if(e.data && e.data.tip === 'sayfa'){
+    var u = document.getElementById('url-b');
+    if(u) u.textContent = 'okulum.com.tr/' + e.data.ad;
+  }
+});
+
+/* ============ KONTROL SORULARI: CEVAP GÖSTER ============ */
+document.querySelectorAll('.cbtn').forEach(function(b){
+  b.addEventListener('click', function(){
+    var c = b.nextElementSibling;
+    if(!c) return;
+    var acik = c.classList.toggle('acik');
+    b.textContent = acik ? 'Cevabı gizle' : 'Cevabı göster';
+  });
+});
+
+/* ============ SLAYT GEZİNME ============ */
+var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var i = 0;
+function goster(n){
+  i = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach(function(s, k){ s.classList.toggle('on', k === i); });
+  document.getElementById('bar').style.width = ((i + 1) / slides.length * 100) + '%';
+  document.getElementById('counter').textContent = (i + 1) + ' / ' + slides.length;
+  var kt = slides[i].querySelector('.kicker .kt');
+  var ks = slides[i].querySelector('.kicker .ks');
+  var h  = slides[i].querySelector('h2, h1');
+  var et = (kt ? kt.textContent : '') + (ks ? ' \u2014 ' + ks.textContent : '');
+  document.getElementById('hudtitle').textContent =
+    (et ? et + '  \u00b7  ' : '') + (h ? h.textContent.replace(/\s+/g,' ').trim() : '');
+}
+document.getElementById('next').addEventListener('click', function(){ goster(i + 1); });
+document.getElementById('prev').addEventListener('click', function(){ goster(i - 1); });
+/* Önizlemeye tıklandığında odak iframe'e geçip ok tuşları çalışmaz hâle gelir;
+   odağı sunuya geri alıyoruz (demolar tıklanabilir kalır). */
+setInterval(function(){
+  var a = document.activeElement;
+  if(a && a.tagName === 'IFRAME'){ a.blur(); window.focus(); }
+}, 350);
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); goster(i + 1); }
+  else if(e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goster(i - 1); }
+  else if(e.key === 'Home') goster(0);
+  else if(e.key === 'End') goster(slides.length - 1);
+});
+goster(0);
+</script>
+</body>
+</html>

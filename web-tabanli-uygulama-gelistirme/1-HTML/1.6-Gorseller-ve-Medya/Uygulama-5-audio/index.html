@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!--tek ses dosyası ekleme işlemi-->
+    <audio src="sesler/arka-plan-muzigi.mp3" controls></audio>
+
+    <!--birden fazla formatta ses dosyası ekleme-->
+    <audio controls loop>
+        <source src="sesler/arka-plan-muzigi.mp3" type="audio/mpeg">
+        <source src="sesler/arka-plan-muzigi.ogg" type="audio/ogg">
+        <source src="sesler/arka-plan-muzigi.wav" type="audio/wav">
+        Tarayıcınız bu ses dosyasını desteklemiyor
+    </audio>
+</body>
+</html>

@@ -11,7 +11,5 @@
 | 4 | 5-9 Ekim | if, if-else, else if | [Hafta_4](./haftalik-dersler/Hafta_4_5-9_Ekim) |
 | 5 | 12-16 Ekim | İç içe if, switch, `&&` ve `\|\|` | [Hafta_5](./haftalik-dersler/Hafta_5_12-16_Ekim) |
 | 6 | 19-23 Ekim | Mantıksal operatörler ve döngüler | [Hafta_6](./haftalik-dersler/Hafta_6_19-23_Ekim) |
-| — | — | Genel tekrar (kitap kapsamı) | [Genel_Tekrar_Kitap_Kapsami](./haftalik-dersler/Genel_Tekrar_Kitap_Kapsami) |
-| — | — | Genel tekrar (uygulamalar) | [Genel_Tekrar_Uygulamalari](./haftalik-dersler/Genel_Tekrar_Uygulamalari) |
 
 Her hafta klasöründe: `Hafta_X_Sunum.html`, `Calisma_Sorulari.html`.

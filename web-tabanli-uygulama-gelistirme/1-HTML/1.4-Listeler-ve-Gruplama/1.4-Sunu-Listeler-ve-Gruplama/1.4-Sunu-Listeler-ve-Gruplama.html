@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listeler ve Gruplama</title>
+<style>
+:root{
+  --bg:#0e151d; --bg2:#131d27; --panel:#16212c; --line:#26343f;
+  --text:#e9f0f6; --muted:#a7bccd;
+  --accent:#7cc4ff; --accent-2:#5eead4;
+  --bad:#fca5a5; --good:#86efac; --warn:#fcd34d;
+  --code:#0a1017;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  overflow:hidden;
+}
+.deck{position:relative;height:100vh;width:100vw;overflow:hidden}
+.slide{
+  position:absolute; inset:0;
+  display:none; flex-direction:column; justify-content:center;
+  padding:2.6vh 3.2vw 7.5vh;
+  opacity:0; transition:opacity .18s ease;
+}
+.slide.on{display:flex;opacity:1}
+.slide > *{flex-shrink:0}
+
+/* --- kicker --- */
+.kicker{
+  display:inline-flex; align-items:center; gap:.5rem;
+  align-self:flex-start;
+  font-size:1.05rem; font-weight:700; letter-spacing:.02em;
+  text-transform:none;
+  background:#101b25; border:1px solid var(--line);
+  border-radius:999px; padding:.34rem .95rem; margin-bottom:.7rem;
+}
+.kicker .kt{color:var(--accent-2)}
+.kicker .kd{color:#54687a}
+.kicker .ks{color:var(--accent)}
+
+.bridge{font-size:1rem;color:var(--muted);margin:0 0 .35rem;max-width:105ch}
+h2{
+  font-size:clamp(1.3rem,2.4vw,1.85rem); line-height:1.2;
+  margin:.1rem 0 .8rem; font-weight:750; letter-spacing:-.01em;
+}
+h1{font-size:clamp(2.1rem,4.6vw,3.4rem);line-height:1.1;margin:0 0 .8rem;letter-spacing:-.02em}
+.sub{font-size:clamp(1.18rem,1.7vw,1.45rem);line-height:1.5;color:var(--text);margin:0 0 .7rem;max-width:100ch}
+.sub.muted{color:var(--muted)}
+
+ul.bul{margin:.2rem 0 .6rem;padding-left:1.15rem}
+ul.bul li{font-size:1.12rem;line-height:1.55;margin:.3rem 0}
+ul.bul li::marker{color:var(--accent)}
+
+/* --- kartlar --- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem}
+.card{
+  background:var(--panel); border:1px solid var(--line);
+  border-radius:14px; padding:.85rem 1rem;
+}
+.card h3{font-size:1.18rem;margin:0 0 .4rem;color:var(--accent-2);font-weight:700}
+.card p{font-size:1.12rem;line-height:1.5;margin:.25rem 0;color:var(--text)}
+.card ul{margin:.3rem 0 0;padding-left:1.1rem}
+.card li{font-size:1.05rem;line-height:1.5;margin:.22rem 0;color:var(--muted)}
+.card li::marker{color:#4c6478}
+.card.bad{border-color:#5c2b2b}
+.card.bad h3{color:var(--bad)}
+.card.good{border-color:#2b5c3f}
+.card.good h3{color:var(--good)}
+
+/* --- tablo --- */
+table.tbl{width:100%;border-collapse:collapse;font-size:1.12rem;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden}
+table.tbl th{
+  font-size:.92rem;letter-spacing:.06em;text-transform:none;color:var(--accent-2);
+  text-align:left;padding:.55rem .8rem;background:#101b25;border-bottom:1px solid var(--line);
+  font-weight:700;
+}
+table.tbl td{padding:.5rem .8rem;border-bottom:1px solid #1e2a35;vertical-align:top;line-height:1.45}
+table.tbl tr:last-child td{border-bottom:none}
+table.tbl td.k{color:var(--accent);font-weight:600;white-space:nowrap}
+
+/* --- kutular --- */
+.note{
+  font-size:1.05rem;line-height:1.5;background:#1b1710;border:1px solid #4a3a17;
+  border-left:4px solid var(--warn);border-radius:10px;padding:.6rem .9rem;margin:.5rem 0;
+}
+.quote{
+  font-size:1.12rem;line-height:1.55;background:#101b25;border:1px solid var(--line);
+  border-left:4px solid var(--accent-2);border-radius:10px;padding:.65rem .95rem;margin:.5rem 0;
+  color:#d7e6f2;
+}
+.bigrule{
+  font-size:1.18rem;line-height:1.5;font-weight:650;
+  background:#0f2029;border:1px solid #23505c;border-radius:12px;
+  padding:.7rem 1rem;margin:.5rem 0;color:#dff4fb;
+}
+.cap{font-size:.92rem;color:var(--muted);margin:.3rem 0 0}
+
+/* --- kod ve panel --- */
+.panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  display:flex;flex-direction:column;overflow:hidden;min-height:0;
+  font-size:1.08rem;
+}
+.panel-head{
+  font-size:.95rem;font-weight:700;letter-spacing:.03em;text-transform:none;
+  color:var(--muted);background:#101b25;border-bottom:1px solid var(--line);
+  padding:.4rem .8rem;display:flex;align-items:center;gap:.5rem;flex:0 0 auto;
+}
+.panel-head .dot{width:.55rem;height:.55rem;border-radius:50%;background:#3d4f5e}
+.panel-head .url{
+  margin-left:auto;font-weight:600;color:#8aa2b5;background:#0c141c;
+  border:1px solid var(--line);border-radius:999px;padding:.1rem .6rem;font-size:.85rem;
+}
+.panel-head .reset{
+  margin-left:.4rem;cursor:pointer;background:#0c141c;color:var(--accent-2);
+  border:1px solid var(--line);border-radius:8px;padding:.05rem .45rem;font-size:.95rem;line-height:1.4;
+}
+.panel-head .reset:hover{background:#16323a}
+pre{
+  margin:0;padding:.7rem .85rem;background:var(--code);color:#dbe9f5;
+  font-family:"Cascadia Mono",Consolas,"Courier New",monospace;
+  font-size:clamp(.88rem,1.05vw,1.05rem);line-height:1.5;
+  flex:1;min-height:0;overflow:auto;white-space:pre;
+}
+pre .t{color:#7cc4ff}
+pre .a{color:#5eead4}
+pre .v{color:#fcd34d}
+pre .c{color:#6b8296;font-style:italic}
+pre .x{color:#fca5a5}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-height:62vh;min-height:34vh;flex:1 1 auto}
+.split.wide-code{grid-template-columns:1.15fr 1fr}
+.split iframe{border:0;width:100%;height:100%;background:#fff;flex:1;min-height:0;display:block}
+.codebox{background:var(--code);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.codebox pre{border-radius:0}
+
+code{
+  font-family:"Cascadia Mono",Consolas,"Courier New",monospace;
+  background:#0c141c;border:1px solid var(--line);border-radius:6px;
+  padding:.05em .35em;font-size:.92em;color:#bfe3ff;
+}
+/* --- diyagram --- */
+.boxdiag{display:flex;flex-direction:column;gap:.45rem}
+.blockbox{background:#12303c;border:1px dashed var(--accent);border-radius:8px;
+  padding:.45rem .8rem;font-size:1.05rem;color:#d7f0fb}
+.inlinewrap{background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:.55rem .8rem;font-size:1.08rem;line-height:1.9}
+.inlinebox{background:#153a34;border:1px dashed var(--accent-2);border-radius:6px;padding:.1rem .35rem}
+
+/* --- başlık slaytı --- */
+.title-wrap{margin:auto 0;max-width:100ch}
+.chiprow{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:.35rem .85rem;font-size:1.05rem;color:var(--muted)}
+.chip b{color:var(--accent-2);font-weight:700}
+
+/* --- gezinme --- */
+.nav{
+  position:fixed;left:0;right:0;bottom:0;height:5.4vh;min-height:38px;
+  display:flex;align-items:center;justify-content:center;gap:1rem;
+  background:linear-gradient(to top,rgba(10,16,23,.95),rgba(10,16,23,0));
+  font-size:.95rem;color:var(--muted);z-index:50;
+}
+.nav button{
+  background:var(--panel);color:var(--text);border:1px solid var(--line);
+  border-radius:8px;padding:.2rem .8rem;font-size:1rem;cursor:pointer;
+}
+.nav button:hover{background:#1d2b37}
+.counter{min-width:5.5rem;text-align:center;font-variant-numeric:tabular-nums}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent-2);z-index:60;transition:width .18s ease}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide">
+  <div class="title-wrap">
+    <div class="kicker"><span class="kt">HTML</span><span class="kd">—</span><span class="ks">Bölüm 1</span></div>
+    <h1>Listeler ve Gruplama</h1>
+    <p class="sub muted">İçeriği sıralı, sırasız ve ad&ndash;değer ilişkileriyle anlamlandırmak;
+    anlam katmadan parçaları bir arada tutmak.</p>
+    <div class="chiprow">
+      <span class="chip"><b>ul</b> sırasız liste</span>
+      <span class="chip"><b>ol</b> sıralı liste</span>
+      <span class="chip"><b>li</b> liste öğesi</span>
+      <span class="chip"><b>type · start · reversed · value</b></span>
+      <span class="chip"><b>dl · dt · dd</b> ad&ndash;değer listesi</span>
+      <span class="chip"><b>div</b> blok gruplama</span>
+      <span class="chip"><b>span</b> satır içi gruplama</span>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">NEDEN LİSTE ETİKETİ?</span></div>
+  <p class="bridge">Ekranda benzer görünen iki kod, tarayıcı için aynı şey değildir.</p>
+  <h2>Alt alta yazılmış paragraflar liste değildir</h2>
+  <div class="grid2">
+    <div class="card bad">
+      <h3>Liste gibi görünen ama liste olmayan kod</h3>
+      <div class="codebox"><pre>&lt;<span class="t">p</span>&gt;1. Kredi kartı&lt;/<span class="t">p</span>&gt;
+&lt;<span class="t">p</span>&gt;2. Havale / EFT&lt;/<span class="t">p</span>&gt;
+&lt;<span class="t">p</span>&gt;3. Kapıda ödeme&lt;/<span class="t">p</span>&gt;</pre></div>
+      <ul>
+        <li>Tarayıcı üç ayrı paragraf görür, bir bütün görmez.</li>
+        <li>Numaralar metnin içinde yazdığı için araya öğe eklenince elle düzeltilmesi gerekir.</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>Gerçekten liste olan kod</h3>
+      <div class="codebox"><pre>&lt;<span class="t">ol</span>&gt;
+  &lt;<span class="t">li</span>&gt;Kredi kartı&lt;/<span class="t">li</span>&gt;
+  &lt;<span class="t">li</span>&gt;Havale / EFT&lt;/<span class="t">li</span>&gt;
+  &lt;<span class="t">li</span>&gt;Kapıda ödeme&lt;/<span class="t">li</span>&gt;
+&lt;/<span class="t">ol</span>&gt;</pre></div>
+      <ul>
+        <li>Ekran okuyucu &ldquo;3 öğeli liste&rdquo; diyerek okumaya başlar.</li>
+        <li>Numaraları tarayıcı üretir; araya öğe eklenince kendiliğinden yeniden numaralanır.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="bigrule">HTML'in görevi metni ekrana dizmek değil, o metnin ne olduğunu söylemektir.
+  Liste etiketleri &ldquo;bunlar birbirine ait öğelerdir&rdquo; bilgisini taşır.</div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">SIRASIZ LİSTE: ul</span></div>
+  <p class="bridge">Sırası değişse de anlamı bozulmayan öğeler için sırasız liste kullanılır.</p>
+  <h2>ul, sırası anlam taşımayan öğeleri gruplar</h2>
+  <div class="split" data-demo="ulOdeme" data-url="odeme.html"></div>
+  <p class="cap">ul = unordered list (sırasız liste). Madde işaretini tarayıcı koyar; öğeler yer değiştirse
+  içeriğin anlamı değişmez.</p>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">SIRALI LİSTE: ol</span></div>
+  <p class="bridge">Bazı içeriklerde sıra, içeriğin kendisi kadar önemlidir.</p>
+  <h2>ol, sırası anlamın parçası olan öğeleri gruplar</h2>
+  <div class="split" data-demo="olTarif" data-url="tarif.html"></div>
+  <p class="cap">ol = ordered list (sıralı liste). Numaraları tarayıcı üretir; ikinci adımı silersen
+  üçüncü adım kendiliğinden 2 olur.</p>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">ul mu, ol mu?</span></div>
+  <p class="bridge">Seçim görünüşe göre değil, sıranın anlam taşıyıp taşımadığına göre yapılır.</p>
+  <h2>Karar sorusu: öğelerin yerini değiştirince anlam bozuluyor mu?</h2>
+  <table class="tbl">
+    <tr><th>Gerçek sayfadaki içerik</th><th>Etiket</th><th>Gerekçe</th></tr>
+    <tr><td>Yemek tarifinin hazırlanış adımları</td><td class="k">ol</td><td>Unu pişirdikten sonra eklemek aynı tarif değildir.</td></tr>
+    <tr><td>E-ticaret sitesindeki ödeme yöntemleri</td><td class="k">ul</td><td>Hangisinin önce yazıldığı içeriği değiştirmez.</td></tr>
+    <tr><td>Kargo takip aşamaları (hazırlanıyor &rarr; yolda &rarr; teslim)</td><td class="k">ol</td><td>Aşamalar birbirini takip eder.</td></tr>
+    <tr><td>Sitenin gezinme menüsündeki bağlantılar</td><td class="k">ul</td><td>Bağlantılar arasında bir işlem sırası yoktur.</td></tr>
+    <tr><td>Sözleşme maddeleri</td><td class="k">ol</td><td>Maddelere numarasıyla atıf yapılır.</td></tr>
+  </table>
+  <div class="quote">Alışveriş listesindeki maddelerin sırası önemli değildir; yemek tarifindeki
+  adımların sırası ise yemeğin kendisidir.</div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">LİSTE ÖĞESİ: li</span></div>
+  <p class="bridge">Listenin numarası ve madde işareti içeriğin bir parçası değildir.</p>
+  <h2>Numarayı sen yazmazsın; tarayıcı üretir</h2>
+  <div class="split wide-code" data-demo="liHata" data-url="adimlar.html"></div>
+  <div class="note"><b>li kapanış etiketi:</b> HTML standardı bazı durumlarda <code>&lt;/li&gt;</code>
+  yazılmamasına izin verir. Biz her zaman yazacağız: kod daha okunabilir olur ve iç içe listelerde
+  hangi öğenin nerede bittiği tartışmasız hâle gelir.</div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">İÇ İÇE LİSTELER</span></div>
+  <p class="bridge">Bir liste öğesinin kendi alt öğeleri varsa, alt liste o öğenin içine yerleştirilir.</p>
+  <h2>Alt liste, ait olduğu li kapanmadan önce yazılır</h2>
+  <div class="split" data-demo="icIce" data-url="kurs.html"></div>
+  <div class="note"><b>Sık yapılan hata:</b> Alt listeyi üst <code>&lt;li&gt;</code> kapandıktan sonra
+  yazmak. O zaman ekranda benzer bir girinti görünse bile HTML'de &ldquo;bu konular Frontend'e aittir&rdquo;
+  ilişkisi kurulmamış olur; alt liste, üst öğenin kardeşi hâline gelir.</div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">İÇ İÇE LİSTEDE TÜR SEÇİMİ</span></div>
+  <p class="bridge">Dış listenin türü, iç listenin türünü belirlemez.</p>
+  <h2>Her seviye kendi içeriğinin anlamına göre ul veya ol olur</h2>
+  <div class="split" data-demo="destek" data-url="destek.html"></div>
+  <p class="cap">Destek sayfasında sorunların sırası önemsizdir (dış liste <b>ul</b>), ama her sorunun
+  çözüm adımları sırayla uygulanır (iç listeler <b>ol</b>). İçerik bir öğrenme planı olsaydı ve
+  konular da belirli bir sırayla öğrenilecekse iç listeler de <b>ol</b> olurdu.</p>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">ol ÖZNİTELİĞİ: type</span></div>
+  <p class="bridge">Sıralı listenin işaretleri her zaman 1, 2, 3 olmak zorunda değildir.</p>
+  <h2>type, numaralandırmanın biçimini belirler</h2>
+  <div class="split" data-demo="olType" data-url="sozlesme.html"></div>
+  <table class="tbl" style="margin-top:.7rem">
+    <tr><th>Değer</th><th>Görünüm</th><th>Değer</th><th>Görünüm</th><th>Değer</th><th>Görünüm</th></tr>
+    <tr>
+      <td class="k">type="1"</td><td>1, 2, 3 &mdash; varsayılan</td>
+      <td class="k">type="a"</td><td>a, b, c</td>
+      <td class="k">type="i"</td><td>i, ii, iii</td>
+    </tr>
+    <tr>
+      <td class="k">type="A"</td><td>A, B, C</td>
+      <td class="k">type="I"</td><td>I, II, III</td>
+      <td></td><td></td>
+    </tr>
+  </table>
+  <p class="cap">Yalnızca görünüm tercihi yapılıyorsa bu iş CSS'in alanıdır. Ancak metin içinde
+  &ldquo;B maddesi uyarınca&rdquo; gibi işaretin kendisine atıf yapılacaksa, işaret artık içeriğin
+  parçasıdır; o zaman HTML'de type kullanmak anlamlıdır.</p>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">ol ÖZNİTELİĞİ: start</span></div>
+  <p class="bridge">Bir liste, önceki bir listenin devamı olabilir.</p>
+  <h2>start, listenin kaçtan başlayacağını belirler</h2>
+  <div class="split" data-demo="olStart" data-url="siralama.html"></div>
+  <div class="note"><b>start her zaman sayıdır.</b> Liste harf veya Roma rakamı gösterse bile değer
+  sayı olarak yazılır: <code>&lt;ol type="A" start="3"&gt;</code> listesi C, D, E biçiminde görünür.
+  <code>start="C"</code> yazılmaz.</div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">ol ÖZNİTELİĞİ: reversed</span></div>
+  <p class="bridge">Bazı listeler sondan başa doğru numaralanır.</p>
+  <h2>reversed, numaralandırmayı azalan sıraya çevirir</h2>
+  <div class="split" data-demo="olRev" data-url="odul.html"></div>
+  <div class="note"><b>reversed bir boolean özniteliktir:</b> değeri değil, varlığı önemlidir.
+  Tek başına <code>&lt;ol reversed&gt;</code> yazmak yeterlidir. <code>reversed="false"</code> yazmak
+  özelliği kapatmaz &mdash; öznitelik yine orada olduğu için reversed etkin kalır. Kapatmanın tek yolu
+  özniteliği tamamen silmektir.</div>
+  <p class="cap">Listede üç öğe olduğu için tarayıcı başlangıcı kendisi 3 olarak hesapladı. Öğe sayısı
+  ileride değişebilecekse yalnızca reversed kullanmak daha sürdürülebilirdir; start ancak başlangıç
+  değerini içerikten bağımsız olarak sabitlemek gerektiğinde eklenir.</p>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">li ÖZNİTELİĞİ: value</span></div>
+  <p class="bridge">Bazen listenin tamamı değil, tek bir öğenin numarası değişir.</p>
+  <h2>value, tek bir öğenin sıra değerini belirler; sonrakiler oradan devam eder</h2>
+  <div class="split" data-demo="liValue" data-url="maddeler.html"></div>
+  <ul class="bul">
+    <li><b>value yalnızca sayı alır.</b> Liste <code>type="A"</code> kullansa bile değer sayıyla yazılır.</li>
+    <li><b>ul içinde value'nun bir etkisi yoktur</b>, çünkü sırasız listede öğelerin sıra değeri yoktur.</li>
+  </ul>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">ESKİ KODLARDA GÖRECEKLERİN</span></div>
+  <p class="bridge">Eski sayfalarda listelerin görünümü HTML özniteliğiyle ayarlanırdı.</p>
+  <h2>Madde işaretinin görünümü HTML'in değil CSS'in işidir</h2>
+  <div class="grid2">
+    <div class="card bad">
+      <h3>Kullanımdan kaldırılmış</h3>
+      <div class="codebox"><pre>&lt;<span class="t">ul</span> <span class="a">type</span>=<span class="v">"square"</span>&gt;
+&lt;<span class="t">li</span> <span class="a">type</span>=<span class="v">"A"</span>&gt;Madde&lt;/<span class="t">li</span>&gt;
+&lt;<span class="t">ul</span> <span class="a">compact</span>&gt;</pre></div>
+      <ul>
+        <li>Bazı tarayıcılar geçmişe uyumluluk için hâlâ gösterebilir; bu geçerli olduğu anlamına gelmez.</li>
+        <li>Yeni projelerde yazılmaz.</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>Bugünkü karşılığı</h3>
+      <div class="codebox"><pre><span class="c">/* görünüm: CSS */</span>
+<span class="t">ul</span> {
+  <span class="a">list-style-type</span>: <span class="v">square</span>;
+}
+
+<span class="c">&lt;!-- anlam: HTML --&gt;</span>
+&lt;<span class="t">ol</span> <span class="a">type</span>=<span class="v">"A"</span>&gt;</pre></div>
+      <ul>
+        <li>Görünüm CSS'e, anlam HTML'e ait olduğunda ikisini birbirinden bağımsız değiştirebilirsin.</li>
+        <li><b>ol</b> üzerindeki type, start, reversed ve <b>li</b> üzerindeki value hâlâ geçerli HTML'dir.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="bigrule">Ayrım şu: sıranın kendisini değiştiren özellikler (start, reversed, value)
+  HTML'de kalır; yalnızca göze hitap eden ayarlar CSS'e taşınır.</div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">GRUPLAMA: div ve span</span></div>
+  <p class="bridge">Liste etiketleri içeriğe anlam katar; bazen ise anlam katmadan yalnızca parçaları bir arada tutmak gerekir.</p>
+  <h2>div ve span: sayfaya hiçbir anlam eklemeyen iki gruplama etiketi</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>div &mdash; blok seviyesinde gruplama</h3>
+      <p>Kendi satırını kaplar, alt alta dizilir. Birden çok bloğu (başlık, paragraf, liste, görsel)
+      tek bir kutuda toplar.</p>
+      <div class="boxdiag" style="margin-top:.5rem">
+        <div class="blockbox">div &mdash; ürün kartı</div>
+        <div class="blockbox">div &mdash; ürün kartı</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>span &mdash; satır içi gruplama</h3>
+      <p>Kendi satırını açmaz, metnin akışında kalır. Bir cümlenin içindeki küçük bir parçayı
+      işaretlemek için kullanılır.</p>
+      <div class="inlinewrap" style="margin-top:.5rem">Bu ilanın fiyatı
+      <span class="inlinebox">span &mdash; 3.500.000 TL</span> olarak güncellendi.</div>
+    </div>
+  </div>
+  <div class="quote">Bir metinde paragrafın tamamının etrafına çizilen çerçeve div'dir; cümlenin
+  içindeki tek bir kelimenin altına çekilen kalem izi span'dır.</div>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">div NE ZAMAN KULLANILIR?</span></div>
+  <p class="bridge">div anlam taşımadığı için, kullanılmasının gerekçesi her zaman dışarıdan gelir.</p>
+  <h2>div, bir amaca hizmet ettiğinde eklenir; &ldquo;dursun&rdquo; diye eklenmez</h2>
+  <div class="bigrule">Grup CSS ile birlikte düzenlenecek, JavaScript ile tek parça olarak yönetilecek
+  veya ortak bir öznitelik alacaksa <b>ve</b> bu iş için daha uygun bir etiket yoksa div kullanılır.</div>
+  <div class="grid2">
+    <div class="card bad">
+      <h3>Gereksiz div</h3>
+      <div class="codebox"><pre>&lt;<span class="t">div</span>&gt;
+  &lt;<span class="t">h1</span>&gt;Yeteneklerim&lt;/<span class="t">h1</span>&gt;
+  &lt;<span class="t">p</span>&gt;Kısa açıklama.&lt;/<span class="t">p</span>&gt;
+&lt;/<span class="t">div</span>&gt;</pre></div>
+      <ul><li>Bu div hiçbir şey yapmıyor: öğeler zaten aynı sayfada ve zaten alt alta.</li></ul>
+    </div>
+    <div class="card good">
+      <h3>Gerekçesi olan div</h3>
+      <div class="codebox"><pre>&lt;<span class="t">div</span> <span class="a">class</span>=<span class="v">"urun-karti"</span>&gt;
+  &lt;<span class="t">h3</span>&gt;Kablosuz kulaklık&lt;/<span class="t">h3</span>&gt;
+  &lt;<span class="t">p</span>&gt;1.299 TL&lt;/<span class="t">p</span>&gt;
+&lt;/<span class="t">div</span>&gt;</pre></div>
+      <ul><li>Bu üçlü ekranda tek bir kart olarak çerçevelenecek; grup gerçek bir hedef.</li></ul>
+    </div>
+  </div>
+  <p class="cap"><b>class</b>, bir öğeye sonradan CSS veya JavaScript ile ulaşabilmek için verilen
+  isimdir; öğenin anlamını değiştirmez.</p>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">span NE ZAMAN KULLANILIR?</span></div>
+  <p class="bridge">Cümlenin tamamı değil, içindeki tek bir parça hedeflenecekse span kullanılır.</p>
+  <h2>span, anlam eklemeden metnin bir bölümünü işaretler</h2>
+  <div class="split" data-demo="spanFiyat" data-url="ilan.html"></div>
+  <table class="tbl" style="margin-top:.7rem">
+    <tr><th>Etiket</th><th>Ne bildirir</th><th>Ne zaman doğru seçim</th></tr>
+    <tr><td class="k">span</td><td>Hiçbir anlam eklemez; yalnızca sınır çizer.</td><td>Yalnızca hedeflemek veya dilini belirtmek istiyorsan.</td></tr>
+    <tr><td class="k">strong</td><td>Metnin özel bir öneme sahip olduğunu bildirir.</td><td>Metin gerçekten önemliyse; kalın göstermek için değil.</td></tr>
+  </table>
+  <p class="cap"><code>&lt;strong lang="en"&gt;</code> yazmak teknik olarak geçerlidir, çünkü lang her
+  etikette kullanılabilen genel bir özniteliktir. Ama bu kod iki şey birden söyler: &ldquo;bu metin
+  İngilizcedir&rdquo; ve &ldquo;bu metin önemlidir&rdquo;. İkincisini kastetmiyorsan span daha doğrudur.</p>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">AÇIKLAMA LİSTESİ: dl</span></div>
+  <p class="bridge">Bazı içerikler ne sıralı ne sırasız listedir; bir adın ona ait bir değerle eşleşmesidir.</p>
+  <h2>dl, ad&ndash;değer eşleşmelerinden oluşan bir listedir</h2>
+  <div class="split" data-demo="dlIlan" data-url="ilan-detay.html"></div>
+  <ul class="bul">
+    <li><b>dl</b> (description list) ilişkinin tamamını, <b>dt</b> (description term) adı,
+    <b>dd</b> (description details) o ada ait değeri temsil eder.</li>
+    <li>Tarayıcı değeri girintili göstererek ilişkiyi görünür kılar; asıl kazanç ise ekran okuyucunun
+    ve arama motorunun &ldquo;Konum&rdquo; ile &ldquo;Atakum&rdquo; arasındaki bağı bilmesidir.</li>
+  </ul>
+</section>
+
+<!-- 18 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">dl İLİŞKİ BİÇİMLERİ</span></div>
+  <p class="bridge">Bir dt'ye bir dd bağlamak yaygın hâldir, ama tek hâl değildir.</p>
+  <h2>Bir ada birden çok değer, birden çok ada tek değer bağlanabilir</h2>
+  <div class="split" data-demo="dlCok" data-url="proje.html"></div>
+  <p class="cap">Bir grup, art arda gelen bir veya daha fazla <b>dt</b> ile onları izleyen bir veya daha
+  fazla <b>dd</b>'den oluşur. &ldquo;Geliştiriciler&rdquo; altındaki iki dd de aynı dt'ye bağlıdır;
+  &ldquo;Canlı ortam&rdquo; ve &ldquo;Üretim ortamı&rdquo; ise tek bir açıklamayı paylaşır.</p>
+</section>
+
+<!-- 19 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">dl GRUPLARINI div İLE SARMA</span></div>
+  <p class="bridge">Her ad&ndash;değer grubunu tek parça olarak hedeflemek gerekebilir.</p>
+  <h2>dl içinde her grup bir div ile sarılabilir</h2>
+  <div class="split wide-code" data-demo="dlDiv" data-url="proje-bilgi.html"></div>
+  <ul class="bul">
+    <li>Buradaki div <b>yeni bir anlam oluşturmaz</b>; dl'nin ad&ndash;değer yapısını da değiştirmez.
+    Yalnızca grubu topluca hedeflenebilir hâle getirir.</li>
+    <li>Her div içinde önce en az bir <b>dt</b>, ardından en az bir <b>dd</b> bulunmalıdır.</li>
+    <li><b>Karıştırma kuralı:</b> Aynı dl içinde ya bütün gruplar doğrudan dt&ndash;dd olarak yazılır,
+    ya da grupların tamamı div ile sarılır. İki yöntem aynı dl seviyesinde karıştırılmaz.</li>
+  </ul>
+</section>
+
+<!-- 20 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">dl AYRINTILARI</span></div>
+  <p class="bridge">İki dd yazmak, iki ayrı değer olduğunu bildirir.</p>
+  <h2>Aynı değerin iki paragrafı için ikinci bir dd açılmaz</h2>
+  <div class="grid2">
+    <div class="card bad">
+      <h3>Yanlış: iki ayrı değer gibi görünür</h3>
+      <div class="codebox"><pre>&lt;<span class="t">dt</span>&gt;Proje açıklaması&lt;/<span class="t">dt</span>&gt;
+&lt;<span class="t">dd</span>&gt;Müşteri siparişlerini yönetir.&lt;/<span class="t">dd</span>&gt;
+&lt;<span class="t">dd</span>&gt;Panel çalışanlara açıktır.&lt;/<span class="t">dd</span>&gt;</pre></div>
+    </div>
+    <div class="card good">
+      <h3>Doğru: tek değer, iki paragraf</h3>
+      <div class="codebox"><pre>&lt;<span class="t">dt</span>&gt;Proje açıklaması&lt;/<span class="t">dt</span>&gt;
+&lt;<span class="t">dd</span>&gt;
+  &lt;<span class="t">p</span>&gt;Müşteri siparişlerini yönetir.&lt;/<span class="t">p</span>&gt;
+  &lt;<span class="t">p</span>&gt;Panel çalışanlara açıktır.&lt;/<span class="t">p</span>&gt;
+&lt;/<span class="t">dd</span>&gt;</pre></div>
+    </div>
+  </div>
+  <ul class="bul">
+    <li><b>dt</b> tek başına &ldquo;sözlük tanımı&rdquo; anlamına gelmez; grubun adını ya da terimini temsil eder.</li>
+    <li><b>dl</b>, <b>dt</b> ve <b>dd</b> etiketlerinin kendilerine özel öznitelikleri yoktur;
+    class, id, lang gibi her etikette kullanılabilen genel öznitelikleri alırlar.</li>
+    <li>Konuşma ve diyalogları göstermek için dl uygun değildir; dl bir ad&ndash;değer yapısıdır.</li>
+  </ul>
+</section>
+
+<!-- 21 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">dl mi, table mı?</span></div>
+  <p class="bridge">Aynı bilgiler, kaç kayıt gösterildiğine göre farklı yapılar ister.</p>
+  <h2>Tek nesnenin özellikleri dl, birden çok kaydın karşılaştırması table olur</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Tek ilanın özellikleri &rarr; dl</h3>
+      <p>Sayfada yalnızca bir evin bilgileri var. Her satır bir ad ve onun değeri: Konum &rarr; Atakum,
+      Oda sayısı &rarr; 4+1. Karşılaştırılacak ikinci bir kayıt yok.</p>
+    </div>
+    <div class="card">
+      <h3>Birden çok ilan &rarr; table</h3>
+      <table class="tbl" style="font-size:1.02rem">
+        <tr><th>İlan</th><th>Konum</th><th>Oda</th><th>Net alan</th></tr>
+        <tr><td>Ev A</td><td>Atakum</td><td>4+1</td><td>200 m&sup2;</td></tr>
+        <tr><td>Ev B</td><td>İlkadım</td><td>3+1</td><td>140 m&sup2;</td></tr>
+        <tr><td>Ev C</td><td>Canik</td><td>2+1</td><td>110 m&sup2;</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="bigrule">Kısa seçim kuralı: <b>tek bir nesnenin</b> ad&ndash;değer bilgileri dl ile,
+  <b>birden çok kaydın</b> ortak alanlar üzerinden karşılaştırılması table ile gösterilir.</div>
+</section>
+
+<!-- 22 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">LİSTE YERLEŞTİRME KURALLARI</span></div>
+  <p class="bridge">Listelerin nereye yazılabileceği de standardın bir parçasıdır.</p>
+  <h2>Liste bir paragrafın içine yazılamaz</h2>
+  <div class="grid2">
+    <div class="card bad">
+      <h3>Yanlış</h3>
+      <div class="codebox"><pre>&lt;<span class="t">p</span>&gt;
+  Öğrenilecek konular:
+  &lt;<span class="t">ul</span>&gt;
+    &lt;<span class="t">li</span>&gt;HTML&lt;/<span class="t">li</span>&gt;
+  &lt;/<span class="t">ul</span>&gt;
+&lt;/<span class="t">p</span>&gt;</pre></div>
+      <ul><li>Tarayıcı paragrafı listeden önce kendiliğinden kapatır; kod senin yazdığın yapıya benzemez.</li></ul>
+    </div>
+    <div class="card good">
+      <h3>Doğru</h3>
+      <div class="codebox"><pre>&lt;<span class="t">p</span>&gt;Öğrenilecek konular:&lt;/<span class="t">p</span>&gt;
+
+&lt;<span class="t">ul</span>&gt;
+  &lt;<span class="t">li</span>&gt;HTML&lt;/<span class="t">li</span>&gt;
+&lt;/<span class="t">ul</span>&gt;</pre></div>
+      <ul><li>Paragraf kapanır, liste kardeşi olarak devam eder.</li></ul>
+    </div>
+  </div>
+  <ul class="bul">
+    <li><b>ul</b> ve <b>ol</b>'un doğrudan çocuğu <b>li</b> olmalıdır; metin veya başka bir etiket
+    doğrudan liste etiketinin içine yazılmaz.</li>
+    <li>Bir <b>li</b> yalnızca metin taşımak zorunda değildir: paragraf, bağlantı, görsel ve başka bir
+    liste barındırabilir.</li>
+  </ul>
+</section>
+
+<!-- 23 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">ul, nav ve menu AYRIMI</span></div>
+  <p class="bridge">Aynı görünen üç yapı, içeriğin ne olduğuna göre ayrılır.</p>
+  <h2>ul içerik listesidir, nav gezinme bölümüdür, menu komut grubudur</h2>
+  <table class="tbl">
+    <tr><th>Yapı</th><th>Ne anlatır</th><th>Gerçek sayfada nerede</th></tr>
+    <tr><td class="k">ul</td><td>Sırası önemsiz içerik öğeleri.</td><td>Ürün özellikleri, ödeme yöntemleri, yetenek listesi.</td></tr>
+    <tr><td class="k">nav</td><td>Gezinme bağlantılarının bulunduğu bölüm; içinde genellikle bir ul yer alır.</td><td>Site üst menüsü, sayfa içi içindekiler.</td></tr>
+    <tr><td class="k">menu</td><td>Kullanıcının çalıştırabileceği sırasız komutlar. Doğrudan çocuğu yine li'dir.</td><td>Metin düzenleyicideki Kaydet / Geri Al düğmeleri.</td></tr>
+  </table>
+  <div class="note"><b>Gerçek projelerde:</b> menu geçerli bir etikettir ama ul kadar yaygın değildir;
+  pek çok projede araç çubukları da ul ile yazılır. Eski kaynaklarda göreceğin
+  <code>type="context"</code>, <code>type="toolbar"</code> ve <code>label</code> öznitelikleri
+  güncel yaklaşım değildir.</div>
+</section>
+
+<!-- 24 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">SIK YAPILAN HATALAR</span></div>
+  <p class="bridge">Bu hataların çoğu tarayıcıda hata mesajı üretmez; sayfa çalışır ama yapı yanlıştır.</p>
+  <h2>Sessizce kabul edilen, buna rağmen yanlış olan kullanımlar</h2>
+  <table class="tbl">
+    <tr><th>Hata</th><th>Tarayıcıda ne olur</th><th>Doğrusu</th></tr>
+    <tr><td class="k">&lt;li&gt;1. Adım&lt;/li&gt;</td><td>Ekranda &ldquo;1. 1. Adım&rdquo; görünür.</td><td>Numarayı tarayıcı üretir; metne yazılmaz.</td></tr>
+    <tr><td class="k">Alt listeyi li dışına yazmak</td><td>Girinti benzer görünür, ilişki kurulmaz.</td><td>Alt liste, üst li kapanmadan içine yazılır.</td></tr>
+    <tr><td class="k">&lt;ol reversed="false"&gt;</td><td>Liste yine ters numaralanır.</td><td>Kapatmak için öznitelik tamamen silinir.</td></tr>
+    <tr><td class="k">&lt;ul&gt; içinde &lt;li value="5"&gt;</td><td>Hiçbir şey değişmez.</td><td>value yalnızca ol içinde anlam taşır.</td></tr>
+    <tr><td class="k">Aynı değerin paragrafları için iki dd</td><td>İki ayrı değer gibi okunur.</td><td>Paragraflar tek dd içine konur.</td></tr>
+    <tr><td class="k">Her şeyi div ile sarmak</td><td>Sayfa çalışır, kod okunmaz hâle gelir.</td><td>div, gerçek bir hedefi olduğunda eklenir.</td></tr>
+  </table>
+</section>
+
+<!-- 25 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">KARAR REHBERİ</span></div>
+  <p class="bridge">Yapıyı seçmeden önce sorulacak soru her zaman aynıdır: bu içerik nedir?</p>
+  <h2>İçerikten yapıya giden karar zinciri</h2>
+  <table class="tbl">
+    <tr><th>İçerik</th><th>Yapı</th><th>Karar sorusu</th></tr>
+    <tr><td>Sırayla uygulanacak adımlar</td><td class="k">ol &gt; li</td><td>Sıra değişince anlam bozuluyor mu? Bozuluyorsa ol.</td></tr>
+    <tr><td>Sırası anlam taşımayan öğeler</td><td class="k">ul &gt; li</td><td>Öğeler yer değiştirse içerik aynı kalıyor mu?</td></tr>
+    <tr><td>Ana öğeye bağlı alt öğeler</td><td class="k">İç içe liste</td><td>Bu öğeler tek bir üst öğeye mi ait? Aitse alt liste onun içine.</td></tr>
+    <tr><td>Tek nesnenin ad&ndash;değer bilgileri</td><td class="k">dl &gt; dt + dd</td><td>Her satır bir ad ve onun karşılığı mı?</td></tr>
+    <tr><td>Birden çok kaydın ortak alanlarla karşılaştırılması</td><td class="k">table</td><td>Satırlar aynı sütunlara sahip mi?</td></tr>
+    <tr><td>Uygun semantik etiketi olmayan blokları bir arada tutmak</td><td class="k">div</td><td>Grubun CSS, JavaScript veya öznitelik açısından bir hedefi var mı?</td></tr>
+    <tr><td>Cümlenin içindeki tek bir parçayı hedeflemek</td><td class="k">span</td><td>Bu parçaya bir anlam mı ekliyorum, yoksa sadece sınır mı çiziyorum?</td></tr>
+  </table>
+</section>
+
+<!-- 26 -->
+<section class="slide">
+  <div class="kicker"><span class="kt">LİSTELER VE GRUPLAMA</span><span class="kd">—</span><span class="ks">ÖZET</span></div>
+  <p class="bridge">Bu konuda öğrenilenler tek bir ilkeye dayanır.</p>
+  <h2>Etiket, içeriğin ne olduğunu söyler; nasıl göründüğünü değil</h2>
+  <ul class="bul">
+    <li>Sırası anlam taşıyan öğeler <b>ol</b>, taşımayanlar <b>ul</b> ile yazılır; ikisinin de öğeleri <b>li</b>'dir.</li>
+    <li>Numaraları ve madde işaretlerini tarayıcı üretir; bunları metnin içine yazmak listeyi bozar.</li>
+    <li>Bir öğeye ait alt liste, o öğenin <b>li</b>'si kapanmadan içine yerleştirilir; her seviye kendi türünü kendi içeriğine göre seçer.</li>
+    <li><b>type</b> numaralandırma biçimini, <b>start</b> başlangıç değerini, <b>reversed</b> yönü, <b>li value</b> ise tek bir öğenin sıra değerini belirler.</li>
+    <li><b>reversed</b> gibi boolean özniteliklerde önemli olan değer değil, özniteliğin orada bulunmasıdır.</li>
+    <li>Madde işaretinin görünümü CSS ile, sıranın kendisini değiştiren ayarlar HTML ile yapılır.</li>
+    <li>Bir adın kendi değeriyle eşleştiği içerikler <b>dl</b> ile yazılır; bir gruba birden çok <b>dt</b> veya birden çok <b>dd</b> girebilir.</li>
+    <li>Tek bir nesnenin özellikleri <b>dl</b> ile, birden çok kaydın karşılaştırması <b>table</b> ile gösterilir.</li>
+    <li><b>div</b> ve <b>span</b> sayfaya anlam eklemez; yalnızca gerçek bir hedef varsa ve daha uygun bir etiket yoksa kullanılır.</li>
+  </ul>
+</section>
+
+</div><!-- /deck -->
+
+<div class="nav">
+  <button id="prev" type="button">&larr; Geri</button>
+  <span class="counter"><span id="cur">1</span> / <span id="tot">1</span></span>
+  <button id="next" type="button">İleri &rarr;</button>
+</div>
+
+<script>
+/* ---------- Demo kaynakları: kod paneli ve önizleme aynı metinden üretilir ---------- */
+const DEMOS = {
+ulOdeme:
+`<h3>Ödeme yöntemleri</h3>
+<ul>
+  <li>Kredi kartı</li>
+  <li>Havale / EFT</li>
+  <li>Kapıda ödeme</li>
+</ul>`,
+
+olTarif:
+`<h3>Hazırlanışı</h3>
+<ol>
+  <li>Fırını 180 dereceye ısıtın.</li>
+  <li>Yumurta ve şekeri çırpın.</li>
+  <li>Unu eleyerek ekleyin.</li>
+  <li>35 dakika pişirin.</li>
+</ol>`,
+
+liHata:
+`<h3>Numara metne yazılırsa</h3>
+<ol>
+  <li>1. Fırını ısıtın.</li>
+  <li>2. Yumurtayı çırpın.</li>
+</ol>
+
+<h3>Doğrusu</h3>
+<ol>
+  <li>Fırını ısıtın.</li>
+  <li>Yumurtayı çırpın.</li>
+</ol>`,
+
+icIce:
+`<h3>Kurs içeriği</h3>
+<ul>
+  <li>Frontend
+    <ul>
+      <li>HTML</li>
+      <li>CSS</li>
+    </ul>
+  </li>
+  <li>Backend
+    <ul>
+      <li>Node.js</li>
+      <li>Express.js</li>
+    </ul>
+  </li>
+</ul>`,
+
+destek:
+`<h3>Teknik destek rehberi</h3>
+<ul>
+  <li>İnternet bağlantısı yok
+    <ol>
+      <li>Modemi yeniden başlatın.</li>
+      <li>Kabloları kontrol edin.</li>
+      <li>Destek hattını arayın.</li>
+    </ol>
+  </li>
+  <li>Yazıcı çıktı vermiyor
+    <ol>
+      <li>Yazdırma kuyruğunu boşaltın.</li>
+      <li>Sürücüyü güncelleyin.</li>
+    </ol>
+  </li>
+</ul>`,
+
+olType:
+`<h3>Sözleşme ekleri</h3>
+<ol type="A">
+  <li>Kimlik belgesi</li>
+  <li>Başvuru formu</li>
+  <li>Ödeme belgesi</li>
+</ol>`,
+
+olStart:
+`<h3>Yarışma sıralaması (devamı)</h3>
+<ol start="4">
+  <li>Ayşe Yılmaz</li>
+  <li>Mehmet Demir</li>
+  <li>Zeynep Kaya</li>
+</ol>`,
+
+olRev:
+`<h3>Ödül töreni</h3>
+<ol reversed>
+  <li>Bronz madalya</li>
+  <li>Gümüş madalya</li>
+  <li>Altın madalya</li>
+</ol>`,
+
+liValue:
+`<h3>Sözleşme maddeleri</h3>
+<ol>
+  <li>Taraflar</li>
+  <li>Sözleşmenin konusu</li>
+  <li value="5">Ödeme koşulları</li>
+  <li>Fesih</li>
+</ol>`,
+
+spanFiyat:
+`<p>Bu ilanın fiyatı
+  <span class="fiyat">3.500.000 TL</span>
+  olarak güncellendi.</p>
+
+<p>İlan durumu:
+  <span lang="en">for sale</span></p>`,
+
+dlIlan:
+`<h3>İlan özellikleri</h3>
+<dl>
+  <dt>Konum</dt>
+  <dd>Atakum / Samsun</dd>
+
+  <dt>Oda sayısı</dt>
+  <dd>4+1</dd>
+
+  <dt>Net alan</dt>
+  <dd>200 m²</dd>
+</dl>`,
+
+dlCok:
+`<h3>Proje bilgileri</h3>
+<dl>
+  <dt>Proje yöneticisi</dt>
+  <dd>Ayşe Yılmaz</dd>
+
+  <dt>Geliştiriciler</dt>
+  <dd>Mehmet Demir</dd>
+  <dd>Zeynep Kaya</dd>
+
+  <dt>Canlı ortam</dt>
+  <dt>Üretim ortamı</dt>
+  <dd>Gerçek kullanıcıların eriştiği
+      sistemdir.</dd>
+</dl>`,
+
+dlDiv:
+`<h3>Proje bilgileri</h3>
+<dl>
+  <div class="proje-bilgisi">
+    <dt>Proje yöneticisi</dt>
+    <dd>Ayşe Yılmaz</dd>
+  </div>
+
+  <div class="proje-bilgisi">
+    <dt>Geliştiriciler</dt>
+    <dd>Mehmet Demir</dd>
+    <dd>Zeynep Kaya</dd>
+  </div>
+</dl>`
+};
+
+/* ---------- Kod boyama ve önizleme kurulumu ---------- */
+function esc(s){
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function highlight(src){
+  let h = esc(src);
+  /* öznitelik="değer" */
+  h = h.replace(/([a-zA-Z-]+)=(&quot;|")([^"&]*)(&quot;|")/g,
+    '<span class="a">$1</span>=<span class="v">"$3"</span>');
+  /* etiket adları */
+  h = h.replace(/&lt;(\/?)([a-zA-Z][a-zA-Z0-9]*)/g,
+    '&lt;$1<span class="t">$2</span>');
+  return h;
+}
+const PREV_CSS =
+  'html{font-size:19px}'+
+  'body{margin:0;padding:16px 18px;background:#fff;color:#16202b;'+
+  'font-family:"Segoe UI",system-ui,Arial,sans-serif;line-height:1.55}'+
+  'h3{margin:0 0 .5rem;font-size:1.15rem;color:#0f2b3d}'+
+  'h3+h3{margin-top:1.1rem}'+
+  'ul,ol{margin:.2rem 0 .9rem;padding-left:1.6rem}'+
+  'li{margin:.18rem 0}'+
+  'dl{margin:.2rem 0}'+
+  'dt{font-weight:700;margin-top:.55rem}'+
+  'dd{margin:.1rem 0 .1rem 1.6rem}'+
+  'p{margin:.4rem 0}';
+
+function wrap(src){
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">'+
+    '<style>'+PREV_CSS+'</style></head><body>'+src+'</body></html>';
+}
+
+document.querySelectorAll('.split[data-demo]').forEach(function(box){
+  const key = box.dataset.demo;
+  const src = DEMOS[key] || '';
+  const url = box.dataset.url || 'sayfa.html';
+
+  const codePanel = document.createElement('div');
+  codePanel.className = 'panel';
+  codePanel.innerHTML =
+    '<div class="panel-head"><span class="dot"></span>HTML</div>'+
+    '<pre>'+highlight(src)+'</pre>';
+
+  const prevPanel = document.createElement('div');
+  prevPanel.className = 'panel';
+  prevPanel.innerHTML =
+    '<div class="panel-head"><span class="dot"></span>Tarayıcı'+
+    '<span class="url">'+url+'</span>'+
+    '<button class="reset" type="button" title="Başa döndür">&#10227;</button></div>';
+  const frame = document.createElement('iframe');
+  prevPanel.appendChild(frame);
+
+  box.appendChild(codePanel);
+  box.appendChild(prevPanel);
+
+  frame.srcdoc = wrap(src);
+  prevPanel.querySelector('.reset').addEventListener('click', function(){
+    frame.srcdoc = wrap(src);
+  });
+});
+
+/* ---------- Slayt gezinme ---------- */
+const slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+let i = 0;
+document.getElementById('tot').textContent = slides.length;
+function show(n){
+  i = Math.max(0, Math.min(slides.length-1, n));
+  slides.forEach(function(s,k){ s.classList.toggle('on', k===i); });
+  document.getElementById('cur').textContent = i+1;
+  document.getElementById('progress').style.width =
+    ((i+1)/slides.length*100)+'%';
+}
+document.getElementById('next').addEventListener('click', function(){ show(i+1); });
+document.getElementById('prev').addEventListener('click', function(){ show(i-1); });
+document.addEventListener('keydown', function(e){
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' ') { show(i+1); e.preventDefault(); }
+  if(e.key==='ArrowLeft'||e.key==='PageUp') { show(i-1); e.preventDefault(); }
+  if(e.key==='Home') show(0);
+  if(e.key==='End') show(slides.length-1);
+});
+show(0);
+</script>
+</body>
+</html>

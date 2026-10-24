@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HTML belge iskeleti ve temel sözdizimi: derste ve tek başına çalışırken kullanılabilen etkileşimli sunu.">
+<title>HTML Belge İskeleti ve Temel Sözdizimi | HTML-2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#06091a; --bg-soft:#0b1027;
+  --surface:rgba(17,24,56,.68); --surface-2:rgba(19,29,68,.92);
+  --text:#f2f4ff; --muted:#a8b2d4; --line:rgba(158,174,235,.18);
+  --cyan:#38d9ff; --blue:#5b7cfa; --violet:#a978ff; --orange:#ff9d5c;
+  --yellow:#ffd45c; --green:#56e6a5; --danger:#ff6b8a;
+  --radius-lg:22px; --radius-md:14px;
+  --shadow:0 20px 60px rgba(0,0,0,.35);
+  --controls:66px;
+  --mono:"DM Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;font-size:14.5px}
+body{
+  margin:0;min-width:320px;overflow:hidden;
+  font-family:"Manrope","Segoe UI",sans-serif;
+  color:var(--text);line-height:1.55;
+  background:
+    radial-gradient(circle at 10% 12%,rgba(46,92,255,.18),transparent 32%),
+    radial-gradient(circle at 88% 84%,rgba(137,70,255,.14),transparent 32%),
+    var(--bg);
+}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+code,pre,kbd{font-family:var(--mono)}
+
+/* ---------- slayt çatısı ---------- */
+#presentation{position:relative;width:100%;height:100svh}
+.slide{
+  position:absolute;inset:0;display:none;overflow-y:auto;overflow-x:hidden;
+  padding:clamp(22px,3.4vh,44px) clamp(18px,4.2vw,64px) calc(var(--controls) + 26px);
+  opacity:0;transform:translateX(22px);
+}
+.slide.is-active{display:flex;flex-direction:column;animation:slideIn .42s ease forwards}
+@keyframes slideIn{to{opacity:1;transform:none}}
+.slide-content{max-width:1180px;width:100%;margin:auto}
+.split>*,.grid-2>*,.grid-3>*,.grid-4>*,.explorer>*,.tree-grid>*,.hunt-grid>*,.pg>*{min-width:0}
+.eyebrow{margin:0 0 .5rem;font-size:.72rem;letter-spacing:.16em;font-weight:700;color:var(--cyan)}
+.eyebrow.violet{color:var(--violet)} .eyebrow.orange{color:var(--orange)}
+.eyebrow.green{color:var(--green)} .eyebrow.yellow{color:var(--yellow)}
+h1{font-size:clamp(2rem,4.4vw,3.1rem);line-height:1.08;margin:0 0 1rem;font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.3rem,2.3vw,1.92rem);line-height:1.2;margin:0 0 .8rem;font-weight:800;letter-spacing:-.01em}
+h2.topic{font-size:clamp(1.5rem,2.55vw,2.1rem);line-height:1.12;margin:0 0 .45rem;letter-spacing:-.015em}
+h2.topic .sub{font-size:.5em;letter-spacing:.02em;font-weight:600;color:var(--muted);white-space:nowrap}
+.subtitle{font-size:clamp(1rem,1.5vw,1.22rem);font-weight:600;color:#dbe3fb;margin:0 0 .8rem;max-width:80ch;line-height:1.35}
+.subtitle code{font-size:.9em}
+h3{font-size:1.02rem;margin:0 0 .4rem;font-weight:700}
+p{margin:0 0 .7rem}
+.lead{color:var(--muted);font-size:1rem;max-width:78ch;margin-bottom:1.2rem}
+.hnum{color:var(--cyan);font-weight:800;margin-right:.25rem}
+.eyebrow .sub{letter-spacing:.04em;font-weight:600;color:var(--muted)}
+.gradient{background:linear-gradient(100deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.muted{color:var(--muted)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;align-items:center}
+.split.wide-left{grid-template-columns:1.15fr .85fr}
+
+/* ---------- ortak kutular ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.1rem 1.2rem;box-shadow:var(--shadow)}
+.note{margin-top:1.1rem;padding:.85rem 1rem;border-left:3px solid var(--cyan);border-radius:0 var(--radius-md) var(--radius-md) 0;background:rgba(56,217,255,.07);color:#d6e2ff;font-size:.92rem}
+.note.warn{border-left-color:var(--danger);background:rgba(255,107,138,.08)}
+.note.teach{border-left-color:var(--yellow);background:rgba(255,212,92,.07)}
+.note b{color:#fff}
+.self-study{margin-top:1rem;font-size:.88rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:.7rem}
+.self-study b{color:var(--cyan)}
+.check{list-style:none;padding:0;margin:.8rem 0;display:grid;gap:.45rem}
+.check li{position:relative;padding-left:1.5rem;color:#d3dbf2;font-size:.94rem}
+.check li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
+.tag-inline{color:var(--cyan);background:rgba(56,217,255,.1);padding:.1rem .3rem;border-radius:5px;font-family:var(--mono);font-size:.88em}
+h2 code,h1 code,.lead code,li code,p code,dd code{color:var(--cyan);background:rgba(56,217,255,.1);padding:.05rem .3rem;border-radius:5px;font-size:.88em}
+
+/* ---------- kod pencereleri ---------- */
+.code-window{border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:#050913;box-shadow:var(--shadow)}
+.window-bar{display:flex;align-items:center;gap:.4rem;padding:.55rem .8rem;background:rgba(255,255,255,.04);border-bottom:1px solid var(--line);font-size:.78rem;color:var(--muted)}
+.window-bar i{width:9px;height:9px;border-radius:50%;background:#3d4763;display:block}
+.window-bar i:first-child{background:#ff6b6b}.window-bar i:nth-child(2){background:#ffd45c}.window-bar i:nth-child(3){background:#56e6a5}
+.window-bar span{margin-left:.5rem;font-family:var(--mono)}
+pre{margin:0;padding:.9rem 1rem;overflow-x:auto;font-size:.85rem;line-height:1.65;color:#dbe4f7}
+.t-tag{color:#7dd3fc}.t-attr{color:#c4b5fd}.t-str{color:#fca5a5}.t-com{color:#64748b;font-style:italic}.t-txt{color:#e2e8f0}
+.code-caption{margin:.5rem 0 0;font-size:.82rem;color:var(--muted)}
+
+/* ---------- tarayıcı önizleme ---------- */
+.browser{border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.chrome{display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;background:#1b2440;border-bottom:1px solid var(--line)}
+.chrome i{width:9px;height:9px;border-radius:50%;background:#3d4763;display:block}
+.chrome .tab{margin-left:.6rem;background:#0f1730;color:#cfe0ff;padding:.22rem .7rem;border-radius:7px;font-size:.76rem;max-width:230px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.page{padding:1.2rem;color:#132038;background:#fff}
+.page h3{font-size:1.35rem;margin:0 0 .5rem;color:#0f172a}
+.page p{color:#475569;font-size:.9rem}
+.page a{display:inline-block;margin-top:.5rem;background:#2563eb;color:#fff;text-decoration:none;padding:.45rem .9rem;border-radius:9px;font-size:.85rem}
+
+/* ---------- butonlar ---------- */
+.btn{cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);padding:.5rem .95rem;border-radius:10px;font-size:.88rem;font-weight:600;transition:.18s}
+.btn:hover{border-color:rgba(56,217,255,.5);background:rgba(56,217,255,.1);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(100deg,rgba(56,217,255,.22),rgba(169,120,255,.22));border-color:rgba(56,217,255,.4)}
+.btn.on{background:rgba(56,217,255,.18);border-color:var(--cyan);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:.8rem 0}
+
+/* ---------- 04 parça / grid kartlar ---------- */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:.95rem}
+.tile b.num{display:block;font-family:var(--mono);color:var(--violet);font-size:.78rem;margin-bottom:.35rem}
+.tile code{display:block;color:var(--yellow);font-size:.82rem;margin-bottom:.45rem;word-break:break-word}
+.tile p{font-size:.86rem;color:var(--muted);margin:0}
+
+/* ---------- iskelet gezgini (slayt 3) ---------- */
+.explorer{display:grid;grid-template-columns:1.05fr .95fr;gap:1.2rem;margin-top:1rem}
+.skeleton-code{white-space:pre;overflow-x:auto;background:#050913;border:1px solid var(--line);border-radius:var(--radius-lg);padding:1rem 1.1rem;font-family:var(--mono);font-size:.86rem;line-height:1.85}
+.ln{display:block;border-radius:6px;padding:0 .35rem;cursor:pointer;transition:.18s;opacity:.42}
+.ln:hover{opacity:.8}
+.ln.on{opacity:1;background:rgba(56,217,255,.13);box-shadow:inset 2px 0 0 var(--cyan)}
+.explorer-info{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.1rem 1.2rem;min-height:190px}
+.explorer-info h3{color:var(--cyan);font-family:var(--mono);font-size:1rem}
+.explorer-info .role{display:inline-block;font-size:.72rem;letter-spacing:.1em;color:var(--violet);border:1px solid rgba(169,120,255,.35);padding:.1rem .5rem;border-radius:99px;margin-bottom:.6rem}
+.explorer-info p{font-size:.92rem;color:#d5dcf2}
+.explorer-info .q{margin-top:.7rem;font-size:.87rem;color:var(--yellow)}
+
+/* ---------- karşılaştırma / toggle demoları ---------- */
+.compare{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin-top:1rem}
+.compare .arrow{font-size:1.4rem;color:var(--muted)}
+.box-bad,.box-good{border-radius:var(--radius-md);padding:1rem;border:1px solid}
+.box-bad{border-color:rgba(255,107,138,.35);background:rgba(255,107,138,.07)}
+.box-good{border-color:rgba(86,230,165,.35);background:rgba(86,230,165,.07)}
+.box-bad small,.box-good small{display:block;font-family:var(--mono);font-size:.75rem;margin-bottom:.5rem;color:var(--muted)}
+.box-bad strong,.box-good strong{display:block;font-size:1.12rem;margin-bottom:.4rem}
+.box-bad strong{color:#ffc2ce}.box-good strong{color:#b6f5da}
+.box-bad p,.box-good p{font-size:.85rem;color:var(--muted);margin:0}
+
+/* quirks kutusu */
+.quirks-stage{border:1px solid var(--line);border-radius:var(--radius-md);background:#fff;color:#111;padding:1rem;transition:.3s}
+.quirks-stage .qbox{box-sizing:content-box;width:220px;background:#dbeafe;border:2px solid #2563eb;padding:14px;font-size:.85rem;color:#0f172a;transition:.3s}
+.quirks-stage.quirks .qbox{width:220px;padding:14px;box-sizing:content-box}
+.quirks-stage .measure{margin-top:.6rem;font-family:var(--mono);font-size:.8rem;color:#334155}
+
+/* telefon / viewport */
+.phone-wrap{display:flex;justify-content:center}
+.phone{width:216px;height:392px;padding:11px;border:6px solid #26344c;border-radius:34px;background:#030712;box-shadow:0 20px 55px rgba(0,0,0,.45);overflow:hidden;transition:.35s}
+.phone>.screen{height:100%;border-radius:22px;color:#10203c;background:linear-gradient(160deg,#dff7ff,#fff);overflow:hidden}
+.phone .inner{padding:2.5rem 1rem 1rem;transition:.35s;transform-origin:top left}
+.phone .screen h3{font-size:1.25rem;line-height:1.15;color:#0f172a}
+.phone .screen p{font-size:.85rem;color:#475569}
+.phone .screen .brand{font-size:.72rem;letter-spacing:.12em;color:#2563eb;font-weight:700}
+.phone.no-viewport .inner{width:640px;transform:scale(.34)}
+dl.meta{display:grid;grid-template-columns:170px 1fr;gap:.45rem .9rem;margin:1rem 0;font-size:.88rem}
+dl.meta dt{color:var(--violet);font-family:var(--mono);font-size:.82rem}
+dl.meta dd{margin:0;color:var(--muted)}
+.state-line{font-size:.88rem;color:var(--cyan);min-height:2.4em}
+
+/* canlı düzenleme */
+.live-inputs{display:grid;gap:.7rem;margin:.8rem 0}
+.live-inputs label{font-size:.8rem;color:var(--muted);display:block;margin-bottom:.25rem}
+.live-inputs input{width:100%;padding:.5rem .7rem;border-radius:9px;border:1px solid var(--line);background:#050913;color:var(--text);font-family:var(--mono);font-size:.85rem}
+
+/* element anatomisi */
+.anatomy{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin:1.6rem auto 1rem;max-width:820px}
+.apart{position:relative;font-family:var(--mono);font-size:1.15rem;padding:.7rem 1rem .6rem;border-radius:12px;border:1px solid var(--line);background:var(--surface);cursor:default;transition:.2s}
+.apart small{display:block;font-family:"Manrope",sans-serif;font-size:.7rem;letter-spacing:.08em;color:var(--muted);margin-top:.35rem}
+.apart:hover{transform:translateY(-3px)}
+.apart.open{border-color:rgba(56,217,255,.5);color:var(--cyan)}
+.apart.mid{border-color:rgba(86,230,165,.45);color:var(--green)}
+.apart.close{border-color:rgba(169,120,255,.5);color:var(--violet)}
+.attr-anatomy{display:flex;gap:.4rem;align-items:center;justify-content:center;font-family:var(--mono);font-size:1.05rem;margin:1.2rem 0}
+.attr-anatomy span{padding:.5rem .7rem;border-radius:10px;border:1px dashed var(--line)}
+.attr-anatomy .name{color:var(--violet)}.attr-anatomy .val{color:#fca5a5}
+
+/* ağaç */
+.tree-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;margin-top:1rem}
+.tree{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:1rem;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg)}
+.tnode{font-family:var(--mono);font-size:.85rem;padding:.35rem .8rem;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.04);transition:.2s}
+.tnode.on{background:rgba(56,217,255,.18);border-color:var(--cyan);color:#fff;transform:scale(1.06)}
+.tbar{width:1px;height:14px;background:var(--line)}
+.tsiblings{display:flex;gap:.6rem}
+.rel-list{font-size:.9rem;color:var(--muted);display:grid;gap:.4rem;margin-top:.8rem}
+.rel-list b{color:var(--cyan);font-family:var(--mono)}
+
+/* hata avı */
+.hunt-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:1.2rem;margin-top:.9rem}
+.hunt-code{white-space:pre;overflow-x:auto;background:#050913;border:1px solid var(--line);border-radius:var(--radius-lg);padding:1rem;font-family:var(--mono);font-size:.85rem;line-height:1.85}
+.hline{display:block;padding:0 .4rem;border-radius:6px;cursor:pointer;transition:.16s}
+.hline:hover{background:rgba(255,255,255,.06)}
+.hline.found{background:rgba(86,230,165,.14);box-shadow:inset 2px 0 0 var(--green)}
+.hline.miss{background:rgba(255,107,138,.12);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.hunt-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.1rem}
+.score{font-family:var(--mono);color:var(--green);font-size:.9rem;margin-bottom:.6rem}
+.hunt-log{list-style:none;margin:.6rem 0 0;padding:0;display:grid;gap:.45rem;font-size:.86rem;color:#d5dcf2}
+.hunt-log li{padding-left:1.2rem;position:relative}
+.hunt-log li::before{content:"→";position:absolute;left:0;color:var(--green)}
+.hunt-feedback{font-size:.88rem;color:var(--yellow);min-height:3em}
+
+/* playground */
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.8rem}
+.pg textarea{width:100%;height:270px;resize:vertical;padding:.85rem;border-radius:var(--radius-md);border:1px solid var(--line);background:#050913;color:#dbe4f7;font-family:var(--mono);font-size:.82rem;line-height:1.6}
+.pg iframe{width:100%;height:270px;border:0;background:#fff}
+.pg .browser{display:flex;flex-direction:column}
+
+/* sıralama alıştırması */
+.order-pool{display:flex;flex-wrap:wrap;gap:.5rem;margin:.8rem 0}
+.chip{cursor:pointer;font-family:var(--mono);font-size:.85rem;padding:.5rem .85rem;border-radius:10px;border:1px solid var(--line);background:var(--surface);transition:.18s}
+.chip:hover{border-color:var(--cyan)}
+.chip.used{opacity:.28;pointer-events:none}
+.order-slots{display:flex;flex-wrap:wrap;gap:.5rem;min-height:44px;padding:.5rem;border:1px dashed var(--line);border-radius:var(--radius-md)}
+.slot{font-family:var(--mono);font-size:.85rem;padding:.4rem .8rem;border-radius:9px;background:rgba(56,217,255,.12);border:1px solid rgba(56,217,255,.35)}
+.slot.wrong{background:rgba(255,107,138,.14);border-color:rgba(255,107,138,.45)}
+
+/* quiz */
+.quiz-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;margin-top:1rem}
+.quiz-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1rem 1.1rem}
+.quiz-card>span{font-family:var(--mono);color:var(--violet);font-size:.78rem}
+.quiz-card h3{font-size:.98rem;margin:.3rem 0 .7rem;font-weight:600;line-height:1.4}
+.quiz-answer{max-height:0;overflow:hidden;opacity:0;transition:.3s;font-size:.88rem;color:#b6f5da;margin:0}
+.quiz-card.revealed .quiz-answer{max-height:220px;opacity:1;margin-top:.7rem}
+
+/* kapanış */
+.equation{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.6rem;margin:1.4rem 0}
+.equation span{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:.7rem 1rem;text-align:center;font-size:.82rem;color:var(--muted)}
+.equation span b{display:block;color:#fff;font-size:.98rem;margin-bottom:.15rem}
+.equation i{color:var(--muted);font-style:normal}
+.equation .res{background:linear-gradient(100deg,rgba(56,217,255,.2),rgba(169,120,255,.2));border-color:rgba(56,217,255,.4)}
+.task-list{counter-reset:t;list-style:none;padding:0;display:grid;gap:.55rem;margin:1rem 0}
+.task-list li{counter-increment:t;position:relative;padding-left:2rem;font-size:.92rem;color:#d5dcf2}
+.task-list li::before{content:counter(t);position:absolute;left:0;top:.05rem;width:1.35rem;height:1.35rem;border-radius:50%;background:rgba(56,217,255,.15);border:1px solid rgba(56,217,255,.4);color:var(--cyan);font-size:.75rem;display:grid;place-items:center;font-family:var(--mono)}
+
+/* giriş slaytı */
+.intro{min-height:calc(100svh - var(--controls) - 90px);display:flex;flex-direction:column;justify-content:center;text-align:center;align-items:center}
+.skeleton-mini{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1.4rem}
+.skeleton-mini span{font-family:var(--mono);font-size:.82rem;padding:.45rem .8rem;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--cyan)}
+.kb-hint{position:absolute;bottom:calc(var(--controls) + 14px);left:0;right:0;text-align:center;font-size:.8rem;color:var(--muted)}
+kbd{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:6px;padding:.1rem .4rem;font-size:.8rem}
+
+/* kontroller */
+.controls{position:fixed;left:0;right:0;bottom:0;height:var(--controls);display:flex;align-items:center;gap:1rem;padding:0 clamp(14px,3vw,32px);background:rgba(6,9,26,.86);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:20}
+.nav-btn{cursor:pointer;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:1rem;transition:.18s}
+.nav-btn:hover:not(:disabled){border-color:var(--cyan);background:rgba(56,217,255,.12)}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.progress-wrap{flex:1}
+.slide-meta{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:.35rem;gap:1rem}
+.slide-meta span:first-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.slide-meta b{color:var(--cyan)}
+.track{height:4px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.track span{display:block;height:100%;width:5%;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .35s ease}
+
+@media (max-width:1000px){
+  .split,.split.wide-left,.explorer,.tree-grid,.hunt-grid,.pg,.grid-2{grid-template-columns:1fr}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .compare{grid-template-columns:1fr}
+  .compare .arrow{transform:rotate(90deg);text-align:center}
+}
+@media (max-width:640px){
+  html{font-size:13.5px}
+  .grid-3,.grid-4,.quiz-grid{grid-template-columns:1fr}
+  dl.meta{grid-template-columns:1fr}
+  .phone{width:190px;height:340px}
+}
+</style>
+</head>
+<body>
+<main id="presentation" aria-live="polite">
+
+<!-- 01 GİRİŞ -->
+<section class="slide is-active" data-title="HTML Belge İskeleti ve Temel Sözdizimi">
+  <div class="slide-content intro">
+    <p class="eyebrow">FULL-STACK WEB EĞİTİMİ · HTML-2</p>
+    <h1>HTML Belge İskeleti<br><span class="gradient">ve Temel Sözdizimi</span></h1>
+    <p class="lead" style="text-align:center">Bu derste tarayıcıya "bu bir HTML5 belgesidir, dili şudur, karakterleri şöyle oku, mobilde şu ölçeği kullan" diyen temel yapıyı kuruyoruz. Kısacası: her projede yazacağın ilk 10 satır.</p>
+    <div class="skeleton-mini">
+      <span>&lt;!DOCTYPE html&gt;</span><span>&lt;html lang="tr"&gt;</span><span>&lt;head&gt;</span><span>&lt;body&gt;</span>
+    </div>
+  </div>
+  <p class="kb-hint">İlerlemek için <kbd>→</kbd> · geri gitmek için <kbd>←</kbd> · ilk slayt <kbd>Home</kbd></p>
+</section>
+
+<!-- 02 NEDEN -->
+<section class="slide" data-title="Neden Bir İskelete İhtiyacımız Var?">
+  <div class="slide-content">
+    <h2 class="topic">NEDEN BELGE İSKELETİ GEREKLİ?</h2>
+    <p class="subtitle">Tarayıcı dosyayı açtığında hiçbir şey bilmez</p>
+    <p class="lead">Bir <code>.html</code> dosyası aslında düz bir metin dosyasıdır. Tarayıcı bu dosyayı açtığında dört sorunun cevabını arar. Belge iskeleti, tam olarak bu dört sorunun cevabıdır.</p>
+    <div class="grid-4">
+      <div class="tile"><b class="num">01</b><h3>Bu hangi HTML sürümü?</h3><p>Cevap: <span class="tag-inline">&lt;!DOCTYPE html&gt;</span> — modern standart modunda çalış.</p></div>
+      <div class="tile"><b class="num">02</b><h3>Belge hangi dilde?</h3><p>Cevap: <span class="tag-inline">&lt;html lang="tr"&gt;</span> — Türkçe.</p></div>
+      <div class="tile"><b class="num">03</b><h3>Harfleri nasıl okuyayım?</h3><p>Cevap: <span class="tag-inline">&lt;meta charset="UTF-8"&gt;</span> — ç, ğ, ş dahil.</p></div>
+      <div class="tile"><b class="num">04</b><h3>Küçük ekranda ölçek ne?</h3><p>Cevap: <span class="tag-inline">&lt;meta name="viewport" ...&gt;</span> — cihaz genişliği.</p></div>
+    </div>
+    <p class="self-study"><b>Tek başına çalışırken:</b> Boş bir klasöre <code>index.html</code> oluştur ve bu dersin sonundaki iskeleti ezberden yazmayı dene. Takıldığın satırı not al; en çok unuttuğun satır, en çok tekrar etmen gereken satırdır.</p>
+  </div>
+</section>
+
+<!-- 03 İSKELET GEZGİNİ -->
+<section class="slide" data-title="Belgenin Dört Ana Parçası">
+  <div class="slide-content">
+    <h2 class="topic">BELGENİN DÖRT ANA PARÇASI <span class="sub">(etkileşimli iskelet gezgini)</span></h2>
+    <p class="subtitle">Belgenin dört parçası: DOCTYPE, html, head, body</p>
+    <p class="lead">Aşağıdaki kodda bir satıra tıkla; o parçanın görevi sağda açılır. Dördünü de gez, sonra kapatıp kendi cümlelerinle tekrar anlatmayı dene.</p>
+    <div class="explorer">
+      <div class="skeleton-code" id="skeletonCode">
+<span class="ln" data-part="doctype" data-hl>&lt;!DOCTYPE html&gt;</span><span class="ln" data-part="html" data-hl>&lt;html lang="tr"&gt;</span><span class="ln" data-part="head" data-hl>  &lt;head&gt;</span><span class="ln" data-part="head" data-hl>    &lt;meta charset="UTF-8"&gt;</span><span class="ln" data-part="head" data-hl>    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span><span class="ln" data-part="head" data-hl>    &lt;title&gt;Ev Bul&lt;/title&gt;</span><span class="ln" data-part="head" data-hl>  &lt;/head&gt;</span><span class="ln" data-part="body" data-hl>  &lt;body&gt;</span><span class="ln" data-part="body" data-hl>    &lt;h1&gt;Yeni evinizi keşfedin&lt;/h1&gt;</span><span class="ln" data-part="body" data-hl>  &lt;/body&gt;</span><span class="ln" data-part="html" data-hl>&lt;/html&gt;</span>
+      </div>
+      <div class="explorer-info" id="explorerInfo">
+        <span class="role">BAŞLA</span>
+        <h3>Soldaki satırlardan birine tıkla</h3>
+        <p>Her parçanın tek bir görevi var. Görevleri karıştırmadan öğrenmek, ileride "bunu head'e mi body'ye mi yazacaktım?" sorusunu tamamen ortadan kaldırır.</p>
+      </div>
+    </div>
+    <p class="self-study"><b>Kendini sına:</b> Kodu kapat ve şu soruyu cevapla — <code>title</code> neden <code>body</code> içinde değil?</p>
+  </div>
+</section>
+
+<!-- 04 DOCTYPE -->
+<section class="slide" data-title="DOCTYPE ve Tarayıcı Modu">
+  <div class="slide-content">
+    <h2 class="topic">DOCTYPE VE TARAYICI MODU</h2>
+    <p class="subtitle"><code>&lt;!DOCTYPE html&gt;</code> bir etiket değil, bir talimattır</p>
+    <div class="split wide-left">
+      <div>
+        <p class="lead">Tarayıcıların iki çalışma modu vardır. <b>Standart mod</b>, bugünün HTML/CSS kurallarını uygular. <b>Quirks (tuhaflık) modu</b> ise 1990'ların bozuk sayfalarını çalıştırabilmek için tutulan eski uyumluluk modudur. DOCTYPE satırı yoksa tarayıcı quirks moduna düşebilir ve CSS'in bazı temel davranışları değişir.</p>
+        <ul class="check">
+          <li>Belgenin en üstünde, her şeyden önce yazılır.</li>
+          <li>Kapanış etiketi yoktur, içerik almaz.</li>
+          <li>Büyük-küçük harfe duyarlı değildir.</li>
+          <li>HTML5'te tek bir biçimi vardır: <code>&lt;!DOCTYPE html&gt;</code></li>
+        </ul>
+        <div class="btn-row">
+          <button class="btn primary" id="quirksToggle" type="button">DOCTYPE'ı kaldır</button>
+        </div>
+        <p class="state-line" id="quirksState">Standart mod: kutu genişliği CSS kurallarına göre hesaplanıyor.</p>
+      </div>
+      <div>
+        <div class="card">
+          <p class="muted" style="font-size:.78rem;letter-spacing:.1em;margin-bottom:.6rem">AYNI CSS, İKİ FARKLI SONUÇ</p>
+          <div class="quirks-stage" id="quirksStage">
+            <div class="qbox" id="quirksBox">width: 220px + padding: 14px</div>
+            <p class="measure" id="quirksMeasure">Ölçülen genişlik: 248px (standart kutu modeli)</p>
+          </div>
+        </div>
+        <p class="note"><b>Önemli:</b> Buradaki fark tek başına küçük görünür; ama sayfadaki yüzlerce kutuda birikince tasarım tamamen bozulur. Bu yüzden DOCTYPE tartışmasız bir zorunluluktur.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 html + lang -->
+<section class="slide" data-title="html Kök Elementi ve lang Özniteliği">
+  <div class="slide-content">
+    <h2 class="topic">KÖK ELEMENT VE BELGE DİLİ</h2>
+    <p class="subtitle"><code>&lt;html&gt;</code> kök elementi ve <code>lang</code> özniteliği</p>
+    <p class="lead">Belgedeki her element <code>&lt;html&gt;</code> içinde yer alır; bu yüzden ona <b>kök (root)</b> element denir. Kökün <code>lang</code> özniteliği ise "bu sayfanın metni hangi dilde?" sorusunu cevaplar.</p>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>index.html</span></div>
+        <pre data-hl>&lt;!DOCTYPE html&gt;
+&lt;html lang="tr"&gt;
+  &lt;head&gt; ... &lt;/head&gt;
+  &lt;body&gt; ... &lt;/body&gt;
+&lt;/html&gt;</pre>
+      </div>
+      <div class="card">
+        <h3><code>lang="tr"</code> pratikte ne sağlar?</h3>
+        <ul class="check">
+          <li><b>Ekran okuyucu</b> metni Türkçe telaffuzla okur; <code>lang="en"</code> olsaydı "Yeni evinizi keşfedin" cümlesini İngilizce seslerle okurdu.</li>
+          <li><b>Tarayıcı</b> "bu sayfayı çevir" önerisini doğru yönde sunar.</li>
+          <li><b>Arama motoru</b> sayfayı doğru dildeki kullanıcıya gösterir.</li>
+          <li><b>Yazım denetimi</b> ve bazı tipografi kuralları doğru dile göre çalışır.</li>
+        </ul>
+        <p class="note"><b>Öznitelik yapısı:</b> <code>ad="değer"</code>. Burada ad <code>lang</code>, değer <code>tr</code>. Öznitelikler yalnızca <b>açılış etiketinin içine</b> yazılır.</p>
+      </div>
+    </div>
+    <p class="self-study"><b>Düşün:</b> Sayfanın büyük kısmı Türkçe ama tek bir paragraf İngilizce olsaydı ne yapardın? (İpucu: <code>lang</code> yalnızca <code>html</code> üzerinde kullanılmak zorunda değil.)</p>
+  </div>
+</section>
+
+<!-- 06 head / body -->
+<section class="slide" data-title="head ve body Bölümleri">
+  <div class="slide-content">
+    <h2 class="topic">head VE body BÖLÜMLERİ</h2>
+    <p class="subtitle"><code>head</code> ayarları, <code>body</code> içeriği taşır</p>
+    <p class="lead">Butonlarla iki bölüm arasında geçiş yap. Sağdaki tarayıcı penceresinde, o bölümün kullanıcı için ne değiştirdiğini gör.</p>
+    <div class="btn-row">
+      <button class="btn on" data-region="head" type="button">head bölümü</button>
+      <button class="btn" data-region="body" type="button">body bölümü</button>
+    </div>
+    <div class="split">
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span id="regionFile">index.html · head</span></div>
+        <pre id="regionCode" data-hl>&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Ev Bul&lt;/title&gt;
+&lt;/head&gt;</pre>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab" id="regionTab">Ev Bul</span></div>
+          <div class="page" id="regionPage">
+            <h3>Yeni evinizi keşfedin</h3>
+            <p>Sekme başlığı, karakter kodlaması ve mobil ölçek ayarı sayfanın içinde görünmez — ama hepsi burada etkisini gösterir.</p>
+          </div>
+        </div>
+        <p class="state-line" id="regionExplain" style="margin-top:.8rem"><b>head:</b> Kullanıcının sayfada göremediği, fakat tarayıcının doğru davranması için gereken bilgiler burada tanımlanır.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 charset -->
+<section class="slide" data-title="meta charset (UTF-8)">
+  <div class="slide-content">
+    <h2 class="topic">KARAKTER KODLAMASI</h2>
+    <p class="subtitle"><code>&lt;meta charset="UTF-8"&gt;</code> harfleri doğru çözer</p>
+    <p class="lead">Dosyada aslında harf yoktur; <b>sayılar (bayt)</b> vardır. Karakter kodlaması, hangi sayının hangi harfe karşılık geldiğini söyleyen sözlüktür. Yanlış sözlükle okunan metin bozuk görünür — buna <i>mojibake</i> denir.</p>
+    <div class="btn-row"><button class="btn primary" id="charsetToggle" type="button">charset satırını kaldır</button></div>
+    <div class="browser" style="max-width:760px">
+      <div class="chrome"><i></i><i></i><i></i><span class="tab">evbul.test</span></div>
+      <div class="page">
+        <h3 id="charsetHeading">Güzel bir çağrı: şehrin en iyi köşesi</h3>
+        <p id="charsetText">İstanbul'un güneyinde, doğa ile iç içe müstakil bahçeli evler.</p>
+      </div>
+    </div>
+    <p class="state-line" id="charsetState" style="margin-top:.8rem">UTF-8 etkin: ç, ğ, ı, ö, ş, ü karakterleri doğru görünüyor.</p>
+    <p class="note"><b>Yerleşim kuralı:</b> <code>charset</code> satırı <code>head</code> bölümünün ilk 1024 bayt'ı içinde, pratikte hemen başında yer almalıdır. Tarayıcı metni okumaya başlamadan önce hangi sözlüğü kullanacağını bilmek zorundadır.</p>
+  </div>
+</section>
+
+<!-- 08 viewport -->
+<section class="slide" data-title="meta viewport">
+  <div class="slide-content">
+    <h2 class="topic">VIEWPORT VE MOBİL ÖLÇEK</h2>
+    <p class="subtitle"><code>viewport</code> olmadan mobil tasarım çalışmaz</p>
+    <p class="lead">Telefon tarayıcıları, eski masaüstü siteleri bozulmasın diye sayfayı varsayılan olarak yaklaşık 980px genişliğinde bir sanal ekrana çizip küçültür. Sonuç: her şey minicik görünür. <code>viewport</code> satırı bu davranışı kapatır.</p>
+    <div class="split">
+      <div class="phone-wrap">
+        <div class="phone" id="viewportPhone">
+          <div class="screen"><div class="inner">
+            <span class="brand">EV BUL</span>
+            <h3>Yeni evinizi keşfedin</h3>
+            <p>Konum, oda sayısı ve bütçeye göre size uygun ilanları inceleyin.</p>
+          </div></div>
+        </div>
+      </div>
+      <div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>head içinde</span></div>
+          <pre data-hl>&lt;meta name="viewport"
+      content="width=device-width, initial-scale=1.0"&gt;</pre>
+        </div>
+        <dl class="meta">
+          <dt>width=device-width</dt><dd>Sanal ekran genişliğini gerçek cihaz genişliğine eşitle.</dd>
+          <dt>initial-scale=1.0</dt><dd>Sayfa açıldığında yakınlaştırma yapma, 1:1 ölçekte göster.</dd>
+        </dl>
+        <div class="btn-row"><button class="btn primary" id="viewportToggle" type="button">Viewport'u kaldır</button></div>
+        <p class="state-line" id="viewportState">Viewport etkin: içerik cihaz genişliğine uyuyor, metin okunabilir.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 title vs h1 canlı -->
+<section class="slide" data-title="title ve h1 Farkı">
+  <div class="slide-content">
+    <h2 class="topic">title VE h1 FARKI <span class="sub">(canlı düzenleme)</span></h2>
+    <p class="subtitle"><code>title</code> sekmede, <code>h1</code> sayfanın içinde</p>
+    <p class="lead">Aşağıdaki kutulara yazdığını anında sağdaki tarayıcıda gör. İkisinin nerede göründüğünü bir kez kendi gözünle görürsen bir daha karıştırmazsın.</p>
+    <div class="split">
+      <div>
+        <div class="live-inputs">
+          <div><label for="titleInput">head içindeki &lt;title&gt; içeriği</label><input id="titleInput" type="text" value="Ev Bul — Kiralık ve Satılık İlanlar"></div>
+          <div><label for="h1Input">body içindeki &lt;h1&gt; içeriği</label><input id="h1Input" type="text" value="Yeni evinizi keşfedin"></div>
+        </div>
+        <div class="code-window">
+          <div class="window-bar"><i></i><i></i><i></i><span>index.html</span></div>
+          <pre id="titleCode" data-hl>&lt;head&gt;
+  &lt;title&gt;Ev Bul&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Yeni evinizi keşfedin&lt;/h1&gt;
+&lt;/body&gt;</pre>
+        </div>
+      </div>
+      <div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><span class="tab" id="liveTab">Ev Bul — Kiralık ve Satılık İlanlar</span></div>
+          <div class="page"><h3 id="liveH1">Yeni evinizi keşfedin</h3><p>Sekme başlığı belgeyi <b>dışarıya</b> tanıtır: sekme, yer imi, arama sonucu, paylaşım. <code>h1</code> ise sayfanın <b>içeriğinin</b> ana konusunu belirtir.</p></div>
+        </div>
+        <p class="note"><b>Kural:</b> Bir sayfada tek bir <code>title</code> ve kural olarak tek bir <code>h1</code> bulunur. Bunlar birbirinin kopyası olmak zorunda değildir; <code>title</code> genelde daha açıklayıcı ve site adını da içerir.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 element anatomisi -->
+<section class="slide" data-title="Bir Elementin Anatomisi">
+  <div class="slide-content">
+    <h2 class="topic">TEMEL SÖZDİZİMİ: ELEMENT ANATOMİSİ</h2>
+    <p class="subtitle">Element = açılış etiketi + içerik + kapanış etiketi</p>
+    <p class="lead">HTML'de yazdığın her şey bu kalıba uyar. Parçaların üzerine gel; hangi parçanın ne olduğunu ayrı ayrı gör.</p>
+    <div class="anatomy">
+      <span class="apart open">&lt;p&gt;<small>AÇILIŞ ETİKETİ</small></span>
+      <span class="apart mid">Bahçeli ev, 4+1, 210 m²<small>İÇERİK</small></span>
+      <span class="apart close">&lt;/p&gt;<small>KAPANIŞ ETİKETİ</small></span>
+    </div>
+    <div class="grid-3">
+      <div class="tile"><h3>Etiket (tag)</h3><p><code>&lt;p&gt;</code> ve <code>&lt;/p&gt;</code> işaretlerinin her biri bir etikettir. Kapanışta eğik çizgi vardır.</p></div>
+      <div class="tile"><h3>Element</h3><p>Açılış + içerik + kapanışın tamamı bir elementtir. "p elementi" dediğimizde bu bütünü kastederiz.</p></div>
+      <div class="tile"><h3>İçerik</h3><p>Metin olabilir, başka elementler olabilir, ikisi birden olabilir.</p></div>
+    </div>
+    <p class="note warn"><b>Yeni başlayanların en sık hatası:</b> Kapanış etiketini unutmak veya <code>&lt;/p&gt;</code> yerine <code>&lt;p&gt;</code> yazmak. Tarayıcı hata mesajı vermez; sessizce tahmin eder ve sayfan beklemediğin şekilde bozulur. Bu yüzden HTML hatalarını gözle ve girintiyle yakalamayı öğrenmelisin.</p>
+  </div>
+</section>
+
+<!-- 11 öznitelik -->
+<section class="slide" data-title="Öznitelikler">
+  <div class="slide-content">
+    <h2 class="topic">ÖZNİTELİKLER <span class="sub">(ad="değer")</span></h2>
+    <p class="subtitle">Öznitelikler elementin ayarlarıdır</p>
+    <p class="lead">Etiket "bu nedir?" sorusunu cevaplar; öznitelik "nasıl / hangisi / nereye?" sorusunu cevaplar. Öznitelikler <b>yalnızca açılış etiketinin içine</b>, etiket adından sonra bir boşluk bırakılarak yazılır.</p>
+    <div class="attr-anatomy">
+      <span>&lt;a</span><span class="name">href</span><span>=</span><span class="val">"ilanlar.html"</span><span>&gt;İlanları gör&lt;/a&gt;</span>
+    </div>
+    <div class="grid-3">
+      <div class="tile"><b class="num">01</b><h3>Değer tırnak içinde</h3><p>Tek veya çift tırnak kullanılabilir; ekipler genellikle çift tırnakta anlaşır. Tutarlı ol.</p></div>
+      <div class="tile"><b class="num">02</b><h3>Eşittir etrafında boşluk yok</h3><p><code>href="x"</code> doğru; <code>href = "x"</code> çalışır ama okunabilirliği bozar.</p></div>
+      <div class="tile"><b class="num">03</b><h3>Birden çok öznitelik</h3><p>Aralarına boşluk konur, sıraları önemli değildir: <code>&lt;img src="ev.jpg" alt="Bahçeli ev"&gt;</code></p></div>
+    </div>
+    <p class="self-study"><b>Tek başına çalışırken:</b> Daha önce yazdığın <code>iletisim.html</code> sayfasını aç ve içindeki tüm öznitelikleri bir kâğıda "ad → görev" biçiminde listele. Hangilerinin görevini açıklayamadığını fark edeceksin.</p>
+  </div>
+</section>
+
+<!-- 12 boş elementler -->
+<section class="slide" data-title="Boş Elementler">
+  <div class="slide-content">
+    <h2 class="topic">BOŞ ELEMENTLER</h2>
+    <p class="subtitle">Bazı elementlerin içeriği ve kapanış etiketi yoktur</p>
+    <p class="lead">İçeriği olmayan elementlere <b>boş element (void element)</b> denir. Bunlar ne taşıdıklarını içerikle değil, <b>öznitelikleriyle</b> anlatır. Bu yüzden kapanış etiketleri de yoktur.</p>
+    <div class="grid-3">
+      <div class="tile"><code>&lt;meta charset="UTF-8"&gt;</code><h3>Belge ayarı</h3><p>Bilgi verir, ekranda bir şey çizmez.</p></div>
+      <div class="tile"><code>&lt;img src="ev.jpg" alt="Bahçeli ev"&gt;</code><h3>Görsel</h3><p>Gösterilecek dosyayı ve alternatif metni özniteliklerle bildirir.</p></div>
+      <div class="tile"><code>&lt;br&gt;</code><h3>Satır sonu</h3><p>Metin akışını zorunlu olarak alt satıra indirir.</p></div>
+    </div>
+    <div class="grid-2" style="margin-top:1rem">
+      <div class="box-bad"><small>YANLIŞ</small><strong>&lt;img&gt;&lt;/img&gt;</strong><p>Boş elementin kapanış etiketi yoktur; yazarsan tarayıcı bunu anlamsız bir işaret olarak görür.</p></div>
+      <div class="box-good"><small>DOĞRU</small><strong>&lt;img src="ev.jpg" alt="Bahçeli ev"&gt;</strong><p>Tek etiket yeterlidir. Görevini <code>src</code> ve <code>alt</code> öznitelikleri anlatır.</p></div>
+    </div>
+    <p class="note"><b>Sıkça sorulan:</b> Bazı kaynaklarda <code>&lt;br /&gt;</code> yazıldığını görürsün. Bu XHTML döneminden kalmadır; HTML5'te gerekli değildir, hata da değildir. Yeni kodda sade biçimi (<code>&lt;br&gt;</code>) tercih et.</p>
+  </div>
+</section>
+
+<!-- 13 iç içe yapı / ağaç -->
+<section class="slide" data-title="İç İçe Elementler ve DOM Ağacı">
+  <div class="slide-content">
+    <h2 class="topic">İÇ İÇE YAPI VE DOM AĞACI <span class="sub">(kod → ağaç eşleşmesi)</span></h2>
+    <p class="subtitle">Elementler iç içe girerek bir ağaç kurar</p>
+    <p class="lead">Koddaki bir satırın üzerine gel; sağdaki ağaçta karşılığının nasıl yandığını gör. Tarayıcı senin yazdığın metni tam olarak böyle bir ağaca çevirir — buna <b>DOM</b> denir ve JavaScript'e geçtiğimizde bu ağaç üzerinde çalışacağız.</p>
+    <div class="tree-grid">
+      <div class="skeleton-code" id="nestCode">
+<span class="ln on" data-node="body" data-hl>&lt;body&gt;</span><span class="ln on" data-node="main" data-hl>  &lt;main&gt;</span><span class="ln on" data-node="h1" data-hl>    &lt;h1&gt;İlanlar&lt;/h1&gt;</span><span class="ln on" data-node="p" data-hl>    &lt;p&gt;Yeni evinizi bulun.&lt;/p&gt;</span><span class="ln on" data-node="main" data-hl>  &lt;/main&gt;</span><span class="ln on" data-node="body" data-hl>&lt;/body&gt;</span>
+      </div>
+      <div>
+        <div class="tree">
+          <span class="tnode" data-tnode="body">body</span>
+          <span class="tbar"></span>
+          <span class="tnode" data-tnode="main">main</span>
+          <span class="tbar"></span>
+          <div class="tsiblings"><span class="tnode" data-tnode="h1">h1</span><span class="tnode" data-tnode="p">p</span></div>
+        </div>
+        <div class="rel-list">
+          <p><b>body</b> → <b>main</b>'in ebeveyni (parent)</p>
+          <p><b>main</b> → <b>body</b>'nin çocuğu (child)</p>
+          <p><b>h1</b> ve <b>p</b> → aynı ebeveyni paylaşan kardeşler (siblings)</p>
+        </div>
+      </div>
+    </div>
+    <p class="note warn"><b>Altın kural:</b> Elementler <u>çaprazlanamaz</u>. En son açılan element, en önce kapanır. <code>&lt;p&gt;&lt;b&gt;metin&lt;/p&gt;&lt;/b&gt;</code> yanlıştır; doğrusu <code>&lt;p&gt;&lt;b&gt;metin&lt;/b&gt;&lt;/p&gt;</code>. İç içe kutular gibi düşün: dıştaki kutuyu kapatmadan önce içteki kutuyu kapatmalısın.</p>
+  </div>
+</section>
+
+<!-- 14 girinti -->
+<section class="slide" data-title="Girinti">
+  <div class="slide-content">
+    <h2 class="topic">GİRİNTİ VE KOD DÜZENİ</h2>
+    <p class="subtitle">Girinti hatayı gözle görünür kılar</p>
+    <p class="lead">Tarayıcı iki kodu da aynı şekilde çalıştırır. Fark, kodu okuyan insanda: girintili kodda bir kapanış etiketinin eksik olduğunu saniyeler içinde fark edersin.</p>
+    <div class="grid-2">
+      <div class="code-window"><div class="window-bar"><i></i><i></i><i></i><span>okunması zor</span></div><pre data-hl>&lt;body&gt;&lt;main&gt;&lt;section&gt;&lt;h2&gt;İlanlar&lt;/h2&gt;
+&lt;p&gt;Yeni evinizi bulun.&lt;/p&gt;&lt;/section&gt;
+&lt;/main&gt;&lt;/body&gt;</pre></div>
+      <div class="code-window"><div class="window-bar"><i></i><i></i><i></i><span>yapı açık</span></div><pre data-hl>&lt;body&gt;
+  &lt;main&gt;
+    &lt;section&gt;
+      &lt;h2&gt;İlanlar&lt;/h2&gt;
+      &lt;p&gt;Yeni evinizi bulun.&lt;/p&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+&lt;/body&gt;</pre></div>
+    </div>
+    <p class="note"><b>Uygulama kuralı:</b> Bir element başka bir elementin içine girdiğinde bir seviye (2 boşluk) içeri alınır. Editörün otomatik biçimlendirme kısayolunu öğren — VS Code'da <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>F</kbd>. Ama önce elle yazmayı öğren: girintiyi kendin kurarken yapının mantığını da kurmuş olursun.</p>
+  </div>
+</section>
+
+<!-- 15 yorumlar -->
+<section class="slide" data-title="HTML Yorumları ve Güvenlik">
+  <div class="slide-content">
+    <h2 class="topic">HTML YORUMLARI VE GÜVENLİK</h2>
+    <p class="subtitle">Yorumlar ekranda görünmez — ama gizli değildir</p>
+    <div class="split">
+      <div>
+        <p class="lead">Yorumlar tarayıcı tarafından çizilmez. Kod bölümlerini adlandırmak, geçici olarak bir bölümü devre dışı bırakmak veya ekip arkadaşına not bırakmak için kullanılır.</p>
+        <p class="note warn"><b>Güvenlik uyarısı:</b> Yorumlar sayfada görünmez ama <b>kaynak kodu</b> herkes tarafından görüntülenebilir (<kbd>Ctrl</kbd>+<kbd>U</kbd>). Parola, veritabanı adresi, API anahtarı, test kullanıcısı bilgisi veya kişisel veri asla yorum satırına yazılmaz.</p>
+        <p class="self-study"><b>Hemen dene:</b> Herhangi bir web sitesinde <kbd>Ctrl</kbd>+<kbd>U</kbd> tuşlarına bas. Gördüğün her şey — yorumlar dahil — kullanıcının erişebildiği bilgidir.</p>
+      </div>
+      <div class="code-window">
+        <div class="window-bar"><i></i><i></i><i></i><span>yorumlar.html</span></div>
+        <pre data-hl>&lt;!-- Üst bilgi alanı başlangıcı --&gt;
+&lt;header&gt;
+  &lt;h1&gt;Ev Bul&lt;/h1&gt;
+&lt;/header&gt;
+
+&lt;!-- TODO: ilan filtresi eklenecek --&gt;
+
+&lt;!-- YAZMA: admin şifresi 1234 --&gt;</pre>
+        <p class="code-caption">Son satır, hiçbir zaman yazılmaması gereken türden bir yorumdur.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 16 hata avı -->
+<section class="slide" data-title="Uygulama 1: Hata Avı">
+  <div class="slide-content">
+    <h2 class="topic">UYGULAMA 1 — HATA AVI</h2>
+    <p class="subtitle">Bu belgede 5 hata var. Hatalı satıra tıkla.</p>
+    <p class="lead">Önce kendi başına incele, sonra tıkla. Doğru satırı seçtiğinde hatanın <b>nedeni</b> sağda açıklanır. Yanlış satıra tıklarsan satır kırmızı yanıp söner.</p>
+    <div class="hunt-grid">
+      <div class="hunt-code" id="huntCode">
+<span class="hline" data-err="DOCTYPE satırı yok. Belge quirks moduna düşebilir; her belge &lt;!DOCTYPE html&gt; ile başlamalı." data-hl>&lt;html&gt;</span><span class="hline" data-hl>&lt;head&gt;</span><span class="hline" data-err="title elementinin kapanışı hatalı: &lt;title&gt; yerine &lt;/title&gt; yazılmalı. Eğik çizgi unutulmuş." data-hl>  &lt;title&gt;Ev Bul&lt;title&gt;</span><span class="hline" data-err="head kapanmadan body açılmış. Doğru sıra: &lt;/head&gt; sonra &lt;body&gt;." data-hl>&lt;body&gt;</span><span class="hline" data-err="meta charset head bölümünde olmalı. body içine yazılırsa karakter kodlaması güvenilir biçimde uygulanmaz." data-hl>  &lt;meta charset="UTF-8"&gt;</span><span class="hline" data-err="h1 elementi kapatılmamış: &lt;/h1&gt; eksik." data-hl>  &lt;h1&gt;Yeni evinizi keşfedin</span><span class="hline" data-hl>&lt;/html&gt;</span>
+      </div>
+      <div class="hunt-panel">
+        <p class="score" id="huntScore">Bulunan hata: 0 / 5</p>
+        <p class="hunt-feedback" id="huntFeedback">Kontrol sırası: ① DOCTYPE var mı? ② head/body sırası doğru mu? ③ her etiket kapanıyor mu? ④ lang, charset, viewport var mı? ⑤ girinti yapıyı gösteriyor mu?</p>
+        <ul class="hunt-log" id="huntLog"></ul>
+        <div class="btn-row"><button class="btn" id="huntReset" type="button">Baştan başla</button><button class="btn primary" id="huntFix" type="button" disabled>Düzeltilmiş hâlini göster</button></div>
+        <p class="muted" style="font-size:.8rem">Not: <code>lang</code> ve <code>viewport</code> eksikliği de birer eksiklik — ama tarayıcıyı kilitleyen yapısal hata değil. Düzeltilmiş kodda ikisini de ekliyoruz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 17 sıralama alıştırması -->
+<section class="slide" data-title="Uygulama 2: Sıralama">
+  <div class="slide-content">
+    <h2 class="topic">UYGULAMA 2 — SIRALAMA</h2>
+    <p class="subtitle">Belge iskeletini doğru sırayla diz</p>
+    <p class="lead">Aşağıdaki satırlar karışık. Bir belgede yukarıdan aşağıya hangi sırayla yer almaları gerektiğini düşünerek sırayla tıkla. Yanlış sırada bir satır seçersen kutu kırmızıya döner.</p>
+    <div class="order-pool" id="orderPool"></div>
+    <p class="muted" style="font-size:.82rem;margin-bottom:.3rem">Senin sıralaman:</p>
+    <div class="order-slots" id="orderSlots"></div>
+    <div class="btn-row"><button class="btn" id="orderReset" type="button">Temizle</button></div>
+    <p class="state-line" id="orderState">Başlamak için ilk satırı seç.</p>
+    <p class="self-study"><b>İpucu:</b> Sıralamayı ezberden değil, mantıktan kur: tarayıcı bir bilgiyi <b>kullanmadan önce</b> okumuş olmalıdır. Karakter kodlaması, metinden önce gelir.</p>
+  </div>
+</section>
+
+<!-- 18 playground -->
+<section class="slide" data-title="Uygulama 3: Canlı Editör">
+  <div class="slide-content">
+    <h2 class="topic">UYGULAMA 3 — CANLI EDİTÖR</h2>
+    <p class="subtitle">Kodu değiştir, sonucu anında gör</p>
+    <p class="lead">Soldaki editörde istediğini değiştir; sağdaki tarayıcı penceresi anında güncellenir. Öneri: <code>lang</code> değerini <code>en</code> yap, <code>h1</code>'i sil, kapanış etiketlerinden birini boz ve ne olduğunu gözlemle.</p>
+    <div class="pg">
+      <div>
+        <textarea id="pgCode" spellcheck="false" aria-label="HTML kod editörü"></textarea>
+        <div class="btn-row">
+          <button class="btn primary" id="pgRun" type="button">Çalıştır</button>
+          <button class="btn" id="pgReset" type="button">Başlangıca dön</button>
+          <button class="btn" id="pgBreak" type="button">Bir hata ekle</button>
+        </div>
+      </div>
+      <div class="browser">
+        <div class="chrome"><i></i><i></i><i></i><span class="tab" id="pgTab">index.html</span></div>
+        <iframe id="pgFrame" title="Canlı önizleme"></iframe>
+      </div>
+    </div>
+    <p class="note"><b>Fark ettin mi?</b> Kapanış etiketini sildiğinde tarayıcı hata vermez, tahmin ederek sayfayı yine de çizer. Bu "affedicilik" yeni başlayan için tehlikelidir: hatan sessizce büyür. Bu yüzden düzenli girinti ve doğrulama alışkanlığı kazanmalısın.</p>
+  </div>
+</section>
+
+<!-- 19 devtools -->
+<section class="slide" data-title="Tarayıcı Araçları">
+  <div class="slide-content">
+    <h2 class="topic">TARAYICI ARAÇLARI VE DOĞRULAMA</h2>
+    <p class="subtitle">Yazdığın HTML'i tarayıcıda denetle</p>
+    <p class="lead">Bir geliştirici kodunu yalnızca editörde değil, tarayıcının kendisinde de okur. Bugün üç aracı tanıman yeterli.</p>
+    <div class="grid-3">
+      <div class="tile"><b class="num">01</b><h3>Kaynağı görüntüle · <kbd>Ctrl</kbd>+<kbd>U</kbd></h3><p>Senin yazdığın ham metni gösterir. Yorumlar dahil her şey buradadır.</p></div>
+      <div class="tile"><b class="num">02</b><h3>İncele (Elements) · <kbd>F12</kbd></h3><p>Tarayıcının kodundan <b>oluşturduğu ağacı</b> gösterir. Unuttuğun kapanış etiketlerini tarayıcının nasıl tamamladığını burada görürsün.</p></div>
+      <div class="tile"><b class="num">03</b><h3>W3C Validator</h3><p><code>validator.w3.org</code> adresine dosyanı yükle; standarda aykırı her satırı gerekçesiyle listeler.</p></div>
+    </div>
+    <p class="self-study"><b>Görev:</b> Bir önceki slayttaki editörde bilerek bir kapanış etiketi sil, sonra aynı kodu kendi bilgisayarında <code>deneme.html</code> olarak kaydedip <kbd>F12</kbd> ile ağaca bak. Tarayıcı elementi nerede kapatmış?</p>
+  </div>
+</section>
+
+<!-- 20 quiz -->
+<section class="slide" data-title="Değerlendirme">
+  <div class="slide-content">
+    <h2 class="topic">DEĞERLENDİRME</h2>
+    <p class="subtitle">Önce kendin cevapla, sonra kontrol et</p>
+    <p class="lead">Cevabı görmeden önce yüksek sesle veya yazarak cevap ver. Cevabı okuyup "biliyordum" demek öğrenme değildir; anlatabilmek öğrenmedir.</p>
+    <div class="quiz-grid">
+      <article class="quiz-card"><span>01</span><h3><code>&lt;!DOCTYPE html&gt;</code> neden bir HTML etiketi sayılmaz?</h3><button class="btn reveal" type="button">Yanıtı göster</button><p class="quiz-answer">Çünkü bir element oluşturmaz: içeriği ve kapanış etiketi yoktur, sayfada bir şey temsil etmez. Tarayıcıya belgenin hangi kural setiyle (HTML5 standart modu) yorumlanacağını söyleyen bir bildirimdir.</p></article>
+      <article class="quiz-card"><span>02</span><h3><code>head</code> ile <code>body</code> arasındaki görev farkını tek cümleyle söyle.</h3><button class="btn reveal" type="button">Yanıtı göster</button><p class="quiz-answer"><code>head</code> belge hakkındaki bilgileri (kodlama, başlık, ölçek, bağlantılar) taşır; <code>body</code> ise kullanıcının ekranda gördüğü ve etkileşime girdiği içeriği taşır.</p></article>
+      <article class="quiz-card"><span>03</span><h3><code>charset</code> neden <code>head</code>'in en başında olmalı?</h3><button class="btn reveal" type="button">Yanıtı göster</button><p class="quiz-answer">Tarayıcı metni okumaya başlamadan önce hangi karakter sözlüğünü kullanacağını bilmelidir. Kodlama geç bildirilirse tarayıcı belgeyi baştan yorumlamak zorunda kalır veya karakterler bozuk görünür.</p></article>
+      <article class="quiz-card"><span>04</span><h3><code>viewport</code> satırı olmayan bir sayfa telefonda neden küçük görünür?</h3><button class="btn reveal" type="button">Yanıtı göster</button><p class="quiz-answer">Telefon tarayıcısı, eski masaüstü siteleri bozulmasın diye sayfayı yaklaşık 980px genişliğinde sanal bir ekrana çizip cihaz ekranına sığdırmak için küçültür. <code>width=device-width</code> bu sanal genişliği gerçek cihaz genişliğine eşitler.</p></article>
+      <article class="quiz-card"><span>05</span><h3><code>&lt;p&gt;&lt;b&gt;metin&lt;/p&gt;&lt;/b&gt;</code> neden yanlış?</h3><button class="btn reveal" type="button">Yanıtı göster</button><p class="quiz-answer">Elementler çaprazlanamaz. İçte açılan element, dıştaki kapanmadan önce kapatılmalıdır. Doğrusu: <code>&lt;p&gt;&lt;b&gt;metin&lt;/b&gt;&lt;/p&gt;</code>. Aksi hâlde tarayıcı ağacı kendi tahminine göre kurar ve sonuç beklediğinden farklı olur.</p></article>
+      <article class="quiz-card"><span>06</span><h3>Boş element nedir, bir örnek ver.</h3><button class="btn reveal" type="button">Yanıtı göster</button><p class="quiz-answer">İçerik ve kapanış etiketi taşımayan, görevini yalnızca öznitelikleriyle bildiren elementtir. Örnek: <code>&lt;meta charset="UTF-8"&gt;</code>, <code>&lt;img src="ev.jpg" alt="Bahçeli ev"&gt;</code>, <code>&lt;br&gt;</code>.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- 21 ödev -->
+<section class="slide" data-title="Ders Sonu Görevi">
+  <div class="slide-content">
+    <h2 class="topic">DERS SONU GÖREVİ</h2>
+    <p class="subtitle">"Ev Bul" projesinin ilk dosyasını sıfırdan kur</p>
+    <p class="lead">Bu görevi kopyalayarak değil, <b>ezberden yazarak</b> yap. Takıldığın yerde önce düşün; ancak gerçekten çıkamazsan slaytlara dön.</p>
+    <ol class="task-list">
+      <li><code>ev-bul</code> adında bir klasör ve içinde <code>index.html</code> dosyası oluştur.</li>
+      <li>Belge iskeletini eksiksiz kur: DOCTYPE, <code>lang="tr"</code>, charset, viewport, title.</li>
+      <li><code>title</code> değerini site adını da içerecek şekilde yaz (örn. "Ev Bul — Kiralık ve Satılık İlanlar").</li>
+      <li><code>body</code> içine bir <code>h1</code> ve iki paragraf ekle; içerik gerçekçi olsun, "lorem ipsum" kullanma.</li>
+      <li>Kodun üstüne, ne yaptığını açıklayan bir HTML yorumu ekle.</li>
+      <li>Girintiyi elle, iki boşluk kuralıyla uygula.</li>
+      <li>Dosyayı tarayıcıda aç, <kbd>Ctrl</kbd>+<kbd>U</kbd> ile kaynağı ve <kbd>F12</kbd> ile ağacı incele.</li>
+      <li>Bilerek bir kapanış etiketini sil, sayfayı yenile, ne değiştiğini bir cümleyle not et, sonra düzelt.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 22 kapanış -->
+<section class="slide" data-title="Özet — HTML-2">
+  <div class="slide-content intro">
+    <p class="eyebrow">ÖZET · HTML-2 TAMAMLANDI (KONU 1–20)</p>
+    <h2 style="text-align:center">Sağlam bir belge,<br><span class="gradient">tarayıcıya hiçbir şeyi tahmin ettirmez.</span></h2>
+    <div class="equation">
+      <span><b>DOCTYPE</b>Doğru mod</span><i>+</i>
+      <span><b>html lang</b>Kök ve dil</span><i>+</i>
+      <span><b>head</b>Teknik ayarlar</span><i>+</i>
+      <span><b>body</b>Görünen içerik</span><i>=</i>
+      <span class="res"><b>Geçerli belge</b>CSS ve JS'e hazır</span>
+    </div>
+    <p class="lead" style="text-align:center;max-width:70ch">Doğru sözdizimi, çaprazlanmayan iç içe yapı, tutarlı girinti ve güvenli yorum kullanımı; okunabilir, sürdürülebilir ve sonraki katmanlara hazır bir belge üretir.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="controls">
+  <button class="nav-btn" id="prevBtn" type="button" aria-label="Önceki slayt">←</button>
+  <div class="progress-wrap">
+    <div class="slide-meta"><span id="slideTitle">HTML Belge İskeleti ve Temel Sözdizimi</span><span><b id="slideNum">01</b> / <span id="slideTotal">22</span></span></div>
+    <div class="track" role="progressbar" aria-label="Sunu ilerlemesi" aria-valuemin="1" aria-valuenow="1"><span id="progressBar"></span></div>
+  </div>
+  <button class="nav-btn" id="nextBtn" type="button" aria-label="Sonraki slayt">→</button>
+</footer>
+
+<script>
+/* ============ 1. KOD RENKLENDİRME ============ */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function highlight(raw){
+  var comments=[];
+  var text=esc(raw).replace(/&lt;!--[\s\S]*?--&gt;/g,function(m){comments.push(m);return '\u0001'+(comments.length-1)+'\u0001';});
+  text=text.replace(/&lt;(\/?)([a-zA-Z0-9!-]+)((?:(?!&gt;)[\s\S])*?)(\/?)&gt;/g,function(m,slash,name,attrs,selfc){
+    var a=attrs.replace(/([a-zA-Z-]+)(=)(&quot;[^&]*?&quot;)/g,'<span class="t-attr">$1</span>=<span class="t-str">$3</span>');
+    return '<span class="t-tag">&lt;'+slash+name+'</span>'+a+'<span class="t-tag">'+selfc+'&gt;</span>';
+  });
+  text=text.replace(/\u0001(\d+)\u0001/g,function(m,i){return '<span class="t-com">'+comments[i]+'</span>';});
+  return text;
+}
+document.querySelectorAll('[data-hl]').forEach(function(el){ el.innerHTML=highlight(el.textContent); });
+
+/* ============ 2. SLAYT GEZİNMESİ ============ */
+var slides=[].slice.call(document.querySelectorAll('.slide'));
+var prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+var slideTitle=document.getElementById('slideTitle'), slideNum=document.getElementById('slideNum');
+var slideTotal=document.getElementById('slideTotal'), progressBar=document.getElementById('progressBar');
+var track=document.querySelector('.track');
+var idx=0;
+slideTotal.textContent=String(slides.length).padStart(2,'0');
+track.setAttribute('aria-valuemax',String(slides.length));
+
+function show(n){
+  idx=Math.max(0,Math.min(n,slides.length-1));
+  slides.forEach(function(s,i){
+    s.classList.toggle('is-active',i===idx);
+    if(i===idx){s.removeAttribute('aria-hidden');s.scrollTop=0;} else {s.setAttribute('aria-hidden','true');}
+  });
+  var t=slides[idx].dataset.title;
+  slideTitle.textContent=t;
+  slideNum.textContent=String(idx+1).padStart(2,'0');
+  progressBar.style.width=((idx+1)/slides.length*100)+'%';
+  track.setAttribute('aria-valuenow',String(idx+1));
+  prevBtn.disabled=idx===0; nextBtn.disabled=idx===slides.length-1;
+  document.title=String(idx+1).padStart(2,'0')+' · '+t+' | HTML-2';
+  history.replaceState(null,'','#slayt-'+(idx+1));
+}
+prevBtn.addEventListener('click',function(){show(idx-1);});
+nextBtn.addEventListener('click',function(){show(idx+1);});
+document.addEventListener('keydown',function(e){
+  var tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea')return;
+  if(['ArrowRight','PageDown',' '].indexOf(e.key)>-1){e.preventDefault();show(idx+1);}
+  if(['ArrowLeft','PageUp'].indexOf(e.key)>-1){e.preventDefault();show(idx-1);}
+  if(e.key==='Home'){e.preventDefault();show(0);}
+  if(e.key==='End'){e.preventDefault();show(slides.length-1);}
+});
+var touchX=0;
+document.addEventListener('touchstart',function(e){touchX=e.changedTouches[0].screenX;},{passive:true});
+document.addEventListener('touchend',function(e){
+  var d=e.changedTouches[0].screenX-touchX;
+  if(Math.abs(d)<60)return;
+  show(d<0?idx+1:idx-1);
+},{passive:true});
+
+/* ============ 3. İSKELET GEZGİNİ ============ */
+var partInfo={
+  doctype:{role:'BİLDİRİM · ETİKET DEĞİL',title:'&lt;!DOCTYPE html&gt;',
+    text:'Tarayıcıya "bu belgeyi HTML5 standart moduna göre yorumla" der. Belgenin en üstünde, tek satır, kapanışsız. Eksikse tarayıcı eski uyumluluk (quirks) moduna düşebilir ve CSS ölçüleri beklediğinden farklı hesaplanır.',
+    q:'Soru: Bu satır neden &lt;html&gt; içinde değil?'},
+  html:{role:'KÖK ELEMENT',title:'&lt;html lang="tr"&gt;',
+    text:'Belgedeki her elementi saran en dış elementtir; bu yüzden "kök" denir. lang özniteliği belgenin dilini bildirir: ekran okuyucunun telaffuzunu, tarayıcının çeviri önerisini ve arama motorunun dil eşleşmesini etkiler.',
+    q:'Soru: lang="en" yazsaydık ekran okuyucu Türkçe metni nasıl okurdu?'},
+  head:{role:'BÖLÜM 01 · GÖRÜNMEYEN BİLGİLER',title:'&lt;head&gt; ... &lt;/head&gt;',
+    text:'Belge <b>hakkındaki</b> bilgileri taşır: karakter kodlaması, mobil ölçek ayarı, sekme başlığı, ileride ekleyeceğimiz CSS ve JavaScript bağlantıları. İçeriği kullanıcı sayfada görmez, ama etkisini her yerde hisseder.',
+    q:'Soru: Bir CSS dosyasını sayfaya bağlarken bağlantıyı hangi bölüme yazacaksın?'},
+  body:{role:'BÖLÜM 02 · GÖRÜNEN İÇERİK',title:'&lt;body&gt; ... &lt;/body&gt;',
+    text:'Kullanıcının ekranda gördüğü ve etkileşime girdiği her şey burada: başlıklar, paragraflar, görseller, bağlantılar, listeler, tablolar, formlar. Tarayıcının çizdiği alan tam olarak burasıdır.',
+    q:'Soru: &lt;h1&gt; neden head değil body içinde?'}
+};
+var explorerInfo=document.getElementById('explorerInfo');
+var skeletonCode=document.getElementById('skeletonCode');
+if(skeletonCode){
+  skeletonCode.querySelectorAll('.ln').forEach(function(line){
+    line.addEventListener('click',function(){
+      var part=line.dataset.part, info=partInfo[part];
+      skeletonCode.querySelectorAll('.ln').forEach(function(l){ l.classList.toggle('on', l.dataset.part===part); });
+      explorerInfo.innerHTML='<span class="role">'+info.role+'</span><h3>'+info.title+'</h3><p>'+info.text+'</p><p class="q">'+info.q+'</p>';
+    });
+  });
+}
+
+/* ============ 4. DOCTYPE / QUIRKS ============ */
+var qToggle=document.getElementById('quirksToggle'), qStage=document.getElementById('quirksStage');
+var qBox=document.getElementById('quirksBox'), qMeasure=document.getElementById('quirksMeasure'), qState=document.getElementById('quirksState');
+if(qToggle){
+  qToggle.addEventListener('click',function(){
+    var off=qStage.classList.toggle('quirks');
+    qToggle.textContent=off?'DOCTYPE\'ı geri ekle':'DOCTYPE\'ı kaldır';
+    qToggle.classList.toggle('on',off);
+    qBox.style.width=off?'220px':'220px';
+    qBox.style.boxSizing=off?'border-box':'content-box';
+    qMeasure.textContent=off?'Ölçülen genişlik: 220px (eski/quirks kutu modeli — padding içeri alındı)':'Ölçülen genişlik: 248px (standart kutu modeli)';
+    qState.textContent=off?'Quirks modu: aynı CSS ile kutunun genişliği değişti. Tasarımın tümü kayar.':'Standart mod: kutu genişliği CSS kurallarına göre hesaplanıyor.';
+  });
+}
+
+/* ============ 5. head / body DEĞİŞTİRİCİ ============ */
+var regionCode=document.getElementById('regionCode'), regionExplain=document.getElementById('regionExplain');
+var regionFile=document.getElementById('regionFile'), regionPage=document.getElementById('regionPage'), regionTab=document.getElementById('regionTab');
+var regionData={
+  head:{code:'<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Ev Bul</title>\n</head>',
+    file:'index.html · head',
+    tab:'Ev Bul',
+    page:'<h3>Yeni evinizi keşfedin</h3><p>Sekme başlığı, karakter kodlaması ve mobil ölçek ayarı sayfanın içinde görünmez — ama hepsi burada etkisini gösterir.</p>',
+    exp:'<b>head:</b> Kullanıcının sayfada göremediği, fakat tarayıcının doğru davranması için gereken bilgiler burada tanımlanır.'},
+  body:{code:'<body>\n  <h1>Yeni evinizi keşfedin</h1>\n  <p>Konum ve bütçeye göre ilanları inceleyin.</p>\n  <a href="ilanlar.html">İlanları gör</a>\n</body>',
+    file:'index.html · body',
+    tab:'Ev Bul',
+    page:'<h3>Yeni evinizi keşfedin</h3><p>Konum ve bütçeye göre ilanları inceleyin.</p><a href="#">İlanları gör</a>',
+    exp:'<b>body:</b> Kullanıcının gördüğü ve tıkladığı her şey burada. Yukarıdaki kodda yazan üç satırın karşılığını sağda birebir görüyorsun.'}
+};
+document.querySelectorAll('[data-region]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('[data-region]').forEach(function(b){b.classList.remove('on');});
+    btn.classList.add('on');
+    var d=regionData[btn.dataset.region];
+    regionCode.innerHTML=highlight(d.code);
+    regionFile.textContent=d.file;
+    regionTab.textContent=d.tab;
+    regionPage.innerHTML=d.page;
+    regionExplain.innerHTML=d.exp;
+  });
+});
+
+/* ============ 6. CHARSET ============ */
+var csToggle=document.getElementById('charsetToggle');
+var csHeading=document.getElementById('charsetHeading'), csText=document.getElementById('charsetText'), csState=document.getElementById('charsetState');
+var goodH='Güzel bir çağrı: şehrin en iyi köşesi';
+var goodP='İstanbul\'un güneyinde, doğa ile iç içe müstakil bahçeli evler.';
+var badH='GÃ¼zel bir Ã§aÄŸrÄ±: ÅŸehrin en iyi kÃ¶ÅŸesi';
+var badP='Ä°stanbul\'un gÃ¼neyinde, doÄŸa ile iÃ§ iÃ§e mÃ¼stakil bahÃ§eli evler.';
+if(csToggle){
+  var csOff=false;
+  csToggle.addEventListener('click',function(){
+    csOff=!csOff;
+    csHeading.textContent=csOff?badH:goodH;
+    csText.textContent=csOff?badP:goodP;
+    csToggle.textContent=csOff?'charset satırını geri ekle':'charset satırını kaldır';
+    csToggle.classList.toggle('on',csOff);
+    csState.textContent=csOff?'charset yok: tarayıcı baytları yanlış sözlükle çözdü. Türkçe karakterler bozuldu (mojibake).':'UTF-8 etkin: ç, ğ, ı, ö, ş, ü karakterleri doğru görünüyor.';
+  });
+}
+
+/* ============ 7. VIEWPORT ============ */
+var vpToggle=document.getElementById('viewportToggle'), vpPhone=document.getElementById('viewportPhone'), vpState=document.getElementById('viewportState');
+if(vpToggle){
+  vpToggle.addEventListener('click',function(){
+    var removed=vpPhone.classList.toggle('no-viewport');
+    vpToggle.textContent=removed?'Viewport\'u geri ekle':'Viewport\'u kaldır';
+    vpToggle.classList.toggle('on',removed);
+    vpState.textContent=removed?'Viewport yok: sayfa 640px genişliğinde çizilip ekrana sığdırmak için küçültüldü. Metin okunmuyor.':'Viewport etkin: içerik cihaz genişliğine uyuyor, metin okunabilir.';
+  });
+}
+
+/* ============ 8. title / h1 CANLI ============ */
+var titleInput=document.getElementById('titleInput'), h1Input=document.getElementById('h1Input');
+var liveTab=document.getElementById('liveTab'), liveH1=document.getElementById('liveH1'), titleCode=document.getElementById('titleCode');
+function syncLive(){
+  var t=titleInput.value||'(boş)', h=h1Input.value||'(boş)';
+  liveTab.textContent=t; liveH1.textContent=h;
+  titleCode.innerHTML=highlight('<head>\n  <title>'+t+'</title>\n</head>\n<body>\n  <h1>'+h+'</h1>\n</body>');
+}
+if(titleInput){ titleInput.addEventListener('input',syncLive); h1Input.addEventListener('input',syncLive); syncLive(); }
+
+/* ============ 9. AĞAÇ EŞLEŞMESİ ============ */
+var nestCode=document.getElementById('nestCode');
+if(nestCode){
+  var nodes=document.querySelectorAll('[data-tnode]');
+  function setNode(name){
+    nodes.forEach(function(n){ n.classList.toggle('on', !name || n.dataset.tnode===name); });
+    nestCode.querySelectorAll('.ln').forEach(function(l){ l.classList.toggle('on', !name || l.dataset.node===name); });
+  }
+  nestCode.querySelectorAll('.ln').forEach(function(l){
+    l.addEventListener('mouseenter',function(){setNode(l.dataset.node);});
+    l.addEventListener('click',function(){setNode(l.dataset.node);});
+  });
+  nestCode.addEventListener('mouseleave',function(){setNode(null);});
+  nodes.forEach(function(n){
+    n.addEventListener('mouseenter',function(){setNode(n.dataset.tnode);});
+    n.addEventListener('mouseleave',function(){setNode(null);});
+  });
+}
+
+/* ============ 10. HATA AVI ============ */
+var huntCode=document.getElementById('huntCode'), huntScore=document.getElementById('huntScore');
+var huntFeedback=document.getElementById('huntFeedback'), huntLog=document.getElementById('huntLog');
+var huntReset=document.getElementById('huntReset'), huntFix=document.getElementById('huntFix');
+if(huntCode){
+  var totalErr=huntCode.querySelectorAll('[data-err]').length, found=0;
+  var originalHunt=huntCode.innerHTML;
+  var fixedHunt='<!DOCTYPE html>\n<html lang="tr">\n  <head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Ev Bul</title>\n  </head>\n  <body>\n    <h1>Yeni evinizi keşfedin</h1>\n  </body>\n</html>';
+  function bindHunt(){
+    huntCode.querySelectorAll('.hline').forEach(function(line){
+      line.addEventListener('click',function(){
+        if(line.classList.contains('found'))return;
+        if(line.dataset.err){
+          line.classList.add('found'); found++;
+          huntScore.textContent='Bulunan hata: '+found+' / '+totalErr;
+          huntFeedback.textContent=line.dataset.err;
+          var li=document.createElement('li'); li.textContent=line.dataset.err; huntLog.appendChild(li);
+          if(found===totalErr){
+            huntFeedback.textContent='Hepsini buldun. Şimdi düzeltilmiş hâline bakıp kendi zihnindeki sırayla karşılaştır.';
+            huntFix.disabled=false;
+          }
+        }else{
+          line.classList.add('miss');
+          huntFeedback.textContent='Bu satırda hata yok. Tekrar bak: kapanış etiketleri, bölüm sırası ve ilk satır.';
+          setTimeout(function(){line.classList.remove('miss');},400);
+        }
+      });
+    });
+  }
+  bindHunt();
+  huntReset.addEventListener('click',function(){
+    huntCode.innerHTML=originalHunt; huntCode.querySelectorAll('[data-hl]').forEach(function(el){});
+    found=0; huntScore.textContent='Bulunan hata: 0 / '+totalErr; huntLog.innerHTML='';
+    huntFeedback.textContent='Kontrol sırası: ① DOCTYPE var mı? ② head/body sırası doğru mu? ③ her etiket kapanıyor mu? ④ lang, charset, viewport var mı? ⑤ girinti yapıyı gösteriyor mu?';
+    huntFix.disabled=true; huntFix.textContent='Düzeltilmiş hâlini göster';
+    bindHunt();
+  });
+  var fixShown=false;
+  huntFix.addEventListener('click',function(){
+    fixShown=!fixShown;
+    if(fixShown){ huntCode.innerHTML=highlight(fixedHunt); huntFix.textContent='Hatalı kodu geri getir'; }
+    else{ huntCode.innerHTML=originalHunt; bindHunt(); huntFix.textContent='Düzeltilmiş hâlini göster'; }
+  });
+}
+
+/* ============ 11. SIRALAMA ALIŞTIRMASI ============ */
+var orderItems=[
+  {t:'<!DOCTYPE html>',o:1},
+  {t:'<html lang="tr">',o:2},
+  {t:'<head>',o:3},
+  {t:'<meta charset="UTF-8">',o:4},
+  {t:'<title>Ev Bul</title>',o:5},
+  {t:'</head>',o:6},
+  {t:'<body>',o:7},
+  {t:'<h1>Yeni evinizi keşfedin</h1>',o:8},
+  {t:'</body>',o:9},
+  {t:'</html>',o:10}
+];
+var pool=document.getElementById('orderPool'), slots=document.getElementById('orderSlots'), orderState=document.getElementById('orderState');
+var expected=1;
+function buildOrder(){
+  expected=1; pool.innerHTML=''; slots.innerHTML='';
+  orderState.textContent='Başlamak için ilk satırı seç.';
+  var shuffled=orderItems.slice().sort(function(){return Math.random()-0.5;});
+  shuffled.forEach(function(item){
+    var chip=document.createElement('button');
+    chip.type='button'; chip.className='chip'; chip.textContent=item.t; chip.dataset.o=item.o;
+    chip.addEventListener('click',function(){
+      if(Number(chip.dataset.o)===expected){
+        chip.classList.add('used');
+        var s=document.createElement('span'); s.className='slot'; s.textContent=item.t; slots.appendChild(s);
+        expected++;
+        orderState.textContent=expected>orderItems.length
+          ? 'Tamamı doğru. Bu sıra, her HTML dosyasında yazacağın standart iskelettir.'
+          : 'Doğru. Sıradaki satır: '+(expected)+'. satır.';
+      }else{
+        chip.animate([{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'none'}],{duration:260});
+        orderState.textContent='Henüz değil. Şu anda '+expected+'. satırı arıyoruz. Tarayıcı bir bilgiyi kullanmadan önce okumuş olmalı.';
+      }
+    });
+    pool.appendChild(chip);
+  });
+}
+if(pool){ buildOrder(); document.getElementById('orderReset').addEventListener('click',buildOrder); }
+
+/* ============ 12. CANLI EDİTÖR ============ */
+var startCode='<!DOCTYPE html>\n<html lang="tr">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Ev Bul</title>\n</head>\n<body>\n  <!-- Ana başlık alanı -->\n  <h1>Yeni evinizi keşfedin</h1>\n  <p>Konum, oda sayısı ve bütçeye göre ilanları inceleyin.</p>\n</body>\n</html>';
+var pgCode=document.getElementById('pgCode'), pgFrame=document.getElementById('pgFrame'), pgTab=document.getElementById('pgTab');
+function pgRender(){
+  pgFrame.srcdoc=pgCode.value;
+  var m=pgCode.value.match(/<title>([\s\S]*?)<\/title>/i);
+  pgTab.textContent=m?m[1]:'(title yok)';
+}
+if(pgCode){
+  pgCode.value=startCode; pgRender();
+  var typing;
+  pgCode.addEventListener('input',function(){clearTimeout(typing);typing=setTimeout(pgRender,350);});
+  document.getElementById('pgRun').addEventListener('click',pgRender);
+  document.getElementById('pgReset').addEventListener('click',function(){pgCode.value=startCode;pgRender();});
+  document.getElementById('pgBreak').addEventListener('click',function(){
+    pgCode.value=pgCode.value.replace('</h1>','').replace('<meta charset="UTF-8">','');
+    pgRender();
+  });
+}
+
+/* ============ 13. QUIZ ============ */
+document.querySelectorAll('.reveal').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var card=btn.closest('.quiz-card');
+    var open=card.classList.toggle('revealed');
+    btn.textContent=open?'Yanıtı gizle':'Yanıtı göster';
+  });
+});
+
+/* ============ 14. BAŞLANGIÇ ============ */
+var h=Number((location.hash||'').replace('#slayt-',''))-1;
+show(Number.isInteger(h)&&h>=0&&h<slides.length?h:0);
+</script>
+</body>
+</html>

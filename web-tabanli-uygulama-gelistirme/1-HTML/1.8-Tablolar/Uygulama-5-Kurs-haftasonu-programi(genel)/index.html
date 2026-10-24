@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablolar</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            text-align: center;   
+        }
+        th, td {
+            border: 1px solid darkmagenta;
+            padding: 7px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SamTek Akademi</h1>
+    </header>
+    <main>
+        <h2>Web geliştirme eğitimi</h2>
+        <table>
+            <caption>İki günlük eğitim programı</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Gün</th>
+                    <th scope="col">Saat</th>
+                    <th scope="col">Konu</th>
+                    <th scope="col">Süre</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row" rowspan="2">Cumartesi</th>
+                    <td>09.00 – 11.00</td>
+                    <td>HTML ile içerik yapısı</td>
+                    <td>2 saat</td>
+                </tr>
+                <tr>
+                    <td>11.15 – 12.45</td>
+                    <td>Semantik sayfa uygulaması</td>
+                    <td>1.5 saat</td>
+                </tr>
+                <tr>
+                    <th scope="row" rowspan="2">Pazar</th>
+                    <td>09.00 – 11.00</td>
+                    <td>CSS ile temel biçimlendirme</td>
+                    <td>2 saat</td>
+                </tr>
+                <tr>
+                    <td>11.15 – 12.45</td>
+                    <td>Uygulama ve değerlendirme</td>
+                    <td>1.5 saat</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" scope="row">Toplam Eğitim Süresi</th>
+                    <td>7 saat</td>
+                </tr>
+            </tfoot>
+        </table>
+    </main>
+</body>
+</html>

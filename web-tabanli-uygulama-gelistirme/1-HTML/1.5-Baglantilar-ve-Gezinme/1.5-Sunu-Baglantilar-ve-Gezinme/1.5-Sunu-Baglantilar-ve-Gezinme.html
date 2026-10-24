@@ -1,0 +1,1740 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bağlantılar ve Gezinme</title>
+<style>
+:root{
+  --bg:#0b1120;
+  --bg2:#111a2e;
+  --panel:#16213a;
+  --line:#25324f;
+  --line2:#33425f;
+  --text:#e7edf7;
+  --muted:#9fb0cc;
+  --accent:#7dd3fc;
+  --accent-2:#6ee7b7;
+  --warn:#fbbf24;
+  --bad:#f87171;
+  --good:#4ade80;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  overflow:hidden;
+}
+.deck{position:relative;height:100vh;width:100vw}
+
+/* ---------- SLAYT ---------- */
+.slide{
+  display:none;position:absolute;inset:0;
+  flex-direction:column;
+  padding:2.1vh 2.6vw 6.2vh;
+  overflow:hidden;
+}
+.slide.active{display:flex;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.slide > *{flex-shrink:0}
+
+/* ---------- BAŞLIK BLOĞU ---------- */
+.kicker{
+  display:inline-flex;align-items:center;gap:.5em;
+  align-self:flex-start;
+  font-size:.95rem;font-weight:700;letter-spacing:.02em;
+  background:#0f1b30;border:1px solid var(--line2);
+  border-radius:999px;padding:.3em .95em;margin:0 0 .55rem;
+  text-transform:none;
+}
+.kicker .kt{color:var(--accent-2)}
+.kicker .kd{color:#5b6c8c}
+.kicker .ks{color:var(--accent)}
+.bridge{
+  font-size:.92rem;color:var(--muted);margin:0 0 .3rem;max-width:96ch;
+}
+h2{
+  font-size:clamp(1.15rem,2.1vw,1.62rem);
+  line-height:1.22;margin:0 0 .8rem;font-weight:700;letter-spacing:-.01em;
+}
+h2 code{font-size:.92em}
+.sub{
+  font-size:clamp(1.05rem,1.5vw,1.28rem);
+  line-height:1.5;color:#dbe5f5;margin:0 0 .8rem;max-width:105ch;
+}
+.sub.tight{margin-bottom:.55rem}
+.cap{font-size:.85rem;color:var(--muted);margin:.4rem 0 0}
+
+/* ---------- KAPAK ---------- */
+.cover{justify-content:center;align-items:flex-start;padding-left:6vw}
+.cover h1{
+  font-size:clamp(2rem,4.6vw,3.5rem);margin:.2rem 0 .7rem;line-height:1.05;
+  letter-spacing:-.02em;
+}
+.cover .lead{font-size:clamp(1.05rem,1.6vw,1.35rem);color:var(--muted);max-width:70ch}
+.cover .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.6rem;max-width:80ch}
+.chip{
+  font-size:.95rem;background:#13203a;border:1px solid var(--line2);
+  border-radius:8px;padding:.35em .8em;color:#cfe0f7;
+}
+.chip b{color:var(--accent-2);font-weight:600}
+
+/* ---------- KOD + ÖNİZLEME ---------- */
+.split{
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+  max-height:62vh;min-height:0;flex:1 1 auto;
+}
+.split.wide-left{grid-template-columns:1.15fr 1fr}
+.split.wide-right{grid-template-columns:1fr 1.25fr}
+.panel{
+  display:flex;flex-direction:column;min-height:0;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;
+}
+.panel-head{
+  font-size:.88rem;font-weight:600;color:var(--muted);
+  padding:.5em .8em;border-bottom:1px solid var(--line);
+  background:#101a2e;text-transform:none;
+  display:flex;align-items:center;justify-content:space-between;gap:.6em;
+}
+.panel-head .tag{color:var(--accent-2);font-weight:700}
+.panel-body{font-size:.98rem;line-height:1.5;padding:.7em .9em;overflow:auto;min-height:0}
+pre{
+  margin:0;flex:1;min-height:0;overflow:auto;
+  padding:.75em .9em;
+  font-family:"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;
+  font-size:clamp(.8rem,.95vw,.95rem);
+  line-height:1.55;color:#dbe7fb;white-space:pre;tab-size:2;
+}
+pre.small{font-size:clamp(.72rem,.82vw,.85rem)}
+.tok-tag{color:#7dd3fc}
+.tok-att{color:#6ee7b7}
+.tok-str{color:#fcd34d}
+.tok-txt{color:#e7edf7}
+.tok-com{color:#6b7c9c;font-style:italic}
+
+/* ---------- SAHTE TARAYICI ---------- */
+.browser{display:flex;flex-direction:column;min-height:0;flex:1}
+.bbar{
+  display:flex;align-items:center;gap:.5em;padding:.4em .6em;
+  background:#0d1729;border-bottom:1px solid var(--line);
+}
+.dots{display:flex;gap:.28em}
+.dots i{width:.62em;height:.62em;border-radius:50%;background:#33425f;display:block}
+.url{
+  flex:1;background:#182741;border:1px solid var(--line2);
+  border-radius:999px;padding:.22em .8em;font-size:.82rem;color:#b9cbe6;
+  font-family:Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.reset{
+  background:#1d2b47;border:1px solid var(--line2);color:#cfe0f7;
+  border-radius:7px;cursor:pointer;font-size:.9rem;line-height:1;
+  padding:.28em .5em;
+}
+.reset:hover{background:#27395c}
+iframe{flex:1;width:100%;border:0;background:#fff;min-height:0}
+
+/* ---------- KARTLAR ---------- */
+.cards{display:grid;gap:.75rem;min-height:0;flex:1 0 auto}
+.cards.c2{grid-template-columns:1fr 1fr}
+.cards.c3{grid-template-columns:repeat(3,1fr)}
+.cards.c4{grid-template-columns:repeat(4,1fr)}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:.8em .95em;min-height:0;overflow:auto;
+}
+.card h3{font-size:1.06rem;margin:0 0 .35em;color:var(--accent)}
+.card h3.g{color:var(--accent-2)}
+.card h3.w{color:var(--warn)}
+.card h3.r{color:var(--bad)}
+.card p{font-size:1rem;line-height:1.45;margin:0 0 .4em;color:#d7e2f3}
+.card ul{margin:.2em 0 0;padding-left:1.1em}
+.card li{font-size:.95rem;line-height:1.45;margin:.22em 0;color:#cddaee}
+.card code,.sub code,.panel-body code,.bigrule code,td code,.warn code,li code,.quote code{
+  font-family:Consolas,monospace;background:#0e1930;border:1px solid var(--line);
+  border-radius:5px;padding:.05em .35em;color:#a5d8ff;font-size:.94em;
+}
+
+/* ---------- TABLO ---------- */
+.tblwrap{overflow:auto;min-height:0;border:1px solid var(--line);border-radius:12px;flex:1 0 auto}
+table{border-collapse:collapse;width:100%;font-size:1rem}
+thead th{
+  font-size:.85rem;text-align:left;color:var(--muted);background:#101a2e;
+  padding:.55em .8em;border-bottom:1px solid var(--line2);position:sticky;top:0;
+  text-transform:none;font-weight:700;
+}
+td{padding:.55em .8em;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#131e34}
+td.ok{color:var(--good)}
+td.no{color:var(--bad)}
+
+/* ---------- KUTULAR ---------- */
+.warn{
+  font-size:.95rem;line-height:1.5;
+  background:#2a2110;border:1px solid #5a4718;border-left:4px solid var(--warn);
+  border-radius:10px;padding:.65em .9em;color:#f4e3bd;margin:.7rem 0 0;
+}
+.warn b{color:var(--warn)}
+.warn.bad{background:#2b1518;border-color:#5d2529;border-left-color:var(--bad);color:#f6d5d5}
+.warn.bad b{color:var(--bad)}
+.quote{
+  font-size:1rem;line-height:1.55;background:#132a26;border:1px solid #245045;
+  border-left:4px solid var(--accent-2);border-radius:10px;padding:.7em 1em;
+  color:#cdeee2;margin:.7rem 0 0;
+}
+.bigrule{
+  font-size:1.06rem;line-height:1.5;background:#101d33;border:1px solid var(--line2);
+  border-radius:10px;padding:.7em 1em;color:#dce8f9;margin:.7rem 0 0;
+}
+.bigrule b{color:var(--accent)}
+
+/* ---------- ADIM ŞERİDİ ---------- */
+.steps{display:grid;gap:.7rem;grid-template-columns:repeat(4,1fr);flex:1 0 auto}
+.steps.s3{grid-template-columns:repeat(3,1fr)}
+.steps.s5{grid-template-columns:repeat(5,1fr)}
+.step{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:.75em .9em;position:relative;
+}
+.step .n{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:1.7em;height:1.7em;border-radius:50%;background:#1d3350;color:var(--accent);
+  font-size:.85rem;font-weight:700;margin-bottom:.4em;
+}
+.step h4{font-size:1.02rem;margin:0 0 .3em;color:#eaf2ff}
+.step p{font-size:.95rem;margin:0;color:#c6d5ea;line-height:1.45}
+
+/* ---------- AĞAÇ / DİYAGRAM ---------- */
+.tree{
+  white-space:pre;font-family:Consolas,monospace;
+  font-size:clamp(.8rem,.95vw,.95rem);line-height:1.6;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:.8em 1em;overflow:auto;min-height:0;color:#cfe0f7;
+}
+.tree b{color:var(--accent-2)}
+.tree i{color:var(--warn);font-style:normal}
+.urlmap{
+  display:flex;flex-wrap:wrap;gap:.5rem;align-items:stretch;margin:.2rem 0 .7rem;flex:0 0 auto;
+}
+.upart{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:.55em .8em;min-width:9rem;flex:1;
+}
+.upart .v{
+  font-family:Consolas,monospace;font-size:1.02rem;color:var(--accent);display:block;
+  margin-bottom:.25em;word-break:break-all;
+}
+.upart .d{font-size:.95rem;color:#c6d5ea;line-height:1.4}
+.upart.a .v{color:var(--accent-2)}
+.upart.b .v{color:var(--warn)}
+
+/* ---------- MOCKUP: E-POSTA TASLAĞI ---------- */
+.mock{
+  background:#f4f6fa;color:#111827;border-radius:12px;border:1px solid #cbd5e1;
+  overflow:hidden;display:flex;flex-direction:column;min-height:0;flex:1;
+}
+.mock .mh{
+  background:#e2e8f0;padding:.45em .8em;font-size:.85rem;color:#334155;font-weight:600;
+  border-bottom:1px solid #cbd5e1;
+}
+.mock .mrow{display:flex;gap:.6em;padding:.5em .8em;border-bottom:1px solid #e2e8f0;font-size:.95rem}
+.mock .mk{width:5.2em;color:#64748b;flex-shrink:0}
+.mock .mv{color:#0f172a;font-family:Consolas,monospace;word-break:break-all}
+.mock .mb{padding:.6em .8em;font-size:.95rem;color:#0f172a;flex:1}
+
+/* ---------- KARŞILAŞTIRMA ---------- */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;min-height:0;flex:1 0 auto}
+.cmp .box{
+  border-radius:12px;padding:.7em .9em;min-height:0;overflow:auto;
+  border:1px solid var(--line);background:var(--panel);
+}
+.cmp .box.bad{border-color:#5d2529;background:#22151a}
+.cmp .box.good{border-color:#245045;background:#132420}
+.cmp h3{font-size:1.06rem;margin:0 0 .4em}
+.cmp .box.bad h3{color:var(--bad)}
+.cmp .box.good h3{color:var(--good)}
+.cmp pre{background:transparent;padding:.3em 0;flex:none}
+.cmp p{font-size:1rem;margin:.35em 0 0;color:#d7e2f3;line-height:1.45}
+
+/* ---------- GEZİNME ---------- */
+.nav{
+  position:absolute;left:0;right:0;bottom:0;height:4.4vh;min-height:30px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2.6vw;background:#0a1020;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--muted);z-index:20;
+}
+.nav .t{font-weight:600;color:#b9cbe6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav .ctrl{display:flex;align-items:center;gap:.5rem}
+.nav button{
+  background:#16233c;border:1px solid var(--line2);color:#cfe0f7;border-radius:7px;
+  padding:.2em .6em;cursor:pointer;font-size:.85rem;
+}
+.nav button:hover{background:#1f3050}
+.prog{position:absolute;left:0;top:0;height:2px;background:var(--accent);width:0;transition:width .2s}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ================= 1 KAPAK ================= -->
+<section class="slide cover">
+  <div class="kicker"><span class="kt">BAĞLANTILAR VE GEZİNME</span></div>
+  <h1>Bağlantılar ve Gezinme</h1>
+  <p class="lead">Web'i "web" yapan şey bağlantılardır. Bu konuda bir sayfayı başka bir sayfaya,
+  aynı sayfanın bir bölümüne, bir e-posta adresine, bir telefon numarasına ve indirilebilir bir
+  dosyaya nasıl bağlayacağımızı öğreniyoruz.</p>
+  <div class="chips">
+    <span class="chip"><b>1.</b> <code>a</code> ve <code>href</code></span>
+    <span class="chip"><b>2.</b> Göreli ve mutlak yollar</span>
+    <span class="chip"><b>3.</b> Sayfa içi bağlantı ve <code>id</code></span>
+    <span class="chip"><b>4.</b> <code>mailto:</code> ve <code>tel:</code></span>
+    <span class="chip"><b>5.</b> <code>target</code> ve <code>rel</code></span>
+    <span class="chip"><b>6.</b> <code>download</code></span>
+  </div>
+</section>
+
+<!-- ================= 2 a ve href ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">BAĞLANTILAR VE GEZİNME</span><span class="kd">—</span><span class="ks">a etiketi ve href</span></div>
+  <p class="bridge">Bir bağlantının dört parçası vardır; her parçanın ayrı bir görevi var.</p>
+  <h2>Bağlantıyı <code>a</code> etiketi oluşturur, hedefi <code>href</code> belirler</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>index.html <span class="tag">— kod</span></span></div>
+      <pre data-code="temel/index.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü</span></div>
+      <div class="browser" data-demo="temel"></div>
+    </div>
+  </div>
+  <div class="bigrule">
+    <b>&lt;a&gt;</b> bağlantıyı başlatır · <b>href</b> gidilecek adresi taşır ·
+    <b>Hizmetlerimizi inceleyin</b> kullanıcının gördüğü ve tıkladığı bağlantı metnidir ·
+    <b>&lt;/a&gt;</b> bağlantının kapsadığı içeriği bitirir.
+  </div>
+</section>
+
+<!-- ================= 3 tarayıcı nasıl işler ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">BAĞLANTILAR VE GEZİNME</span><span class="kd">—</span><span class="ks">tarayıcı bağlantıyı nasıl işler</span></div>
+  <p class="bridge">Tıklama ile yeni sayfanın açılması arasında dört adım vardır.</p>
+  <h2>Tarayıcı, <code>href</code> değerini mevcut belgenin adresine göre çözümler</h2>
+  <div class="steps">
+    <div class="step"><span class="n">1</span><h4><code>href</code> okunur</h4>
+      <p>Bağlantının hedef değeri alınır: <code>hizmetler.html</code></p></div>
+    <div class="step"><span class="n">2</span><h4>Adres çözümlenir</h4>
+      <p>Bu değer tek başına anlamsızdır. Tarayıcı onu, bağlantının <b>içinde bulunduğu belgenin
+      adresine göre</b> tam bir adrese dönüştürür.</p></div>
+    <div class="step"><span class="n">3</span><h4>Kaynak istenir</h4>
+      <p>Çözümlenen adresteki kaynak istenir. Dosya yoksa 404 döner.</p></div>
+    <div class="step"><span class="n">4</span><h4>Hedef açılır</h4>
+      <p><code>target</code> yazılmadıysa hedef, <b>mevcut sekmede</b> açılır.</p></div>
+  </div>
+  <div class="quote">Adres tarifi gibi: "iki sokak ileride" ifadesi tek başına bir yer belirtmez;
+  ancak <i>nerede durduğunuz</i> bilinirse bir yere karşılık gelir. Göreli yol da böyledir.</div>
+  <div class="bigrule">Bu yüzden aynı <code>href</code> değeri, farklı klasörlerdeki iki dosyada
+  <b>farklı hedeflere</b> çözümlenir. Yolu hesaplarken proje klasöründen değil,
+  <b>bağlantının yazıldığı dosyadan</b> başlarız.</div>
+</section>
+
+<!-- ================= 4 href yoksa ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">BAĞLANTILAR VE GEZİNME</span><span class="kd">—</span><span class="ks">href olmadan a etiketi</span></div>
+  <p class="bridge">Bir <code>a</code> etiketi yazmak, bağlantı oluşturmak için yeterli değildir.</p>
+  <h2><code>href</code> yoksa ortada tıklanabilir bir bağlantı yoktur</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>menu.html <span class="tag">— kod</span></span></div>
+      <pre data-code="hrefyok/menu.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü</span></div>
+      <div class="browser" data-demo="hrefyok"></div>
+    </div>
+  </div>
+  <div class="bigrule">İkinci öğe mavi ve altı çizili değil, imleç el işaretine dönmüyor, klavyeyle
+  <b>Tab</b> ile üzerine gelinemiyor ve ekran okuyucu onu bağlantı olarak duyurmuyor.
+  HTML standardı bu duruma <b>bağlantı yer tutucusu (placeholder link)</b> der:
+  ileride bağlantı olacak yeri işaretler, ama kendisi bağlantı değildir.</div>
+  <div class="warn"><b>Gerçek projede:</b> menüde <b>bulunduğunuz sayfanın</b> kendi adı çoğu zaman
+  bilinçli olarak <code>href</code>siz bırakılır — kullanıcıyı zaten açık olan sayfaya götüren
+  bir bağlantı gereksizdir.</div>
+</section>
+
+<!-- ================= 5 bağlantı metni ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">BAĞLANTILAR VE GEZİNME</span><span class="kd">—</span><span class="ks">bağlantı metni</span></div>
+  <p class="bridge">Bağlantı metni, hedefi tek başına okunduğunda da anlatmalıdır.</p>
+  <h2>"buraya tıklayın" yerine hedefi adıyla söyleyen bağlantı metni</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>program-linkleri.html <span class="tag">— kod</span></span></div>
+      <pre data-code="linktext/program-linkleri.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü</span></div>
+      <div class="browser" data-demo="linktext"></div>
+    </div>
+  </div>
+  <div class="bigrule">Ekran okuyucular sayfadaki bağlantıları <b>ayrı bir liste hâlinde</b>
+  okuyabilir. O listede "buraya tıklayın, buraya tıklayın, buraya tıklayın" görünür; hiçbiri nereye
+  gittiğini söylemez. İkinci yazım, hem o listede hem de sayfada tek başına anlamlıdır.</div>
+  <div class="warn"><b>Bir bağlantının içine başka bir bağlantı veya düğme yerleştirilmez.</b>
+  İç içe etkileşimli öğelerde tıklamanın hangisine ait olduğu belirsizleşir; klavye ve ekran
+  okuyucu davranışı bozulur.</div>
+</section>
+
+<!-- ================= 6 göreli / mutlak kavramı ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">GÖRELİ VE MUTLAK YOLLAR</span><span class="kd">—</span><span class="ks">iki tür adres</span></div>
+  <p class="bridge">Bir adres ya nerede olduğunuzu bilmeyi gerektirir ya da gerektirmez.</p>
+  <h2>Göreli yol bulunduğunuz dosyaya bağlıdır, mutlak URL bağlı değildir</h2>
+  <div class="split wide-right">
+    <div class="panel">
+      <div class="panel-head"><span>Örnek proje klasörü</span></div>
+      <div class="tree">site/
+├── <b>index.html</b>
+├── sayfalar/
+│   ├── <b>hakkimizda.html</b>
+│   └── <b>iletisim.html</b>
+└── blog/
+    └── yazilar/
+        └── <b>ilk-yazi.html</b></div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <h3 class="g">Göreli yol</h3>
+        <p><code>hakkimizda.html</code> · <code>sayfalar/iletisim.html</code> ·
+        <code>../index.html</code></p>
+        <p>Protokol ve alan adı içermez. Anlamı, <b>bağlantının yazıldığı dosyanın konumuna göre</b>
+        hesaplanır. Site başka bir alan adına taşınsa da çalışmaya devam eder.</p>
+      </div>
+      <div class="card">
+        <h3>Mutlak URL</h3>
+        <p><code>https://html.spec.whatwg.org/</code></p>
+        <p>Protokolü ve alan adını kendi içinde taşır. Hangi dosyada yazıldığından bağımsız olarak
+        hep aynı yeri gösterir. Başka sitelere bağlanırken bu kullanılır.</p>
+      </div>
+    </div>
+  </div>
+  <div class="bigrule">Kendi sitenizin sayfaları arasında <b>göreli yol</b>, başka sitelere
+  <b>mutlak URL</b>. Kendi sayfanıza mutlak URL yazmak, siteyi taşıdığınızda veya alan adı
+  değiştiğinde bağlantıları kırar.</div>
+</section>
+
+<!-- ================= 7 aynı dizin ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">GÖRELİ VE MUTLAK YOLLAR</span><span class="kd">—</span><span class="ks">aynı dizin ve ./</span></div>
+  <p class="bridge">En sık kullanılan yol biçimi, yalnızca dosya adından ibarettir.</p>
+  <h2>Aynı klasördeki dosyaya sadece dosya adıyla bağlanılır</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>index.html <span class="tag">— kod</span></span></div>
+      <pre data-code="yollar/index.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— adres çubuğuna bakın</span></span></div>
+      <div class="browser" data-demo="yollar" data-start="index.html"></div>
+    </div>
+  </div>
+  <div class="bigrule"><code>hakkimizda.html</code> ile <code>./hakkimizda.html</code>
+  <b>aynı anlama gelir</b>; buradaki <code>.</code> "mevcut dizin" demektir. Yazılması zorunlu
+  değildir, ancak bazı araç ve yapılandırmalarda "bu kesinlikle göreli bir yoldur" niyetini
+  belirginleştirmek için tercih edilir.</div>
+</section>
+
+<!-- ================= 8 alt dizin ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">GÖRELİ VE MUTLAK YOLLAR</span><span class="kd">—</span><span class="ks">alt dizine inmek</span></div>
+  <p class="bridge">Hedef, bulunduğunuz klasörün içindeki bir klasördeyse önce o klasörün adı yazılır.</p>
+  <h2>Alt klasördeki dosyaya <code>klasor/dosya.html</code> ile inilir</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>index.html <span class="tag">— kod</span></span></div>
+      <pre data-code="yollar/index.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü</span></div>
+      <div class="browser" data-demo="yollar" data-start="index.html"></div>
+    </div>
+  </div>
+  <div class="bigrule">Tarayıcı önce <b>sayfalar</b> klasörüne girer, ardından orada
+  <b>hakkimizda.html</b> dosyasını arar. Adres çubuğunda çözümlenmiş tam yolu görebilirsiniz:
+  <code>site/sayfalar/hakkimizda.html</code></div>
+  <div class="warn">Windows'ta klasör ayıracı <code>\</code> olsa da <b>URL'lerde her zaman
+  <code>/</code> kullanılır.</b> Ayrıca dosya ve klasör adlarının büyük-küçük harfleri birebir
+  korunmalıdır: <code>Hakkimizda.html</code> ile <code>hakkimizda.html</code> birçok sunucuda
+  <b>farklı iki dosyadır</b> — Windows'ta çalışan bağlantı, sunucuya yüklendiğinde kırılabilir.</div>
+</section>
+
+<!-- ================= 9 üst dizin ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">GÖRELİ VE MUTLAK YOLLAR</span><span class="kd">—</span><span class="ks">üst dizine çıkmak (../)</span></div>
+  <p class="bridge">Hedef, bulunduğunuz klasörün dışındaysa önce yukarı çıkmak gerekir.</p>
+  <h2>Her <code>../</code> bir klasör yukarı çıkar; sayısı hesaplanır, ezberlenmez</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>blog/yazilar/ilk-yazi.html <span class="tag">— kod</span></span></div>
+      <pre data-code="yollar/blog/yazilar/ilk-yazi.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü</span></div>
+      <div class="browser" data-demo="yollar" data-start="blog/yazilar/ilk-yazi.html"></div>
+    </div>
+  </div>
+  <div class="bigrule">Bu dosya <code>blog/yazilar/</code> içindedir. Köke ulaşmak için önce
+  <b>yazilar</b>'dan, sonra <b>blog</b>'dan çıkmak gerekir: <code>../../index.html</code>.
+  <code>sayfalar/hakkimizda.html</code> hedefine ise <b>önce köke çıkıp sonra inilir</b>:
+  <code>../../sayfalar/hakkimizda.html</code></div>
+</section>
+
+<!-- ================= 10 mutlak URL parçaları ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">GÖRELİ VE MUTLAK YOLLAR</span><span class="kd">—</span><span class="ks">mutlak URL'nin parçaları</span></div>
+  <p class="bridge">Mutlak URL, tek başına yeterli olmasını sağlayan parçalardan oluşur.</p>
+  <h2>Şema, alan adı ve yol: mutlak URL hiçbir belgeye bağlı değildir</h2>
+  <div class="urlmap">
+    <div class="upart a"><span class="v">https:</span><span class="d"><b>Şema.</b> Kaynağa hangi
+      yöntemle ulaşılacağını söyler. <code>https</code> şifreli web trafiği demektir.
+      <code>mailto:</code> ve <code>tel:</code> de birer şemadır.</span></div>
+    <div class="upart"><span class="v">//html.spec.whatwg.org</span><span class="d"><b>Alan adı
+      (host).</b> Kaynağın hangi sunucuda olduğunu belirtir. Bu parça olduğu için adres, hangi
+      dosyada yazıldığından bağımsızdır.</span></div>
+    <div class="upart b"><span class="v">/multipage/</span><span class="d"><b>Yol.</b> O sunucudaki
+      hangi kaynağın istendiğini belirtir.</span></div>
+  </div>
+  <div class="split">
+    <div class="panel">
+      <div class="panel-head"><span>Dış siteye bağlantı <span class="tag">— kod</span></span></div>
+      <pre data-code="dis/kaynaklar.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü</span></div>
+      <div class="browser" data-demo="dis"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 11 kök-göreli yol ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">GÖRELİ VE MUTLAK YOLLAR</span><span class="kd">—</span><span class="ks">kök-göreli yol (/)</span></div>
+  <p class="bridge">Üçüncü bir yazım daha var: baştaki eğik çizgi.</p>
+  <h2>Baştaki <code>/</code> sitenin kökünden başlar; tam bir mutlak URL değildir</h2>
+  <div class="cards c3">
+    <div class="card">
+      <h3 class="g">Göreli</h3>
+      <p><code>../sayfalar/hakkimizda.html</code></p>
+      <p>Başlangıç noktası: <b>bağlantının yazıldığı dosya.</b> Dosya taşınırsa yeniden hesaplanmalıdır.</p>
+    </div>
+    <div class="card">
+      <h3 class="w">Kök-göreli</h3>
+      <p><code>/sayfalar/hakkimizda.html</code></p>
+      <p>Başlangıç noktası: <b>sitenin kökü.</b> Aynı satır, sitenin her klasöründeki her sayfada
+      aynı hedefi verir — ortak menüyü kopyalarken yol kırılmaz.</p>
+    </div>
+    <div class="card">
+      <h3>Mutlak</h3>
+      <p><code>https://site.com/sayfalar/hakkimizda.html</code></p>
+      <p>Başlangıç noktası yok; <b>kendi içinde tamdır.</b> Başka sitelere bağlanırken kullanılır.</p>
+    </div>
+  </div>
+  <div class="warn"><b>Şimdilik kullanmıyoruz.</b> Dosyaları çift tıklayarak açtığımız
+  <code>file:</code> ortamında "site kökü" diye bir kavram yoktur; baştaki <code>/</code>
+  <b>diskin köküne</b> çözümlenir ve bağlantı beklenmedik biçimde kırılır. Kök-göreli yollar
+  yerel sunucu ile çalışmaya geçtiğimizde anlam kazanacak.</div>
+</section>
+
+<!-- ================= 12 kırık yol / 404 ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">GÖRELİ VE MUTLAK YOLLAR</span><span class="kd">—</span><span class="ks">kırık yol ve 404</span></div>
+  <p class="bridge">Yolu proje klasöründen hesaplamak, en sık görülen bağlantı hatasıdır.</p>
+  <h2>Yanlış başlangıç noktası: <code>sayfalar/</code> klasörünün içinden tekrar <code>sayfalar/</code> aramak</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>sayfalar/hakkimizda.html <span class="tag">— hatalı kod</span></span></div>
+      <pre data-code="kirik/sayfalar/hakkimizda.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— bağlantıya tıklayın</span></span></div>
+      <div class="browser" data-demo="kirik" data-start="sayfalar/hakkimizda.html"></div>
+    </div>
+  </div>
+  <div class="bigrule">Bu dosya <b>zaten</b> <code>sayfalar/</code> içindedir. Tarayıcı yolu mevcut
+  dizinden başlatınca <code>sayfalar/sayfalar/iletisim.html</code> arar, bulamaz ve <b>404</b>
+  döner. Doğrusu, aynı dizinde olduğu için sadece <code>iletisim.html</code>.</div>
+  <div class="warn"><b>Gerçek projede sık görülür:</b> ortak menü kodu farklı klasörlerdeki
+  sayfalara kopyalanınca göreli yolların başlangıç noktası değişir ve bazı bağlantılar kırılır.
+  Bu tekrar sorununu ileride sunucu tarafında şablonlarla çözeceğiz.</div>
+</section>
+
+<!-- ================= 13 sayfa içi bağlantı ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">SAYFA İÇİ BAĞLANTILAR</span><span class="kd">—</span><span class="ks">href="#..." ve id</span></div>
+  <p class="bridge">Bağlantı her zaman yeni bir belge açmaz; aynı belgenin bir bölümüne de gidebilir.</p>
+  <h2>Sayfa içi bağlantı iki parçanın eşleşmesiyle çalışır: <code>href="#ad"</code> ve <code>id="ad"</code></h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>rehber.html <span class="tag">— kod</span></span></div>
+      <pre data-code="ici/rehber.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü</span></div>
+      <div class="browser" data-demo="ici"></div>
+    </div>
+  </div>
+  <div class="bigrule"><b>#</b> adresin bundan sonraki kısmının bir <b>URL parçası (fragment)</b>
+  olduğunu belirtir · <b>id</b> belgedeki bir öğeye benzersiz bir ad verir · tarayıcı bu adı
+  taşıyan öğeyi bulur ve oraya kaydırır.</div>
+</section>
+
+<!-- ================= 14 tarayıcı ne yapar / adres çubuğu ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">SAYFA İÇİ BAĞLANTILAR</span><span class="kd">—</span><span class="ks">URL parçası sunucuya gitmez</span></div>
+  <p class="bridge">Sayfa içi bağlantıda yeni bir sayfa istenmez; iş tamamen tarayıcıda biter.</p>
+  <h2>Tarayıcı öğeyi bulur, oraya kaydırır ve adrese <code>#ulasim</code> parçasını ekler</h2>
+  <div class="steps s3">
+    <div class="step"><span class="n">1</span><h4>Öğeyi arar</h4>
+      <p>Mevcut belgede <code>id="ulasim"</code> olan öğe aranır.</p></div>
+    <div class="step"><span class="n">2</span><h4>Oraya kaydırır</h4>
+      <p>Bulursa o öğenin bulunduğu bölgeye kaydırır. Sayfa <b>yeniden yüklenmez.</b></p></div>
+    <div class="step"><span class="n">3</span><h4>Adresi günceller</h4>
+      <p>Adres çubuğu <code>rehber.html#ulasim</code> olur. Bu adres artık yalnızca sayfayı değil,
+      <b>hangi bölümün gösterileceğini</b> de ifade eder.</p></div>
+  </div>
+  <div class="bigrule">Bu yüzden bir bölümün adresini kopyalayıp paylaşabilirsiniz:
+  <code>ilan-detayi.html#odeme-secenekleri</code> adresini alan kişi, sayfanın başında değil
+  <b>doğrudan ödeme bölümünde</b> açar.</div>
+  <div class="warn"><b>Ağ trafiği açısından:</b> URL parçası sunucuya gönderilmez. DevTools →
+  Network panelinde sayfa içi bağlantıya tıkladığınızda <b>yeni bir istek satırı belirmez</b>;
+  sayfadan sayfaya geçişte ise belirir. Bu, ikisini ayırt etmenin en kesin yoludur.</div>
+</section>
+
+<!-- ================= 15 içindekiler menüsü ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">SAYFA İÇİ BAĞLANTILAR</span><span class="kd">—</span><span class="ks">içindekiler menüsü ve "başa dön"</span></div>
+  <p class="bridge">Uzun sayfalarda sayfa içi bağlantıların asıl kullanıldığı iki desen budur.</p>
+  <h2>Uzun bir sayfayı gezilebilir yapan iki desen: içindekiler listesi ve "Sayfa başına dön"</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>rehber.html <span class="tag">— kod</span></span></div>
+      <pre data-code="ici/rehber.html" class="small"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü</span></div>
+      <div class="browser" data-demo="ici"></div>
+    </div>
+  </div>
+  <div class="cards c3" style="margin-top:.7rem">
+    <div class="card"><h3 class="g">Gerçek projede nerede kullanılır?</h3>
+      <ul><li>Uzun dokümantasyon sayfaları</li><li>Sık sorulan sorular sayfaları</li>
+      <li>Kullanım koşulları ve gizlilik metinleri</li>
+      <li>Ürün sayfasındaki özellik / yorum / teknik bilgi bölümleri</li>
+      <li>Tek sayfalık tanıtım sitelerinin menüsü</li></ul></div>
+    <div class="card"><h3 class="w">Neden tercih edilir?</h3>
+      <ul><li>Sunucudan yeni sayfa istenmez; geçiş anlıktır</li>
+      <li>Kullanıcı uzun sayfada kaybolmaz</li>
+      <li>Bölümün kendi adresi paylaşılabilir</li></ul></div>
+    <div class="card"><h3 class="r">Yanlış kullanılırsa</h3>
+      <ul><li>Yinelenen <code>id</code> → yanlış bölüme gidilir</li>
+      <li>Eşleşmeyen ad → hiçbir şey olmaz, hata da verilmez</li>
+      <li>Hedefi olmayan <code>href="#"</code> → sayfa başına fırlar</li></ul></div>
+  </div>
+</section>
+
+<!-- ================= 16 derin bağlantı ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">SAYFA İÇİ BAĞLANTILAR</span><span class="kd">—</span><span class="ks">başka sayfanın bölümüne gitmek</span></div>
+  <p class="bridge">Dosya yolu ile URL parçası aynı <code>href</code> içinde birlikte kullanılabilir.</p>
+  <h2><code>egitimler.html#css-egitimi</code>: önce sayfa açılır, sonra bölüme gidilir</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>index.html <span class="tag">— kod</span></span></div>
+      <pre data-code="derin/index.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— bağlantılara tıklayın</span></span></div>
+      <div class="browser" data-demo="derin" data-start="index.html"></div>
+    </div>
+  </div>
+  <div class="bigrule">Bu kullanıma <b>derin bağlantı (deep link)</b> denir: kullanıcı hedef sayfanın
+  başına değil, doğrudan <b>aradığı bölüme</b> iner. Yardım merkezleri, SSS sayfaları ve
+  dokümantasyon sitelerinin standart davranışıdır.</div>
+</section>
+
+<!-- ================= 17 id kuralları / eşleşmeme ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">SAYFA İÇİ BAĞLANTILAR</span><span class="kd">—</span><span class="ks">id kuralları ve sessiz hata</span></div>
+  <p class="bridge">Sayfa içi bağlantı hata vermez; yanlışsa sadece hiçbir şey olmaz.</p>
+  <h2>Ad birebir eşleşmezse tarayıcı hedefi bulamaz ve sessizce durur</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>sss.html <span class="tag">— hatalı kod</span></span></div>
+      <pre data-code="bozuk/sss.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— iki bağlantıyı da deneyin</span></span></div>
+      <div class="browser" data-demo="bozuk"></div>
+    </div>
+  </div>
+  <div class="cards c2" style="margin-top:.7rem">
+    <div class="card"><h3 class="g"><code>id</code> kuralları</h3>
+      <ul><li>Bir belgede her <code>id</code> <b>benzersiz</b> olmalıdır</li>
+      <li><code>href</code> içindeki parça ile <code>id</code> <b>birebir</b> aynı olmalıdır</li>
+      <li><code>id</code> değerinde boşluk kullanılmaz</li>
+      <li>Küçük harf ve tire okunabilirliği artırır: <code>iletisim-bilgileri</code></li></ul></div>
+    <div class="card"><h3 class="r">Neden "sessiz" hata?</h3>
+      <p>Tarayıcı eşleşen öğeyi bulamazsa hata mesajı göstermez, konsola bir şey yazmaz, sayfayı da
+      bozmaz. Kullanıcı yalnızca "tıkladım, bir şey olmadı" der. <b>Teşhis yöntemi:</b> adres
+      çubuğundaki parçayı okuyup aynı adı belgede aramak.</p></div>
+  </div>
+</section>
+
+<!-- ================= 18 href="#" ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">SAYFA İÇİ BAĞLANTILAR</span><span class="kd">—</span><span class="ks">href="#" kullanımı</span></div>
+  <p class="bridge">Boş bir hedef yazmak, bağlantıyı "geçici olarak boş bırakmak" değildir.</p>
+  <h2><code>href="#"</code> bir hedef değildir: tarayıcıyı sayfanın başına götürür</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>rehber.html <span class="tag">— kod</span></span></div>
+      <pre data-code="hash/rehber.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— önce sayfayı aşağı kaydırın, sonra iki bağlantıyı deneyin</span></span></div>
+      <div class="browser" data-demo="hash"></div>
+    </div>
+  </div>
+  <div class="cards c2" style="margin-top:.7rem">
+    <div class="card"><h3 class="r">Hedefsiz: <code>href="#"</code></h3>
+      <p>Yalnızca "bağlantı gibi görünsün" diye yazılmıştır. Tıklayan kullanıcı beklenmedik biçimde
+      <b>sayfanın en başına</b> fırlar, adres çubuğuna anlamsız bir <code>#</code> eklenir ve
+      tarayıcı geçmişi kirlenir.</p></div>
+    <div class="card"><h3 class="g">Hedefli: <code>href="#ulasim"</code></h3>
+      <p>Gerçek bir hedef vardır; kullanıcı beklediği bölüme iner. Hedef henüz hazır değilse
+      bağlantıyı hiç yazmamak, <code>href="#"</code> yazmaktan iyidir.</p></div>
+  </div>
+  <div class="bigrule">Bunu şuna benzer bir sonuçla karıştırmayın: bir bağlantının hedefi
+  <b>var ama yanlışsa</b> (eşleşmeyen <code>id</code>) hiçbir şey olmaz; hedefi <b>boşsa</b>
+  (<code>#</code>) sayfa başına gidilir. İkisi de kullanıcı açısından hatadır.</div>
+</section>
+
+<!-- ================= 19 mailto ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">CİHAZ UYGULAMALARI</span><span class="kd">—</span><span class="ks">mailto: bağlantısı</span></div>
+  <p class="bridge">Bağlantının hedefi her zaman bir web sayfası olmak zorunda değildir.</p>
+  <h2><code>mailto:</code> şeması, cihazda tanımlı e-posta uygulamasını açmayı dener</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>iletisim.html <span class="tag">— kod</span></span></div>
+      <pre data-code="mailto/iletisim.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— bağlantıya tıklayın</span></span></div>
+      <div class="browser" data-demo="mailto"></div>
+    </div>
+  </div>
+  <div class="warn"><b>Bu bağlantı e-posta göndermez.</b> Yalnızca cihazın e-posta uygulamasında
+  <b>yeni bir taslak açmayı dener</b>. Cihazda tanımlı bir e-posta uygulaması yoksa hiçbir şey
+  olmayabilir. Bu, geliştiricinin denetleyemediği bir davranıştır.</div>
+  <div class="bigrule">Bağlantı metni olarak e-posta adresinin kendisini yazmak yaygın ve
+  yararlıdır: uygulama açılmazsa kullanıcı adresi <b>görüp kopyalayabilir.</b></div>
+</section>
+
+<!-- ================= 20 mailto parametreleri ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">CİHAZ UYGULAMALARI</span><span class="kd">—</span><span class="ks">mailto: parametreleri</span></div>
+  <p class="bridge">Adresten sonra yazılan parametrelerle taslağın konusu ve gövdesi hazır gelebilir.</p>
+  <h2>Konu ve ileti: <code>?subject=</code>, <code>&amp;amp;body=</code> ve <code>%20</code></h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>iletisim.html <span class="tag">— kod</span></span></div>
+      <pre data-code="mailto2/iletisim.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Cihazın e-posta uygulamasında açılan taslak <span class="tag">— temsilî görünüm</span></span></div>
+      <div class="mock">
+        <div class="mh">Yeni ileti</div>
+        <div class="mrow"><span class="mk">Kime</span><span class="mv">destek@example.com</span></div>
+        <div class="mrow"><span class="mk">Konu</span><span class="mv">Destek Talebi</span></div>
+        <div class="mb">Merhaba</div>
+      </div>
+    </div>
+  </div>
+  <div class="cards c4" style="margin-top:.7rem">
+    <div class="card"><h3><code>?</code></h3><p>Adresin bittiğini, parametrelerin başladığını
+      gösterir. İlk parametreden önce <b>bir kez</b> yazılır.</p></div>
+    <div class="card"><h3><code>&amp;amp;</code></h3><p>Parametreleri ayırır. HTML içinde
+      <code>&amp;</code> özel bir karakter olduğu için özniteliğin içine <code>&amp;amp;</code>
+      yazmak doğru yazımdır.</p></div>
+    <div class="card"><h3><code>%20</code></h3><p>URL'de boşluk yerine kullanılır. Adreslerde
+      boşluk bulunamaz; boşluk bu şekilde <b>kodlanır</b>.</p></div>
+    <div class="card"><h3 class="r">Yazılmaz</h3><p><code>subject</code> bir HTML özniteliği
+      <b>değildir</b>, <code>href</code> değerinin içindedir. Dışarıya yazılırsa tarayıcı bilinmeyen
+      özniteliği <b>sessizce yok sayar.</b></p></div>
+  </div>
+</section>
+
+<!-- ================= 21 tel ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">CİHAZ UYGULAMALARI</span><span class="kd">—</span><span class="ks">tel: bağlantısı</span></div>
+  <p class="bridge">Telefon numarasının okunabilir hâli ile makinenin anlayacağı hâli farklıdır.</p>
+  <h2><code>tel:</code> — görünen metin insan için, <code>href</code> değeri cihaz için</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>iletisim.html <span class="tag">— kod</span></span></div>
+      <pre data-code="tel/iletisim.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— bağlantıya tıklayın</span></span></div>
+      <div class="browser" data-demo="tel"></div>
+    </div>
+  </div>
+  <div class="bigrule">Görünen metin: <code>+90 (555) 123 45 67</code> — okunabilir olmalı ·
+  <code>href</code> değeri: <code>tel:+905551234567</code> — <b>uluslararası biçimde ve boşluksuz</b>
+  yazmak en güvenilir sonucu verir. Aynı bağlantının iki farklı yüzü vardır.</div>
+  <div class="warn">Bu bağlantı asıl anlamını <b>mobil cihazlarda</b> kazanır. Masaüstünde bir arama
+  uygulaması (ör. Skype, Teams) açılabilir; uygun uygulama yoksa işlem gerçekleşmeyebilir.
+  Numarayı <b>yalnızca düz metin</b> olarak yazmak ise mobil kullanıcıyı numarayı elle kopyalamaya
+  zorlar.</div>
+</section>
+
+<!-- ================= 22 mailto/tel seçim ve riskler ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">CİHAZ UYGULAMALARI</span><span class="kd">—</span><span class="ks">seçim ölçütü ve riskler</span></div>
+  <p class="bridge">Bu bağlantılar kolaydır, ama her iletişim ihtiyacının doğru çözümü değildir.</p>
+  <h2>Ne zaman <code>mailto:</code>, ne zaman iletişim formu?</h2>
+  <div class="cards c3">
+    <div class="card"><h3 class="g">mailto: yeterlidir</h3>
+      <ul><li>Kullanıcının kendi e-posta uygulamasını kullanması sorun değilse</li>
+      <li>Mesajın site tarafında kaydedilmesi gerekmiyorsa</li>
+      <li>Küçük tanıtım siteleri, kişisel siteler, altbilgi iletişim bilgisi</li></ul></div>
+    <div class="card"><h3 class="w">Form ve sunucu gerekir</h3>
+      <ul><li>Mesajın <b>kaydedilmesi</b>, numaralandırılması veya personele atanması gerekiyorsa</li>
+      <li>Doğrulama, spam koruması veya otomatik yanıt isteniyorsa</li>
+      <li>Destek talebi, başvuru, sipariş bildirimi gibi süreçlerde</li></ul>
+      <p>Bunu Node.js ve Express aşamasında yapacağız.</p></div>
+    <div class="card"><h3 class="r">Riskler</h3>
+      <ul><li>E-posta adresi ve telefon numarası <b>kaynak kodda açıkça</b> görünür</li>
+      <li>Adresler otomatik spam araçlarınca toplanabilir</li>
+      <li><code>subject</code> ve <code>body</code> içine <b>parola, kimlik numarası gibi hassas
+      bilgi konulmaz</b> — bu değerler adres çubuğunda ve geçmişte görünür</li></ul></div>
+  </div>
+  <div class="bigrule"><b>Gerçek projede nerede görülür:</b> iletişim sayfaları, site altbilgisi,
+  müşteri destek kartları, restoran rezervasyon alanları, sağlık kuruluşlarının randevu sayfaları,
+  emlak ilanlarındaki "Danışmanı ara" düğmeleri, mobil arayüzlerde sabit iletişim çubuğu.</div>
+</section>
+
+<!-- ================= 23 target ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">target VE rel</span><span class="kd">—</span><span class="ks">target özniteliği</span></div>
+  <p class="bridge">Bağlantının nereye gideceği <code>href</code>, nerede açılacağı <code>target</code> ile belirlenir.</p>
+  <h2><code>target</code>, bağlantının hangi gezinme alanında açılacağını belirtir</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>kaynaklar.html <span class="tag">— kod</span></span></div>
+      <pre data-code="target/kaynaklar.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— iki bağlantıyı da deneyin</span></span></div>
+      <div class="browser" data-demo="target"></div>
+    </div>
+  </div>
+  <div class="tblwrap" style="margin-top:.7rem;max-height:20vh">
+    <table>
+      <thead><tr><th>Değer</th><th>Anlamı</th><th>Not</th></tr></thead>
+      <tbody>
+        <tr><td><code>_self</code></td><td>Bağlantıyı mevcut gezinme alanında (aynı sekmede) açar</td>
+          <td>Varsayılan davranış; bu yüzden genellikle yazılmaz</td></tr>
+        <tr><td><code>_blank</code></td><td>Yeni bir üst düzey gezinme alanı oluşturur</td>
+          <td>Bunun <b>sekme mi pencere mi</b> olacağına tarayıcı ve kullanıcı ayarları karar verir;
+          HTML "sekme" garantisi vermez</td></tr>
+        <tr><td><code>_parent</code> / <code>_top</code></td>
+          <td>Üst / en üst gezinme alanını hedefler</td>
+          <td>Yalnızca sayfa içinde iç içe belge (<code>iframe</code>) varsa anlam kazanır;
+          şu anki uygulamalarımızda gerekmiyor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= 24 rel ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">target VE rel</span><span class="kd">—</span><span class="ks">rel="noopener" ve rel="noreferrer"</span></div>
+  <p class="bridge"><code>rel</code>, mevcut belge ile hedef kaynak arasındaki ilişkiyi bildirir.</p>
+  <h2><code>noopener</code> erişimi keser, <code>noreferrer</code> ek olarak kaynağı gizler</h2>
+  <div class="cards c2">
+    <div class="card">
+      <h3 class="g">rel="noopener"</h3>
+      <pre style="flex:none;padding:.4em 0">&lt;a href="https://ornek.example/"
+   target="_blank"
+   rel="noopener"&gt;
+  Dış kaynağı aç
+&lt;/a&gt;</pre>
+      <p>Açılan sayfanın, kendisini açan sayfaya JavaScript'teki <code>window.opener</code>
+      üzerinden erişmesini engeller. Bu erişim, kötü niyetli bir sayfanın <b>sizi açan sekmeyi
+      başka bir adrese yönlendirmesine</b> imkân verirdi.</p>
+    </div>
+    <div class="card">
+      <h3 class="g">rel="noreferrer"</h3>
+      <pre style="flex:none;padding:.4em 0">&lt;a href="https://ornek.example/"
+   target="_blank"
+   rel="noreferrer"&gt;
+  Dış kaynağı aç
+&lt;/a&gt;</pre>
+      <p>Hedef siteye, ziyaretçinin <b>hangi sayfadan geldiği</b> bilgisinin gönderilmesini engeller.
+      Ayrıca <code>noopener</code> davranışını da kendiliğinden sağlar.</p>
+    </div>
+  </div>
+  <div class="bigrule">Güncel HTML standardında <code>target="_blank"</code>, açıkça
+  <code>rel="opener"</code> yazılmadıkça <b>zaten örtük olarak <code>noopener</code> davranışı</b>
+  gösterir. Buna rağmen <code>rel="noopener"</code> yazmak yaygındır: güvenlik niyetini kodda
+  görünür kılar, eski tarayıcılarda da korur ve kodu okuyan geliştiricinin tercihi anlamasını sağlar.</div>
+  <div class="warn"><code>noreferrer</code> <b>her dış bağlantıya otomatik eklenmez.</b> Hedef site
+  ziyaretçinin nereden geldiğini göremediği için karşı tarafın trafik ölçümlerini etkiler.
+  Yalnızca gerçek bir gizlilik gereksinimi varsa kullanılır.</div>
+</section>
+
+<!-- ================= 25 karıştırılmayacaklar ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">target VE rel</span><span class="kd">—</span><span class="ks">karıştırılmaması gerekenler</span></div>
+  <p class="bridge">Benzer yerlerde yazılan bu değerler tamamen farklı işler yapar.</p>
+  <h2>Dördü de bağlantıya yazılır, hiçbiri diğerinin işini yapmaz</h2>
+  <div class="tblwrap">
+    <table>
+      <thead><tr><th style="width:16%">Yazım</th><th style="width:34%">Ne yapar</th><th style="width:50%">Ne yapmaz / nerede kullanılır</th></tr></thead>
+      <tbody>
+        <tr><td><code>target="_blank"</code></td><td>Hedefin <b>nerede</b> açılacağını belirler</td>
+          <td>Güvenlikle ilgili değildir. Kullanıcıyı sitede tutmak için her dış bağlantıya
+          eklenmesi doğru bir alışkanlık değildir: sekmeler birikir ve <b>geri</b> düğmesi işlevsiz
+          kalır. Kullanıcı isterse zaten yeni sekmede açabilir.</td></tr>
+        <tr><td><code>rel="noopener"</code></td><td>Açılan sayfanın, açan sayfaya
+          <code>window.opener</code> ile erişimini sınırlar</td>
+          <td>Yeni sekme <b>açmaz</b>. Tek başına yazıldığında bağlantının davranışını değiştirmez.</td></tr>
+        <tr><td><code>rel="noreferrer"</code></td><td>Yönlendiren adres bilgisini gizler ve
+          <code>noopener</code> davranışı sağlar</td>
+          <td>Yeni sekme <b>açmaz</b>. Hedef sitenin trafik ölçümünü etkilediği için varsayılan
+          tercih değildir.</td></tr>
+        <tr><td><code>rel="external"</code></td><td>Hedefin <b>başka bir siteye</b> ait olduğunu
+          ifade eden bir ilişki bilgisidir</td>
+          <td>Yeni sekme <b>açmaz</b>, güvenlik sağlamaz. Genellikle stil vermek veya içerik
+          sistemlerinde işaretleme yapmak için kullanılır.</td></tr>
+        <tr><td><code>rel="nofollow"</code></td><td>Arama motorlarına, bu bağlantının bir
+          <b>öneri sayılmaması</b> gerektiğini bildirir</td>
+          <td>Yeni sekme <b>açmaz</b>, güvenlik sağlamaz. Kullanıcı reklamı, sponsorlu bağlantı ve
+          kullanıcı yorumlarındaki bağlantılarda kullanılır.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= 26 yeni sekmede açılır ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">target VE rel</span><span class="kd">—</span><span class="ks">"yeni sekmede açılır" bilgisi</span></div>
+  <p class="bridge">Bağlantının yeni sekmede açılacağı kullanıcıya nasıl bildirilir? Tek bir doğru yoktur.</p>
+  <h2>Üç farklı yaklaşım vardır; hepsi gerçek projelerde görülür</h2>
+  <div class="cards c3">
+    <div class="card"><h3 class="g">Görünür metin</h3>
+      <p>Bağlantı metnine bilgi eklenir: <code>Rehberi indir (yeni sekmede açılır)</code></p>
+      <p><b>Kaynak:</b> GOV.UK tasarım sistemi bunu açıkça ister. <b>Sınıflandırma:</b> kuruma özgü,
+      olgun bir üretim tasarım sistemi kuralı — bütün siteler için zorunlu değil.</p></div>
+    <div class="card"><h3 class="w">Simge + erişilebilir açıklama</h3>
+      <p>Bağlantının yanına küçük bir dış bağlantı simgesi (↗) konur; açıklama görsel olarak gizlenir,
+      yalnızca ekran okuyucu duyar.</p>
+      <p><b>Kaynak:</b> W3C bunu bir <b>erişilebilirlik tekniği</b> olarak listeler; zorunlu değil,
+      tavsiye niteliğindedir.</p></div>
+    <div class="card"><h3 class="r">Hiçbir bilgi verilmez</h3>
+      <p>Bağlantı sessizce yeni sekmede açılır.</p>
+      <p><b>Sınıflandırma:</b> <b>en yaygın</b> uygulamadır, ancak erişilebilirlik açısından tercih
+      edilen davranış değildir: kullanıcı <b>geri</b> düğmesinin neden çalışmadığını anlamaz.</p></div>
+  </div>
+  <div class="bigrule">Bu ayrım, bir yöntemi öğrenirken sorulacak asıl sorudur:
+  bu <b>bir HTML zorunluluğu mu</b>, <b>yaygın bir üretim deseni mi</b>, <b>bir erişilebilirlik
+  tavsiyesi mi</b>, yoksa <b>tek bir kurumun kendi kuralı mı?</b> Dördü aynı ağırlıkta değildir.</div>
+  <div class="warn">Simge ve gizli açıklama tekniğini uygulamak CSS gerektirir; onu CSS ve
+  erişilebilirlik konularında yazacağız. Şu aşamada seçim ölçütünü bilmek yeterli.</div>
+</section>
+
+<!-- ================= 27 download ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">DOSYA BAĞLANTILARI</span><span class="kd">—</span><span class="ks">download özniteliği</span></div>
+  <p class="bridge">Aynı dosyaya giden iki bağlantı, tek bir öznitelik yüzünden farklı davranır.</p>
+  <h2><code>download</code>, kaynağın açılması yerine <b>indirilmesi</b> niyetini bildirir</h2>
+  <div class="split wide-left">
+    <div class="panel">
+      <div class="panel-head"><span>kaynaklar.html <span class="tag">— kod</span></span></div>
+      <pre data-code="download/kaynaklar.html"></pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span>Tarayıcı görünümü <span class="tag">— iki bağlantıyı da deneyin</span></span></div>
+      <div class="browser" data-demo="download"></div>
+    </div>
+  </div>
+  <div class="bigrule"><code>download</code>, <b>değer yazılmadan da kullanılabilen</b> bir
+  özniteliktir — varlığı tek başına anlam taşır. Değer verilirse, kullanıcının cihazına kaydedilirken
+  <b>önerilecek dosya adı</b> olur: <code>download="festival-2026-programi.csv"</code>.
+  Sunucudaki gerçek dosya adı ile önerilen ad <b>farklı olabilir.</b></div>
+</section>
+
+<!-- ================= 28 download sınırları ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">DOSYA BAĞLANTILARI</span><span class="kd">—</span><span class="ks">download'ın sınırları</span></div>
+  <p class="bridge"><code>download</code> bir emir değil, bir niyet bildirimidir.</p>
+  <h2>İndirme garanti edilmez; son sözü tarayıcı ve sunucu söyler</h2>
+  <div class="cards c3">
+    <div class="card"><h3 class="w">Tarayıcı ne yapabilir?</h3>
+      <ul><li>Güvenlik gerekçesiyle indirmeyi engelleyebilir</li>
+      <li>Dosya adını işletim sistemine uygun hâle getirebilir</li>
+      <li>Kullanıcıya farklı bir ad seçtirebilir</li>
+      <li>Sunucunun gönderdiği <code>Content-Disposition</code> başlığına öncelik verebilir</li></ul></div>
+    <div class="card"><h3 class="r">Başka sitedeki dosyalar</h3>
+      <p>Dosya başka bir kaynaktan geliyorsa hedef sunucunun uygun HTTP başlıklarını göndermesi
+      gerekir. Aksi hâlde tarayıcı dosyayı <b>normal bağlantı gibi açabilir</b> veya önerilen adı
+      yok sayabilir.</p>
+      <p><code>download</code> en güvenilir biçimde <b>kendi sitenizin denetlediği dosyalarda</b>
+      çalışır.</p></div>
+    <div class="card"><h3 class="r">target ile birlikte</h3>
+      <p>İndirme bağlantısının amacı yeni bir sayfa açmak değil, kaynağı kaydetmektir.
+      <code>download</code> ile <code>target="_blank"</code> birlikte yazmak çoğunlukla
+      <b>gereksizdir ve davranışı belirsizleştirir.</b></p></div>
+  </div>
+  <div class="bigrule"><b>Buradaki asıl fikir:</b> HTML birçok yerde tarayıcıya <b>ne istediğinizi</b>
+  söyler, <b>ne olacağını</b> değil. <code>download</code>, <code>mailto:</code> ve
+  <code>target="_blank"</code> bunun üç örneğidir — üçünde de son kararı kullanıcının cihazı verir.</div>
+</section>
+
+<!-- ================= 29 download gerçek proje ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">DOSYA BAĞLANTILARI</span><span class="kd">—</span><span class="ks">gerçek projede indirme</span></div>
+  <p class="bridge">Basit dosyayı HTML indirir; korunması gereken dosyayı sunucu indirtir.</p>
+  <h2>Statik dosya <code>download</code> ile, yetki gerektiren belge sunucu üzerinden</h2>
+  <div class="cards c2">
+    <div class="card"><h3 class="g">HTML <code>download</code> yeterlidir</h3>
+      <p>Herkese açık, sitenizde duran <b>statik</b> dosyalarda:</p>
+      <ul><li>CSV veri dışa aktarma</li><li>Belge veya form şablonları</li>
+      <li>Etkinlik programı, başvuru belgesi</li><li>Görsel / ses / çevrimdışı kaynak paketi</li></ul>
+      <pre style="flex:none;padding:.5em 0">&lt;a href="dosyalar/basvuru.docx"
+   download&gt;
+  Başvuru şablonunu indir
+&lt;/a&gt;</pre></div>
+    <div class="card"><h3 class="w">Sunucu yönetir</h3>
+      <p>Fatura, kullanıcıya özel rapor, yetki gerektiren belgelerde indirme davranışı sunucuda
+      belirlenir. Sunucu sırasıyla:</p>
+      <ul><li>Kullanıcının yetkisini denetler</li><li>Dosyayı bulur veya oluşturur</li>
+      <li>Doğru dosya türünü bildirir</li>
+      <li><code>Content-Disposition: attachment</code> başlığıyla indirmeyi yönetir</li></ul>
+      <p>Bunu Node.js ve Express aşamasında uygulayacağız.</p></div>
+  </div>
+  <div class="bigrule"><b>İçerik deseni:</b> ABD federal siteleri için geliştirilen U.S. Web Design
+  System, dosya bağlantılarında kullanıcıya <b>dosya türünün ve mümkünse boyutunun önceden
+  bildirilmesini</b> önerir: <code>Etkinlik programını indir [CSV, 24 KB]</code>. Bu bir HTML
+  zorunluluğu değil, olgun bir üretim tasarım sisteminin içerik önerisidir — ama kullanıcıya
+  "tıklarsam ne olacak" bilgisini verdiği için yaygın biçimde benimsenmiştir.</div>
+</section>
+
+<!-- ================= 30 sık hatalar ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">BAĞLANTILAR VE GEZİNME</span><span class="kd">—</span><span class="ks">sık yapılan hatalar</span></div>
+  <p class="bridge">Bu hataların çoğu hata mesajı vermez; yalnızca beklenen şey olmaz.</p>
+  <h2>Yeni başlayanların en sık yaptığı bağlantı hataları</h2>
+  <div class="tblwrap">
+    <table>
+      <thead><tr><th style="width:30%">Hata</th><th style="width:34%">Tarayıcıda ne olur</th><th style="width:36%">Doğru düşünme biçimi</th></tr></thead>
+      <tbody>
+        <tr><td>Yolu proje klasöründen hesaplamak</td><td>404 — sayfa bulunamadı</td>
+          <td>Başlangıç noktası her zaman <b>bağlantının yazıldığı dosyadır</b></td></tr>
+        <tr><td><code>href</code> ile <code>id</code> birebir aynı değil</td>
+          <td>Hiçbir şey olmaz, hata da verilmez</td>
+          <td>Adres çubuğundaki parçayı okuyup aynı adı belgede aramak</td></tr>
+        <tr><td>Aynı <code>id</code> değerini birden fazla öğede kullanmak</td>
+          <td>Yanlış bölüme gidilir</td><td><code>id</code> belge içinde <b>benzersiz</b> olmalıdır</td></tr>
+        <tr><td>Windows'taki <code>\</code> ile yol yazmak</td><td>Bağlantı çalışmaz</td>
+          <td>URL'lerde ayıraç her zaman <code>/</code></td></tr>
+        <tr><td>Büyük-küçük harfi değiştirmek</td>
+          <td>Windows'ta çalışır, sunucuda 404 verir</td>
+          <td>Dosya adlarını <b>birebir</b> yazmak; küçük harf + tire alışkanlığı</td></tr>
+        <tr><td><code>subject</code>'i HTML özniteliği olarak yazmak</td>
+          <td>Konu boş gelir; tarayıcı bilinmeyen özniteliği <b>sessizce yok sayar</b></td>
+          <td>Parametreler <code>href</code> <b>değerinin içinde</b>, <code>?</code> sonrasında</td></tr>
+        <tr><td>Bağlantı metni olarak "buraya tıklayın"</td>
+          <td>Çalışır ama hedef anlaşılmaz</td>
+          <td>Bağlantı metni tek başına okunduğunda hedefi anlatmalı</td></tr>
+        <tr><td>Her dış bağlantıya <code>target="_blank"</code></td>
+          <td>Sekmeler birikir, <b>geri</b> düğmesi işlevsiz kalır</td>
+          <td>Yeni sekme bir <b>gerekçe</b> ister; varsayılan davranış aynı sekmedir</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= 31 özet ================= -->
+<section class="slide">
+  <div class="kicker"><span class="kt">BAĞLANTILAR VE GEZİNME</span><span class="kd">—</span><span class="ks">özet</span></div>
+  <p class="bridge">Bu konuda öğrendiklerimizin tek cümlelik karşılıkları.</p>
+  <h2>Konunun özeti</h2>
+  <div class="cards c2">
+    <div class="card">
+      <h3>Bağlantının kendisi</h3>
+      <ul>
+        <li>Bağlantıyı <code>a</code> etiketi oluşturur, hedefini <code>href</code> belirler;
+        <code>href</code> yoksa ortada bağlantı yoktur.</li>
+        <li>Tarayıcı <code>href</code> değerini <b>bağlantının bulunduğu belgenin adresine göre</b>
+        çözümler.</li>
+        <li>Bağlantı metni tek başına okunduğunda hedefi anlatmalıdır; bağlantı içine başka bir
+        bağlantı veya düğme yerleştirilmez.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Yollar</h3>
+      <ul>
+        <li>Göreli yol bulunduğunuz dosyaya bağlıdır; mutlak URL şema ve alan adını taşıdığı için
+        bağlı değildir.</li>
+        <li>Aynı dizin için dosya adı, alt dizin için <code>klasor/dosya</code>, üst dizin için
+        her seviyede bir <code>../</code> yazılır.</li>
+        <li>Kendi sayfalarınıza göreli, başka sitelere mutlak yol yazılır.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Sayfa içi gezinme</h3>
+      <ul>
+        <li>Sayfa içi bağlantı <code>href="#ad"</code> ile <code>id="ad"</code> eşleşmesiyle çalışır;
+        adlar birebir aynı olmalıdır.</li>
+        <li>URL parçası sunucuya gitmez; sayfa yeniden yüklenmez ve Network panelinde yeni istek
+        görünmez.</li>
+        <li><code>sayfa.html#bolum</code> yazımıyla başka bir sayfanın belirli bölümüne gidilir.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Şemalar ve öznitelikler</h3>
+      <ul>
+        <li><code>mailto:</code> ve <code>tel:</code> cihazdaki uygulamayı açmayı <b>dener</b>;
+        sonucu garanti etmez.</li>
+        <li><code>target</code> hedefin nerede açılacağını, <code>rel</code> hedefle olan ilişkiyi
+        bildirir; ikisi farklı işler yapar.</li>
+        <li><code>download</code>, kaynağın indirilmesi niyetini bildirir; son kararı tarayıcı ve
+        sunucu verir.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="nav">
+  <div class="prog" id="prog"></div>
+  <div class="t" id="navTitle"></div>
+  <div class="ctrl">
+    <button id="btnPrev">◀</button>
+    <span id="counter">1 / 1</span>
+    <button id="btnNext">▶</button>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   DEMO KAYNAKLARI — TEK KAYNAK İLKESİ
+   Slayttaki <pre> içeriği ile iframe'e verilen belge aynı nesneden üretilir.
+   ===================================================================== */
+var DEMOS = {
+
+  temel: {
+    start: "index.html",
+    pages: {
+      "index.html":
+'<h1>Yıldız Bilişim</h1>\n' +
+'<p>Kurumsal web çözümleri.</p>\n' +
+'\n' +
+'<a href="hizmetler.html">\n' +
+'  Hizmetlerimizi inceleyin\n' +
+'</a>',
+      "hizmetler.html":
+'<h1>Hizmetlerimiz</h1>\n' +
+'<p>Web sitesi kurulumu ve bakımı.</p>\n' +
+'\n' +
+'<a href="index.html">Ana sayfaya dön</a>'
+    }
+  },
+
+  hrefyok: {
+    start: "menu.html",
+    pages: {
+      "menu.html":
+'<h1>Hizmetlerimiz</h1>\n' +
+'\n' +
+'<p>\n' +
+'  <a href="index.html">Ana sayfa</a>\n' +
+'  <a>Hizmetler</a>\n' +
+'  <a href="iletisim.html">İletişim</a>\n' +
+'</p>\n' +
+'\n' +
+'<p>Ortadaki öğe bu sayfanın kendisidir.</p>',
+      "index.html":
+'<h1>Yıldız Bilişim</h1>\n' +
+'<a href="menu.html">Hizmetler</a>',
+      "iletisim.html":
+'<h1>İletişim</h1>\n' +
+'<a href="menu.html">Hizmetler</a>'
+    }
+  },
+
+  linktext: {
+    start: "program-linkleri.html",
+    pages: {
+      "program-linkleri.html":
+'<h2>Zayıf bağlantı metni</h2>\n' +
+'<p>\n' +
+'  Ders programı için\n' +
+'  <a href="program.html">buraya tıklayın</a>.\n' +
+'</p>\n' +
+'\n' +
+'<h2>İyi bağlantı metni</h2>\n' +
+'<p>\n' +
+'  <a href="program.html">\n' +
+'    Ders programını inceleyin\n' +
+'  </a>\n' +
+'</p>',
+      "program.html":
+'<h1>Ders Programı</h1>\n' +
+'<p>Haftalık ders saatleri.</p>\n' +
+'<a href="program-linkleri.html">Geri dön</a>'
+    }
+  },
+
+  yollar: {
+    start: "index.html",
+    root: "site",
+    pages: {
+      "index.html":
+'<h1>Yıldız Bilişim</h1>\n' +
+'\n' +
+'<p>Aynı klasördeki sayfa:</p>\n' +
+'<a href="iletisim-kisa.html">İletişim özeti</a>\n' +
+'\n' +
+'<p>Alt klasördeki sayfa:</p>\n' +
+'<a href="sayfalar/hakkimizda.html">\n' +
+'  Hakkımızda sayfasına git\n' +
+'</a>',
+      "iletisim-kisa.html":
+'<h1>İletişim Özeti</h1>\n' +
+'<a href="index.html">Ana sayfaya dön</a>',
+      "sayfalar/hakkimizda.html":
+'<h1>Hakkımızda</h1>\n' +
+'\n' +
+'<a href="iletisim.html">\n' +
+'  İletişim sayfasına git\n' +
+'</a>\n' +
+'\n' +
+'<a href="../index.html">Ana sayfaya dön</a>',
+      "sayfalar/iletisim.html":
+'<h1>İletişim</h1>\n' +
+'\n' +
+'<a href="../blog/yazilar/ilk-yazi.html">\n' +
+'  İlk blog yazısını oku\n' +
+'</a>\n' +
+'\n' +
+'<a href="../index.html">Ana sayfaya dön</a>',
+      "blog/yazilar/ilk-yazi.html":
+'<h1>İlk Yazı</h1>\n' +
+'\n' +
+'<a href="../../index.html">\n' +
+'  Ana sayfaya dön\n' +
+'</a>\n' +
+'\n' +
+'<a href="../../sayfalar/hakkimizda.html">\n' +
+'  Hakkımızda sayfasına git\n' +
+'</a>\n' +
+'\n' +
+'<a href="https://html.spec.whatwg.org/">\n' +
+'  HTML standardını incele\n' +
+'</a>'
+    }
+  },
+
+  dis: {
+    start: "kaynaklar.html",
+    pages: {
+      "kaynaklar.html":
+'<h1>Kaynaklar</h1>\n' +
+'\n' +
+'<a href="https://html.spec.whatwg.org/">\n' +
+'  HTML standardını incele\n' +
+'</a>\n' +
+'\n' +
+'<p>Bu adres hangi dosyada yazılırsa\n' +
+'yazılsın aynı yeri gösterir.</p>'
+    }
+  },
+
+  kirik: {
+    start: "sayfalar/hakkimizda.html",
+    root: "site",
+    pages: {
+      "sayfalar/hakkimizda.html":
+'<h1>Hakkımızda</h1>\n' +
+'\n' +
+'<!-- Bu dosya zaten sayfalar/ içinde -->\n' +
+'<a href="sayfalar/iletisim.html">\n' +
+'  İletişim sayfasına git\n' +
+'</a>',
+      "sayfalar/iletisim.html":
+'<h1>İletişim</h1>\n' +
+'<a href="hakkimizda.html">Geri dön</a>'
+    }
+  },
+
+  ici: {
+    start: "rehber.html",
+    pages: {
+      "rehber.html":
+'<h1 id="sayfa-basi">Şehir Rehberi</h1>\n' +
+'\n' +
+'<h2>İçindekiler</h2>\n' +
+'<ul>\n' +
+'  <li><a href="#gezilecek">Gezilecek yerler</a></li>\n' +
+'  <li><a href="#ulasim">Ulaşım</a></li>\n' +
+'  <li><a href="#konaklama">Konaklama</a></li>\n' +
+'</ul>\n' +
+'\n' +
+'<h2 id="gezilecek">Gezilecek Yerler</h2>\n' +
+'<p>Şehrin tarihî ve doğal alanları...</p>\n' +
+'<a href="#sayfa-basi">Sayfa başına dön</a>\n' +
+'\n' +
+'<h2 id="ulasim">Ulaşım</h2>\n' +
+'<p>Toplu taşıma seçenekleri...</p>\n' +
+'<a href="#sayfa-basi">Sayfa başına dön</a>\n' +
+'\n' +
+'<h2 id="konaklama">Konaklama</h2>\n' +
+'<p>Konaklama seçenekleri...</p>\n' +
+'<a href="#sayfa-basi">Sayfa başına dön</a>'
+    }
+  },
+
+  derin: {
+    start: "index.html",
+    pages: {
+      "index.html":
+'<h1>Eğitimlerimiz</h1>\n' +
+'\n' +
+'<a href="egitimler.html#html-egitimi">\n' +
+'  HTML eğitimini incele\n' +
+'</a>\n' +
+'\n' +
+'<a href="egitimler.html#css-egitimi">\n' +
+'  CSS eğitimini incele\n' +
+'</a>\n' +
+'\n' +
+'<a href="egitimler.html#javascript-egitimi">\n' +
+'  JavaScript eğitimini incele\n' +
+'</a>',
+      "egitimler.html":
+'<h1 id="sayfa-basi">Eğitim Programı</h1>\n' +
+'\n' +
+'<h2 id="html-egitimi">HTML Eğitimi</h2>\n' +
+'<p>Belge yapısı, metin, bağlantılar.</p>\n' +
+'<p>Süre: 6 hafta.</p>\n' +
+'<a href="#sayfa-basi">Sayfa başına dön</a>\n' +
+'\n' +
+'<h2 id="css-egitimi">CSS Eğitimi</h2>\n' +
+'<p>Kutu modeli, yerleşim, responsive.</p>\n' +
+'<p>Süre: 10 hafta.</p>\n' +
+'<a href="#sayfa-basi">Sayfa başına dön</a>\n' +
+'\n' +
+'<h2 id="javascript-egitimi">JavaScript Eğitimi</h2>\n' +
+'<p>Değişkenler, fonksiyonlar, DOM.</p>\n' +
+'<p>Süre: 12 hafta.</p>\n' +
+'<a href="#sayfa-basi">Sayfa başına dön</a>\n' +
+'\n' +
+'<a href="index.html">Eğitim listesine dön</a>'
+    }
+  },
+
+  bozuk: {
+    start: "sss.html",
+    pages: {
+      "sss.html":
+'<h1 id="sayfa-basi">Sık Sorulan Sorular</h1>\n' +
+'\n' +
+'<ul>\n' +
+'  <li><a href="#kayit">Kayıt koşulları</a></li>\n' +
+'  <li><a href="#sure">Eğitim süresi</a></li>\n' +
+'</ul>\n' +
+'\n' +
+'<h2 id="kayit-kosullari">Kayıt Koşulları</h2>\n' +
+'<p>Ön koşul aranmaz.</p>\n' +
+'<p>Kayıtlar eylülde başlar.</p>\n' +
+'<p>Belgeler e-posta ile iletilir.</p>\n' +
+'\n' +
+'<h2 id="sure">Eğitim Süresi</h2>\n' +
+'<p>Program 28 hafta sürer.</p>\n' +
+'<a href="#sayfa-basi">Sayfa başına dön</a>'
+    }
+  },
+
+  hash: {
+    start: "rehber.html",
+    pages: {
+      "rehber.html":
+'<h1 id="sayfa-basi">Şehir Rehberi</h1>\n' +
+'\n' +
+'<!-- Hedefi olmayan bağlantı -->\n' +
+'<a href="#">Ulaşım (hedefsiz)</a>\n' +
+'\n' +
+'<!-- Gerçek hedefi olan bağlantı -->\n' +
+'<a href="#ulasim">Ulaşım (hedefli)</a>\n' +
+'\n' +
+'<h2>Gezilecek Yerler</h2>\n' +
+'<p>Şehrin tarihî alanları...</p>\n' +
+'<p>Doğal alanlar ve parklar...</p>\n' +
+'<p>Müzeler ve sergiler...</p>\n' +
+'<p>Meydanlar ve çarşılar...</p>\n' +
+'\n' +
+'<h2 id="ulasim">Ulaşım</h2>\n' +
+'<p>Toplu taşıma seçenekleri...</p>'
+    }
+  },
+
+  mailto: {
+    start: "iletisim.html",
+    pages: {
+      "iletisim.html":
+'<h1>Teknik Destek</h1>\n' +
+'\n' +
+'<p>\n' +
+'  <a href="mailto:destek@example.com">\n' +
+'    destek@example.com\n' +
+'  </a>\n' +
+'</p>'
+    }
+  },
+
+  mailto2: {
+    start: "iletisim.html",
+    pages: {
+      "iletisim.html":
+'<h1>Teknik Destek</h1>\n' +
+'\n' +
+'<a href="mailto:destek@example.com?subject=Destek%20Talebi&amp;body=Merhaba">\n' +
+'  Destek talebi oluştur\n' +
+'</a>'
+    }
+  },
+
+  tel: {
+    start: "iletisim.html",
+    pages: {
+      "iletisim.html":
+'<h1>Danışman</h1>\n' +
+'\n' +
+'<p>\n' +
+'  <a href="tel:+905551234567">\n' +
+'    +90 (555) 123 45 67\n' +
+'  </a>\n' +
+'</p>'
+    }
+  },
+
+  target: {
+    start: "kaynaklar.html",
+    pages: {
+      "kaynaklar.html":
+'<h1>Kaynaklar</h1>\n' +
+'\n' +
+'<p>Site içi bağlantı:</p>\n' +
+'<a href="egitimler.html">Eğitim programı</a>\n' +
+'\n' +
+'<p>Dış kaynak:</p>\n' +
+'<a href="https://html.spec.whatwg.org/"\n' +
+'   target="_blank"\n' +
+'   rel="noopener">\n' +
+'  HTML standardını incele\n' +
+'</a>',
+      "egitimler.html":
+'<h1>Eğitim Programı</h1>\n' +
+'<a href="kaynaklar.html">Kaynaklara dön</a>'
+    }
+  },
+
+  download: {
+    start: "kaynaklar.html",
+    pages: {
+      "dosyalar/program.csv":
+'<pre>saat,etkinlik,salon\n' +
+'09:00,Açılış,A Salonu\n' +
+'10:30,HTML Atölyesi,B Salonu\n' +
+'13:00,CSS Atölyesi,B Salonu</pre>',
+      "kaynaklar.html":
+'<h1>Etkinlik Kaynakları</h1>\n' +
+'\n' +
+'<p>Görüntüleme bağlantısı:</p>\n' +
+'<a href="dosyalar/program.csv">\n' +
+'  Etkinlik programını görüntüle\n' +
+'</a>\n' +
+'\n' +
+'<p>İndirme bağlantısı:</p>\n' +
+'<a href="dosyalar/program.csv"\n' +
+'   download="festival-2026-programi.csv">\n' +
+'  Etkinlik programını indir [CSV]\n' +
+'</a>'
+    }
+  }
+};
+
+/* ---------------------------------------------------------------------
+   KAYNAK KODU GÖRÜNTÜLEME
+   --------------------------------------------------------------------- */
+function esc(s){
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function hlTag(t){
+  if(t.slice(0,4) === '<!--'){ return '<span class="tok-com">' + esc(t) + '</span>'; }
+  var inner = t.slice(1, t.length-1);
+  var closing = inner.charAt(0) === '/';
+  if(closing){ inner = inner.slice(1); }
+  var mm = /^([a-zA-Z][a-zA-Z0-9]*)([\s\S]*)$/.exec(inner);
+  if(!mm){ return esc(t); }
+  var rest = mm[2];
+  var html = '<span class="tok-tag">&lt;' + (closing ? '/' : '') + esc(mm[1]) + '</span>';
+  var pos = 0, buf = '';
+  rest.replace(/([a-zA-Z-]+)(="([^"]*)")?/g, function(full, an, eqp, av, off){
+    buf += esc(rest.slice(pos, off));
+    buf += '<span class="tok-att">' + esc(an) + '</span>';
+    if(eqp){ buf += '=<span class="tok-str">"' + esc(av) + '"</span>'; }
+    pos = off + full.length;
+    return full;
+  });
+  buf += esc(rest.slice(pos));
+  return html + buf + '<span class="tok-tag">&gt;</span>';
+}
+function highlight(src){
+  var re = /<!--[\s\S]*?-->|<\/?[a-zA-Z][a-zA-Z0-9]*(?:\s[^<>]*?)?\/?>/g;
+  var out = '', last = 0, m;
+  while((m = re.exec(src)) !== null){
+    out += esc(src.slice(last, m.index));
+    out += hlTag(m[0]);
+    last = m.index + m[0].length;
+  }
+  out += esc(src.slice(last));
+  return out;
+}
+document.querySelectorAll('pre[data-code]').forEach(function(pre){
+  var ref = pre.getAttribute('data-code');
+  var i = ref.indexOf('/');
+  var demo = ref.slice(0,i), page = ref.slice(i+1);
+  var src = (DEMOS[demo] && DEMOS[demo].pages[page]) || '';
+  pre.innerHTML = highlight(src);
+});
+
+/* ---------------------------------------------------------------------
+   CANLI ÖNİZLEME
+   --------------------------------------------------------------------- */
+var PREVIEW_CSS =
+'html{font-size:17px}' +
+'body{margin:18px 20px;line-height:1.62;color:#111827;' +
+'font-family:"Segoe UI",system-ui,Arial,sans-serif;background:#fff}' +
+'h1{font-size:1.6rem;margin:0 0 .5rem;line-height:1.2}' +
+'h2{font-size:1.22rem;margin:1.4rem 0 .45rem}' +
+'p{margin:.5rem 0}' +
+'ul{margin:.5rem 0 .5rem 1.2rem;padding:0}' +
+'li{margin:.25rem 0}' +
+'a{color:#1a4fd6}' +
+'a:visited{color:#7a2ea8}' +
+'.nf{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px 16px}' +
+'.nf h1{color:#b91c1c;font-size:1.35rem}' +
+'.nf code{background:#fff;border:1px solid #fecaca;padding:1px 5px;border-radius:4px;' +
+'font-family:Consolas,monospace}';
+
+var INJECT =
+'(function(){' +
+'function toast(t){var b=document.getElementById("__t");' +
+'if(!b){b=document.createElement("div");b.id="__t";document.body.appendChild(b);' +
+'b.style.cssText="position:fixed;left:10px;right:10px;bottom:10px;background:#0f172a;' +
+'color:#e2e8f0;padding:9px 12px;border-radius:9px;z-index:99999;' +
+'font:400 13.5px/1.45 Segoe UI,system-ui,Arial;box-shadow:0 6px 20px rgba(0,0,0,.3)";}' +
+'b.textContent=t;b.style.display="block";' +
+'clearTimeout(window.__tt);window.__tt=setTimeout(function(){b.style.display="none";},4200);}' +
+'document.addEventListener("click",function(e){' +
+'var n=e.target,a=null;while(n){if(n.tagName==="A"){a=n;break;}n=n.parentNode;}' +
+'if(!a)return;e.preventDefault();' +
+'parent.postMessage({t:"nav",id:window.__FID,href:a.getAttribute("href"),' +
+'tgt:a.getAttribute("target"),dl:a.getAttribute("download")},"*");});' +
+'window.addEventListener("message",function(e){var d=e.data||{};' +
+'if(d.t==="top"){window.scrollTo({top:0,behavior:"smooth"});}if(d.t==="goto"){var el=document.getElementById(d.id);' +
+'if(el){el.scrollIntoView({behavior:"smooth",block:"start"});}}' +
+'if(d.t==="toast"){toast(d.text);}});' +
+'})();';
+
+var FRAMES = {};
+var fseq = 0;
+
+function buildDoc(body, fid){
+  return '<!doctype html><html lang="tr"><head><meta charset="utf-8">' +
+    '<style>' + PREVIEW_CSS + '</style></head><body>' + body +
+    '<script>window.__FID="' + fid + '";' + INJECT + '<\/script></body></html>';
+}
+
+function notFound(path){
+  return '<div class="nf"><h1>404 — Sayfa bulunamadı</h1>' +
+    '<p>Tarayıcının aradığı adres:</p><p><code>' + esc(path) + '</code></p>' +
+    '<p>Bu adreste bir dosya yok.</p></div>';
+}
+
+function resolvePath(base, href){
+  var hash = '', hi = href.indexOf('#');
+  if(hi >= 0){ hash = href.slice(hi+1); href = href.slice(0,hi); }
+  if(href === '') return { page: base, hash: hash };
+  var parts;
+  if(href.charAt(0) === '/'){ parts = href.slice(1).split('/'); }
+  else { parts = base.split('/').slice(0,-1).concat(href.split('/')); }
+  var out = [];
+  for(var i=0;i<parts.length;i++){
+    var p = parts[i];
+    if(p === '.' || p === '') continue;
+    if(p === '..'){ out.pop(); continue; }
+    out.push(p);
+  }
+  return { page: out.join('/'), hash: hash };
+}
+
+function load(fid, page, hash){
+  var st = FRAMES[fid];
+  var demo = DEMOS[st.demo];
+  var body = demo.pages[page];
+  st.page = page;
+  st.frame.srcdoc = buildDoc(body != null ? body : notFound(page), fid);
+  var root = demo.root ? demo.root + '/' : '';
+  st.url.textContent = root + page + (hash ? '#' + hash : '');
+  if(hash){
+    st.pendingHash = hash;
+  }
+  st.frame.onload = function(){
+    if(st.pendingHash){
+      var h = st.pendingHash; st.pendingHash = null;
+      setTimeout(function(){
+        st.frame.contentWindow.postMessage({t:'goto', id:h}, '*');
+      }, 60);
+    }
+  };
+}
+
+function say(fid, text){
+  var st = FRAMES[fid];
+  try { st.frame.contentWindow.postMessage({t:'toast', text:text}, '*'); } catch(e){}
+}
+
+window.addEventListener('message', function(e){
+  var d = e.data || {};
+  if(d.t !== 'nav') return;
+  var fid = d.id, st = FRAMES[fid];
+  if(!st) return;
+  var href = d.href;
+  if(href == null){ return; }
+
+  if(/^https?:/i.test(href)){
+    if(d.tgt === '_blank'){
+      say(fid, 'Yeni sekmede açılırdı: ' + href);
+    } else {
+      say(fid, 'Bu adrese gidilirdi (aynı sekmede): ' + href);
+    }
+    return;
+  }
+  if(/^mailto:/i.test(href)){
+    var v = href.slice(7).split('?')[0];
+    say(fid, 'Cihazda tanımlı e-posta uygulamasında yeni taslak açılır — Kime: ' + v +
+             ' · E-posta gönderilmez.');
+    return;
+  }
+  if(/^tel:/i.test(href)){
+    say(fid, 'Cihazın arama uygulaması açılmayı dener — ' + href.slice(4));
+    return;
+  }
+  if(d.dl != null){
+    say(fid, 'İndirme başlar — önerilen dosya adı: ' + (d.dl || 'program.csv'));
+    return;
+  }
+
+  var demo = DEMOS[st.demo];
+  var rootp = demo.root ? demo.root + '/' : '';
+  if(href === '#'){
+    st.url.textContent = rootp + st.page + '#';
+    try { st.frame.contentWindow.postMessage({t:'top'}, '*'); } catch(e){}
+    return;
+  }
+  var r = resolvePath(st.page, href);
+  if(r.page === st.page){
+    if(r.hash){
+      var has = (demo.pages[st.page] || '').indexOf('id="' + r.hash + '"') >= 0;
+      st.url.textContent = rootp + st.page + '#' + r.hash;
+      if(has){
+        st.frame.contentWindow.postMessage({t:'goto', id:r.hash}, '*');
+      } else {
+        say(fid, 'Eşleşen id bulunamadı: #' + r.hash + ' — tarayıcı hata vermez, hiçbir şey olmaz.');
+      }
+    } else {
+      load(fid, st.page, '');
+    }
+    return;
+  }
+  load(fid, r.page, r.hash);
+});
+
+document.querySelectorAll('.browser[data-demo]').forEach(function(el){
+  var name = el.getAttribute('data-demo');
+  var demo = DEMOS[name];
+  var start = el.getAttribute('data-start') || demo.start;
+  var fid = 'f' + (++fseq);
+
+  var bar = document.createElement('div');
+  bar.className = 'bbar';
+  var dots = document.createElement('div');
+  dots.className = 'dots';
+  dots.innerHTML = '<i></i><i></i><i></i>';
+  var url = document.createElement('div');
+  url.className = 'url';
+  var rb = document.createElement('button');
+  rb.className = 'reset';
+  rb.textContent = '⟲';
+  rb.title = 'Başa döndür';
+  bar.appendChild(dots); bar.appendChild(url); bar.appendChild(rb);
+
+  var frame = document.createElement('iframe');
+  el.appendChild(bar); el.appendChild(frame);
+
+  FRAMES[fid] = { demo:name, frame:frame, url:url, page:start, pendingHash:null };
+  rb.addEventListener('click', function(){ load(fid, start, ''); });
+  load(fid, start, '');
+});
+
+/* ---------------------------------------------------------------------
+   SLAYT GEZİNMESİ
+   --------------------------------------------------------------------- */
+var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var idx = 0;
+var counter = document.getElementById('counter');
+var navTitle = document.getElementById('navTitle');
+var prog = document.getElementById('prog');
+
+function show(n){
+  if(n < 0) n = 0;
+  if(n > slides.length-1) n = slides.length-1;
+  slides[idx].classList.remove('active');
+  idx = n;
+  slides[idx].classList.add('active');
+  counter.textContent = (idx+1) + ' / ' + slides.length;
+  var h = slides[idx].querySelector('h2') || slides[idx].querySelector('h1');
+  navTitle.textContent = h ? h.textContent.trim() : '';
+  prog.style.width = ((idx+1)/slides.length*100) + '%';
+}
+document.getElementById('btnNext').addEventListener('click', function(){ show(idx+1); });
+document.getElementById('btnPrev').addEventListener('click', function(){ show(idx-1); });
+document.addEventListener('keydown', function(e){
+  if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ show(idx+1); e.preventDefault(); }
+  if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ show(idx-1); e.preventDefault(); }
+  if(e.key === 'Home'){ show(0); }
+  if(e.key === 'End'){ show(slides.length-1); }
+});
+show(0);
+</script>
+</body>
+</html>
