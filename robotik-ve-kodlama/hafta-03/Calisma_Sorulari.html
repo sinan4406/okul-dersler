@@ -1,0 +1,38 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ROB 10 · 3. Hafta · Çalışma Soruları</title><style>
+:root{--ink:#14202E;--mut:#5B6675;--acc:#C2410C;--line:#D9D4C7;--bg:#FBFAF6;--card:#FFFFFF;--code:#14202E;--codefg:#F6F4EE}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Segoe UI",Arial,sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:28px;margin:0 0 4px}
+.sub{color:var(--mut);margin:0 0 14px}
+.id{display:flex;gap:24px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 16px;margin-bottom:18px}
+.id span{flex:1;border-bottom:1px solid var(--line);color:var(--mut)}
+.how{background:#FFF3E8;border-left:4px solid var(--acc);padding:10px 14px;border-radius:6px;margin-bottom:22px}
+article{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin-bottom:22px;break-inside:avoid}
+h2{font-size:21px;margin:0 0 4px}
+.lvl{color:var(--acc);font-size:15px;letter-spacing:2px;margin-left:8px}
+.sc{color:var(--mut);margin:0 0 10px;font-style:italic}
+h3{font-size:14px;text-transform:uppercase;letter-spacing:1.5px;color:var(--acc);margin:14px 0 6px}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:6px 0}
+th,td{border:1px solid var(--line);padding:5px 10px;text-align:left;vertical-align:top;height:30px}
+th{background:#F1EEE4}
+td.m{font-family:Consolas,"Courier New",monospace}
+ol,ul{margin:0;padding-left:22px}
+li{margin:5px 0}
+.ip{color:var(--mut);font-size:15px;margin-top:8px}
+.ans{border:1px solid #2E7D32;background:#EEF8EF;border-radius:8px;padding:6px 12px;margin-top:8px}
+pre{background:var(--code);color:var(--codefg);border-radius:8px;padding:12px 16px;overflow:auto;font:15px/1.5 Consolas,"Courier New",monospace;margin:6px 0 0;white-space:pre}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--ink:#EEF1F5;--mut:#A9B4C2;--bg:#0F1720;--card:#17212C;--line:#2B3947;--code:#0B1118}.how{background:#2A1D12}th{background:#1F2B38}.ans{background:#14281A}}
+@media print{body{background:#fff;color:#000;font-size:13.5pt}main{padding:0}article{border:1px solid #999}pre{background:#f2f2f2;color:#000;border:1px solid #bbb}.how{background:#fff}.ans{background:#fff}}
+</style></head><body><main><h1>3. Hafta · Çalışma Soruları</h1><p class="sub">Konu: Robotun parçaları, sensörler ve düğme ile LED · 5 uygulama, kolaydan zora</p><div class="id"><span>Ad Soyad:</span><span>Sınıf / No:</span></div><div class="how"><b>Nasıl çalışacaksın?</b> Soruları önce defterine kendin çöz. Devre sorularını Tinkercad’de kurup kodu çalıştırarak dene. Takılırsan ipucuna bak; cevap anahtarı öğretmendedir.</div><article><h2>1. Hangi parça?<span class="lvl" title="Zorluk">★☆☆</span></h2><p class="sc">Tanımı doğru robot parçasıyla eşleştiriyorsun.</p><h3>Yapılacaklar</h3><table><tr><th>Tanım</th><th>Parça</th></tr><tr><td>Mesafeyi ses dalgasıyla ölçer</td><td></td></tr><tr><td>Elektrik enerjisini dönme hareketine çevirir</td><td></td></tr><tr><td>Arduino pininden fazla akım isteyen motoru sürmek için kullanılır</td><td></td></tr><tr><td>Robotu uzaktan yönetmeyi sağlar</td><td></td></tr></table><p>Seçenekler: DC motor · motor sürücü · ultrasonik sensör · Bluetooth modülü</p></article><article><h2>2. Ultrasonik mesafe hesabı<span class="lvl" title="Zorluk">★★☆</span></h2><p class="sc">Ses dalgası cisme gidip geri döner; mesafe, gidiş-dönüş süresinin yarısına göre bulunur. Ses hızı 343 m/s = 0,0343 cm/µs.</p><h3>Yapılacaklar</h3><ol><li>Sensör 1166 µs sonra yankı aldı. Cisim kaç cm uzakta?</li><li>Yankı süresi 580 µs ise mesafe yaklaşık kaç cm’dir?</li><li>2 m uzaktaki bir cisim için gidiş-dönüş süresi yaklaşık kaç ms’dir?</li></ol><p class="ip"><b>İpucu:</b> Mesafe = süre × 0,0343 / 2 (cm).</p></article><article><h2>3. Düğme devresi<span class="lvl" title="Zorluk">★★☆</span></h2><p class="sc">Düğmeyi D2’ye pull-down dirençle bağlıyorsun.</p><h3>Yapılacaklar</h3><table><tr><th>Düğme bacağı</th><th>Bağlandığı yer</th></tr><tr><td>Bir taraf</td><td></td></tr><tr><td>Karşı taraf</td><td></td></tr></table><ol><li>10 kΩ direnç nereye bağlanır?</li><li>Düğme bırakıldığında D2 hangi değeri okur ve neden?</li><li>Direnç olmasaydı ne olurdu?</li></ol></article><article><h2>4. Kodu oku: basılıyken yan<span class="lvl" title="Zorluk">★★☆</span></h2><p class="sc">Düğme D2’de, LED D13’te.</p><h3>Yapılacaklar</h3><pre>void setup() {
+  pinMode(2, INPUT);
+  pinMode(13, OUTPUT);
+}
+
+void loop() {
+  if (digitalRead(2) == HIGH) {
+    digitalWrite(13, HIGH);
+  } else {
+    digitalWrite(13, LOW);
+  }
+}</pre><ol><li>Düğmeye basılıyken LED ne yapar? Bırakınca?</li><li>İki yerdeki HIGH ve LOW yer değiştirirse ne olur?</li></ol></article><article><h2>5. Acil durdurma ışığı<span class="lvl" title="Zorluk">★★★</span></h2><p class="sc">Robotun acil durdurma düğmesi var.</p><h3>Yapılacaklar</h3><p>Düğme D2’de, yeşil LED D4’te, kırmızı LED D5’te. Düğme basılı değilken yeşil yansın (robot çalışıyor). Basılınca kırmızı yansın, yeşil sönsün. Programı yaz.</p><ol><li>Kaç direnç kullanırsın?</li></ol></article></main></body></html>
