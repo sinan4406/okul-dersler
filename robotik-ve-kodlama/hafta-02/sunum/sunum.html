@@ -1,0 +1,1588 @@
+<title>ROB 2. Hafta Sunumu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Düzen: 1920x1080 sabit sahne pencereye ölçeklenir, altta ince kumanda çubuğu, istenince öğretmen notu çekmecesi. Bilinçli olarak tek (koyu) görünüm. */
+:root{
+  color-scheme:dark;
+  --ink:#0E1621; --bar:#18222F; --bar-fg:#E6EDF3; --muted:#8A97A8; --accent:#FF9F5A; --line:#2A3746;
+  --sans:'Rubik',Arial,sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--bar-fg);font-family:var(--sans);overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+#app{height:100%;display:flex;flex-direction:column;gap:8px;padding-block:8px;box-sizing:border-box}
+#viewport{flex:1;position:relative;overflow:hidden;min-height:0}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#stage>section{position:absolute;left:0;top:0;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;
+  transition:opacity .25s ease;opacity:0;visibility:hidden;pointer-events:none}
+#stage>section.active{opacity:1;visibility:visible;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){#stage>section{transition:none}}
+#stage *{margin:0;box-sizing:border-box}
+#stage aside{display:none}
+#stage ul{padding-left:1.1em}
+#stage table{border-collapse:collapse;width:100%}
+#stage td,#stage th{padding:.35em .6em;border-bottom:1px solid rgba(20,32,46,.1);text-align:left;vertical-align:middle}
+#stage th{font-weight:600}
+/* tablo kontrastı: yazı rengi her zaman zemine göre açıkça verilir. Sıra önemli: slayt zemini, sonra kart zemini (kart en yakın zemindir) */
+#stage .light table:not(.pt) td{color:#1B2533!important;background:transparent!important}
+#stage .light table:not(.pt) th{color:#14202E!important;background:rgba(20,32,46,.08)!important}
+#stage .dark table:not(.pt) td{color:#F6F4EE!important;background:transparent!important}
+#stage .dark table:not(.pt) th{color:#FFD9B8!important;background:rgba(255,255,255,.1)!important}
+#stage .card table:not(.pt) td{color:#1B2533!important;background:transparent!important}
+#stage .card table:not(.pt) th{color:#14202E!important;background:rgba(20,32,46,.08)!important}
+#stage .card.dk table:not(.pt) td{color:#F6F4EE!important;background:transparent!important}
+#stage .card.dk table:not(.pt) th{color:#FFD9B8!important;background:rgba(255,255,255,.1)!important}
+#stage h1,#stage h2,#stage h3{text-wrap:balance}
+/* kumanda çubuğu */
+#bar{display:flex;align-items:center;gap:12px;height:48px;background:var(--bar);border-radius:12px;padding:0 12px;flex-wrap:nowrap;min-width:0}
+#bar button{font:500 15px var(--sans);color:var(--bar-fg);background:transparent;border:1px solid var(--line);border-radius:8px;height:34px;padding:0 12px;cursor:pointer;white-space:nowrap}
+#bar button:hover{background:#223042}
+#bar button:focus-visible,.ans-btn:focus-visible,.stp button:focus-visible,.cbtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#count{font:500 15px var(--sans);font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+#stitle{flex:1;min-width:0;font-size:15px;color:var(--bar-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#prog{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);transition:width .2s}
+#barwrap{position:relative}
+#notes{position:absolute;left:0;right:0;bottom:0;max-height:45%;overflow:auto;background:#FBF8F1;color:#1B2533;font:18px/1.5 var(--sans);
+  padding:20px 24px;border-radius:12px 12px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.4);z-index:5}
+#notes b{display:block;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#C2410C;margin-bottom:6px}
+.hide-sm{display:inline}
+@media (max-width:640px){.hide-sm{display:none}#bar{gap:6px}#bar button{padding:0 8px}}
+
+/* slayt yapı taşları (sahne pikseli) */
+.sl{font-family:var(--sans);padding:96px 112px 120px;display:flex;flex-direction:column;gap:32px}
+.sl.nf{padding-bottom:88px}
+.sl.tight{padding:64px 88px 80px;gap:22px}
+.light{background:#F6F4EE;color:#1B2533}
+.dark{background:#14202E;color:#F6F4EE}
+.hd{display:flex;flex-direction:column;gap:10px}
+.eb{font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C2410C}
+.dark .eb{color:#FF9F5A}
+.ttl{font-size:56px;font-weight:600;line-height:1.1;color:#14202E}
+.tight .ttl{font-size:48px}
+.dark .ttl{color:#F6F4EE}
+.foot{position:absolute;left:112px;bottom:40px;width:1696px;font-size:22px;color:#6B7685}
+.dark .foot{color:#93A3B8}
+.row{display:flex;flex-direction:row;gap:32px}
+.col{display:flex;flex-direction:column;gap:20px}
+.f1{flex:1;min-width:0}
+.card{background:#FFFFFF;border:1px solid #E2DED3;border-radius:16px;padding:22px 28px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:28px;font-weight:600;color:#14202E}
+.card p,.card li{font-size:24px;line-height:1.4;color:#3D4A5C}
+.card.warn{background:#FFF3E8;border:0;border-left:8px solid #C2410C}
+.card.info{background:#EAF1FD;border:0;border-left:8px solid #2F6FDE}
+.card.ok{background:#E3F4E8;border:0;border-left:8px solid #2E8540}
+.card.dk{background:#1F2E40;border:0}
+.card.dk h3{color:#FF9F5A}.card.dk p,.card.dk li{color:#E6EDF3}
+.codebox{background:#16212E;border-radius:16px;padding:22px 30px;min-width:0;display:flex;flex-direction:column;gap:12px}
+pre.code{font-family:var(--mono);font-size:24px;line-height:1.5;color:#E6EDF3;white-space:pre;margin:0}
+pre.code.lg{font-size:28px}
+.k{color:#FF9F5A}.t{color:#6CB6FF}.s{color:#9BE38B}.c{color:#93A3B8;font-style:italic}.n{color:#F2CC60}.e{color:#FF8A80}
+.mono{font-family:var(--mono)}
+.pill{display:inline-block;font-size:22px;font-weight:600;letter-spacing:1px;border-radius:999px;padding:6px 16px;background:#E9E5DA;color:#14202E}
+.dark .pill{background:#2A3B50;color:#F6F4EE}
+/* cevap düğmeleri */
+.ans-btn{font:600 24px var(--sans);background:#2F6FDE;color:#FFFFFF;border:0;border-radius:999px;padding:10px 26px;cursor:pointer;align-self:flex-start;white-space:nowrap}
+.ans-btn:hover{background:#2459B8}
+.ans-btn.sm{font-size:21px;padding:6px 18px}
+.ans-btn.alt{background:#C2410C}.ans-btn.alt:hover{background:#9E340A}
+.ans{background:#E3F4E8;color:#14301F;border-left:6px solid #2E8540;border-radius:10px;padding:12px 20px;font-size:23px;line-height:1.45}
+.ans code,.ans .mono{font-family:var(--mono);font-size:21px}
+td .ans{padding:4px 12px;display:inline-block}
+/* açıklama balonları */
+.tip{border-bottom:3px dotted #FF9F5A;cursor:help;position:relative;outline:none}
+.tip::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 14px);width:540px;background:#FFF8E6;color:#14202E;
+  font:400 22px/1.4 var(--sans);font-style:normal;white-space:normal;padding:14px 18px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.35);
+  opacity:0;visibility:hidden;transition:opacity .15s;z-index:20;pointer-events:none;text-shadow:none;letter-spacing:0}
+.tip.dn::after{bottom:auto;top:calc(100% + 14px)}
+.tip.lf::after{left:auto;right:0}
+.tip:hover::after,.tip:focus::after{opacity:1;visibility:visible}
+/* adım adım kumanda */
+.stp{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.stp button,.cbtn{font:600 22px var(--sans);border-radius:12px;padding:8px 20px;cursor:pointer;border:2px solid #14202E;background:#FFFFFF;color:#14202E}
+.dark .stp button,.dark .cbtn{border-color:#5B6E85;background:#1F2E40;color:#F6F4EE}
+.stp button.go,.cbtn.go{background:#14202E;color:#F6F4EE}
+.dark .stp button.go,.dark .cbtn.go{background:#2F6FDE;border-color:#2F6FDE}
+.stp button[aria-pressed="true"],.cbtn[aria-pressed="true"]{background:#C2410C;border-color:#C2410C;color:#FFFFFF}
+.cbtn.sel{background:#C2410C;border-color:#C2410C;color:#FFFFFF}
+.stp .cnt{font-size:22px;color:#6B7685;font-variant-numeric:tabular-nums}
+.dark .stp .cnt{color:#93A3B8}
+.hl{background:rgba(255,159,90,.28);outline:3px solid #FF9F5A;border-radius:8px}
+/* devre paneli */
+.ckt{background:#16253A;border-radius:20px;padding:10px;display:flex;flex-direction:column;gap:0}
+.ckt svg{display:block;width:100%;height:auto}
+.hole{fill:#46505E}
+.hole.on{fill:#FF9F5A}
+.hole.on2{fill:#2F6FDE}
+.hole.pick{fill:#C2410C}
+.hole.ok{fill:#2E8540}
+@keyframes pulseG{0%,100%{opacity:1}50%{opacity:.35}}
+.pulse{animation:pulseG 1s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+/* kod görünümü (satır tablosu) */
+.cgrid{display:grid;grid-template-columns:48px max-content 1fr;column-gap:20px;font-family:var(--mono);font-size:20px;line-height:30px;color:#E6EDF3}
+.cgrid>.ln{color:#5B6E85;text-align:right;user-select:none;padding-right:4px}
+.cgrid>div{border-radius:6px;white-space:pre;cursor:pointer;padding:0 8px}
+.cgrid>div.cm{color:#93A3B8;font-style:italic;padding-left:0}
+.cgrid>div.hi{background:#2A3B50;outline:3px solid #FF9F5A}
+.cgrid>div.dimmed{opacity:.55}
+textarea.ed{width:100%;font:22px/1.5 var(--mono);color:#E6EDF3;background:#16212E;border:2px solid #2A3B50;border-radius:14px;padding:16px 20px;resize:none;tab-size:2;outline:none}
+textarea.ed:focus{border-color:#FF9F5A}
+.conso{background:#0B121B;border-radius:12px;padding:12px 18px;font:20px/1.45 var(--mono);color:#9BE38B;min-height:120px;white-space:pre-wrap;overflow:auto}
+.conso .er{color:#FF8A80}.conso .wr{color:#F2CC60}.conso .dm{color:#93A3B8}
+table.pt{font-family:var(--mono);font-size:20px;color:#E6EDF3}
+table.pt td,table.pt th{border-bottom:1px solid #2A3B50!important;padding:.25em .5em!important}
+table.pt th{color:#FF9F5A;font-weight:600;font-family:var(--sans);font-size:18px;letter-spacing:1px;text-transform:uppercase}
+.chip{display:inline-block;border-radius:999px;padding:2px 12px;font-weight:700;font-size:19px}
+.chip.hi{background:#2E8540;color:#fff}.chip.lo{background:#3A4656;color:#C8D3E0}
+</style>
+<div id="app">
+<div id="viewport"><div id="stage">
+<style>
+@keyframes blk{0%,46%{opacity:1}50%,96%{opacity:0}100%{opacity:1}}
+@keyframes blk2{0%,46%{opacity:0}50%,96%{opacity:1}100%{opacity:0}}
+.bl1{animation:blk 3s infinite}.bl2{animation:blk2 3s infinite}
+@keyframes chase{0%,60%,100%{opacity:.12}8%{opacity:1}30%{opacity:.35}}
+.cl{animation:chase 2.1s infinite}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s ease-out}
+@media (prefers-reduced-motion:reduce){.bl1,.bl2,.cl,.pop{animation:none}.bl2{opacity:0}.cl{opacity:.6}}
+.goal{display:flex;flex-direction:row;gap:24px;align-items:center;background:#FFFFFF;border:1px solid #E2DED3;border-radius:16px;padding:20px 28px}
+.goal b.no{font-size:44px;font-weight:700;color:#C2410C;min-width:44px;text-align:center}
+.goal p{font-size:27px;line-height:1.3;color:#1B2533}
+.opt{display:flex;flex-direction:row;gap:18px;align-items:center;border-radius:16px;padding:18px 28px;background:#1F2E40;border:2px solid #2A3B50;cursor:pointer;font:inherit;color:#F6F4EE;text-align:left;width:100%}
+.opt:hover{border-color:#FF9F5A}
+.opt .ab{font-size:34px;font-weight:700;color:#FF9F5A;min-width:40px}
+.opt .tx{font-size:30px;line-height:1.3;flex:1}
+.opt .bar{height:14px;border-radius:7px;background:#FF9F5A;width:0;transition:width .4s}
+.opt .cn{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;min-width:40px;text-align:right}
+.ruled{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px}
+textarea.ed{white-space:pre;overflow:auto}
+.cgrid{line-height:28px!important}
+.cgrid>div.cm:empty.hi{outline:none;background:transparent}
+.kl{padding:0 10px;border-radius:6px;white-space:pre;min-height:1.5em}
+.kl.hi{background:#2A3B50;outline:3px solid #FF9F5A}
+.kl.dimmed{opacity:.3}
+.seg{border-radius:8px;padding:2px 6px;cursor:pointer;border:3px solid transparent}
+.seg.on{background:rgba(255,159,90,.25);border-color:#FF9F5A}
+.bt{width:100%;font-size:23px}
+.bt td,.bt th{padding:.4em .7em}
+.bt th{font-weight:600}
+.bt tr.off{display:none}
+.vbox{background:#0B121B;border-radius:14px;padding:12px 22px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.vbox b{font:700 56px var(--mono);color:#F2CC60}
+.ledrow{display:flex;gap:10px;align-items:flex-end}
+.ledrow .lb{width:62px;height:62px;border-radius:50%;background:#3A1414;border:3px solid #5B2A2A;display:flex;align-items:center;justify-content:center;font:700 20px var(--mono);color:#7A5050;transition:all .2s}
+.ledrow .lb.on{background:#FF6B6B;border-color:#FFC1C1;color:#4A0A0A;box-shadow:0 0 22px #FF5252}
+.sl.tight2{padding:44px 88px 56px;gap:14px}
+.mono,pre.code,textarea.ed,.cgrid,.conso,table.pt,.pt{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+#test1 .col,#test2 .col{gap:10px!important}
+#test1 .card,#test2 .card{padding:8px 22px!important;gap:5px!important}
+#test1 .card p,#test2 .card p{font-size:20px!important;line-height:1.3}
+#test1 .ttl,#test2 .ttl{font-size:42px!important}
+#test1 .mono,#test2 .mono{font-size:18px!important}
+.ans[hidden]{display:none!important}
+#test1 .ans,#test2 .ans{font-size:18px;padding:4px 12px}
+#test1 .ans-btn.sm,#test2 .ans-btn.sm{font-size:19px;padding:4px 16px}
+#stage,#stage *{font-variant-ligatures:none}
+
+/* ---- ortak kit: tıkla-öğren, adım adım, eşleştirme, bölüm göstergeleri ---- */
+.hs .hz{fill:rgba(255,159,90,0);cursor:pointer;stroke:none}
+.hs:hover .hz{fill:rgba(255,159,90,.28)}
+.hs.sel .hz{fill:rgba(255,159,90,.32);stroke:#FF9F5A;stroke-width:3}
+.hs.good .hz{fill:rgba(46,133,64,.5);stroke:#4CE07A;stroke-width:3}
+.hs.bad .hz{fill:rgba(198,40,40,.5);stroke:#FF6B6B;stroke-width:3}
+[data-s]{transition:opacity .25s,filter .25s}
+[data-s].off{opacity:.25}
+[data-s].on.glow{filter:drop-shadow(0 0 9px #FF9F5A)}
+.hs-panel{background:#1F2E40;border-radius:16px;padding:20px 26px;display:flex;flex-direction:column;gap:10px}
+.hs-panel h3{font-size:32px;color:#FF9F5A;font-weight:600}
+.hs-panel .hs-x{font-size:25px;line-height:1.4;color:#E6EDF3}
+.hs-panel .hs-q{font-size:30px;font-weight:600;color:#F2CC60}
+.hs-panel .hs-score{font-size:24px;color:#93A3B8;font-variant-numeric:tabular-nums}
+.hs-list{display:flex;flex-wrap:wrap;gap:8px}
+.hs-list .cbtn{font-size:19px;padding:5px 12px}
+.mc-row{display:grid;grid-template-columns:1fr 470px 54px;gap:16px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(20,32,46,.12)}
+.mc-row .tx{font-size:23px;line-height:1.3;color:#1B2533}
+select.mc-sel{font:500 22px var(--sans);padding:7px 10px;border-radius:10px;border:2px solid #14202E;background:#fff;color:#14202E;width:100%}
+.mc-row.ok select{border-color:#2E8540;background:#E3F4E8}
+.mc-row.bad select{border-color:#C62828;background:#FDE0DC}
+.mc-mark{font-size:34px;font-weight:700;text-align:center}
+.mc-row.ok .mc-mark{color:#2E8540}.mc-row.bad .mc-mark{color:#C62828}
+.mc-why{grid-column:1/-1;font-size:19px;color:#2E8540;display:none}
+.mc-row.show .mc-why{display:block}
+.mc-res{font-size:26px;font-weight:600;color:#14202E;min-height:36px}
+.bigbtn{font:600 26px var(--sans);border-radius:14px;padding:12px 28px;cursor:pointer;border:2px solid #14202E;background:#fff;color:#14202E}
+.bigbtn.on{background:#C2410C;border-color:#C2410C;color:#fff}
+.dark .bigbtn{border-color:#5B6E85;background:#1F2E40;color:#F6F4EE}
+.dark .bigbtn.on{background:#C2410C;border-color:#C2410C}
+.range{width:100%;accent-color:#FF9F5A;height:36px}
+.big{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:19px;font-weight:700;letter-spacing:1px;border-radius:8px;padding:2px 10px;background:#FFE3CC;color:#9E340A}
+.dark .tag{background:#3A2A1E;color:#FFB784}
+.kit-wrong{color:#C62828;text-decoration:line-through}
+.kit-right{color:#2E8540;font-weight:600}
+.side .mc-row{grid-template-columns:1fr 360px 48px}
+.side .mc-row{padding:3px 0}
+.side .mc-why{font-size:17px;line-height:1.15;margin-top:-4px}
+.side .mc-row .tx{font-size:23px;line-height:1.25}
+.side select.mc-sel{font-size:21px;padding:6px 8px}
+.side .mc-mark{font-size:30px}
+#ozet .card{padding:14px 22px!important;gap:6px!important}
+#ozet .card p{font-size:22px!important;line-height:1.3}
+#ozet .card h3{font-size:26px!important}
+#ozet .card svg{max-height:96px}
+</style>
+<section id="cover" class="dark" style="padding:104px 112px;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--sans)">
+<p style="font-size:28px;letter-spacing:4px;text-transform:uppercase;color:#FF9F5A">Robotik Kodlama · 10. Sınıf</p>
+<div class="row" style="align-items:center;gap:64px">
+<div class="col f1" style="gap:30px">
+<h1 style="font-size:104px;font-weight:700;line-height:1.04;color:#F6F4EE">İlk Program: Blink<br>ve Robot Kavramı</h1>
+<p style="font-size:40px;line-height:1.3;color:#BFCAD6">LED’i Tinkercad’de yak-söndür, sonra robotun ne olduğunu ve türlerini öğren.</p>
+<div class="row" style="gap:16px;flex-wrap:wrap"><span class="pill">Blink</span><span class="pill">LED + direnç</span><span class="pill">Robot nedir?</span><span class="pill">Robot türleri</span></div>
+</div>
+<svg viewBox="0 0 700 520" width="700" height="520" role="img" aria-label="Gözleri yanıp sönen robot başı" style="flex:none">
+<defs><radialGradient id="cvg"><stop offset="0" stop-color="#FF5A3C" stop-opacity="1"/><stop offset="1" stop-color="#FF5A3C" stop-opacity="0"/></radialGradient></defs>
+<line x1="350" y1="60" x2="350" y2="110" stroke="#9FB3C8" stroke-width="8"/><circle cx="350" cy="52" r="14" fill="#FF9F5A"/>
+<rect x="190" y="110" width="320" height="260" rx="40" fill="#2A3B50" stroke="#5B6E85" stroke-width="6"/>
+<circle class="bl1" cx="280" cy="220" r="62" fill="url(#cvg)"/><circle cx="280" cy="220" r="26" fill="#FF3B30"/>
+<circle class="bl1" cx="420" cy="220" r="62" fill="url(#cvg)"/><circle cx="420" cy="220" r="26" fill="#FF3B30"/>
+<rect x="270" y="300" width="160" height="22" rx="8" fill="#171B22"/>
+<g fill="#9FB3C8"><rect x="240" y="306" width="12" height="10"/><rect x="262" y="306" width="12" height="10"/><rect x="284" y="306" width="12" height="10"/></g>
+<rect x="150" y="190" width="30" height="70" rx="8" fill="#5B6E85"/><rect x="520" y="190" width="30" height="70" rx="8" fill="#5B6E85"/>
+<rect x="260" y="372" width="180" height="90" rx="14" fill="#1F2E40" stroke="#5B6E85" stroke-width="4"/>
+<g font-family="JetBrains Mono,monospace" font-size="22" fill="#93A3B8"><text x="30" y="430">digitalWrite(13, HIGH);</text><text x="30" y="462">delay(1000);</text></g>
+</svg>
+</div>
+<div class="row" style="justify-content:space-between;align-items:flex-end">
+<p style="font-size:28px;color:#BFCAD6">Tinkercad’de Blink · Robot Türleri · 2. Hafta</p>
+<p style="font-size:28px;color:#BFCAD6">21–25 Eylül 2026</p>
+</div>
+<aside>Öğrencileri karşılayın, bu haftanın konusunu tek cümleyle söyleyin. Sunumu tam ekran açın (F), notları N ile görün. Bütün etkileşimler tarayıcıda çalışır; internet yalnızca yazı tipleri için gerekir.</aside>
+</section>
+<section id="hedefler" class="sl light">
+<div class="hd"><p class="eb">Bu haftanın hedefleri</p><h2 class="ttl">Ders sonunda şunları yapabileceksin</h2></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px"><div class="goal"><b class="no">1</b><p>Tinkercad’de Arduino Uno, LED ve direnç ile yanıp sönme devresini kurmak</p></div><div class="goal"><b class="no">2</b><p>LED’in uzun (anot) ve kısa (katot) bacağını, direncin görevini söylemek</p></div><div class="goal"><b class="no">3</b><p>Blink kodundaki setup(), loop(), pinMode, digitalWrite ve delay komutlarını açıklamak</p></div><div class="goal"><b class="no">4</b><p>delay sürelerini değiştirerek yanıp sönme hızını ve desenini ayarlamak</p></div><div class="goal"><b class="no">5</b><p>Robotu “algıla, karar ver, harekete geç” kalıbıyla tanımlamak</p></div><div class="goal"><b class="no">6</b><p>Robot türlerini ve eğitsel robot çeşitlerini örneklerle eşleştirmek</p></div></div>
+<div class="row" style="gap:22px">
+<div class="card dk f1"><h3>Bu hafta yapacağın 4 uygulama</h3><p>Blink · Robot Pil Uyarısı · Demiryolu Geçidi · Endüstriyel Robot Işığı</p></div>
+<div class="card info f1"><h3>Araç</h3><p>Tinkercad Circuits (tarayıcıda) ve bu sunumun canlı Arduino simülasyonu</p></div>
+</div>
+<p class="foot">ROB 10 · 2. Hafta · Kazanım: Blink uygulamasını yapar; robot türlerini ve eğitsel robotları açıklar · Kitap s.24–36</p>
+<aside>Hedefleri yüksek sesle okutun. Hedef 1–4 uygulama, 5–6 kavram: ders ikiye bölünür. İlk 2 saat devre ve kod, son saatlerde robot türleri. Ders sonunda bu slayta dönüp öğrencilerin kendilerini 1–5 arası puanlamasını isteyin.</aside>
+</section>
+<section id="dikkat" class="sl dark" data-poll="1">
+<div class="hd"><p class="eb">Oylama · Dikkat çekme</p><h2 class="ttl">Aşağıdakilerden hangisini robot sayarız?</h2></div>
+<div class="row" style="gap:40px;align-items:flex-start">
+<div class="col f1" style="gap:16px"><button type="button" class="opt" data-vote="0"><span class="ab">A</span><span class="tx">Düğmeyle açılıp kapanan fişli elektrikli süpürge</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<button type="button" class="opt" data-vote="1"><span class="ab">B</span><span class="tx">Odayı haritalayıp engelden kaçarak kendi temizleyen robot süpürge</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<button type="button" class="opt" data-vote="2"><span class="ab">C</span><span class="tx">Sadece ışık veren bir masa lambası</span><span class="bar" style="width:0"></span><span class="cn">0</span></button>
+<p style="font-size:24px;color:#93A3B8">Her seçeneğe tıkla: sınıfın oy sayısı artar. Sayıyı tahtaya yazdır.</p></div>
+<svg viewBox="0 0 520 420" width="520" height="420" role="img" aria-label="Robot süpürge" style="flex:none;background:#1F2E40;border-radius:20px">
+<circle cx="260" cy="210" r="130" fill="#2A3B50" stroke="#5B6E85" stroke-width="6"/><circle cx="260" cy="210" r="96" fill="#16253A" stroke="#4A5E78" stroke-width="3"/>
+<circle cx="260" cy="210" r="30" fill="#FF9F5A"/><rect x="226" y="82" width="68" height="14" rx="7" fill="#6CB6FF"/>
+<path d="M150 330 q110 70 220 0" fill="none" stroke="#9BE38B" stroke-width="6" stroke-dasharray="10 12" class="flow"/>
+<text x="260" y="404" text-anchor="middle" font-family="Rubik,Arial" font-size="20" fill="#93A3B8">Bu bir robot mu?</text></svg>
+</div>
+<div class="col" style="gap:14px"><button class="ans-btn" type="button">Oylamadan sonra cevabı göster</button>
+<div class="ans" hidden><b>Cevap: B.</b> Robot süpürge çevresini <b>algılar</b> (mesafe sensörleri), programına göre <b>karar verir</b> ve <b>harekete geçer</b> (tekerlek motorları). A ve C’de algılama ve karar yoktur; yalnız elektrik açılır ya da kapanır. Bugün bu üç basamağı, LED’i yakan ilk programımızla birlikte öğreneceğiz.</div></div>
+
+<aside>5 dakika. Oylamayı el kaldırtarak da yapabilirsiniz; cevabı hemen açmayın. Kitap (s.28) robotu “programlama algoritmasıyla çalışan elektromekanik parçalardan oluşan akıllı sistemler” diye tanımlar; kullanıcı kumandasıyla çalışan robotlar da tanıma girer. Tartışma: uzaktan kumandalı oyuncak araç robot mu? Kitaba göre programlı parçaları varsa evet; yalnız bir motoru düğmeyle çalıştırıyorsa hayır.</aside>
+</section>
+<section id="tekrar" class="sl light nf">
+<div class="hd"><p class="eb">Geçen haftadan · Mikrodenetleyici kart yapısı</p><h2 class="ttl">Hatırlıyor musun?</h2></div>
+<div class="row f1" style="align-items:flex-start;gap:28px"><div class="card f1" style="gap:16px;padding:26px 30px"><svg viewBox="0 0 400 190" width="100%" role="img" aria-label="L LED"><rect width="400" height="190" rx="14" fill="#16212E"/><text x="200" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="40" font-weight="700" fill="#FFB74D">L LED</text><text x="200" y="120" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="28" font-weight="700" fill="#BFCAD6">hangi pinde?</text></svg><h3>1 · Uno’nun üzerindeki yerleşik L LED’i hangi pine bağlıdır?</h3><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>D13.</b> Bu yüzden Blink’i D13 ile yapacağız; kodda LED_BUILTIN adıyla da kullanılır.</div></div>
+<div class="card f1" style="gap:16px;padding:26px 30px"><svg viewBox="0 0 400 190" width="100%" role="img" aria-label="D0 D1"><rect width="400" height="190" rx="14" fill="#16212E"/><text x="110" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="34" font-weight="700" fill="#6CB6FF">D0 RX</text><text x="290" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="34" font-weight="700" fill="#9BE38B">D1 TX</text><text x="200" y="130" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="26" font-weight="700" fill="#BFCAD6">seri haberleşme</text></svg><h3>2 · Hangi iki pin USB seri haberleşmesine ayrılmıştır?</h3><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>D0 (RX) ve D1 (TX).</b> LED ve diğer parçalar için D2–D13 pinlerini seçeriz.</div></div>
+<div class="card f1" style="gap:16px;padding:26px 30px"><svg viewBox="0 0 400 190" width="100%" role="img" aria-label="Tinkercad"><rect width="400" height="190" rx="14" fill="#16212E"/><text x="200" y="66" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="38" font-weight="700" fill="#FF9F5A">Devreler</text><text x="200" y="120" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="30" font-weight="700" fill="#F6F4EE">→ Yeni Devre</text></svg><h3>3 · Tinkercad’de yeni devre hangi menüden açılır?</h3><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>Devreler (Circuits) → Yeni Devre oluştur.</b> Sonra Bileşenler panelinden parça seçilir.</div></div>
+</div>
+<p class="foot">Önce bireysel cevap (20 sn), sonra düğmeyle kontrol.</p>
+<aside>Üç soruyu da geçen haftanın sunumundaki kavramlara bağlayın: pin numaraları, seri haberleşme pinleri ve Tinkercad menüleri. Her kart için 20 saniye düşünme süresi verin; cevaplar kartta açılır. Bu üç bilgi bugünkü uygulamanın temelidir.</aside>
+</section>
+<section id="led-yapi" class="sl dark tight" data-hotspot="1">
+<div class="hd"><p class="eb">Tıkla-öğren · LED, direnç ve pinler</p><h2 class="ttl">Yanıp sönme devresinde hangi parça ne yapar?</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div style="width:1080px;flex:none;background:#16253A;border-radius:20px;padding:10px"><svg viewBox="0 0 1060 520" width="100%" role="img" aria-label="Arduino D13, direnç, LED ve GND bağlantısı"><rect x="20" y="50" width="170" height="440" rx="18" fill="#0E7C86" stroke="#0A5D65" stroke-width="4"/><text x="105" y="120" text-anchor="middle" font-family="Rubik,Arial" font-size="28" font-weight="700" fill="#E8F7F8">ARDUINO</text><text x="105" y="156" text-anchor="middle" font-family="Rubik,Arial" font-size="28" font-weight="700" fill="#E8F7F8">UNO</text><g><circle cx="190" cy="330" r="9" fill="#C9D1D9"/><text x="170" y="320" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#E8F7F8">GND</text><path d="M190 330 H735" stroke="#93A3B8" stroke-width="6" fill="none" stroke-linecap="round"/></g><g><circle cx="190" cy="430" r="9" fill="#FFE08A"/><text x="170" y="420" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#FFE08A">D13</text><path d="M190 430 H300" stroke="#F97316" stroke-width="6" fill="none" stroke-linecap="round"/></g><g><path d="M300 430 H320 M470 430 H785" stroke="#F97316" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="320" y="408" width="150" height="44" rx="20" fill="#D9B98A" stroke="#A8845A" stroke-width="3"/><rect x="345" y="408" width="14" height="44" fill="#C62828"/><rect x="372" y="408" width="14" height="44" fill="#C62828"/><rect x="399" y="408" width="14" height="44" fill="#6D4C41"/><rect x="438" y="408" width="14" height="44" fill="#D4AF37"/><text x="395" y="488" text-anchor="middle" font-family="Rubik,Arial" font-size="22" font-weight="700" fill="#F6F4EE">220 Ω</text></g><g><path d="M690 232 A70 70 0 1 1 830 232 V252 H690 Z" fill="#E53935" stroke="#8E1B1B" stroke-width="4"/><path d="M690 252 H830" stroke="#8E1B1B" stroke-width="6"/><path d="M690 200 V252" stroke="#FFD0CC" stroke-width="4" opacity=".0"/><path d="M735 252 V330" stroke="#C9D1D9" stroke-width="8" stroke-linecap="round"/><path d="M785 252 V430" stroke="#C9D1D9" stroke-width="8" stroke-linecap="round"/><text x="735" y="288" text-anchor="end" font-family="Rubik,Arial" font-size="22" fill="#BFCAD6" dx="-14">katot (−)</text><text x="785" y="368" font-family="Rubik,Arial" font-size="22" fill="#BFCAD6" dx="16">anot (+)</text><text x="760" y="140" text-anchor="middle" font-family="Rubik,Arial" font-size="24" font-weight="700" fill="#F6F4EE">LED</text></g><g class="hs" data-id="d13"><rect class="hz" x="150" y="400" width="110" height="60" rx="8"/></g><g class="hs" data-id="gnd"><rect class="hz" x="150" y="300" width="110" height="60" rx="8"/></g><g class="hs" data-id="direnc"><rect class="hz" x="300" y="395" width="190" height="80" rx="8"/></g><g class="hs" data-id="anot"><rect class="hz" x="765" y="270" width="70" height="180" rx="8"/></g><g class="hs" data-id="katot"><rect class="hz" x="705" y="262" width="60" height="90" rx="8"/></g><g class="hs" data-id="duz"><rect class="hz" x="670" y="205" width="40" height="60" rx="8"/></g></svg></div>
+<div class="col f1" style="gap:14px">
+<div class="hs-panel" style="min-height:330px"><h3 class="hs-t"></h3><p class="hs-q"></p><p class="hs-x"></p><p class="hs-score"></p></div>
+<div class="hs-list"></div><button type="button" class="ans-btn alt hs-quiz-btn" aria-pressed="false">Bul bakalım (sınav modu)</button>
+</div>
+</div><script type="application/json" class="hs-data">[{"id": "d13", "t": "D13 · dijital çıkış pini", "x": "Kodla HIGH yazınca 5 V, LOW yazınca 0 V verir. LED’i yakıp söndüren pin budur. Karttaki yerleşik L LED’i de bu pine bağlıdır."}, {"id": "direnc", "t": "220 Ω direnç", "x": "Akımı sınırlar; LED’in yanıp bozulmasını önler. Renkleri: kırmızı, kırmızı, kahverengi, altın = 22 × 10 = 220 Ω, %5 tolerans. (5 V − 2 V) / 220 Ω ≈ 13,6 mA: LED için güvenli."}, {"id": "anot", "t": "LED’in uzun bacağı · anot (+)", "x": "Akım buradan girer. Dirençten gelen kabloya takılır. Uzun bacak artı (+) taraftır."}, {"id": "katot", "t": "LED’in kısa bacağı · katot (−)", "x": "Akım buradan çıkar ve GND’ye gider. Kısa bacak eksi (−) taraftır."}, {"id": "duz", "t": "Gövdedeki düz kenar", "x": "LED’in plastik gövdesinde bir yanı düz kesiktir. Düz kenarın olduğu bacak katottur (−). Bacaklar kısaltılmışsa düz kenara bak."}, {"id": "gnd", "t": "GND (toprak)", "x": "Akımın dönüş yolu. Devre ancak akım Arduino’dan çıkıp GND’ye ulaşınca tamamlanır."}]</script>
+<p class="foot">Kitap s.24 · Önemli kutusu · LED’in bacakları ve direnç</p>
+<aside>Önce şemayı parça parça gezin, sonra “Bul bakalım” ile pekiştirin. Güvenlik: LED’i dirençsiz bağlamayın; LED’in kendisi akımı sınırlamaz, bozulur. Ters bağlanırsa yanmaz ama genellikle zarar görmez (5 V’ta ters gerilim çoğu LED’de sınırdadır; yine de doğru yönde takmayı alışkanlık yapın). Kırmızı LED’in gerilim düşümü yaklaşık 2 V’tur; hesap: (5 − 2) / 220 ≈ 13,6 mA, LED’in 20 mA sınırının altında. Kitap s.24: “LED’ler 3 V ile çalışır” der; bu mavi/beyaz için daha doğrudur, kırmızı için yaklaşık 2 V’tur.</aside>
+</section>
+<section id="akim-yolu" class="sl dark tight" data-steps="1">
+<div class="hd"><p class="eb">Adım adım animasyon · Akım halkası</p><h2 class="ttl">D13 HIGH olunca akım hangi yoldan geçer?</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div style="width:1180px;flex:none;background:#16253A;border-radius:20px;padding:10px"><svg viewBox="0 0 1060 520" width="100%" role="img" aria-label="Arduino D13, direnç, LED ve GND bağlantısı"><rect x="20" y="50" width="170" height="440" rx="18" fill="#0E7C86" stroke="#0A5D65" stroke-width="4"/><text x="105" y="120" text-anchor="middle" font-family="Rubik,Arial" font-size="28" font-weight="700" fill="#E8F7F8">ARDUINO</text><text x="105" y="156" text-anchor="middle" font-family="Rubik,Arial" font-size="28" font-weight="700" fill="#E8F7F8">UNO</text><g data-s="4 5"><circle cx="190" cy="330" r="9" fill="#C9D1D9"/><text x="170" y="320" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#E8F7F8">GND</text><path d="M190 330 H735" stroke="#93A3B8" stroke-width="6" fill="none" stroke-linecap="round"/></g><g data-s="1 5"><circle cx="190" cy="430" r="9" fill="#FFE08A"/><text x="170" y="420" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#FFE08A">D13</text><path d="M190 430 H300" stroke="#F97316" stroke-width="6" fill="none" stroke-linecap="round"/></g><g data-s="2 5"><path d="M300 430 H320 M470 430 H785" stroke="#F97316" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="320" y="408" width="150" height="44" rx="20" fill="#D9B98A" stroke="#A8845A" stroke-width="3"/><rect x="345" y="408" width="14" height="44" fill="#C62828"/><rect x="372" y="408" width="14" height="44" fill="#C62828"/><rect x="399" y="408" width="14" height="44" fill="#6D4C41"/><rect x="438" y="408" width="14" height="44" fill="#D4AF37"/><text x="395" y="488" text-anchor="middle" font-family="Rubik,Arial" font-size="22" font-weight="700" fill="#F6F4EE">220 Ω</text></g><g data-s="3 5"><path d="M690 232 A70 70 0 1 1 830 232 V252 H690 Z" fill="#E53935" stroke="#8E1B1B" stroke-width="4"/><path d="M690 252 H830" stroke="#8E1B1B" stroke-width="6"/><path d="M690 200 V252" stroke="#FFD0CC" stroke-width="4" opacity=".0"/><path d="M735 252 V330" stroke="#C9D1D9" stroke-width="8" stroke-linecap="round"/><path d="M785 252 V430" stroke="#C9D1D9" stroke-width="8" stroke-linecap="round"/><text x="735" y="288" text-anchor="end" font-family="Rubik,Arial" font-size="22" fill="#BFCAD6" dx="-14">katot (−)</text><text x="785" y="368" font-family="Rubik,Arial" font-size="22" fill="#BFCAD6" dx="16">anot (+)</text><text x="760" y="140" text-anchor="middle" font-family="Rubik,Arial" font-size="24" font-weight="700" fill="#F6F4EE">LED</text></g></svg></div>
+<div class="col f1" style="gap:16px">
+<div class="card dk" style="padding:18px 24px;min-height:260px"><h3 class="st-t" style="font-size:30px"></h3><p class="st-m" style="font-size:26px;line-height:1.4"></p></div>
+<div class="stp"><button type="button" data-act="first">⏮ Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1 / 5</span></div>
+</div>
+</div><script type="application/json" class="st-data">[{"t": "1 · D13 HIGH yazar", "m": "digitalWrite(13, HIGH) çalışınca D13 pini 5 V verir. Akım Arduino’dan çıkıp kabloya girer."}, {"t": "2 · Direnç akımı sınırlar", "m": "Akım 220 Ω dirençten geçer. Hesap: (5 V − 2 V) / 220 Ω ≈ 13,6 mA. Bu LED için güvenli bir değerdir."}, {"t": "3 · LED’den geçer, ışık verir", "m": "Akım uzun bacaktan (anot +) girer, LED’in içinden geçer ve kısa bacaktan (katot −) çıkar. LED ışık verir."}, {"t": "4 · GND’ye ulaşır", "m": "Akım GND pinine döner. Halka tamamlanmıştır; akım ancak kapalı bir halkada akar."}, {"t": "5 · Halka tamam: LED yanıyor", "m": "Dört parça birlikte çalışınca LED yanar. digitalWrite(13, LOW) yazınca D13 0 V olur, halka kopar ve LED söner."}]</script>
+<p class="foot">Kitap s.24 · Akım yolu: D13 → direnç → LED → GND</p>
+<aside>Adım adım ilerleyin; her adımda ilgili parça parlar. Her adımda önce öğrencilerden tahmin isteyin. Soru: “Direnci çıkarırsak ne olur?” (akım çok artar, LED bozulur). “LED’i ters takarsak?” (akım geçmez, LED yanmaz). Hesabı tahtada gösterin: 5 − 2 = 3 V direncin üzerine düşer; 3 / 220 = 0,01364 A = 13,6 mA. Gerçekte kırmızı LED’in gerilimi 1,8–2,2 V arasındadır; 2 V yaklaşık değerdir.</aside>
+</section>
+<section id="tkc-blink" class="sl dark tight" data-steps="1">
+<div class="hd"><p class="eb">Adım adım animasyon · Tinkercad’de kurulum</p><h2 class="ttl">Blink devresini Tinkercad’de adım adım kur</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div style="width:1180px;flex:none;background:#16253A;border-radius:20px;padding:10px"><svg viewBox="0 0 1180 520" width="100%" role="img" aria-label="Tinkercad çalışma alanında Blink devresi kurulumu"><rect width="1180" height="520" rx="14" fill="#F4F1E8"/><g stroke="#E4DFD0" stroke-width="2"><path d="M40 0 V520"/><path d="M80 0 V520"/><path d="M120 0 V520"/><path d="M160 0 V520"/><path d="M200 0 V520"/><path d="M240 0 V520"/><path d="M280 0 V520"/><path d="M320 0 V520"/><path d="M360 0 V520"/><path d="M400 0 V520"/><path d="M440 0 V520"/><path d="M480 0 V520"/><path d="M520 0 V520"/><path d="M560 0 V520"/><path d="M600 0 V520"/><path d="M640 0 V520"/><path d="M680 0 V520"/><path d="M720 0 V520"/><path d="M760 0 V520"/><path d="M800 0 V520"/><path d="M840 0 V520"/><path d="M880 0 V520"/><path d="M920 0 V520"/><path d="M960 0 V520"/><path d="M1000 0 V520"/><path d="M1040 0 V520"/><path d="M1080 0 V520"/><path d="M1120 0 V520"/><path d="M1160 0 V520"/></g><g data-from="1" data-s="1 6 7"><rect x="50" y="150" width="270" height="230" rx="16" fill="#0E7C86" stroke="#0A5D65" stroke-width="4"/><text x="185" y="270" text-anchor="middle" font-family="Rubik,Arial" font-size="30" font-weight="700" fill="#E8F7F8">ARDUINO UNO</text><circle cx="320" cy="180" r="8" fill="#FFE08A"/><text x="304" y="172" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="20" font-weight="700" fill="#F6F4EE">D13</text><circle cx="320" cy="340" r="8" fill="#C9D1D9"/><text x="304" y="332" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="20" font-weight="700" fill="#F6F4EE">GND</text></g><g data-from="2" data-s="2 6 7"><rect x="470" y="130" width="560" height="270" rx="12" fill="#E4DCC8" stroke="#B9AE92" stroke-width="3"/><rect x="486" y="146" width="528" height="8" fill="#E53935"/><rect x="486" y="376" width="528" height="8" fill="#2F6FDE"/><g fill="#8B826C"><circle cx="500" cy="190" r="4"/><circle cx="500" cy="330" r="4"/><circle cx="528" cy="190" r="4"/><circle cx="528" cy="330" r="4"/><circle cx="556" cy="190" r="4"/><circle cx="556" cy="330" r="4"/><circle cx="584" cy="190" r="4"/><circle cx="584" cy="330" r="4"/><circle cx="612" cy="190" r="4"/><circle cx="612" cy="330" r="4"/><circle cx="640" cy="190" r="4"/><circle cx="640" cy="330" r="4"/><circle cx="668" cy="190" r="4"/><circle cx="668" cy="330" r="4"/><circle cx="696" cy="190" r="4"/><circle cx="696" cy="330" r="4"/><circle cx="724" cy="190" r="4"/><circle cx="724" cy="330" r="4"/><circle cx="752" cy="190" r="4"/><circle cx="752" cy="330" r="4"/><circle cx="780" cy="190" r="4"/><circle cx="780" cy="330" r="4"/><circle cx="808" cy="190" r="4"/><circle cx="808" cy="330" r="4"/><circle cx="836" cy="190" r="4"/><circle cx="836" cy="330" r="4"/><circle cx="864" cy="190" r="4"/><circle cx="864" cy="330" r="4"/><circle cx="892" cy="190" r="4"/><circle cx="892" cy="330" r="4"/><circle cx="920" cy="190" r="4"/><circle cx="920" cy="330" r="4"/><circle cx="948" cy="190" r="4"/><circle cx="948" cy="330" r="4"/><circle cx="976" cy="190" r="4"/><circle cx="976" cy="330" r="4"/></g><text x="750" y="432" text-anchor="middle" font-family="Rubik,Arial" font-size="22" fill="#6B7F95">Breadboard (küçük)</text></g><g data-from="3" data-s="3 6 7"><rect x="565" y="248" width="100" height="30" rx="14" fill="#D9B98A" stroke="#A8845A" stroke-width="3"/><rect x="585" y="248" width="10" height="30" fill="#C62828"/><rect x="605" y="248" width="10" height="30" fill="#C62828"/><rect x="625" y="248" width="10" height="30" fill="#6D4C41"/><path d="M540 263 H565 M665 263 H760" stroke="#C9D1D9" stroke-width="5"/><path d="M722 262 A38 38 0 1 1 798 262 V275 H722 Z" fill="#E53935" stroke="#8E1B1B" stroke-width="3"/><path d="M760 275 V300 M740 275 V300" stroke="#C9D1D9" stroke-width="5"/><text x="760" y="238" text-anchor="middle" font-family="Rubik,Arial" font-size="20" fill="#6B7F95"></text></g><g data-from="4" data-s="4 6 7"><path d="M320 340 C430 340 450 380 500 380 H740 V300" fill="none" stroke="#1A1A1A" stroke-width="6" stroke-linecap="round"/></g><g data-from="5" data-s="5 6 7"><path d="M320 180 C420 180 430 263 540 263" fill="none" stroke="#F97316" stroke-width="6" stroke-linecap="round"/></g><g data-only="6"><rect x="470" y="30" width="600" height="400" rx="12" fill="#14202E"/><text x="490" y="62" font-family="Rubik,Arial" font-size="20" font-weight="600" fill="#93A3B8">Kod · Metin</text><text x="490" y="104" font-family="JetBrains Mono,monospace" font-size="24" fill="#FF9F5A">void setup() {</text><text x="518" y="136" font-family="JetBrains Mono,monospace" font-size="24" fill="#F6F4EE">pinMode(13, OUTPUT);</text><text x="490" y="168" font-family="JetBrains Mono,monospace" font-size="24" fill="#FF9F5A">}</text><text x="490" y="200" font-family="JetBrains Mono,monospace" font-size="24" fill="#fff"></text><text x="490" y="232" font-family="JetBrains Mono,monospace" font-size="24" fill="#6CB6FF">void loop() {</text><text x="518" y="264" font-family="JetBrains Mono,monospace" font-size="24" fill="#F6F4EE">digitalWrite(13, HIGH);</text><text x="518" y="296" font-family="JetBrains Mono,monospace" font-size="24" fill="#F6F4EE">delay(1000);</text><text x="518" y="328" font-family="JetBrains Mono,monospace" font-size="24" fill="#F6F4EE">digitalWrite(13, LOW);</text><text x="518" y="360" font-family="JetBrains Mono,monospace" font-size="24" fill="#F6F4EE">delay(1000);</text><text x="490" y="392" font-family="JetBrains Mono,monospace" font-size="24" fill="#6CB6FF">}</text></g><g data-only="7"><circle class="bl1" cx="760" cy="255" r="60" fill="#FF6B6B" opacity=".45"/><rect x="800" y="448" width="260" height="46" rx="8" fill="#C62828"/><text x="930" y="479" text-anchor="middle" font-family="Rubik,Arial" font-size="21" font-weight="700" fill="#fff">■ Simülasyonu Durdur</text><text x="470" y="479" font-family="Rubik,Arial" font-size="22" font-weight="600" fill="#C2410C">1 sn yanar · 1 sn söner</text></g></svg></div>
+<div class="col f1" style="gap:16px">
+<div class="card dk" style="padding:18px 24px;min-height:260px"><h3 class="st-t" style="font-size:30px"></h3><p class="st-m" style="font-size:26px;line-height:1.4"></p></div>
+<div class="stp"><button type="button" data-act="first">⏮ Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1 / 7</span></div>
+</div>
+</div><script type="application/json" class="st-data">[{"t": "1 · Arduino Uno’yu yerleştir", "m": "Yeni devre aç. Bileşenler panelinden Arduino Uno R3’ü çalışma alanına sürükle."}, {"t": "2 · Breadboard ekle", "m": "Küçük breadboard’u Uno’nun yanına sürükle. Kırmızı hat artı (+), mavi hat eksi (−) içindir."}, {"t": "3 · Direnç ve LED’i tak", "m": "220 Ω direnci ve LED’i breadboard’a tak. LED’in uzun bacağı (anot) dirençle aynı sütuna gelsin; kısa bacağı (katot) ayrı sütunda olsun."}, {"t": "4 · GND kablosu", "m": "Uno’nun GND pinini breadboard’un mavi (−) hattına bağla. LED’in kısa bacağını da mavi hatta bağla."}, {"t": "5 · D13 kablosu", "m": "Uno’nun D13 pinini direncin boş ucuna bağla. Böylece D13 → direnç → LED → GND halkası tamamlanır."}, {"t": "6 · Kodu yaz", "m": "Kod düğmesine tıkla, Metin seçeneğini seç ve Blink kodunun tamamını yaz (ya da yapıştır)."}, {"t": "7 · Simülasyonu başlat", "m": "Simülasyonu Başlat’a bas. LED saniyede bir yanıp söner. Durdurmak için Simülasyonu Durdur’a bas."}]</script>
+<p class="foot">Kitap s.24–28 · Görsel 1.11–1.18 (sadeleştirilmiş)</p>
+<aside>Gerçek Tinkercad ekranını projeksiyona açıp bu adımları öğrencilerle birlikte yapın; sunumdaki çizim sadeleştirilmiş taklittir. Düğme adları ve yerleri değişebilir (arayüz güncellenir); bu yüzden adları ekranda okuyun. Sık yapılan hatalar: (1) LED’in ters takılması, (2) direncin unutulması, (3) kablonun deliğe tam oturmaması (ucu yeşil olunca bağlantı tamamdır). Kodu yazarken kitap s.27’deki Kod → Metin yolunu kullanın.</aside>
+</section>
+<section id="ex1-sen" class="sl light tight">
+<div class="hd"><p class="eb">Örnek 1 · Temel · 1 LED · Canlı devre ve simülasyon</p><h2 class="ttl">Blink: saniyede bir yanıp sön</h2>
+<p style="font-size:25px;line-height:1.35;color:#3D4A5C;max-width:1700px">Kitaptaki 2. uygulamanın aynısı: D13’e bağlı LED 1 saniye yanar, 1 saniye söner. Bu kısa program, bütün robot projelerinde kullanacağımız “çıkış pini + bekleme” kalıbıdır.</p></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:880px;gap:12px">
+<div class="ckt" id="ex1-sen-ckt"></div>
+<div class="card warn" style="padding:12px 22px;gap:4px"><h3 style="font-size:23px">Dene</h3><p style="font-size:21px;line-height:1.35">Hızı 1× bırak. Zaman çizelgesinde bir turun 2000 ms olduğunu say. D13 pin tablosunda HIGH ve LOW’un değiştiğini izle.</p></div>
+</div>
+<div class="col f1" style="gap:12px">
+
+<div id="ex1-sen-ctl"></div>
+<div id="ex1-sen-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:12px 18px"><div id="ex1-sen-pins"></div></div>
+</div>
+</div>
+<p class="foot">Malzeme: Arduino Uno · Breadboard · 1 kırmızı LED · 1 direnç (220 Ω) · 2 jumper kablo</p>
+<aside>Kitap s.24–28’deki 2. uygulamadır. Önce 6. slayttaki animasyonu hatırlatın: akım D13 → direnç → LED → GND yolunu izler. Zaman çizelgesinde D13’ün 1000 ms yüksek, 1000 ms alçak olduğunu gösterin; bir tur 2000 ms, yani 0,5 Hz. Öğrencilerden “LED’i iki kat hızlı yandırmak için ne değiştirmeliyiz?” sorusunu tahmin etmelerini isteyin. Tinkercad’de kurma adımları: Tinkercad: Arduino Uno + Breadboard Small + LED + Resistor (220 Ω). Arduino GND → mavi hat, LED kısa bacak (katot) → mavi hat, D13 → direnç, direnç → LED uzun bacak (anot). Code → Text → kodu yapıştır → Start Simulation. Kartın L LED’i de aynı anda yanıp söner.</aside>
+</section>
+<section id="ex1-kod" class="sl dark tight">
+<div class="hd"><p class="eb">Örnek 1 · Kodu satır satır oku · İmleci altı çizgili kelimelerin üzerine getir, satıra tıkla</p><h2 class="ttl">Blink: kodun açıklaması</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="codebox" style="width:1160px;padding:18px 24px"><div class="cgrid" id="ex1-grid"></div></div>
+<div class="col f1" style="gap:12px">
+<div class="card dk" style="gap:10px;min-height:400px"><p style="font-size:20px;letter-spacing:2px;text-transform:uppercase;color:#93A3B8">Bu satır ne yapar?</p>
+<p id="ex1-kod-c" class="mono" style="font-size:22px;color:#F2CC60;white-space:pre-wrap;word-break:break-all"></p>
+<h3 id="ex1-kod-t" style="font-size:30px"></h3><p id="ex1-kod-x" style="font-size:25px;line-height:1.4"></p>
+<div style="margin-top:auto;background:#0B121B;border-radius:10px;padding:10px 16px"><p id="ex1-kod-s" class="mono" style="font-size:22px;color:#9BE38B"></p></div></div>
+<div class="stp"><button type="button" data-act="first">⏮</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1</span></div>
+</div>
+</div>
+<aside>Kodu satır satır okuyun. İleri düğmesi sıradaki açıklamalı satıra geçer; satıra tıklayarak da atlayabilirsiniz. Sağdaki kutu bu satırdan sonra pinin ve LED’in durumunu özetler. Öğrencilerden bir sonraki satırın ne yapacağını tahmin etmelerini isteyin. Hazır dosya: Hafta02_Arduino/Ornek1_Blink/Ornek1_Blink.ino</aside>
+</section>
+<section id="ex1-dene" class="sl dark tight">
+<div class="hd"><p class="eb">Örnek 1 · Değiştir ve gözle</p><h2 class="ttl">Blink: kodu değiştir, sonucu izle</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div class="col" style="width:880px;gap:10px">
+<textarea class="ed" id="ex1-dene-ed" spellcheck="false" aria-label="Arduino kodu" style="height:370px;font-size:20px"></textarea>
+<div class="stp"><button type="button" class="go" id="ex1-dene-btn">Derle ve yükle</button><button type="button" id="ex1-dene-orig">Başlangıç kodu</button></div>
+<div class="conso" id="ex1-dene-con" style="min-height:56px;max-height:66px;font-size:18px"></div>
+<div class="row" style="gap:14px;align-items:flex-start"><div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:21px"><b style="color:#FF9F5A">1)</b> Her iki delay(1000) değerini 250 yap, derle. LED saniyede kaç kez yanıp söner?</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:20px">Tur 250 + 250 = 500 ms; 1000 / 500 = saniyede 2 kez yanıp söner. Bekleme süreleri azaldıkça LED hızlanır.</div></div>
+<div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:21px"><b style="color:#FF9F5A">2)</b> İlk delay(1000) değerini 3000 yap, derle. LED çoğu zaman yanık mı sönük mü görünür?</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:20px">Yanık kalan süre 3000 ms, sönük süre 1000 ms: tur 4000 ms. LED turun %75’inde yanık, yani çoğu zaman yanık görünür.</div></div></div>
+</div>
+<div class="col f1" style="gap:10px">
+<div class="ckt" id="ex1-dene-ckt" style="max-width:520px"></div>
+<div id="ex1-dene-ctl"></div>
+<div id="ex1-dene-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:10px 16px"><div id="ex1-dene-pins"></div></div>
+</div>
+</div>
+<aside>Eşli çalışma, 8–10 dakika. Soldaki kutuda kodu değiştirin, “Derle ve yükle” (veya Ctrl+Enter) ile karta yükleyin. Derleme hatası olursa konsol satır numarasıyla gösterir; eski program çalışmaya devam eder. “Başlangıç kodu” her şeyi geri alır. İki görevi öğrenciler önce tahmin edip denesin, sonra cevabı açın. Tinkercad’de aynı değişikliği de denetin.</aside>
+</section>
+<section id="ex2-sen" class="sl light tight">
+<div class="hd"><p class="eb">Örnek 2 · Uygulama · 1 LED · Canlı devre ve simülasyon</p><h2 class="ttl">Robot Pil Uyarısı: 3 kısa çakma, uzun bekleme</h2>
+<p style="font-size:25px;line-height:1.35;color:#3D4A5C;max-width:1700px">Küçük robotlarda durum LED’i, hata kodunu yanıp sönme sayısıyla söyler: 3 kısa çakma ve uzun bekleme “pil azaldı” demektir. delay süreleriyle bir desen üretiyoruz.</p></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:880px;gap:12px">
+<div class="ckt" id="ex2-sen-ckt"></div>
+<div class="card warn" style="padding:12px 22px;gap:4px"><h3 style="font-size:23px">Dene</h3><p style="font-size:21px;line-height:1.35">Hızı 1× bırak. Zaman çizelgesinde üç kısa yüksek bölüm ve uzun alçak bölüm görüyor musun? Bir turun 2200 ms olduğunu say.</p></div>
+</div>
+<div class="col f1" style="gap:12px">
+
+<div id="ex2-sen-ctl"></div>
+<div id="ex2-sen-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:12px 18px"><div id="ex2-sen-pins"></div></div>
+</div>
+</div>
+<p class="foot">Malzeme: Arduino Uno · Breadboard · 1 sarı LED · 1 direnç (220 Ω) · 2 jumper kablo</p>
+<aside>Kitaptaki Blink’ten bir adım ileri: aynı komutlar, farklı süreler. Gerçek ürünlerde (drone, robot süpürge, yazıcı) durum LED’inin yanıp sönme deseni hata kodudur. Tur hesabı: 3 × (200 + 200) = 1200 ms, artı son bekleme farkı: kodda son bekleme 1200 ms olduğundan 200 + 200 + 200 + 200 + 200 + 1200 = 2200 ms. Pil uyarısının neden desen olduğunu sorun: tek LED ile birden çok mesaj vermek için. Tinkercad’de kurma adımları: Tinkercad: Arduino Uno + Breadboard Small + LED (rengini Sarı yap) + Resistor (220 Ω). D8 → direnç → LED anot, LED katot → mavi GND hattı. Code → Text → kodu yapıştır → Start Simulation.</aside>
+</section>
+<section id="ex2-kod" class="sl dark tight">
+<div class="hd"><p class="eb">Örnek 2 · Kodu satır satır oku · İmleci altı çizgili kelimelerin üzerine getir, satıra tıkla</p><h2 class="ttl">Robot Pil Uyarısı: kodun açıklaması</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="codebox" style="width:1160px;padding:18px 24px"><div class="cgrid" id="ex2-grid"></div></div>
+<div class="col f1" style="gap:12px">
+<div class="card dk" style="gap:10px;min-height:400px"><p style="font-size:20px;letter-spacing:2px;text-transform:uppercase;color:#93A3B8">Bu satır ne yapar?</p>
+<p id="ex2-kod-c" class="mono" style="font-size:22px;color:#F2CC60;white-space:pre-wrap;word-break:break-all"></p>
+<h3 id="ex2-kod-t" style="font-size:30px"></h3><p id="ex2-kod-x" style="font-size:25px;line-height:1.4"></p>
+<div style="margin-top:auto;background:#0B121B;border-radius:10px;padding:10px 16px"><p id="ex2-kod-s" class="mono" style="font-size:22px;color:#9BE38B"></p></div></div>
+<div class="stp"><button type="button" data-act="first">⏮</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1</span></div>
+</div>
+</div>
+<aside>Kodu satır satır okuyun. İleri düğmesi sıradaki açıklamalı satıra geçer; satıra tıklayarak da atlayabilirsiniz. Sağdaki kutu bu satırdan sonra pinin ve LED’in durumunu özetler. Öğrencilerden bir sonraki satırın ne yapacağını tahmin etmelerini isteyin. Hazır dosya: Hafta02_Arduino/Ornek2_PilUyarisi/Ornek2_PilUyarisi.ino</aside>
+</section>
+<section id="ex2-dene" class="sl dark tight">
+<div class="hd"><p class="eb">Örnek 2 · Değiştir ve gözle</p><h2 class="ttl">Robot Pil Uyarısı: kodu değiştir, sonucu izle</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div class="col" style="width:880px;gap:10px">
+<textarea class="ed" id="ex2-dene-ed" spellcheck="false" aria-label="Arduino kodu" style="height:370px;font-size:20px"></textarea>
+<div class="stp"><button type="button" class="go" id="ex2-dene-btn">Derle ve yükle</button><button type="button" id="ex2-dene-orig">Başlangıç kodu</button></div>
+<div class="conso" id="ex2-dene-con" style="min-height:56px;max-height:66px;font-size:18px"></div>
+<div class="row" style="gap:14px;align-items:flex-start"><div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:21px"><b style="color:#FF9F5A">1)</b> Son delay(1200) değerini 2200 yap, derle. Bir tur kaç milisaniye olur?</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:20px">5 × 200 + 2200 = 3200 ms. Uzun ara büyüdüğü için desen daha seyrek tekrarlanır, çakmalar yine 3 tanedir.</div></div>
+<div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:21px"><b style="color:#FF9F5A">2)</b> Üçüncü çakmanın 3 satırını (HIGH, delay(200), LOW) sil. Desen nasıl değişir, tur kaç ms olur?</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:20px">Yalnız 2 çakma kalır: 3 × 200 + 1200 = 1800 ms. Artık “2 çakma” kodu olur; bir ürünün hata tablosuna göre başka bir anlam taşır.</div></div></div>
+</div>
+<div class="col f1" style="gap:10px">
+<div class="ckt" id="ex2-dene-ckt" style="max-width:520px"></div>
+<div id="ex2-dene-ctl"></div>
+<div id="ex2-dene-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:10px 16px"><div id="ex2-dene-pins"></div></div>
+</div>
+</div>
+<aside>Eşli çalışma, 8–10 dakika. Soldaki kutuda kodu değiştirin, “Derle ve yükle” (veya Ctrl+Enter) ile karta yükleyin. Derleme hatası olursa konsol satır numarasıyla gösterir; eski program çalışmaya devam eder. “Başlangıç kodu” her şeyi geri alır. İki görevi öğrenciler önce tahmin edip denesin, sonra cevabı açın. Tinkercad’de aynı değişikliği de denetin.</aside>
+</section>
+<section id="robot-nedir" class="sl dark">
+<div class="hd"><p class="eb">Anlatım · Robot kavramı (kitap s.28)</p><h2 class="ttl">Robot: algılar, karar verir, harekete geçer</h2></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px"><div class="card dk"><svg viewBox="0 0 300 150" width="100%" role="img" aria-label="Algıla"><rect width="300" height="150" rx="12" fill="#16253A"/><text x="150" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="54" font-weight="700" fill="#F6F4EE">👁</text><text x="150" y="124" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="26" font-weight="700" fill="#6CB6FF">sensör</text></svg><h3>1 · Algıla</h3><p>Robot çevresinden <span class="tip" tabindex="0" data-tip="Sensör: ışık, mesafe, sıcaklık gibi fiziksel bir olayı elektrik sinyaline çeviren parça. Örnek: ultrasonik mesafe sensörü.">sensörlerle</span> veri toplar: engel var mı, ışık yeterli mi, sıcaklık kaç?</p></div><div class="card dk"><svg viewBox="0 0 300 150" width="100%" role="img" aria-label="Karar ver"><rect width="300" height="150" rx="12" fill="#16253A"/><text x="150" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="40" font-weight="700" fill="#FF9F5A">if (…)</text><text x="150" y="124" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="26" font-weight="700" fill="#9BE38B">program</text></svg><h3>2 · Değerlendir ve karar ver</h3><p>Mikrodenetleyici programdaki <span class="tip" tabindex="0" data-tip="Algoritma: bir işi yapmak için adım adım izlenen yol. Örnek: “Engel 20 cm’den yakınsa dur ve sağa dön.”">algoritmaya</span> göre veriyi değerlendirir ve bir sonuç üretir.</p></div><div class="card dk"><svg viewBox="0 0 300 150" width="100%" role="img" aria-label="Harekete geç"><rect width="300" height="150" rx="12" fill="#16253A"/><text x="150" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="54" font-weight="700" fill="#F6F4EE">⚙</text><text x="150" y="124" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="26" font-weight="700" fill="#FFB74D">motor · LED</text></svg><h3>3 · Harekete geç</h3><p>Sonuç <span class="tip" tabindex="0" data-tip="Aktüatör (eyleyici): motor, servo, LED, buzzer gibi çıkış elemanı. Elektrik sinyalini harekete, ışığa veya sese çevirir.">aktüatörlere</span> gider: motor döner, LED yanar, buzzer öter. Robot bunu kendi başına (otonom) ya da kullanıcı komutuyla yapar.</p></div></div>
+<p class="foot">Kitap s.28 · 1.2.1. Robot Kavramı</p>
+<aside>Kitap s.28: “Robotlar, bir programlama algoritması ile çalıştırılan elektromekanik parçalardan oluşan akıllı sistemlerdir.” Bu üç basamak (algıla – karar ver – harekete geç) bugünkü LED uygulamamızla birebir örtüşür: LED “eyleyici”dir; sensörü ve kararı sonraki haftalarda ekleyeceğiz. Altı çizili kelimelerin üstüne gelince açıklama balonu çıkar. Tartışma: poll’daki robot süpürge bu üç basamağı nasıl yapıyor?</aside>
+</section>
+<section id="robot-dongu" class="sl dark tight" data-steps="1">
+<div class="hd"><p class="eb">Adım adım animasyon · Robot süpürge</p><h2 class="ttl">Robot süpürge duvara yaklaşınca ne olur?</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div style="width:1180px;flex:none;background:#16253A;border-radius:20px;padding:10px"><svg viewBox="0 0 1180 520" width="100%" role="img" aria-label="Sensör, mikrodenetleyici ve motor arasındaki robot döngüsü"><defs><marker id="ah" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="24" refX="20" refY="12" orient="auto"><path d="M0 2 L22 12 L0 22 Z" fill="#FF9F5A"/></marker></defs><g data-s="1 5"><rect x="30" y="190" width="250" height="140" rx="16" fill="#2A3B50" stroke="#5B6E85" stroke-width="3"/><text x="155" y="258" text-anchor="middle" font-family="Rubik,Arial" font-size="30" font-weight="700" fill="#F6F4EE">Çevre</text><text x="155" y="290" text-anchor="middle" font-family="Rubik,Arial" font-size="21" fill="#BFCAD6">duvar · mobilya</text></g><g data-s="1 2"><rect x="360" y="60" width="260" height="120" rx="16" fill="#2F6FDE" stroke="#5B6E85" stroke-width="3"/><text x="490" y="118" text-anchor="middle" font-family="Rubik,Arial" font-size="30" font-weight="700" fill="#F6F4EE">Sensör</text><text x="490" y="150" text-anchor="middle" font-family="Rubik,Arial" font-size="21" fill="#BFCAD6">mesafe: 15 cm</text></g><g data-s="4 5"><rect x="360" y="340" width="260" height="120" rx="16" fill="#1F6B5A" stroke="#5B6E85" stroke-width="3"/><text x="490" y="398" text-anchor="middle" font-family="Rubik,Arial" font-size="30" font-weight="700" fill="#F6F4EE">Motor</text><text x="490" y="430" text-anchor="middle" font-family="Rubik,Arial" font-size="21" fill="#BFCAD6">tekerlekler</text></g><g data-s="2 3"><rect x="720" y="190" width="420" height="140" rx="16" fill="#C2410C" stroke="#5B6E85" stroke-width="3"/><text x="930" y="258" text-anchor="middle" font-family="Rubik,Arial" font-size="30" font-weight="700" fill="#F6F4EE">Mikrodenetleyici</text><text x="930" y="290" text-anchor="middle" font-family="Rubik,Arial" font-size="21" fill="#BFCAD6">program: if (engel < 20) …</text></g><path d="M280 230 L360 130" data-s="1 5" fill="none" stroke="#FF9F5A" stroke-width="6" stroke-linecap="round" marker-end="url(#ah)"/><path d="M620 120 L720 220" data-s="1 2" fill="none" stroke="#FF9F5A" stroke-width="6" stroke-linecap="round" marker-end="url(#ah)"/><path d="M930 330 L930 400 L620 400" data-s="4 5" fill="none" stroke="#FF9F5A" stroke-width="6" stroke-linecap="round" marker-end="url(#ah)"/><path d="M360 400 L220 400 L220 330" data-s="4 5" fill="none" stroke="#FF9F5A" stroke-width="6" stroke-linecap="round" marker-end="url(#ah)"/><text x="930" y="470" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" fill="#93A3B8" data-s="3">karar: sağa dön</text></svg></div>
+<div class="col f1" style="gap:16px">
+<div class="card dk" style="padding:18px 24px;min-height:260px"><h3 class="st-t" style="font-size:30px"></h3><p class="st-m" style="font-size:26px;line-height:1.4"></p></div>
+<div class="stp"><button type="button" data-act="first">⏮ Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1 / 5</span></div>
+</div>
+</div><script type="application/json" class="st-data">[{"t": "1 · Çevreyi algıla", "m": "Önde bir duvar var. Mesafe sensörü 15 cm ölçer ve bu bilgiyi mikrodenetleyiciye yollar."}, {"t": "2 · Veriyi değerlendir", "m": "Mikrodenetleyici programa bakar: “Mesafe 20 cm’den az mı?” 15 < 20, yani evet."}, {"t": "3 · Karar ver", "m": "Programdaki kural çalışır: “Engel yakınsa dur ve sağa dön.” Sonuç: sağa dönme komutu."}, {"t": "4 · Harekete geç", "m": "Komut motorlara gider: sol tekerlek ileri, sağ tekerlek geri. Robot yerinde dönmeye başlar."}, {"t": "5 · Yeni veriyle tekrar", "m": "Dönünce sensör yeni bir mesafe ölçer; döngü baştan başlar. Robot saniyede yüzlerce kez algıla–karar ver–hareket et yapar."}]</script>
+<p class="foot">Kitap s.28 · Robotun işleyişi: algılar, değerlendirir, sonuç üretir</p>
+<aside>Adım adım ilerleyin. Burada işleyiş loop() içindeki mantıkla aynıdır: Blink’te sensör yoktu, yalnız çıkış vardı. Sonraki haftalarda sensör ekleyeceğiz. Sayısal örnek: sensör 15 cm ölçüyor, eşik 20 cm; 15 < 20 olduğundan dönüş kararı çıkar. Öğrencilere “eşiği 10 cm yaparsak robot ne yapar?” diye sorun: 15 < 10 olmaz, duvara daha çok yaklaşır.</aside>
+</section>
+<section id="tarihce" class="sl light">
+<div class="hd"><p class="eb">Anlatım · Robotun kısa tarihi</p><h2 class="ttl">Dört durak: sözcükten Mars’a</h2></div>
+<div class="card" style="padding:12px 20px"><table style="font-size:23px"><tr><th>Yıl</th><th>Olay</th><th>Neden önemli?</th></tr><tr><td><b>1920–21</b></td><td>Karel Čapek’in <b>R.U.R.</b> (Rossum’un Evrensel Robotları) adlı oyunu sahnelenir</td><td>“Robot” sözcüğü ilk kez bu oyunda kullanılır; sözcüğü öneren Karel’in kardeşi Josef Čapek’tir.</td></tr><tr><td><b>1966–72</b></td><td>Stanford Araştırma Enstitüsü’nde (SRI) <b>Shakey</b> geliştirilir</td><td>Çevreyi algılayıp plan yapan ilk genel amaçlı mobil robot: “bilinçli” kontrolün atası.</td></tr><tr><td><b>1997</b></td><td>IBM’in <b>Deep Blue</b> bilgisayarı satranç ustası Garry Kasparov’u yener</td><td>Makinenin belirli bir alanda insanı geçebildiğini gösterir (kitapta tepkisel kontrol örneği).</td></tr><tr><td><b>2021</b></td><td>NASA’nın <b>Perseverance</b> aracı Mars’a iner</td><td>Uzak gezegende çalışan uzay robotu; adını bir öğrencinin yarışma önerisi belirlemiştir.</td></tr></table></div><div class="card warn"><p style="font-size:25px"><b>Sorabilirsin:</b> “Robot” sözcüğü hangi dilden ve hangi anlamdan gelir? <button class="ans-btn sm" type="button" style="margin-left:12px">Cevabı göster</button><span class="ans" hidden style="display:block;margin-top:8px">Çekçe <b>robota</b>: zorunlu iş, angarya. Oyunda insanların yerine çalışan yapay işçileri anlatır.</span></p></div>
+<p class="foot">Kitap s.28–31 · Karel Čapek, Shakey, Deep Blue, Perseverance</p>
+<aside>Dört olayı kronolojik okutun. Čapek notu: sözcük Çekçe “robota” (angarya, zorunlu iş) kelimesinden gelir. Kitapta s.28 “Karel Capek (Karel Kapek)” yazılışı vardır; doğru yazılışı Čapek, okunuşu yaklaşık “Çapek”tir. Kitap s.28–31 bu dört örneği içerir. Doğrulanabilir tarihler: R.U.R. 1920’de yazıldı, Ocak 1921’de Prag’da oynandı; Deep Blue maçı Mayıs 1997; Perseverance 18 Şubat 2021’de Mars’a indi.</aside>
+</section>
+<section id="kontrol" class="sl light">
+<div class="hd"><p class="eb">Anlatım · Kontrol yöntemlerine göre robotlar</p><h2 class="ttl">Robot nasıl karar veriyor?</h2></div>
+<div class="card" style="padding:12px 20px"><table style="font-size:23px"><tr><th>Kontrol türü</th><th>Çalışma ilkesi</th><th>Örnek</th></tr><tr><td><b>Tepkisel</b> (Reactive)</td><td>Etki–tepki: algıla → cevapla. Plan yapmaz, anında karşılık verir.</td><td>Engel görünce dönen basit robot; kitapta Deep Blue</td></tr><tr><td><b>Bilinçli</b> (Deliberative)</td><td>Algıla → planla → hareket et. Çevre modeli çıkarır, plan yapar, hatasını düzeltir.</td><td>Shakey (kitap Görsel 1.20)</td></tr><tr><td><b>Karma</b> (Hibrit)</td><td>Düşünme ve hareket olayları paralel yürür: hem plan hem anlık tepki.</td><td>Modern robot süpürge, otonom araç</td></tr><tr><td><b>Davranışsal</b> (Behavioral)</td><td>Hibrite alternatif: davranış katmanları çevreye göre devreye girer.</td><td>Karınca benzeri sürü robotları</td></tr></table></div>
+<p class="foot">Kitap s.28–29 · Kontrol yöntemlerine göre robotlar</p>
+<aside>Kitap s.28–29’daki dört türü okutun. “Sıra Sizde” (s.29): Karma ve Davranışsal robotları bir arkadaşınızla araştırıp görsel çalışma hazırlayın; bunu ödev olarak değil, istek üzerine yapılacak ek çalışma olarak sunun. Dikkat (kitap notu): Deep Blue taşları kamerayla görmüyordu; hamleler elle girilirdi. Kitap onu tepkisel örnek olarak verir; birçok kaynak onu arama yapan planlayıcı sayar. Burada sınıflandırmanın tek bir “doğru”su olmadığını söyleyin. Karma ve davranışsal örnekleri bu tabloda yaklaşık, öğrenciye yön verici örnekler olarak verilmiştir.</aside>
+</section>
+<section id="kontrol-es" class="sl light tight" data-match="1">
+<div class="hd"><p class="eb">Eşleştirme · Kontrol türü</p><h2 class="ttl">Hangi robot hangi kontrol türüyle çalışıyor?</h2></div>
+<p style="font-size:25px;line-height:1.35;color:#3D4A5C;max-width:1700px">Her satır için kontrol türünü seç, sonra “Kontrol et”e bas.</p><div class="col" style="gap:0"><div class="mc-row" data-ok="0"><p class="tx">Engel görünce hiç plan yapmadan anında yön değiştiren robot</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Tepkisel (reactive)</option><option value="1">Bilinçli (deliberative)</option><option value="2">Karma (hibrit)</option></select><span class="mc-mark"></span><p class="mc-why">Algıla → cevapla: tepkisel (reactive).</p></div><div class="mc-row" data-ok="1"><p class="tx">Önce odanın haritasını çıkarıp rota planlayan, hatalarını düzelten robot</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Tepkisel (reactive)</option><option value="1">Bilinçli (deliberative)</option><option value="2">Karma (hibrit)</option></select><span class="mc-mark"></span><p class="mc-why">Algıla → planla → hareket et: bilinçli (deliberative).</p></div><div class="mc-row" data-ok="2"><p class="tx">Planlamayı ve anlık tepkiyi aynı anda yürüten robot</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Tepkisel (reactive)</option><option value="1">Bilinçli (deliberative)</option><option value="2">Karma (hibrit)</option></select><span class="mc-mark"></span><p class="mc-why">Düşünme ve hareket paralel: karma (hibrit).</p></div><div class="mc-row" data-ok="1"><p class="tx">Shakey: çevreyi algılar, plan yapar, planı uygular</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Tepkisel (reactive)</option><option value="1">Bilinçli (deliberative)</option><option value="2">Karma (hibrit)</option></select><span class="mc-mark"></span><p class="mc-why">Kitapta bilinçli kontrol robotlarının atası.</p></div><div class="mc-row" data-ok="0"><p class="tx">Kitaba göre Deep Blue (tahtadaki duruma anında karşılık)</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Tepkisel (reactive)</option><option value="1">Bilinçli (deliberative)</option><option value="2">Karma (hibrit)</option></select><span class="mc-mark"></span><p class="mc-why">Kitapta tepkisel örnek olarak verilir.</p></div></div><div class="row" style="gap:16px;align-items:center;margin-top:8px"><button type="button" class="ans-btn mc-check">Kontrol et</button><button type="button" class="ans-btn alt mc-show">Cevapları göster</button><button type="button" class="ans-btn sm mc-reset" style="background:#5B6675">Temizle</button><span class="mc-res"></span></div>
+<p class="foot">Kitap s.28–29</p>
+<aside>Eşli çalışma, 4 dakika. Tartışma: aynı robot hem tepkisel hem bilinçli olabilir mi? (Evet: karma.) Deep Blue satırı kitabın sınıflandırmasına göredir; tek doğru olmadığını belirtin.</aside>
+</section>
+<section id="turler" class="sl light tight" data-match="1">
+<div class="hd"><p class="eb">Eşleştirme · Robot türleri</p><h2 class="ttl">Hangi uygulama alanı hangi robot türü?</h2></div>
+<div class="col" style="gap:0"><div class="mc-row" data-ok="0"><p class="tx">Araba parçalarını birleştiren kaynakçı robot kolu</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Endüstriyel</option><option value="1">Ev</option><option value="2">Tıbbi</option><option value="3">Uzay</option><option value="4">Hobi / yarışma</option><option value="5">Sanal</option><option value="6">Eğitsel</option></select><span class="mc-mark"></span><p class="mc-why">Endüstriyel robot: yük taşıma, kesme, tutma, kaynak.</p></div><div class="mc-row" data-ok="1"><p class="tx">Odayı haritalayıp zemini temizleyen robot süpürge</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Endüstriyel</option><option value="1">Ev</option><option value="2">Tıbbi</option><option value="3">Uzay</option><option value="4">Hobi / yarışma</option><option value="5">Sanal</option><option value="6">Eğitsel</option></select><span class="mc-mark"></span><p class="mc-why">Ev robotu: ev işlerine yardımcı olur.</p></div><div class="mc-row" data-ok="2"><p class="tx">Ameliyatta cerraha yardımcı olan robot kol</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Endüstriyel</option><option value="1">Ev</option><option value="2">Tıbbi</option><option value="3">Uzay</option><option value="4">Hobi / yarışma</option><option value="5">Sanal</option><option value="6">Eğitsel</option></select><span class="mc-mark"></span><p class="mc-why">Tıbbi robot: cerrahi işlemlerde kullanılır.</p></div><div class="mc-row" data-ok="3"><p class="tx">Mars’ta kaya örnekleri toplayan Perseverance</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Endüstriyel</option><option value="1">Ev</option><option value="2">Tıbbi</option><option value="3">Uzay</option><option value="4">Hobi / yarışma</option><option value="5">Sanal</option><option value="6">Eğitsel</option></select><span class="mc-mark"></span><p class="mc-why">Uzay robotu: gezegen ve uzay istasyonlarında çalışır.</p></div><div class="mc-row" data-ok="4"><p class="tx">Siyah çizgiyi sensörle izleyen yarış robotu</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Endüstriyel</option><option value="1">Ev</option><option value="2">Tıbbi</option><option value="3">Uzay</option><option value="4">Hobi / yarışma</option><option value="5">Sanal</option><option value="6">Eğitsel</option></select><span class="mc-mark"></span><p class="mc-why">Hobi / yarışma robotu: belirli bir görev için tasarlanır.</p></div><div class="mc-row" data-ok="5"><p class="tx">Fiziksel gövdesi olmayan, yalnız yazılım olarak çalışan robot</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Endüstriyel</option><option value="1">Ev</option><option value="2">Tıbbi</option><option value="3">Uzay</option><option value="4">Hobi / yarışma</option><option value="5">Sanal</option><option value="6">Eğitsel</option></select><span class="mc-mark"></span><p class="mc-why">Sanal robot: simülasyon ve tekrarlı görevler için yazılan program.</p></div><div class="mc-row" data-ok="6"><p class="tx">Blok programlamayla akıllı ev yapılan montaj seti</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Endüstriyel</option><option value="1">Ev</option><option value="2">Tıbbi</option><option value="3">Uzay</option><option value="4">Hobi / yarışma</option><option value="5">Sanal</option><option value="6">Eğitsel</option></select><span class="mc-mark"></span><p class="mc-why">Eğitsel robot: blok tabanlı robot montaj seti.</p></div></div><div class="row" style="gap:16px;align-items:center;margin-top:8px"><button type="button" class="ans-btn mc-check">Kontrol et</button><button type="button" class="ans-btn alt mc-show">Cevapları göster</button><button type="button" class="ans-btn sm mc-reset" style="background:#5B6675">Temizle</button><span class="mc-res"></span></div>
+<p class="foot">Kitap s.29–32 · 1.2.2. Robot Türleri</p>
+<aside>Eşli çalışma, 5 dakika. Kitapta ayrıca askerî robotlar anılır (s.29). Sınıfta çevrelerinden başka robot örneği sorun: hastane ilaç robotu, depo robotu, tarım dronu. Güncel not: robot türleri kesin sınırlarla ayrılmaz; bir robot birden fazla alana girebilir (örn. tarım dronu hem hobi hem endüstriyel).</aside>
+</section>
+<section id="egitsel" class="sl light">
+<div class="hd"><p class="eb">Anlatım · Eğitsel amaçlı robotlar</p><h2 class="ttl">Eğitsel robotlar kimler için, nasıl çalışır?</h2></div>
+<div class="card" style="padding:12px 20px"><table style="font-size:23px"><tr><th>Tür</th><th>Özellik</th><th>Kitaptaki örnek</th></tr><tr><td><b>Blok tabanlı robot montaj setleri</b></td><td>Parçalar kolayca birbirine takılır; blok tabanlı programlama öğretir.</td><td>Blok robotlardan yapılmış akıllı ev</td></tr><tr><td><b>Düşük maliyetli mobil robot tasarım kitleri</b></td><td>Montajlanmamış, temel bilgi düzeyinde herkesin kullanabileceği ucuz kitler.</td><td>Laboratuvarlarda kullanılan mobil robot kiti</td></tr><tr><td><b>Açık kaynak mobil robot platformları</b></td><td>Donanım ve yazılım ücretsiz paylaşılır; öğrenciler kendi proje fikirlerini uygular.</td><td>Kullanıcıya uygun robot platformu</td></tr><tr><td><b>Tam monte edilmiş mobil robotlar</b></td><td>Montajı bitmiş, kullanıma hazır satılır.</td><td>Cam silme robotu</td></tr><tr><td><b>Minyatür sürü robotları</b></td><td>Birbirine benzeyen çok sayıda robot ortak bir işi birlikte yapar.</td><td>Güvenlik gözetimi yapan insansız hava aracı sürüsü</td></tr></table></div><div class="card warn"><p style="font-size:25px"><b>Soru:</b> Bizim sınıfımızdaki Arduino Uno + Tinkercad düzeni hangi türe en yakındır? <button class="ans-btn sm" type="button" style="margin-left:12px">Cevabı göster</button><span class="ans" hidden style="display:block;margin-top:8px"><b>Açık kaynak platform.</b> Arduino’nun donanımı ve yazılımı açıktır; Tinkercad ise parça almadan simülasyon sağlar.</span></p></div>
+<p class="foot">Kitap s.32–34 · 1.2.3. Eğitsel amaçlı robotlar</p>
+<aside>Kitap s.32–34. Eğitsel robotlar, öğrencilerin çok erken yaşlardan itibaren robotik ve programlama ile tanışması için tasarlanmıştır; amaç beceri geliştirmektir (problem çözme, eleştirel bakış, karar verme). Sınıfta tartışın: hangi tür kendi ihtiyacımıza uygun? Bizim derste kullandığımız: Arduino Uno + Tinkercad (simülasyon). Sonraki haftalarda gerçek robot kiti kullanmak isteyen öğrencilere açık kaynak platformları gösterin. Kitap “sıra sizde”: gruplar kurup her eğitsel robot türüne birer örnek bulmak (s.34).</aside>
+</section>
+<section id="ex3-sen" class="sl light tight">
+<div class="hd"><p class="eb">Örnek 3 · Önceki haftalarla birleştirme · 2 LED · Canlı devre ve simülasyon</p><h2 class="ttl">Demiryolu Geçidi: dönüşümlü kırmızı ışıklar</h2>
+<p style="font-size:25px;line-height:1.35;color:#3D4A5C;max-width:1700px">1. haftada pinleri tanıdık: D0 ve D1 seri haberleşmeye ayrılıdır, LED için D2–D13 uygundur. Hemzemin geçitte iki kırmızı ışık dönüşümlü yanar; ışıkları D13 ve D8 pinlerine bağlıyoruz.</p></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:880px;gap:12px">
+<div class="ckt" id="ex3-sen-ckt"></div>
+<div class="card warn" style="padding:12px 22px;gap:4px"><h3 style="font-size:23px">Dene</h3><p style="font-size:21px;line-height:1.35">Hızı 1× bırak. Zaman çizelgesinde D13 ve D8 hiç aynı anda yüksek oluyor mu? Bir turun 1000 ms olduğunu say.</p></div>
+</div>
+<div class="col f1" style="gap:12px">
+
+<div id="ex3-sen-ctl"></div>
+<div id="ex3-sen-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:12px 18px"><div id="ex3-sen-pins"></div></div>
+</div>
+</div>
+<p class="foot">Malzeme: Arduino Uno · Breadboard · 2 kırmızı LED · 2 direnç (220 Ω) · 3 jumper kablo (her LED’in kendi direnci)</p>
+<aside>1. haftanın pin bilgisini kullanır: D0/D1’i neden seçmedik? (USB seri haberleşme). Devre: her LED’in kendi direnci vardır; tek dirençle iki LED paylaşmak parlaklığı dengesiz yapar. Kod yapısı: iki pinMode, loop’ta dönüşümlü iki durum. Gerçek hemzemin geçitlerde ışıklar ve çan bu tür bir kalıpla yönetilir (saniyede yaklaşık 1–2 yanıp sönme). Dikkat: D13’e bağlı LED ile birlikte kartın L LED’i de yanar; bu normaldir. Tinkercad’de kurma adımları: Tinkercad: İki LED, iki direnç. D13 → direnç 1 → LED 1 anot, D8 → direnç 2 → LED 2 anot, iki katot mavi GND hattında. Her LED’in kendi direnci olsun.</aside>
+</section>
+<section id="ex3-kod" class="sl dark tight">
+<div class="hd"><p class="eb">Örnek 3 · Kodu satır satır oku · İmleci altı çizgili kelimelerin üzerine getir, satıra tıkla</p><h2 class="ttl">Demiryolu Geçidi: kodun açıklaması</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="codebox" style="width:1160px;padding:18px 24px"><div class="cgrid" id="ex3-grid"></div></div>
+<div class="col f1" style="gap:12px">
+<div class="card dk" style="gap:10px;min-height:400px"><p style="font-size:20px;letter-spacing:2px;text-transform:uppercase;color:#93A3B8">Bu satır ne yapar?</p>
+<p id="ex3-kod-c" class="mono" style="font-size:22px;color:#F2CC60;white-space:pre-wrap;word-break:break-all"></p>
+<h3 id="ex3-kod-t" style="font-size:30px"></h3><p id="ex3-kod-x" style="font-size:25px;line-height:1.4"></p>
+<div style="margin-top:auto;background:#0B121B;border-radius:10px;padding:10px 16px"><p id="ex3-kod-s" class="mono" style="font-size:22px;color:#9BE38B"></p></div></div>
+<div class="stp"><button type="button" data-act="first">⏮</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1</span></div>
+</div>
+</div>
+<aside>Kodu satır satır okuyun. İleri düğmesi sıradaki açıklamalı satıra geçer; satıra tıklayarak da atlayabilirsiniz. Sağdaki kutu bu satırdan sonra pinin ve LED’in durumunu özetler. Öğrencilerden bir sonraki satırın ne yapacağını tahmin etmelerini isteyin. Hazır dosya: Hafta02_Arduino/Ornek3_DemiryoluIsigi/Ornek3_DemiryoluIsigi.ino</aside>
+</section>
+<section id="ex3-dene" class="sl dark tight">
+<div class="hd"><p class="eb">Örnek 3 · Değiştir ve gözle</p><h2 class="ttl">Demiryolu Geçidi: kodu değiştir, sonucu izle</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div class="col" style="width:880px;gap:10px">
+<textarea class="ed" id="ex3-dene-ed" spellcheck="false" aria-label="Arduino kodu" style="height:370px;font-size:20px"></textarea>
+<div class="stp"><button type="button" class="go" id="ex3-dene-btn">Derle ve yükle</button><button type="button" id="ex3-dene-orig">Başlangıç kodu</button></div>
+<div class="conso" id="ex3-dene-con" style="min-height:56px;max-height:66px;font-size:18px"></div>
+<div class="row" style="gap:14px;align-items:flex-start"><div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:21px"><b style="color:#FF9F5A">1)</b> Her iki delay(500) değerini 250 yap, derle. Her ışık saniyede kaç kez yanar?</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:20px">Tur 250 + 250 = 500 ms; 1000 / 500 = 2 kez. Her ışık saniyede 2 kez yanar, geçit daha “acil” görünür.</div></div>
+<div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:21px"><b style="color:#FF9F5A">2)</b> İlk gruptaki digitalWrite(8, LOW); satırını sil, derle. D8’deki LED ne yapar?</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:20px">D8 başta LOW’dur; ikinci grupta HIGH olunca yanar ve bir daha LOW yazılmaz: sağ LED hep yanık kalır, yalnız sol ışık yanıp söner.</div></div></div>
+</div>
+<div class="col f1" style="gap:10px">
+<div class="ckt" id="ex3-dene-ckt" style="max-width:520px"></div>
+<div id="ex3-dene-ctl"></div>
+<div id="ex3-dene-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:10px 16px"><div id="ex3-dene-pins"></div></div>
+</div>
+</div>
+<aside>Eşli çalışma, 8–10 dakika. Soldaki kutuda kodu değiştirin, “Derle ve yükle” (veya Ctrl+Enter) ile karta yükleyin. Derleme hatası olursa konsol satır numarasıyla gösterir; eski program çalışmaya devam eder. “Başlangıç kodu” her şeyi geri alır. İki görevi öğrenciler önce tahmin edip denesin, sonra cevabı açın. Tinkercad’de aynı değişikliği de denetin.</aside>
+</section>
+<section id="ex4-sen" class="sl light tight">
+<div class="hd"><p class="eb">Örnek 4 · Sektör / gerçek hayat · 2 LED · Canlı devre ve simülasyon</p><h2 class="ttl">Endüstriyel Robot Kolu Uyarı Işığı: yeşil güvenli, sarı çakar</h2>
+<p style="font-size:25px;line-height:1.35;color:#3D4A5C;max-width:1700px">Fabrikada kaynak robotunun yanındaki iki ışık: yeşil “robot durdu, yaklaşabilirsin”; sarı 3 kez hızlı çakar “robot hareket edecek, uzak dur”. Endüstriyel robotlar iş güvenliği için bu tür ışıklarla çalışır.</p></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="col" style="width:880px;gap:12px">
+<div class="ckt" id="ex4-sen-ckt"></div>
+<div class="card warn" style="padding:12px 22px;gap:4px"><h3 style="font-size:23px">Dene</h3><p style="font-size:21px;line-height:1.35">Hızı 2× yap. Zaman çizelgesinde önce uzun D6 (yeşil), sonra üç kısa D7 (sarı) çakması görüyor musun? Bir turun 3500 ms olduğunu say.</p></div>
+</div>
+<div class="col f1" style="gap:12px">
+
+<div id="ex4-sen-ctl"></div>
+<div id="ex4-sen-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:12px 18px"><div id="ex4-sen-pins"></div></div>
+</div>
+</div>
+<p class="foot">Malzeme: Arduino Uno · Breadboard · 1 yeşil + 1 sarı LED · 2 direnç (220 Ω) · 3 jumper kablo</p>
+<aside>Endüstriyel robot konusuyla bağ: kitap s.29, endüstriyel robotları kaynakçı robot koluyla örnekler. Güvenlik tartışması: yeşil ışık yalnız robot gerçekten dururken yanmalıdır. İkinci “Değiştir ve gözle” görevi bu yüzden önemlidir: yeşili söndüren satırı silince robot hareket edecekken yeşil ışık yanık kalır; gerçek hayatta bu bir iş kazasına yol açabilir. Tur: 2000 + 3 × (250 + 250) = 3500 ms. Tinkercad’de kurma adımları: Tinkercad: Yeşil LED D6’ya, sarı LED D7’ye; her biri kendi 220 Ω direnciyle. Katotlar mavi GND hattında. Code → Text → kodu yapıştır → Start Simulation.</aside>
+</section>
+<section id="ex4-kod" class="sl dark tight">
+<div class="hd"><p class="eb">Örnek 4 · Kodu satır satır oku · İmleci altı çizgili kelimelerin üzerine getir, satıra tıkla</p><h2 class="ttl">Endüstriyel Robot Kolu Uyarı Işığı: kodun açıklaması</h2></div>
+<div class="row" style="gap:28px;align-items:flex-start">
+<div class="codebox" style="width:1160px;padding:18px 24px"><div class="cgrid" id="ex4-grid"></div></div>
+<div class="col f1" style="gap:12px">
+<div class="card dk" style="gap:10px;min-height:400px"><p style="font-size:20px;letter-spacing:2px;text-transform:uppercase;color:#93A3B8">Bu satır ne yapar?</p>
+<p id="ex4-kod-c" class="mono" style="font-size:22px;color:#F2CC60;white-space:pre-wrap;word-break:break-all"></p>
+<h3 id="ex4-kod-t" style="font-size:30px"></h3><p id="ex4-kod-x" style="font-size:25px;line-height:1.4"></p>
+<div style="margin-top:auto;background:#0B121B;border-radius:10px;padding:10px 16px"><p id="ex4-kod-s" class="mono" style="font-size:22px;color:#9BE38B"></p></div></div>
+<div class="stp"><button type="button" data-act="first">⏮</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1</span></div>
+</div>
+</div>
+<aside>Kodu satır satır okuyun. İleri düğmesi sıradaki açıklamalı satıra geçer; satıra tıklayarak da atlayabilirsiniz. Sağdaki kutu bu satırdan sonra pinin ve LED’in durumunu özetler. Öğrencilerden bir sonraki satırın ne yapacağını tahmin etmelerini isteyin. Hazır dosya: Hafta02_Arduino/Ornek4_RobotKoluUyari/Ornek4_RobotKoluUyari.ino</aside>
+</section>
+<section id="ex4-dene" class="sl dark tight">
+<div class="hd"><p class="eb">Örnek 4 · Değiştir ve gözle</p><h2 class="ttl">Endüstriyel Robot Kolu Uyarı Işığı: kodu değiştir, sonucu izle</h2></div>
+<div class="row" style="gap:26px;align-items:flex-start">
+<div class="col" style="width:880px;gap:10px">
+<textarea class="ed" id="ex4-dene-ed" spellcheck="false" aria-label="Arduino kodu" style="height:370px;font-size:20px"></textarea>
+<div class="stp"><button type="button" class="go" id="ex4-dene-btn">Derle ve yükle</button><button type="button" id="ex4-dene-orig">Başlangıç kodu</button></div>
+<div class="conso" id="ex4-dene-con" style="min-height:56px;max-height:66px;font-size:18px"></div>
+<div class="row" style="gap:14px;align-items:flex-start"><div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:21px"><b style="color:#FF9F5A">1)</b> delay(2000) değerini 4000 yap, derle. Bir tur kaç ms olur? Güvenli süre uzar mı kısalır mı?</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:20px">4000 + 1500 = 5500 ms. Yeşil 4 saniye yanar; güvenli süre uzar.</div></div>
+<div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:21px"><b style="color:#FF9F5A">2)</b> digitalWrite(6, LOW); satırını sil, derle. Sarı çakarken yeşil ne yapar? Bu neden tehlikelidir?</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:20px">Yeşil hiç sönmez, sarı çakarken de yanık kalır. Çalışan “güvenli” sanıp yaklaşır; oysa robot hareket etmek üzeredir.</div></div></div>
+</div>
+<div class="col f1" style="gap:10px">
+<div class="ckt" id="ex4-dene-ckt" style="max-width:520px"></div>
+<div id="ex4-dene-ctl"></div>
+<div id="ex4-dene-tl" style="max-width:640px"></div>
+<div class="codebox" style="padding:10px 16px"><div id="ex4-dene-pins"></div></div>
+</div>
+</div>
+<aside>Eşli çalışma, 8–10 dakika. Soldaki kutuda kodu değiştirin, “Derle ve yükle” (veya Ctrl+Enter) ile karta yükleyin. Derleme hatası olursa konsol satır numarasıyla gösterir; eski program çalışmaya devam eder. “Başlangıç kodu” her şeyi geri alır. İki görevi öğrenciler önce tahmin edip denesin, sonra cevabı açın. Tinkercad’de aynı değişikliği de denetin.</aside>
+</section>
+<section id="hata-avi" class="sl light tight" data-match="1">
+<div class="hd"><p class="eb">Hata avı · Doğru mu, yanlış mı?</p><h2 class="ttl">Bu cümlelerin 4 tanesi yanlış. Bul</h2></div>
+<p style="font-size:25px;line-height:1.35;color:#3D4A5C;max-width:1700px">Her cümle için Doğru veya Yanlış seç. Yanlışları bulduktan sonra nedenini söyle.</p><div class="col" style="gap:0"><div class="mc-row" data-ok="1"><p class="tx">Blink programında setup() fonksiyonu sürekli tekrar eder.</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Doğru</option><option value="1">Yanlış</option></select><span class="mc-mark"></span><p class="mc-why">Yanlış: setup bir kez çalışır; sürekli tekrar eden loop()’tur.</p></div><div class="mc-row" data-ok="0"><p class="tx">delay(1000) programı 1000 milisaniye, yani 1 saniye bekletir.</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Doğru</option><option value="1">Yanlış</option></select><span class="mc-mark"></span><p class="mc-why">Doğru.</p></div><div class="mc-row" data-ok="1"><p class="tx">LED’in uzun bacağı (anot) GND’ye bağlanır.</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Doğru</option><option value="1">Yanlış</option></select><span class="mc-mark"></span><p class="mc-why">Yanlış: uzun bacak artı (+) taraftır, dirençle D13’e bağlanır; GND’ye kısa bacak (katot) gider.</p></div><div class="mc-row" data-ok="1"><p class="tx">LED’i direnç kullanmadan doğrudan 5 V’a bağlamak güvenlidir.</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Doğru</option><option value="1">Yanlış</option></select><span class="mc-mark"></span><p class="mc-why">Yanlış: direnç akımı sınırlar; olmazsa LED fazla akımdan bozulur.</p></div><div class="mc-row" data-ok="0"><p class="tx">Robot sözcüğü ilk kez Karel Čapek’in R.U.R. oyununda kullanılmıştır.</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Doğru</option><option value="1">Yanlış</option></select><span class="mc-mark"></span><p class="mc-why">Doğru. Sözcüğü öneren Karel’in kardeşi Josef Čapek’tir.</p></div><div class="mc-row" data-ok="1"><p class="tx">Eğitsel robotlar yalnız programlama bilenler için tasarlanmıştır.</p><select class="mc-sel" aria-label="Seçim"><option value="">Seç…</option><option value="0">Doğru</option><option value="1">Yanlış</option></select><span class="mc-mark"></span><p class="mc-why">Yanlış: robot programlama bilmeyen ve tanımayan öğrencileri robotikle tanıştırmak için tasarlanır.</p></div></div><div class="row" style="gap:16px;align-items:center;margin-top:8px"><button type="button" class="ans-btn mc-check">Kontrol et</button><button type="button" class="ans-btn alt mc-show">Cevapları göster</button><button type="button" class="ans-btn sm mc-reset" style="background:#5B6675">Temizle</button><span class="mc-res"></span></div>
+<p class="foot">Hafta 2 kavramları</p>
+<aside>Önce tek tek cevaplayın, “Kontrol et”le sonucu görün. Yanlışlar: 1, 3, 4, 6. Bu dersin hataya düşülen kavramlarını yoklar: setup/loop farkı, anot/katot, direnç, robotun tanımı.</aside>
+</section>
+<section id="kitap" class="sl light tight">
+<div class="hd"><p class="eb">Kitap notları · Kaynağı eleştirel oku</p><h2 class="ttl">Kitapta böyle yazıyor, doğrusu şu</h2></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div class="card f1"><p class="eb" style="font-size:20px">Kitap s.24 · Önemli kutusu</p><p><b>Kitapta:</b> <span class="kit-wrong">LED’ler 3 V ile çalışır; bu yüzden 5 V’u dengelemek için direnç gerekir.</span></p><p><b>Doğrusu:</b> <span class="kit-right">Gerilim LED’in rengine göre değişir: kırmızı yaklaşık 2 V, mavi/beyaz yaklaşık 3 V. Her durumda direnç gerekir: R = (5 − 2) / 0,0136 ≈ 220 Ω.</span></p></div>
+<div class="card f1"><p class="eb" style="font-size:20px">Kitap s.28</p><p><b>Kitapta:</b> <span class="kit-wrong">Karel Capek (Karel Kapek), robot kelimesini ilk kez kullanmıştır.</span></p><p><b>Doğrusu:</b> <span class="kit-right">Doğru yazılışı Čapek (okunuşu “Çapek”). Sözcüğü öneren kardeşi Josef Čapek’tir. R.U.R. 1921’de sahnelendi.</span></p></div>
+<div class="card f1"><p class="eb" style="font-size:20px">Kitap s.28 · Görsel 1.19</p><p><b>Kitapta:</b> <span class="kit-wrong">Deep Blue, taşları tanıyıp hamlelerini seçen bir robot örneğidir.</span></p><p><b>Doğrusu:</b> <span class="kit-right">Deep Blue bir satranç bilgisayarıydı; taşları kamerayla tanımazdı, hamleler elle girilirdi. Tepkisel örnek olarak basitleştirilmiştir.</span></p></div>
+<div class="card f1"><p class="eb" style="font-size:20px">Kitap s.24–28 · Blink uygulaması</p><p><b>Kitapta:</b> <span class="kit-wrong">Blink uygulaması 13 numaralı pin üzerindeki LED’i yakıp söndürür.</span></p><p><b>Doğrusu:</b> <span class="kit-right">Hem karttaki L LED’i hem breadboard’a taktığın harici LED aynı pini (D13) kullanır; ikisi birlikte yanıp söner. Harici LED eklemek devre kurmayı öğretir.</span></p></div>
+</div><div class="card warn"><p style="font-size:25px"><b>Soru:</b> Blink’i çalıştırdın ama harici LED yanmıyor, karttaki L LED’i yanıp sönüyor. İlk neye bakarsın? <button class="ans-btn sm" type="button" style="margin-left:14px">Cevabı göster</button></p><div class="ans" hidden><b>LED’in yönü ve kablolar.</b> Uzun bacak (anot) dirence, kısa bacak (katot) GND’ye gitmeli; D13 kablosu direncin doğru ucuna bağlanmalı. L LED’i yanıyorsa kod ve pin doğrudur, sorun harici devrededir.</div></div>
+
+<aside>Her kart “Kitapta X → Doğrusu Y” biçimindedir. s.24’teki 3 V notu bir basitleştirmedir: yanlış değil, eksiktir. Čapek notu için bkz. tarihçe slaydı. Deep Blue notunu tartışmaya açık bırakın. Son kart: hata ayıklama alışkanlığı: önce kod mu devre mi diye ayırmak.</aside>
+</section>
+<section id="ozet" class="sl dark tight">
+<div class="hd"><p class="eb">Özet · 2. hafta</p><h2 class="ttl">Bugün neler öğrendik?</h2></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px"><div class="card dk"><svg viewBox="0 0 300 90" width="100%" role="img" aria-label="Akım halkası"><rect width="300" height="90" rx="12" fill="#16253A"/><text x="150" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#FFE08A">D13 → R → LED</text><text x="150" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="26" font-weight="700" fill="#9BE38B">→ GND</text></svg><h3>LED devresi</h3><p>D13 → 220 Ω → LED (uzun bacak +) → GND. Direnç LED’i korur.</p></div><div class="card dk"><svg viewBox="0 0 300 90" width="100%" role="img" aria-label="Kod yapısı"><rect width="300" height="90" rx="12" fill="#16253A"/><text x="150" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#FF9F5A">setup() bir kez</text><text x="150" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#6CB6FF">loop() sürekli</text></svg><h3>Blink kodu</h3><p>pinMode çıkış yapar, digitalWrite HIGH/LOW yazar, delay(ms) bekler.</p></div><div class="card dk"><svg viewBox="0 0 300 90" width="100%" role="img" aria-label="Robot"><rect width="300" height="90" rx="12" fill="#16253A"/><text x="150" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="28" font-weight="700" fill="#6CB6FF">algıla</text><text x="150" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#FF9F5A">karar · hareket</text></svg><h3>Robot</h3><p>Programla çalışan elektromekanik sistem: algılar, karar verir, harekete geçer.</p></div><div class="card dk"><svg viewBox="0 0 300 90" width="100%" role="img" aria-label="Kontrol"><rect width="300" height="90" rx="12" fill="#16253A"/><text x="150" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" fill="#F6F4EE">Tepkisel · Bilinçli</text><text x="150" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" fill="#BFCAD6">Karma · Davranışsal</text></svg><h3>Kontrol türleri</h3><p>Tepkisel, bilinçli, karma ve davranışsal. Tek doğru sınıflandırma yoktur.</p></div><div class="card dk"><svg viewBox="0 0 300 90" width="100%" role="img" aria-label="Türler"><rect width="300" height="90" rx="12" fill="#16253A"/><text x="150" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" fill="#F6F4EE">Endüstri · Ev · Tıp</text><text x="150" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" fill="#BFCAD6">Uzay · Hobi · Eğitsel</text></svg><h3>Robot türleri</h3><p>Endüstriyel, ev, tıbbi, askerî, uzay, hobi, sanal ve eğitsel robotlar.</p></div><div class="card dk"><svg viewBox="0 0 300 90" width="100%" role="img" aria-label="Eğitsel"><rect width="300" height="90" rx="12" fill="#16253A"/><text x="150" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#9BE38B">Blok · Kit · Açık</text><text x="150" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#FF9F5A">Monte · Sürü</text></svg><h3>Eğitsel robotlar</h3><p>Blok tabanlı set, düşük maliyetli kit, açık kaynak platform, monte edilmiş, sürü.</p></div></div>
+<div class="row" style="gap:22px"><div class="card info f1"><h3 style="color:#14202E">Bu hafta yaptıkların</h3><p>Blink · Robot Pil Uyarısı · Demiryolu Geçidi · Endüstriyel Robot Işığı · Robot eşleştirmeleri</p></div>
+<div class="card warn f1"><h3 style="color:#14202E">Hazırlan</h3><p style="color:#3D4A5C">Gelecek hafta robotların mekanik, elektromekanik ve elektronik bileşenlerini ve düğmeyle LED yakmayı öğreneceğiz.</p></div></div>
+
+<aside>Altı kartı sırayla özetleyin; her birinde öğrencilerden bir örnek isteyin. Bu slayttan sonra test başlar. Öz değerlendirme için hedefler slaytına dönüp 1–5 arası puan verdirin.</aside>
+</section>
+<section id="test1" class="sl light tight">
+<div class="hd"><p class="eb">Test · Soru 1–5</p><h2 class="ttl">Bildiklerini yokla</h2></div>
+<button class="ans-btn alt" data-all="1" type="button" style="align-self:flex-start">Tüm cevapları göster</button>
+<div class="col" style="gap:14px"><div class="card" style="padding:14px 26px;gap:8px"><p><b>1)</b> LED’in uzun bacağı hangi uçtur ve devrede nereye bağlanır?<br><span class="mono" style="font-size:21px">A) Katot (−): GND’ye  B) Anot (+): dirençten gelen D13 hattına  C) Anot (+): GND’ye  D) Katot (−): D13’e</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Uzun bacak anot (+) tarafıdır; dirençle D13’e bağlanır. Kısa bacak (katot) GND’ye gider.</div></div>
+<div class="card" style="padding:14px 26px;gap:8px"><p><b>2)</b> 220 Ω direncin LED devresindeki görevi nedir?<br><span class="mono" style="font-size:21px">A) Işığı artırmak  B) Akımı sınırlayıp LED’i korumak  C) Gerilimi 12 V’a çıkarmak  D) Pini çıkış yapmak</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Direnç akımı sınırlar; olmazsa LED fazla akımdan bozulur.</div></div>
+<div class="card" style="padding:14px 26px;gap:8px"><p><b>3)</b> delay(500) komutu ne yapar?<br><span class="mono" style="font-size:21px">A) Programı 500 saniye bekletir  B) Programı 500 milisaniye bekletir  C) LED’i 500 kez yakar  D) D500 pinini seçer</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> delay milisaniye cinsinden bekler; 500 ms yarım saniyedir.</div></div>
+<div class="card" style="padding:14px 26px;gap:8px"><p><b>4)</b> Arduino’da hangi fonksiyon sürekli tekrar eder?<br><span class="mono" style="font-size:21px">A) setup()  B) loop()  C) pinMode()  D) main()</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> loop() kart kapanana kadar tekrar eder; setup() bir kez çalışır.</div></div>
+<div class="card" style="padding:14px 26px;gap:8px"><p><b>5)</b> pinMode(13, OUTPUT); satırı ne yapar?<br><span class="mono" style="font-size:21px">A) D13’ü giriş yapar  B) D13’ü çıkış yapar  C) D13’e 5 V yazar  D) D13’ü siler</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> pinMode pini çıkış (OUTPUT) ya da giriş (INPUT) yapar.</div></div>
+</div>
+
+<aside>İlk beş soru Blink ve LED devresi üzerine. Öğrenciler kendi kâğıdına yazsın, sonra tek tek cevaplar açılsın. Doğru cevaplar: 1-B, 2-B, 3-B, 4-B, 5-B.</aside>
+</section>
+<section id="test2" class="sl light tight">
+<div class="hd"><p class="eb">Test · Soru 6–10</p><h2 class="ttl">Biraz daha zor</h2></div>
+<button class="ans-btn alt" data-all="1" type="button" style="align-self:flex-start">Tüm cevapları göster</button>
+<div class="col" style="gap:14px"><div class="card" style="padding:14px 26px;gap:8px"><p><b>6)</b> Robotun çalışma sırası hangi seçenekte doğru verilmiştir?<br><span class="mono" style="font-size:21px">A) Harekete geç → Algıla → Karar ver  B) Algıla → Karar ver → Harekete geç  C) Karar ver → Harekete geç → Algıla  D) Algıla → Harekete geç → Karar ver</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Önce sensörle algılar, sonra programa göre karar verir, en son motoru çalıştırır.</div></div>
+<div class="card" style="padding:14px 26px;gap:8px"><p><b>7)</b> Çevreyi algılayıp plan yapan ve bilinçli kontrolün atası sayılan robot hangisidir?<br><span class="mono" style="font-size:21px">A) Deep Blue  B) Shakey  C) Perseverance  D) Robot süpürge</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Shakey (1966–72) algıla–planla–hareket et ilkesiyle çalışan ilk genel amaçlı mobil robottur.</div></div>
+<div class="card" style="padding:14px 26px;gap:8px"><p><b>8)</b> Evdeki zemini kendi temizleyen robot süpürge hangi robot türüne girer?<br><span class="mono" style="font-size:21px">A) Endüstriyel  B) Tıbbi  C) Ev robotu  D) Uzay robotu</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>C.</b> Ev işlerine yardımcı olan robotlar ev robotlarıdır.</div></div>
+<div class="card" style="padding:14px 26px;gap:8px"><p><b>9)</b> Mars’a inen Perseverance hangi robot türüdür?<br><span class="mono" style="font-size:21px">A) Hobi robotu  B) Sanal robot  C) Eğitsel robot  D) Uzay robotu</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>D.</b> Uzay robotları gezegenlerde ve uzay istasyonlarında görev yapar.</div></div>
+<div class="card" style="padding:14px 26px;gap:8px"><p><b>10)</b> Blok tabanlı robot montaj setleri hangi robot türüne örnektir?<br><span class="mono" style="font-size:21px">A) Endüstriyel robot  B) Eğitsel amaçlı robot  C) Tıbbi robot  D) Askerî robot</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Blok tabanlı montaj setleri öğrencileri robotik ve programlama ile tanıştıran eğitsel robotlardır.</div></div>
+</div>
+
+<aside>Son beş soru robot kavramı ve türleri üzerine. Online sınavda farklı sorular gelecektir. Doğru cevaplar: 6-B, 7-B, 8-C, 9-D, 10-B.</aside>
+</section>
+<section id="kapanis" class="sl dark">
+<div class="hd"><p class="eb">Kapanış · Oylamanın cevabı ve gelecek hafta</p><h2 class="ttl">Başladığımız soruya dönelim</h2></div>
+<div class="row" style="gap:28px;align-items:stretch">
+<div class="card dk f1" style="gap:14px"><h3>Bu bir robot mu?</h3><p>Dersin başında oylamıştık. Şimdi üç basamakla gerekçelendir.</p>
+<button class="ans-btn" type="button">Cevabı göster</button>
+<div class="ans" hidden><b>B: Odayı haritalayan robot süpürge.</b> Algılar (mesafe sensörü), karar verir (programı) ve harekete geçer (motor). Fişli süpürge ve masa lambasında algılama ve karar yoktur.</div></div>
+<div class="card dk f1" style="gap:14px"><h3>Düşün</h3><p>Bugün yaptığın Blink devresini bir robota nasıl dönüştürürdün? Hangi sensörü ve hangi motoru eklerdin?</p>
+<button class="ans-btn" type="button">İpucu</button>
+<div class="ans" hidden>Örnek: Engelden kaçan robot. Sensör: ultrasonik mesafe sensörü (giriş). Karar: “engel 20 cm’den yakınsa dön”. Çıkış: iki DC motor. LED, “dönüyorum” uyarı ışığı olur.</div></div>
+</div>
+<div class="row" style="gap:28px">
+<div style="flex:1;background:#2F6FDE;border-radius:20px;padding:30px 40px;display:flex;flex-direction:column;gap:12px"><p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#DCE8FF">Gelecek hafta · 3. hafta</p><p style="font-size:36px;line-height:1.3;color:#FFFFFF">Robotun mekanik, elektromekanik ve elektronik bileşenleri · Düğme ve LED uygulaması</p></div>
+<div style="flex:1;background:#F6F4EE;border-radius:20px;padding:30px 40px;display:flex;flex-direction:column;gap:12px"><p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#C2410C">Hatırla</p><p style="font-size:32px;line-height:1.3;color:#14202E">Robot = algıla + karar ver + harekete geç. LED devresi: D13 → direnç → LED → GND</p></div>
+</div>
+
+<aside>Dersi toparlayın. Oylamanın cevabını öğrencilerin söylemesini isteyin. Gelecek hafta 3. hafta: 28 Eylül–2 Ekim. “Düşün” sorusu merak içindir, ödev değildir. Ödev ayrıca verilecektir.</aside>
+</section>
+</div>
+<div id="notes" hidden><b>Öğretmen notu</b><div id="notestxt"></div></div>
+</div>
+<div id="barwrap">
+<div id="bar">
+<button id="bprev" type="button" aria-label="Önceki slayt">◀<span class="hide-sm"> Önceki</span></button>
+<button id="bnext" type="button" aria-label="Sonraki slayt"><span class="hide-sm">Sonraki </span>▶</button>
+<span id="count">1 / 1</span>
+<span id="stitle"></span>
+<button id="bnotes" type="button" aria-pressed="false">Notlar<span class="hide-sm"> (N)</span></button>
+<button id="bfull" type="button">Tam ekran<span class="hide-sm"> (F)</span></button>
+</div>
+<div id="prog"></div>
+</div>
+</div>
+<script>
+/* ÇEKİRDEK: gezinme, notlar, cevap düğmeleri, adım kumandası, slayt giriş/çıkış kancaları */
+(function(){
+var stage=document.getElementById('stage'),vp=document.getElementById('viewport');
+var slides=[].slice.call(stage.children).filter(function(n){return n.tagName==='SECTION'});
+var cur=0,scale=1;
+window.steppers={};window.hooks={};
+function fit(){var w=vp.clientWidth,h=vp.clientHeight,s=Math.min(w/1920,h/1080);scale=s;
+  stage.style.transform='translate('+((w-1920*s)/2)+'px,'+((h-1080*s)/2)+'px) scale('+s+')';}
+function title(sec){var h=sec.querySelector('h1,h2');if(!h)return '';var c=h.cloneNode(true);c.querySelectorAll('br').forEach(function(b){b.replaceWith(' ')});return c.textContent.replace(/\s+/g,' ').trim();}
+/* balonlar sahne kenarına taşmasın: konuma göre yukarı/aşağı, sola/sağa çevir */
+window.placeTips=function(root){
+  var sr=stage.getBoundingClientRect(),sc=scale||1;
+  [].forEach.call((root||stage).querySelectorAll('.tip'),function(t){
+    var r=t.getBoundingClientRect();if(!r.width&&!r.height)return;
+    var x=(r.left-sr.left)/sc,y=(r.top-sr.top)/sc;
+    t.classList.toggle('dn',y<330);
+    t.classList.toggle('lf',x+540>1860);
+  });
+};
+function go(n){n=Math.max(0,Math.min(slides.length-1,n));
+  var prev=slides[cur];prev.classList.remove('active');
+  var ph=window.hooks[prev.id];if(ph&&ph.leave&&prev!==slides[n]){try{ph.leave()}catch(e){console.error(e)}}
+  cur=n;var s=slides[cur];s.classList.add('active');
+  document.getElementById('count').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('stitle').textContent=title(s);
+  document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+  var a=s.querySelector('aside');document.getElementById('notestxt').textContent=a?a.textContent:'Bu slayt için not yok.';
+  try{history.replaceState(null,'','#'+s.id)}catch(e){}
+  var h=window.hooks[s.id];if(h&&h.enter){try{h.enter()}catch(e){console.error(e)}}
+  window.placeTips(s);}
+window.goTo=function(id){slides.forEach(function(s,i){if(s.id===id)go(i)})};
+function next(){var st=window.steppers[slides[cur].id];if(st&&st.next())return;go(cur+1);}
+function prevS(){var st=window.steppers[slides[cur].id];if(st&&st.prev())return;go(cur-1);}
+document.getElementById('bnext').onclick=function(){go(cur+1)};
+document.getElementById('bprev').onclick=function(){go(cur-1)};
+function toggleNotes(){var n=document.getElementById('notes');n.hidden=!n.hidden;document.getElementById('bnotes').setAttribute('aria-pressed',String(!n.hidden));}
+function full(){try{if(document.fullscreenElement)document.exitFullscreen();else{var p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){});}}catch(e){}}
+document.getElementById('bnotes').onclick=toggleNotes;document.getElementById('bfull').onclick=full;
+document.addEventListener('keydown',function(e){var t=e.target;
+  if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
+  if(t&&t.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();next();}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prevS();}
+  else if(e.key==='Home'){go(0);}else if(e.key==='End'){go(slides.length-1);}
+  else if(e.key==='n'||e.key==='N'){toggleNotes();}else if(e.key==='f'||e.key==='F'){full();}});
+/* cevap düğmeleri */
+document.querySelectorAll('.ans-btn:not([data-all])').forEach(function(b){if(!b.getAttribute('data-on'))b.setAttribute('data-on',b.textContent);});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.ans-btn');if(!b)return;
+  var sec=b.closest('section');
+  if(b.hasAttribute('data-all')){var list=sec.querySelectorAll('.ans');var open=b.getAttribute('aria-pressed')!=='true';
+    list.forEach(function(x){x.hidden=!open});
+    sec.querySelectorAll('.ans-btn:not([data-all])').forEach(function(x){x.textContent=open?(x.getAttribute('data-off')||'Gizle'):(x.getAttribute('data-on')||'Cevabı göster')});
+    b.setAttribute('aria-pressed',String(open));b.textContent=open?'Tüm cevapları gizle':'Tüm cevapları göster';return;}
+  var tg=b.getAttribute('data-for')?document.getElementById(b.getAttribute('data-for')):b.nextElementSibling;
+  if(!tg)return;tg.hidden=!tg.hidden;
+  if(!b.getAttribute('data-on'))b.setAttribute('data-on',b.textContent);
+  b.textContent=tg.hidden?b.getAttribute('data-on'):(b.getAttribute('data-off')||'Gizle');});
+/* genel adım kumandası: id, adımlar[], çiz(adım, indeks) */
+window.makeStepper=function(id,steps,render){var sec=document.getElementById(id);if(!sec)return;var k=0,timer=null;
+  var cnt=sec.querySelector('.stp .cnt'),auto=sec.querySelector('[data-act="auto"]');
+  function draw(){render(steps[k],k);if(cnt)cnt.textContent='Adım '+(k+1)+' / '+steps.length;}
+  function stop(){if(timer){clearInterval(timer);timer=null;if(auto){auto.setAttribute('aria-pressed','false');auto.textContent='Otomatik oynat';}}}
+  var api={next:function(){if(k<steps.length-1){k++;draw();return true}return false},prev:function(){if(k>0){k--;draw();return true}return false},
+    goto:function(i){k=Math.max(0,Math.min(steps.length-1,i));draw();},stop:stop,index:function(){return k}};
+  sec.querySelectorAll('.stp [data-act]').forEach(function(btn){btn.addEventListener('click',function(){var a=btn.getAttribute('data-act');
+    if(a==='next'){stop();api.next();}else if(a==='prev'){stop();api.prev();}else if(a==='first'){stop();k=0;draw();}
+    else if(a==='auto'){if(timer){stop();}else{if(k>=steps.length-1){k=0;draw();}btn.setAttribute('aria-pressed','true');btn.textContent='Durdur';
+      timer=setInterval(function(){if(!api.next())stop();},3000);}}});});
+  window.steppers[id]=api;draw();
+  var hk=window.hooks[id]||(window.hooks[id]={});var old=hk.leave;hk.leave=function(){stop();if(old)old();};
+  return api;};
+window.addEventListener('resize',function(){fit();window.placeTips();});
+fit();
+var h=(location.hash||'').slice(1),start=0;slides.forEach(function(s,i){if(s.id===h)start=i});
+window.__boot=function(){slides.forEach(function(s){s.classList.remove('active')});slides[0].classList.add('active');go(start);window.__deckReady=true;};
+})();
+
+/* ÇİZİMLER: breadboard (30 veya 42 sütun), Arduino Uno devresi (1–7 LED), canlı sahneler (kalp monitörü, ambulans, şarj göstergesi, robot tarayıcı), zaman çizelgesi */
+(function(root){
+var PINX={AREF:210,GND:234,13:258,12:282,11:306,10:330,9:354,8:378,7:414,6:438,5:462,4:486,3:510,2:534,1:558,0:582};
+var PWM={11:1,10:1,9:1,6:1,5:1,3:1};
+var RY={j:100,i:122,h:144,g:166,f:188,e:230,d:252,c:274,b:296,a:318};
+var RAIL={tp:44,tm:64,bm:348,bp:368};
+var ROWS_UP=['j','i','h','g','f'],ROWS_LO=['e','d','c','b','a'];
+function bx(c,pt){return 88+(pt||28)*(c-1);}
+function Ckt_bx(c,pt){return bx(c,pt);}
+var LEDC={
+  red:{base:'#C62828',lit:'#FF8A80',glow:'#FF5252',vf:2.0,name:'kırmızı'},
+  green:{base:'#2E7D32',lit:'#A5F5B8',glow:'#4CFF7A',vf:2.2,name:'yeşil'},
+  white:{base:'#9FB0BA',lit:'#FFFFFF',glow:'#EAF6FF',vf:3.0,name:'beyaz'},
+  yellow:{base:'#B58900',lit:'#FFF59D',glow:'#FFD54F',vf:2.1,name:'sarı'},
+  blue:{base:'#1A56B8',lit:'#9CCBFF',glow:'#4DA3FF',vf:3.0,name:'mavi'}};
+var WIRE=['#F97316','#22C55E','#FACC15','#A78BFA','#06B6D4','#EC4899','#94A3B8'];
+
+function board(p,o){
+  o=o||{};var PT=o.pitch||28,NC=o.cols||30;function bx(c){return Ckt_bx(c,PT);}
+  var s='<g>';
+  s+='<rect x="52" y="20" width="884" height="372" rx="14" fill="#EFEADB" stroke="#B9B29B" stroke-width="2"/>';
+  s+='<line x1="72" y1="34" x2="916" y2="34" stroke="#D32F2F" stroke-width="3"/><line x1="72" y1="76" x2="916" y2="76" stroke="#1E6BD6" stroke-width="3"/>';
+  s+='<line x1="72" y1="337" x2="916" y2="337" stroke="#1E6BD6" stroke-width="3"/><line x1="72" y1="379" x2="916" y2="379" stroke="#D32F2F" stroke-width="3"/>';
+  s+='<g font-family="Rubik,Arial,sans-serif" font-weight="700" font-size="15" text-anchor="middle"><text x="63" y="49" fill="#D32F2F">+</text><text x="63" y="69" fill="#1E6BD6">−</text><text x="63" y="353" fill="#1E6BD6">−</text><text x="63" y="373" fill="#D32F2F">+</text></g>';
+  s+='<rect x="72" y="199" width="844" height="20" rx="4" fill="#DCD5C0"/>';
+  s+='<text x="494" y="213" text-anchor="middle" font-family="Rubik,Arial,sans-serif" font-size="12" letter-spacing="3" fill="#8D8670">ÇUKUR (ORTA OLUK)</text>';
+  s+='<g id="'+p+'-strips" style="display:none" fill="#9FB1C6">';
+  for(var c=1;c<=NC;c++){s+='<rect x="'+(bx(c)-2.5)+'" y="'+(RY.j-9)+'" width="5" height="106" rx="2"/><rect x="'+(bx(c)-2.5)+'" y="'+(RY.e-9)+'" width="5" height="106" rx="2"/>';}
+  ['tp','tm','bm','bp'].forEach(function(k){s+='<rect x="82" y="'+(RAIL[k]-2.5)+'" width="824" height="5" rx="2"/>';});
+  s+='</g>';
+  var lt='font-family="JetBrains Mono,monospace" font-size="11" fill="#8D8670"';
+  ROWS_UP.concat(ROWS_LO).forEach(function(r){s+='<text x="72" y="'+(RY[r]+4)+'" '+lt+' text-anchor="middle">'+r+'</text>';});
+  for(c=1;c<=NC;c++){if(c===1||c%5===0){s+='<text x="'+bx(c)+'" y="91" '+lt+' text-anchor="middle">'+c+'</text><text x="'+bx(c)+'" y="332" '+lt+' text-anchor="middle">'+c+'</text>';}}
+  s+='<g id="'+p+'-holes">';
+  for(c=1;c<=NC;c++){
+    ROWS_UP.concat(ROWS_LO).forEach(function(r){s+='<rect class="hole" data-k="m:'+c+':'+r+'" data-g="'+(ROWS_LO.indexOf(r)>=0?'L':'U')+c+'" x="'+(bx(c)-4.5)+'" y="'+(RY[r]-4.5)+'" width="9" height="9" rx="1.5"/>';});
+    ['tp','tm','bm','bp'].forEach(function(k){s+='<rect class="hole" data-k="r:'+k+':'+c+'" data-g="'+k+'" x="'+(bx(c)-4.5)+'" y="'+(RAIL[k]-4.5)+'" width="9" height="9" rx="1.5"/>';});}
+  s+='</g></g>';
+  return s;}
+
+function uno(p,used){
+  var s='<g id="'+p+'-uno" font-family="Rubik,Arial,sans-serif">';
+  s+='<rect x="100" y="430" width="520" height="235" rx="12" fill="#0E7C86" stroke="#0A5A62" stroke-width="3"/>';
+  s+='<rect x="58" y="462" width="96" height="76" rx="4" fill="#C4CBD3" stroke="#8F99A5" stroke-width="2"/><rect x="70" y="476" width="70" height="48" fill="#9AA5B1"/>';
+  s+='<rect x="58" y="575" width="86" height="64" rx="4" fill="#1B1F26"/>';
+  s+='<rect x="198" y="436" width="200" height="22" rx="3" fill="#171B22"/><rect x="402" y="436" width="194" height="22" rx="3" fill="#171B22"/>';
+  Object.keys(PINX).forEach(function(k){
+    var px=PINX[k],isUsed=used&&used.indexOf(+k)>=0;
+    s+='<rect x="'+(px-4)+'" y="441" width="8" height="12" fill="'+(isUsed?'#FFB74D':'#D9B34A')+'"/>';
+    var lab=(PWM[k]?'~':'')+k;
+    s+='<text x="'+px+'" y="474" font-size="11" text-anchor="middle" fill="'+(isUsed?'#FFE0B2':'#D5F3F6')+'" font-weight="'+(isUsed?700:400)+'">'+lab+'</text>';
+    if(isUsed)s+='<rect x="'+(px-12)+'" y="432" width="24" height="96" rx="6" fill="none" stroke="#FFB74D" stroke-width="2" stroke-dasharray="4 3"/>';});
+  s+='<rect x="300" y="560" width="200" height="46" rx="3" fill="#1D252E"/><text x="400" y="588" font-size="14" text-anchor="middle" fill="#9FB0BA" font-family="JetBrains Mono,monospace">ATmega328P</text>';
+  s+='<circle cx="182" cy="520" r="14" fill="#C62828" stroke="#F5F5F5" stroke-width="3"/><text x="182" y="552" font-size="11" text-anchor="middle" fill="#D5F3F6">RESET</text>';
+  s+='<text x="400" y="640" font-size="26" font-weight="700" text-anchor="middle" fill="#E8F7F8" letter-spacing="4">ARDUINO UNO</text>';
+  s+='<text x="400" y="538" font-size="12" text-anchor="middle" fill="#BFE9ED" letter-spacing="2">DİJİTAL PİNLER · D0–D13</text>';
+  s+='</g>';return s;}
+
+function pinBubbles(p,pins){var s='';
+  pins.forEach(function(pin){var px=PINX[pin];
+    s+='<rect id="'+p+'-pv-'+pin+'" x="'+(px-12)+'" y="496" width="24" height="18" rx="4" fill="#2A3B50"/><text id="'+p+'-pt-'+pin+'" x="'+px+'" y="509" font-size="11" font-weight="700" text-anchor="middle" fill="#C8D3E0" font-family="JetBrains Mono,monospace">0V</text>';});
+  return s;}
+
+function wire(d,col,id){
+  return '<g id="'+id+'"><path d="'+d.d+'" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="10" stroke-linecap="round"/><path d="'+d.d+'" fill="none" stroke="'+col+'" stroke-width="6" stroke-linecap="round"/>'
+   +'<circle cx="'+d.x1+'" cy="'+d.y1+'" r="6" fill="'+col+'" stroke="rgba(0,0,0,.45)" stroke-width="2"/><circle cx="'+d.x2+'" cy="'+d.y2+'" r="6" fill="'+col+'" stroke="rgba(0,0,0,.45)" stroke-width="2"/></g>';}
+function curve(x1,y1,x2,y2,k){k=k||395;return{d:'M'+x1+' '+y1+' C'+x1+' '+k+','+x2+' '+k+','+x2+' '+y2,x1:x1,y1:y1,x2:x2,y2:y2};}
+
+function resistor(p,i,xa,xb,y,bands){
+  var x1=xa+14,w=(xb-xa)-28,s='<g id="'+p+'-r'+i+'">';
+  s+='<line x1="'+xa+'" y1="'+y+'" x2="'+xb+'" y2="'+y+'" stroke="#9AA5B1" stroke-width="4" stroke-linecap="round"/>';
+  s+='<rect x="'+x1+'" y="'+(y-11)+'" width="'+w+'" height="22" rx="9" fill="#D9BC8C" stroke="#A98B58" stroke-width="2"/>';
+  var pos=[.2,.34,.48,.8];
+  bands.forEach(function(c,k){s+='<rect x="'+(x1+w*pos[k]-3)+'" y="'+(y-11)+'" width="6" height="22" fill="'+c+'"/>';});
+  s+='</g>';return s;}
+
+function led(p,i,xa,xc,color,labels,tag){
+  var c=LEDC[color]||LEDC.red,xm=(xa+xc)/2,s='<g id="'+p+'-l'+i+'">';
+  s+='<line x1="'+xa+'" y1="232" x2="'+xa+'" y2="176" stroke="#C9D1D9" stroke-width="4" stroke-linecap="round"/>';
+  s+='<line x1="'+xc+'" y1="232" x2="'+xc+'" y2="192" stroke="#C9D1D9" stroke-width="4" stroke-linecap="round"/>';
+  s+='<circle id="'+p+'-glow'+i+'" cx="'+xm+'" cy="164" r="86" fill="url(#'+p+'-gr'+i+')" opacity="0"/>';
+  s+='<path d="M'+(xm-25)+' 192 V168 A25 25 0 0 1 '+(xm+25)+' 168 V192 Z" fill="'+c.base+'" stroke="rgba(0,0,0,.35)" stroke-width="2"/>';
+  s+='<path id="'+p+'-lit'+i+'" d="M'+(xm-25)+' 192 V168 A25 25 0 0 1 '+(xm+25)+' 168 V192 Z" fill="'+c.lit+'" opacity="0"/>';
+  s+='<path d="M'+(xm-17)+' 160 A18 18 0 0 1 '+(xm-3)+' 146" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="4" stroke-linecap="round"/>';
+  s+='<rect x="'+(xm-30)+'" y="190" width="60" height="8" rx="2" fill="'+c.base+'" stroke="rgba(0,0,0,.35)" stroke-width="2"/>';
+  if(tag){var tw=tag.length*8.4+22;s+='<rect x="'+(xm-tw/2)+'" y="112" width="'+tw+'" height="24" rx="12" fill="#FFF8E6" stroke="#B9B29B"/><text x="'+xm+'" y="129" text-anchor="middle" font-family="Rubik,Arial" font-weight="600" font-size="14" fill="#14202E">'+tag+'</text>';}
+  if(labels)s+='<text x="'+xa+'" y="214" text-anchor="middle" font-family="Rubik,Arial" font-weight="700" font-size="14" fill="#B71C1C">+</text><text x="'+xc+'" y="214" text-anchor="middle" font-family="Rubik,Arial" font-weight="700" font-size="14" fill="#1E4FA3">−</text>';
+  s+='</g>';return s;}
+
+/* cfg: {leds:[{pin,color}], labels:bool} */
+function circuit(p,cfg){
+  var leds=cfg.leds.slice().sort(function(a,b){return PINX[a.pin]-PINX[b.pin];});
+  var n=leds.length,PT=n>=6?20:28,NC=n>=6?42:30;
+  function bx(c){return Ckt_bx(c,PT);}
+  var starts=n===1?[11]:n===2?[8,17]:n===3?[6,14,22]:leds.map(function(l,i){return 1+6*i;});
+  var btns=cfg.buttons||[];
+  var used=leds.map(function(l){return l.pin;}).concat(btns.map(function(b){return b.pin;}));
+  var s='<svg id="'+p+'-svg" viewBox="0 0 1000 680" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Arduino Uno ve breadboard devresi"><defs>';
+  leds.forEach(function(l,i){var c=LEDC[l.color]||LEDC.red;
+    s+='<radialGradient id="'+p+'-gr'+i+'"><stop offset="0" stop-color="'+c.glow+'" stop-opacity=".95"/><stop offset=".45" stop-color="'+c.glow+'" stop-opacity=".35"/><stop offset="1" stop-color="'+c.glow+'" stop-opacity="0"/></radialGradient>';});
+  s+='</defs>'+board(p,{pitch:PT,cols:NC})+uno(p,used);
+  s+=wire(curve(PINX.GND,447,bx(1),RAIL.bm,400),'#263238',p+'-gnd');
+  leds.forEach(function(l,i){
+    var cB=starts[i],cL=cB+4,xa=bx(cL),xc=bx(cL+1);
+    s+=resistor(p,i,bx(cB),xa,RY.c,['#C62828','#C62828','#6D4C41','#C9A227']);
+    s+=led(p,i,xa,xc,l.color,cfg.labels,l.tag);
+    s+=wire({d:'M'+xc+' '+RY.d+' L'+xc+' '+RAIL.bm,x1:xc,y1:RY.d,x2:xc,y2:RAIL.bm},'#263238',p+'-k'+i);
+    s+=wire(curve(PINX[l.pin],447,bx(cB),RY.a),WIRE[i%WIRE.length],p+'-w'+i);});
+  btns.forEach(function(b,i){
+    var X=n<=1?22:24,xl=bx(X),xr=bx(X+2),xk=bx(X+4);
+    /* pull-down direnç (10 kΩ: kahverengi, siyah, turuncu): düğme sol bacağı ile GND arasında */
+    s+=resistor(p,'b'+i,xl,xk,RY.c,['#6D4C41','#212121','#E65100','#C9A227']);
+    s+=wire({d:'M'+xk+' '+RY.d+' L'+xk+' '+RAIL.bm,x1:xk,y1:RY.d,x2:xk,y2:RAIL.bm},'#263238',p+'-bk'+i);
+    s+=wire({d:'M'+xr+' '+RAIL.tp+' L'+xr+' '+RY.j,x1:xr,y1:RAIL.tp,x2:xr,y2:RY.j},'#D32F2F',p+'-b5'+i);
+    s+=wire(curve(PINX[b.pin],447,xl,RY.a),'#1E88E5',p+'-bw'+i);
+    s+=pushbutton(p,i,xl,xr,b.tag);});
+  /* 5 V: breadboard + hattı Uno'nun 5V pinine bağlı */
+  if(btns.length){
+    s+='<rect x="594" y="650" width="8" height="12" fill="#FFB74D"/><text x="598" y="646" font-size="12" text-anchor="middle" font-weight="700" fill="#FFE0B2" font-family="Rubik,Arial">5V</text>';
+    s+=wire({d:'M598 662 V672 H26 V44 H82',x1:598,y1:662,x2:82,y2:44},'#D32F2F',p+'-5v');}
+  s+=pinBubbles(p,used);
+  s+='</svg>';
+  return {svg:s,leds:leds,buttons:btns};}
+
+function pushbutton(p,i,xl,xr,tag){
+  var xm=(xl+xr)/2,s='<g id="'+p+'-pb'+i+'" style="cursor:pointer" tabindex="0" role="button" aria-label="Düğme (basılı tut)">';
+  [[xl,RY.f],[xl,RY.e],[xr,RY.f],[xr,RY.e]].forEach(function(q){s+='<rect x="'+(q[0]-3)+'" y="'+(q[1]-6)+'" width="6" height="12" fill="#B0BAC4"/>';});
+  s+='<rect x="'+(xl-17)+'" y="170" width="'+(xr-xl+34)+'" height="78" rx="6" fill="#2B2F36" stroke="#14171C" stroke-width="2"/>';
+  s+='<circle cx="'+xm+'" cy="209" r="25" fill="#3B4048" stroke="#14171C" stroke-width="2"/>';
+  s+='<circle id="'+p+'-cap'+i+'" cx="'+xm+'" cy="209" r="19" fill="#5C6470" stroke="#14171C" stroke-width="2"/>';
+  s+='<circle id="'+p+'-bglow'+i+'" cx="'+xm+'" cy="209" r="60" fill="#FF9F5A" opacity="0"/>';
+  if(tag){var tw=tag.length*8.4+22;s+='<rect x="'+(xm-tw/2)+'" y="128" width="'+tw+'" height="24" rx="12" fill="#FFF8E6" stroke="#B9B29B"/><text x="'+xm+'" y="145" text-anchor="middle" font-family="Rubik,Arial" font-weight="600" font-size="14" fill="#14202E">'+tag+'</text>';}
+  s+='<rect x="'+(xl-30)+'" y="160" width="'+(xr-xl+60)+'" height="98" fill="transparent"/>';
+  s+='</g>';return s;}
+
+function setButton(p,i,pin,pressed,lv){
+  var c=document.getElementById(p+'-cap'+i),g=document.getElementById(p+'-bglow'+i);
+  if(c){c.setAttribute('fill',pressed?'#C2410C':'#5C6470');c.setAttribute('r',pressed?'16':'19');}
+  if(g)g.setAttribute('opacity',pressed?'0.35':'0');
+  var r=document.getElementById(p+'-pv-'+pin),t=document.getElementById(p+'-pt-'+pin);
+  if(r&&t){var hi=lv>0.5;r.setAttribute('fill',hi?'#2E8540':'#2A3B50');t.textContent=hi?'5V':'0V';t.setAttribute('fill',hi?'#FFFFFF':'#C8D3E0');}}
+
+function setLevel(p,i,lv,pin){
+  var g=document.getElementById(p+'-glow'+i),l=document.getElementById(p+'-lit'+i);
+  if(g)g.setAttribute('opacity',(lv*0.95).toFixed(3));if(l)l.setAttribute('opacity',(lv*0.85).toFixed(3));
+  var r=document.getElementById(p+'-pv-'+pin),t=document.getElementById(p+'-pt-'+pin);
+  if(r&&t){var hi=lv>0.5;r.setAttribute('fill',hi?'#2E8540':'#2A3B50');t.textContent=hi?'5V':'0V';t.setAttribute('fill',hi?'#FFFFFF':'#C8D3E0');}}
+
+/* ---- sahneler ---- */
+function stars(n,seed,w,h){var s='',x=seed;for(var i=0;i<n;i++){x=(x*9301+49297)%233280;var a=x/233280;x=(x*9301+49297)%233280;var b=x/233280;
+  s+='<circle cx="'+(a*w).toFixed(0)+'" cy="'+(b*h).toFixed(0)+'" r="'+(1+((i%3)*0.6)).toFixed(1)+'" fill="#FFFFFF" opacity="'+(0.35+(i%4)*0.15).toFixed(2)+'"/>';}return s;}
+var SC={};
+SC.ecg=function(p,map){
+  var N=150,samples=[],sm=0;
+  var s='<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kalp monitörü"><defs><radialGradient id="'+p+'-hg"><stop offset="0" stop-color="#FF5A6E" stop-opacity="1"/><stop offset="1" stop-color="#FF5A6E" stop-opacity="0"/></radialGradient></defs>';
+  s+='<rect width="640" height="300" fill="#07131F"/>';
+  for(var gx=0;gx<=640;gx+=40)s+='<line x1="'+gx+'" y1="0" x2="'+gx+'" y2="300" stroke="#0F2A3F" stroke-width="1"/>';
+  for(var gy=0;gy<=300;gy+=40)s+='<line x1="0" y1="'+gy+'" x2="640" y2="'+gy+'" stroke="#0F2A3F" stroke-width="1"/>';
+  s+='<circle id="'+p+'-hglow" cx="150" cy="95" r="120" fill="url(#'+p+'-hg)" opacity="0"/>';
+  s+='<g id="'+p+'-heart" transform="translate(150,95)"><path d="M0 52 C-70 0 -62 -58 -26 -58 C-10 -58 0 -46 0 -36 C0 -46 10 -58 26 -58 C62 -58 70 0 0 52 Z" fill="#7A1B2B" stroke="#FF8A9A" stroke-width="3"/><path id="'+p+'-hlit" d="M0 52 C-70 0 -62 -58 -26 -58 C-10 -58 0 -46 0 -36 C0 -46 10 -58 26 -58 C62 -58 70 0 0 52 Z" fill="#FF4D63" opacity="0"/></g>';
+  s+='<text x="300" y="60" font-family="JetBrains Mono,monospace" font-size="22" fill="#6CB6FF">EKG · D'+map.heart+'</text>';
+  s+='<text x="300" y="108" font-family="JetBrains Mono,monospace" font-size="44" font-weight="700" fill="#9BE38B">♥ 72</text><text x="430" y="108" font-family="Rubik,Arial" font-size="20" fill="#93A3B8">atım / dk</text>';
+  s+='<path id="'+p+'-tr" d="" fill="none" stroke="#9BE38B" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>';
+  s+='<text x="20" y="288" font-family="Rubik,Arial" font-size="16" fill="#5B7894">Kızılay Haftası · ilk yardım monitörü</text></svg>';
+  function draw(){var d='',n=samples.length;
+    for(var i=0;i<n;i++){var x=630-(n-i)*(620/N),y=235-samples[i]*84;d+=(i?' L':'M')+x.toFixed(1)+' '+y.toFixed(1);}
+    var t=document.getElementById(p+'-tr');if(t)t.setAttribute('d',d);}
+  return{svg:s,reset:function(){samples=[];sm=0;draw();},
+    update:function(lv){var l=lv[map.heart]||0;sm=sm*0.6+l*0.4;samples.push(sm);if(samples.length>N)samples.shift();
+      var h=document.getElementById(p+'-heart'),gl=document.getElementById(p+'-hglow'),hl=document.getElementById(p+'-hlit');
+      if(h)h.setAttribute('transform','translate(150,95) scale('+(1+0.14*l).toFixed(3)+')');
+      if(gl)gl.setAttribute('opacity',l.toFixed(3));if(hl)hl.setAttribute('opacity',l.toFixed(3));draw();}};};
+
+SC.ambulance=function(p,map){
+  var s='<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ambulans çakar ışıkları"><defs>'
+   +'<radialGradient id="'+p+'-gR"><stop offset="0" stop-color="#FF4D4D" stop-opacity="1"/><stop offset="1" stop-color="#FF4D4D" stop-opacity="0"/></radialGradient>'
+   +'<radialGradient id="'+p+'-gB"><stop offset="0" stop-color="#4DA3FF" stop-opacity="1"/><stop offset="1" stop-color="#4DA3FF" stop-opacity="0"/></radialGradient></defs>';
+  s+='<rect width="640" height="300" fill="#0B1220"/>';
+  s+='<circle id="'+p+'-wB" cx="130" cy="150" r="220" fill="url(#'+p+'-gB)" opacity="0"/><circle id="'+p+'-wR" cx="510" cy="150" r="220" fill="url(#'+p+'-gR)" opacity="0"/>';
+  s+='<rect y="236" width="640" height="64" fill="#1A2230"/><g fill="#C9D1D9"><rect x="40" y="266" width="70" height="8"/><rect x="190" y="266" width="70" height="8"/><rect x="380" y="266" width="70" height="8"/><rect x="530" y="266" width="70" height="8"/></g>';
+  s+='<g transform="translate(320,0)"><rect x="-130" y="96" width="260" height="130" rx="22" fill="#F3F5F7" stroke="#B6C0CC" stroke-width="3"/>';
+  s+='<rect x="-130" y="176" width="260" height="20" fill="#D32F2F"/><path d="M20 112 H46 V138 H72 V160 H46 V186 H20 V160 H-6 V138 H20 Z" fill="#D32F2F" transform="translate(20,-10) scale(0.8)"/>';
+  s+='<rect x="-108" y="108" width="62" height="46" rx="8" fill="#9BC4E8"/><circle cx="-84" cy="228" r="22" fill="#263238"/><circle cx="84" cy="228" r="22" fill="#263238"/><circle cx="-84" cy="228" r="9" fill="#90A4AE"/><circle cx="84" cy="228" r="9" fill="#90A4AE"/>';
+  s+='<rect x="-70" y="74" width="140" height="22" rx="6" fill="#37474F"/>';
+  s+='<circle id="'+p+'-lB" cx="-40" cy="85" r="16" fill="#4DA3FF" opacity=".2" stroke="#ECEFF1" stroke-width="3"/><circle id="'+p+'-lR" cx="40" cy="85" r="16" fill="#FF4D4D" opacity=".2" stroke="#ECEFF1" stroke-width="3"/></g>';
+  s+='<text x="12" y="24" font-family="JetBrains Mono,monospace" font-size="17" fill="#8FA6C4">mavi D'+map.B+' · kırmızı D'+map.R+'</text></svg>';
+  return{svg:s,update:function(lv){var b=lv[map.B]||0,r=lv[map.R]||0;
+    function set(id,v,a,k){var e=document.getElementById(p+'-'+id);if(e)e.setAttribute('opacity',(a+k*v).toFixed(3));}
+    set('lB',b,.2,.8);set('lR',r,.2,.8);set('wB',b,0,.55);set('wR',r,0,.55);}};};
+
+SC.battery=function(p,map){
+  var cols=['#E53935','#FFB300','#FFB300','#43A047','#43A047'];
+  var s='<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Şarj göstergesi"><rect width="640" height="300" fill="#0E1B2B"/>';
+  s+='<rect x="90" y="70" width="420" height="150" rx="22" fill="#16253A" stroke="#93A3B8" stroke-width="6"/><rect x="510" y="115" width="32" height="60" rx="8" fill="#93A3B8"/>';
+  for(var i=0;i<5;i++){var x=110+i*80;
+    s+='<rect x="'+x+'" y="90" width="68" height="110" rx="10" fill="#1F2E40"/><rect id="'+p+'-b'+i+'" x="'+x+'" y="90" width="68" height="110" rx="10" fill="'+cols[i]+'" opacity=".12"/>';
+    s+='<text x="'+(x+34)+'" y="250" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="17" fill="#9FB0BA">D'+map.pins[i]+'</text>';}
+  s+='<text id="'+p+'-pct" x="320" y="48" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="34" font-weight="700" fill="#F6F4EE">% 0</text>';
+  s+='<path d="M590 130 L560 175 H582 L572 210 L606 160 H584 Z" fill="#FFD54F" opacity=".9"/></svg>';
+  return{svg:s,update:function(lv){var n=0;
+    for(var i=0;i<5;i++){var l=lv[map.pins[i]]||0;if(l>0.5)n++;var e=document.getElementById(p+'-b'+i);if(e)e.setAttribute('opacity',(0.12+0.88*l).toFixed(3));}
+    var t=document.getElementById(p+'-pct');if(t)t.textContent='% '+(n*20);}};};
+
+SC.visor=function(p,map){
+  var n=map.pins.length,trail=[],i;for(i=0;i<n;i++)trail.push(0);
+  var s='<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Robot tarayıcı ışığı"><defs><radialGradient id="'+p+'-g"><stop offset="0" stop-color="#FF5252" stop-opacity="1"/><stop offset="1" stop-color="#FF5252" stop-opacity="0"/></radialGradient></defs>';
+  s+='<rect width="640" height="300" fill="#0B121B"/>';
+  s+='<line x1="320" y1="10" x2="320" y2="46" stroke="#93A3B8" stroke-width="6"/><circle cx="320" cy="12" r="9" fill="#FF9F5A"/>';
+  s+='<rect x="60" y="46" width="520" height="210" rx="46" fill="#C9D3DE" stroke="#8FA0B3" stroke-width="6"/><rect x="38" y="120" width="22" height="64" rx="8" fill="#8FA0B3"/><rect x="580" y="120" width="22" height="64" rx="8" fill="#8FA0B3"/>';
+  s+='<rect x="90" y="96" width="460" height="96" rx="40" fill="#10151C"/>';
+  for(i=0;i<n;i++){var cx=130+i*(380/(n-1));
+    s+='<circle id="'+p+'-g'+i+'" cx="'+cx+'" cy="144" r="46" fill="url(#'+p+'-g)" opacity="0"/><circle cx="'+cx+'" cy="144" r="18" fill="#3A1414"/><circle id="'+p+'-c'+i+'" cx="'+cx+'" cy="144" r="18" fill="#FF6B6B" opacity="0"/>';
+    s+='<text x="'+cx+'" y="228" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" fill="#52606F">D'+map.pins[i]+'</text>';}
+  s+='<text x="320" y="285" text-anchor="middle" font-family="Rubik,Arial" font-size="17" fill="#6B7C90">güvenlik robotu · tarayıcı çubuğu</text></svg>';
+  return{svg:s,reset:function(){for(var k=0;k<n;k++)trail[k]=0;},
+    update:function(lv){for(var k=0;k<n;k++){var l=lv[map.pins[k]]||0;trail[k]=Math.max(l,trail[k]*0.82);
+      var c=document.getElementById(p+'-c'+k),g=document.getElementById(p+'-g'+k);
+      if(c)c.setAttribute('opacity',trail[k].toFixed(3));if(g)g.setAttribute('opacity',(trail[k]*0.9).toFixed(3));}}};};
+
+/* ---- zaman çizelgesi ---- */
+function timelineSvg(p,rows,w,rh){
+  rh=rh||52;var h=rows.length*rh+22,s='<svg id="'+p+'-tls" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pin zaman çizelgesi" style="width:100%;height:auto">';
+  s+='<rect width="'+w+'" height="'+h+'" rx="12" fill="#0B121B"/>';
+  rows.forEach(function(r,i){var y=10+i*rh;
+    s+='<text x="12" y="'+(y+Math.round(rh/2)+5)+'" font-family="JetBrains Mono,monospace" font-size="18" font-weight="700" fill="'+r.col+'">D'+r.pin+'</text>';
+    s+='<line x1="62" y1="'+(y+4)+'" x2="'+(w-10)+'" y2="'+(y+4)+'" stroke="#1F2E40" stroke-dasharray="3 5"/><line x1="62" y1="'+(y+rh-12)+'" x2="'+(w-10)+'" y2="'+(y+rh-12)+'" stroke="#1F2E40"/>';
+    s+='<path id="'+p+'-tl'+i+'" d="" fill="none" stroke="'+r.col+'" stroke-width="3" stroke-linejoin="round"/>';});
+  s+='<text x="62" y="'+(h-4)+'" font-family="Rubik,Arial" font-size="13" fill="#6B7C90">geçmiş</text><text x="'+(w-10)+'" y="'+(h-4)+'" text-anchor="end" font-family="Rubik,Arial" font-size="13" fill="#6B7C90">şimdi</text>';
+  s+='<line x1="'+(w-10)+'" y1="4" x2="'+(w-10)+'" y2="'+(h-16)+'" stroke="#FF9F5A" stroke-width="2"/></svg>';
+  return s;}
+function timelineDraw(p,rows,rt,w,win,rh){
+  rh=rh||52;var x0=62,x1=w-10,span=x1-x0,t0=rt.t-win;
+  rows.forEach(function(r,i){var y=10+i*rh,top=y+4,bot=y+rh-12,h=rt.hist[r.pin];
+    var el=document.getElementById(p+'-tl'+i);if(!el)return;
+    if(!h){el.setAttribute('d','M'+x0+' '+bot+' L'+x1+' '+bot);return;}
+    function X(t){return x0+Math.max(0,(t-t0))/win*span;}
+    function Y(l){return bot-(bot-top)*l;}
+    var i0=0;for(var k=0;k<h.length;k++){if(h[k][0]<=t0)i0=k;}
+    var d='M'+x0+' '+Y(h[i0][1]).toFixed(1),last=h[i0][1];
+    for(k=i0+1;k<h.length;k++){if(h[k][0]>rt.t)break;var xx=X(h[k][0]).toFixed(1);d+=' L'+xx+' '+Y(last).toFixed(1)+' L'+xx+' '+Y(h[k][1]).toFixed(1);last=h[k][1];}
+    d+=' L'+x1+' '+Y(last).toFixed(1);el.setAttribute('d',d);});}
+
+root.Ckt={PINX:PINX,RY:RY,RAIL:RAIL,bx:bx,LEDC:LEDC,board:board,circuit:circuit,setLevel:setLevel,setButton:setButton,scenes:SC,timelineSvg:timelineSvg,timelineDraw:timelineDraw,stars:stars,ROWS_UP:ROWS_UP,ROWS_LO:ROWS_LO};
+})(window);
+
+/* MOTOR: Arduino'nun alt kümesi (setup, loop, pinMode, digitalWrite, digitalRead, delay, int, for, if/else) için mini derleyici ve sanal zamanlı çalıştırıcı */
+(function(root){
+var FN={pinMode:2,digitalWrite:2,delay:1};
+var CONSTV={OUTPUT:1,INPUT:0,INPUT_PULLUP:2,HIGH:1,LOW:0,LED_BUILTIN:13};
+var TYPES={int:1,byte:1,long:1};
+var KNOWN=Object.keys(FN).concat(Object.keys(CONSTV),['void','setup','loop','int','for','if','else','digitalRead']);
+
+function strip(src){var out='',i=0,n=src.length;
+  while(i<n){var c=src[i],d=src[i+1];
+    if(c==='/'&&d==='/'){while(i<n&&src[i]!=='\n'){out+=' ';i++;}}
+    else if(c==='/'&&d==='*'){out+='  ';i+=2;while(i<n&&!(src[i]==='*'&&src[i+1]==='/')){out+=src[i]==='\n'?'\n':' ';i++;}if(i<n){out+='  ';i+=2;}}
+    else{out+=c;i++;}}
+  return out;}
+function lineAt(s,idx){var n=1;for(var i=0;i<idx&&i<s.length;i++)if(s[i]==='\n')n++;return n;}
+
+var P2=['++','--','<=','>=','==','!=','&&','||','+=','-=','*=','/='];
+function tokenize(s,errs){
+  var out=[],i=0,line=1,n=s.length;
+  while(i<n){var c=s[i];
+    if(c==='\n'){line++;i++;continue;}
+    if(/\s/.test(c)){i++;continue;}
+    var j=i;
+    if(/[A-Za-z_]/.test(c)){while(j<n&&/\w/.test(s[j]))j++;out.push({k:'id',v:s.slice(i,j),line:line,pos:i,end:j});i=j;continue;}
+    if(/\d/.test(c)){while(j<n&&/[\d.]/.test(s[j]))j++;out.push({k:'num',v:parseFloat(s.slice(i,j)),line:line,pos:i,end:j});i=j;continue;}
+    var two=s.substr(i,2);
+    if(P2.indexOf(two)>=0){out.push({k:'p',v:two,line:line,pos:i,end:i+2});i+=2;continue;}
+    if('(){};,=<>+-*/%!'.indexOf(c)>=0){out.push({k:'p',v:c,line:line,pos:i,end:i+1});i++;continue;}
+    errs.push({line:line,msg:"stray '"+c+"' in program"});i++;}
+  return out;}
+
+function compile(src){
+  var errs=[],warns=[],s=strip(src);
+  /* parantez dengesi */
+  var st=[];
+  for(var i=0;i<s.length;i++){var c=s[i];
+    if(c==='('||c==='{')st.push({c:c,i:i});
+    else if(c===')'||c==='}'){var want=c===')'?'(':'{',o=st[st.length-1];
+      if(!o||o.c!==want){errs.push({line:lineAt(s,i),msg:"expected "+(o&&o.c==='('?"')'":"'}'")+" before '"+c+"' token"});return{errors:errs,warnings:warns};}
+      st.pop();}}
+  if(st.length){var o2=st[st.length-1];
+    errs.push(o2.c==='{'?{line:lineAt(s,s.length),msg:"expected '}' at end of input"}:{line:lineAt(s,o2.i),msg:"expected ')' before ';' token"});
+    return{errors:errs,warnings:warns};}
+  var toks=tokenize(s,errs);
+  if(errs.length)return{errors:errs,warnings:warns};
+
+  var p=0,scopes=[{}],globals=[],funcs={};
+  function cur(){return toks[p];}
+  function isP(v,o){var t=toks[p+(o||0)];return !!t&&t.k==='p'&&t.v===v;}
+  function prevLine(){return p>0?toks[p-1].line:1;}
+  function fail(line,msg){throw {line:line,msg:msg};}
+  function tokTxt(t){return t?(t.k==='num'?String(t.v):t.v):'end of input';}
+  function declared(n){for(var k=scopes.length-1;k>=0;k--)if(Object.prototype.hasOwnProperty.call(scopes[k],n))return true;return false;}
+  function hint(w){var hit=null,all=KNOWN.slice();
+    scopes.forEach(function(sc){Object.keys(sc).forEach(function(k){all.push(k);});});
+    all.forEach(function(k){if(k!==w&&k.toLowerCase()===w.toLowerCase())hit=k;});
+    return hit?"; did you mean '"+hit+"'?":"";}
+  function semi(){if(isP(';')){p++;return;}errs.push({line:prevLine(),msg:"expected ';' before '"+tokTxt(cur())+"' token"});}
+  function expectClose(){if(isP(')')){return toks[p++];}fail(cur()?cur().line:prevLine(),"expected ')' before '"+tokTxt(cur())+"'");}
+
+  var PREC={'||':1,'&&':2,'==':3,'!=':3,'<':4,'>':4,'<=':4,'>=':4,'+':5,'-':5,'*':6,'/':6,'%':6};
+  function parseExpr(min){
+    var l=parseUnary();
+    for(;;){var t=cur();if(!t||t.k!=='p'||!PREC[t.v]||PREC[t.v]<min)break;p++;var r=parseExpr(PREC[t.v]+1);l={k:'b',op:t.v,l:l,r:r,line:t.line};}
+    return l;}
+  function parseUnary(){
+    var t=cur();
+    if(!t)fail(prevLine(),"expected primary-expression before end of input");
+    if(isP('-')){p++;return{k:'u',op:'-',e:parseUnary()};}
+    if(isP('!')){p++;return{k:'u',op:'!',e:parseUnary()};}
+    if(isP('(')){p++;var e=parseExpr(1);expectClose();return e;}
+    if(t.k==='num'){p++;return{k:'n',v:t.v};}
+    if(t.k==='id'&&t.v==='digitalRead'&&isP('(',1)){p+=2;var da=parseExpr(1);expectClose();return{k:'dr',e:da,line:t.line};}
+    if(t.k==='id'){p++;
+      if(Object.prototype.hasOwnProperty.call(CONSTV,t.v))return{k:'c',name:t.v,v:CONSTV[t.v]};
+      if(declared(t.v))return{k:'v',name:t.v};
+      fail(t.line,"'"+t.v+"' was not declared in this scope"+hint(t.v));}
+    fail(t.line,"expected primary-expression before '"+tokTxt(t)+"' token");}
+
+  function parseDecl(needSemi){
+    p++;var list=[];
+    for(;;){var t=cur();
+      if(!t||t.k!=='id'||TYPES[t.v])fail(t?t.line:prevLine(),"expected unqualified-id before '"+tokTxt(t)+"' token");
+      p++;var init=null;
+      if(isP('=')){p++;init=parseExpr(1);}
+      var sc=scopes[scopes.length-1];
+      if(Object.prototype.hasOwnProperty.call(sc,t.v))fail(t.line,"redeclaration of 'int "+t.v+"'");
+      sc[t.v]=1;list.push({name:t.v,init:init});
+      if(isP(',')){p++;continue;}break;}
+    if(needSemi)semi();
+    return{t:'seq',list:list};}
+  function parseAssign(needSemi){
+    var t=cur();
+    if(!t||t.k!=='id')fail(t?t.line:prevLine(),"expected primary-expression before '"+tokTxt(t)+"' token");
+    if(!declared(t.v))fail(t.line,"'"+t.v+"' was not declared in this scope"+hint(t.v));
+    p++;var n=cur(),node;
+    if(n&&n.k==='p'&&(n.v==='++'||n.v==='--')){p++;node={t:'assign',name:t.v,op:n.v==='++'?'+=':'-=',expr:{k:'n',v:1},line:t.line};}
+    else if(n&&n.k==='p'&&(n.v==='='||n.v==='+='||n.v==='-='||n.v==='*='||n.v==='/=')){p++;node={t:'assign',name:t.v,op:n.v,expr:parseExpr(1),line:t.line};}
+    else fail(t.line,"expected ';' before '"+tokTxt(n)+"' token");
+    if(needSemi)semi();
+    return node;}
+  function parseCall(){
+    var t=cur(),name=t.v;
+    if(!FN[name])fail(t.line,"'"+name+"' was not declared in this scope"+hint(name));
+    p+=2;var args=[];
+    if(!isP(')')){for(;;){args.push(parseExpr(1));if(isP(',')){p++;continue;}break;}}
+    var close=expectClose();
+    if(args.length<FN[name])fail(t.line,"too few arguments to function '"+name+"'");
+    if(args.length>FN[name])fail(t.line,"too many arguments to function '"+name+"'");
+    if(name==='pinMode'&&!(args[1].k==='c'&&(args[1].name==='OUTPUT'||args[1].name==='INPUT'||args[1].name==='INPUT_PULLUP')))fail(t.line,"invalid pin mode in 'pinMode' (OUTPUT, INPUT veya INPUT_PULLUP yaz)");
+    semi();
+    return{t:'call',name:name,args:args,line:t.line,txt:s.slice(t.pos,close.end).replace(/\s+/g,' ')+';'};}
+  function parseFor(){
+    var t=cur();p++;
+    if(!isP('('))fail(t.line,"expected '(' after 'for'");
+    p++;scopes.push({});
+    var init=null,cond=null,incr=null;
+    try{
+      if(!isP(';')){init=(cur()&&cur().k==='id'&&TYPES[cur().v])?parseDecl(false):parseAssign(false);}
+      if(!isP(';'))fail(prevLine(),"expected ';' before '"+tokTxt(cur())+"' token");p++;
+      if(!isP(';'))cond=parseExpr(1);
+      if(!isP(';'))fail(prevLine(),"expected ';' before '"+tokTxt(cur())+"' token");p++;
+      if(!isP(')'))incr=parseAssign(false);
+      expectClose();
+    }catch(e){
+      if(!e.msg)throw e;errs.push(e);
+      var d=1;while(cur()&&d>0){if(isP('('))d++;else if(isP(')'))d--;p++;}
+      init=cond=incr=null;}
+    var body=parseStmt();
+    scopes.pop();
+    return{t:'for',init:init,cond:cond,incr:incr,body:body,line:t.line};}
+  function parseIf(){
+    var t=cur();p++;
+    if(!isP('('))fail(t.line,"expected '(' after 'if'");
+    p++;var cond=parseExpr(1);expectClose();
+    var th=parseStmt(),el=null;
+    if(cur()&&cur().k==='id'&&cur().v==='else'){p++;el=parseStmt();}
+    return{t:'if',cond:cond,then:th,els:el,line:t.line};}
+  function sync(s0){
+    var d=0;
+    while(cur()){if(isP('('))d++;else if(isP(')'))d--;
+      else if(d<=0&&isP(';')){p++;break;}
+      else if(d<=0&&isP('}'))break;
+      p++;}
+    if(p===s0)p++;}
+  function parseBody(){
+    var list=[];
+    while(cur()&&!isP('}')){
+      var s0=p;
+      try{list.push(parseStmt());}catch(e){if(!e.msg)throw e;errs.push(e);sync(s0);}}
+    if(isP('}'))p++;
+    return list;}
+  function parseStmt(){
+    var t=cur();
+    if(!t)fail(prevLine(),"expected '}' at end of input");
+    if(isP('{')){p++;scopes.push({});var b=parseBody();scopes.pop();return{t:'block',body:b};}
+    if(isP(';')){p++;return{t:'empty'};}
+    if(t.k==='id'){
+      if(TYPES[t.v])return parseDecl(true);
+      if(t.v==='for')return parseFor();
+      if(t.v==='if')return parseIf();
+      if(t.v==='else')fail(t.line,"expected primary-expression before 'else' token");
+      if(isP('(',1))return parseCall();
+      return parseAssign(true);}
+    fail(t.line,"expected primary-expression before '"+tokTxt(t)+"' token");}
+
+  while(cur()){
+    var s0=p;
+    try{
+      var t0=cur();
+      if(t0.k==='id'&&TYPES[t0.v]){globals.push(parseDecl(true));}
+      else if(t0.k==='id'&&t0.v==='void'){
+        p++;var nm=cur();
+        if(!nm||nm.k!=='id')fail(t0.line,"expected unqualified-id before '"+tokTxt(nm)+"' token");
+        p++;
+        if(!isP('('))fail(nm.line,"expected '(' before '"+tokTxt(cur())+"' token");p++;
+        if(!isP(')'))fail(nm.line,"expected ')' before '"+tokTxt(cur())+"' token");p++;
+        if(!isP('{'))fail(nm.line,"expected '{' before '"+tokTxt(cur())+"' token");p++;
+        scopes.push({});var body=parseBody();scopes.pop();
+        funcs[nm.v]={body:body,line:nm.line};}
+      else if(t0.k==='id'&&isP('(',1))fail(t0.line,"expected constructor, destructor, or type conversion before '(' token");
+      else fail(t0.line,"'"+tokTxt(t0)+"' does not name a type");
+    }catch(e){
+      if(!e.msg)throw e;errs.push(e);
+      var d=0;while(cur()){if(isP('{'))d++;else if(isP('}')){d--;if(d<=0){p++;break;}}else if(d<=0&&isP(';')){p++;break;}p++;}
+      if(p===s0)p++;}}
+  if(!funcs.setup)errs.push({line:0,msg:"undefined reference to `setup'"});
+  if(!funcs.loop)errs.push({line:0,msg:"undefined reference to `loop'"});
+  errs.sort(function(a,b){return a.line-b.line;});
+  if(errs.length)return{errors:errs,warnings:warns};
+  return{funcs:funcs,globals:globals,errors:errs,warnings:warns};
+}
+var EMPTY={funcs:{setup:{body:[]},loop:{body:[]}},globals:[],errors:[],warnings:[]};
+
+/* ---- çalıştırma ---- */
+function Env(parent){this.vars={};this.parent=parent||null;}
+Env.prototype.find=function(n){var e=this;while(e){if(Object.prototype.hasOwnProperty.call(e.vars,n))return e;e=e.parent;}return null;};
+function evalx(e,env){
+  switch(e.k){
+    case 'n':case 'c':return e.v;
+    case 'v':var o=env.find(e.name);return o?o.vars[e.name]:0;
+    case 'dr':{var dp=evalx(e.e,env),R=root.Engine&&root.Engine._rt;return R?R.readPin(dp):((root.Engine&&root.Engine._probe)?1:0);}
+    case 'u':{var v=evalx(e.e,env);return e.op==='-'?-v:(v?0:1);}
+    case 'b':{var a=evalx(e.l,env),b=evalx(e.r,env);
+      switch(e.op){case '+':return a+b;case '-':return a-b;case '*':return a*b;
+        case '/':if(b===0)throw {msg:"0'a bölme (satır "+e.line+")"};return Math.trunc(a/b);
+        case '%':if(b===0)throw {msg:"0'a bölme (satır "+e.line+")"};return a%b;
+        case '<':return a<b?1:0;case '>':return a>b?1:0;case '<=':return a<=b?1:0;case '>=':return a>=b?1:0;
+        case '==':return a===b?1:0;case '!=':return a!==b?1:0;case '&&':return(a&&b)?1:0;case '||':return(a||b)?1:0;}}}
+  return 0;}
+function varsText(env){
+  var seen={},out=[];
+  for(var e=env;e;e=e.parent)Object.keys(e.vars).forEach(function(k){if(!seen[k]){seen[k]=1;out.push(k+' = '+e.vars[k]);}});
+  return out.join(', ');}
+function initGlobals(prog,env){
+  prog.globals.forEach(function(g){g.list.forEach(function(d){env.vars[d.name]=d.init?evalx(d.init,env):0;});});}
+function* exec(s,env,ctx){
+  switch(s.t){
+    case 'empty':break;
+    case 'seq':s.list.forEach(function(d){env.vars[d.name]=d.init?evalx(d.init,env):0;});break;
+    case 'block':{var e2=new Env(env);for(var k=0;k<s.body.length;k++)yield* exec(s.body[k],e2,ctx);break;}
+    case 'assign':{var o=env.find(s.name)||env,cv=o.vars[s.name]||0,v=evalx(s.expr,env);
+      o.vars[s.name]=s.op==='='?v:s.op==='+='?cv+v:s.op==='-='?cv-v:s.op==='*='?cv*v:(v===0?0:Math.trunc(cv/v));break;}
+    case 'if':{
+      if(evalx(s.cond,env))yield* exec(s.then,new Env(env),ctx);
+      else if(s.els)yield* exec(s.els,new Env(env),ctx);
+      break;}
+    case 'for':{
+      var fe=new Env(env);
+      if(s.init)yield* exec(s.init,fe,ctx);
+      while(!s.cond||evalx(s.cond,fe)){
+        if(++ctx.steps>200000)throw {msg:"Döngü bitmiyor: for koşulu hiç yanlış olmuyor (satır "+s.line+")"};
+        yield* exec(s.body,new Env(fe),ctx);
+        if(s.incr)yield* exec(s.incr,fe,ctx);}
+      break;}
+    case 'call':{
+      var a=s.args.map(function(x){return evalx(x,env);});
+      var nm=function(i){return s.args[i].k==='c'?s.args[i].name:String(a[i]);};
+      var op={line:s.line,txt:s.txt,vars:varsText(env)};
+      if(s.name==='pinMode'){op.t='pm';op.pin=a[0];op.mode=s.args[1].name;op.res='pinMode('+a[0]+', '+op.mode+');';}
+      else if(s.name==='digitalWrite'){op.t='dw';op.pin=a[0];op.val=a[1]?1:0;op.res='digitalWrite('+a[0]+', '+(s.args[1].k==='c'?s.args[1].name:(a[1]?'HIGH':'LOW'))+');';}
+      else{op.t='dl';op.ms=Math.max(0,a[0]);op.res='delay('+a[0]+');';}
+      ctx.steps=0;
+      yield op;break;}
+  }}
+function* runBody(body,env,ctx){for(var k=0;k<body.length;k++)yield* exec(body[k],env,ctx);}
+
+function analyze(prog){
+  var r={modes:{},written:{},loopDelay:false,loopWrite:false,warns:[],stuck:null};
+  if(!prog.funcs)return r;
+  [0,1].forEach(function(probe){
+    var genv=new Env(),ctx={steps:0};
+    root.Engine._probe=probe;root.Engine._rt=null;
+    try{
+      initGlobals(prog,genv);
+      ['setup','loop'].forEach(function(name){
+        var g=runBody(prog.funcs[name].body,genv,ctx),n=0;
+        for(;;){var x=g.next();if(x.done)break;var o=x.value;
+          if(++n>20000){if(r.warns.indexOf('Çok uzun: bir turda 20000’den fazla komut var.')<0)r.warns.push('Çok uzun: bir turda 20000’den fazla komut var.');break;}
+          if(o.t==='pm'&&o.mode==='OUTPUT')r.modes[o.pin]=1;
+          if(o.t==='dw'){r.written[o.pin]=1;if(name==='loop')r.loopWrite=true;}
+          if(o.t==='dl'&&name==='loop')r.loopDelay=true;
+          if((o.t==='pm'||o.t==='dw')&&(o.pin<0||o.pin>13)){var m="D"+o.pin+" Uno'da yok (D0–D13) (satır "+o.line+")";if(r.warns.indexOf(m)<0)r.warns.push(m);}}});
+    }catch(e){r.stuck=e.msg||String(e);}
+    root.Engine._probe=0;});
+  return r;}
+
+function Runtime(prog){this.prog=prog;this.listeners=[];this.reset();}
+Runtime.prototype.reset=function(){
+  this.t=0;this.clock=0;this.mode={};this.val={};this.level={};this.lastT={};this.on={};this.hist={};
+  this.stage='setup';this.gen=null;this.opsRun=0;this.setupRuns=0;this.loopRuns=0;this.cur=null;this.stuck=null;
+  this.env=new Env();this.ctx={steps:0};initGlobals(this.prog,this.env);};
+Runtime.prototype.onEdge=function(fn){this.listeners.push(fn);};
+/* düğmeler: {pin:{wiring:'pullup'|'pulldown',pressed:0|1}} (UI ile paylaşılır) */
+Runtime.prototype.setButtons=function(map){this.buttons=map||{};var self=this;
+  Object.keys(this.buttons).forEach(function(p){self.hist[p]=[[0,self.inLevel(+p)]];});};
+Runtime.prototype.inLevel=function(pin){
+  var b=this.buttons&&this.buttons[pin];if(!b)return 0;
+  var m=this.mode[pin];
+  if(b.wiring==='pulldown')return b.pressed?1:0;
+  if(b.pressed)return 0;
+  return m===2||m==='INPUT_PULLUP'?1:0.5;};
+Runtime.prototype.readPin=function(pin){
+  if(this.mode[pin]==='OUTPUT')return this.val[pin]?1:0;
+  var b=this.buttons&&this.buttons[pin];if(!b)return 0;
+  var l=this.inLevel(pin);
+  if(l===0.5){this.floating=this.floating||{};this.floating[pin]=1;return Math.random()<0.5?1:0;}
+  return l>0.5?1:0;};
+Runtime.prototype.noteInput=function(pin){
+  var h=this.hist[pin]||(this.hist[pin]=[[0,0]]),l=this.inLevel(pin);
+  if(h[h.length-1][1]!==l)h.push([this.t,l]);};
+Runtime.prototype._lv=function(p){return this.mode[p]==='OUTPUT'?(this.val[p]?1:0):(this.val[p]?0.06:0);};
+Runtime.prototype._acc=function(p,t){var l=this.level[p]||0,lt=this.lastT[p]||0;this.on[p]=(this.on[p]||0)+l*(t-lt);this.lastT[p]=t;};
+Runtime.prototype._apply=function(st,t){
+  var p=st.pin;this._acc(p,t);
+  if(st.t==='pm')this.mode[p]=st.mode;else this.val[p]=st.val;
+  var nl=this._lv(p),old=this.level[p]||0;
+  if(nl!==old||!this.hist[p]){
+    this.level[p]=nl;
+    var h=this.hist[p]||(this.hist[p]=[[0,0]]);
+    h.push([t,nl]);
+    for(var i=0;i<this.listeners.length;i++)this.listeners[i](p,nl,t,old);}};
+Runtime.prototype.advance=function(dt){
+  var target=this.t+dt,guard=0;root.Engine._rt=this;
+  while(this.clock<=target&&guard<6000&&!this.stuck){
+    if(!this.gen){
+      var body=this.prog.funcs[this.stage].body;
+      this.gen=runBody(body,this.env,this.ctx);this.opsRun=0;}
+    var r;
+    try{r=this.gen.next();}catch(e){this.stuck=e.msg||String(e);this.clock=target+1;break;}
+    if(r.done){
+      this.gen=null;
+      if(this.stage==='setup'){this.stage='loop';this.setupRuns=1;continue;}
+      if(!this.opsRun){this.clock=target+1;break;}
+      this.loopRuns++;
+      this.clock+=0.002;continue;}
+    var st=r.value;this.cur=st;this.opsRun++;
+    if(st.t==='dl')this.clock+=st.ms;
+    else{this._apply(st,this.clock);this.clock+=0.004;}
+    guard++;}
+  if(guard>=6000)this.clock=target+1;
+  var self=this,out={};
+  Object.keys(this.level).forEach(function(p){self._acc(+p,target);out[p]=dt>0?Math.min(1,self.on[p]/dt):self.level[p];self.on[p]=0;});
+  this.t=target;
+  Object.keys(this.hist).forEach(function(p){var h=self.hist[p];while(h.length>3&&h[1][0]<target-20000)h.shift();});
+  root.Engine._rt=null;
+  return out;};
+root.Engine={compile:compile,analyze:analyze,Runtime:Runtime,EMPTY:EMPTY,_rt:null,_probe:0};
+})(window);
+
+/* SİMÜLASYON ARAYÜZÜ: devre + sahne + zaman çizelgesi + pin tablosu + (isteğe bağlı) kod editörü ve derleyici konsolu */
+(function(root){
+var Sim={};
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+var COLS={red:'#FF6B6B',green:'#4CE07A',white:'#EAF6FF',yellow:'#FFD54F',blue:'#6CB6FF'};
+var CHIPS={red:'#C62828',green:'#2E8540',white:'#7A8A99',yellow:'#9A7B00',blue:'#1A56B8'};
+
+Sim.mount=function(id,cfg){
+  var sec=$(id);if(!sec)return;
+  var bcfg=cfg.buttons||[];
+  var built=Ckt.circuit(id,{leds:cfg.leds,labels:cfg.labels,buttons:bcfg});
+  $(id+'-ckt').innerHTML=built.svg;
+  var leds=built.leds;                                     /* pin sırasına göre */
+  var pins=leds.map(function(l){return l.pin;});
+  var scene=null;
+  if(cfg.scene&&$(id+'-scene')){scene=Ckt.scenes[cfg.scene](id,cfg.map);$(id+'-scene').innerHTML=scene.svg;}
+  var rows=leds.map(function(l){return{pin:l.pin,col:COLS[l.color]||'#fff'};});
+  var btnState={};bcfg.forEach(function(b){btnState[b.pin]={wiring:b.wiring||'pulldown',pressed:0,lock:0};rows.push({pin:b.pin,col:'#C8D3E0'});});
+  var tlW=cfg.tlW||640,win=cfg.win||10000,compact=leds.length>=4,rh=compact?34:(rows.length>=3?36:52);
+  if($(id+'-tl'))$(id+'-tl').innerHTML=Ckt.timelineSvg(id,rows,tlW,rh);
+  var rt=null,running=false,speed=cfg.speed||1,raf=0,last=0,prog=null;
+
+  function pinTable(){
+    var el=$(id+'-pins');if(!el)return;
+    if(compact){
+      var hc='<div style="display:flex;flex-wrap:wrap;gap:8px">';
+      leds.forEach(function(l,i){hc+='<span id="'+id+'-pb'+i+'" class="chip lo" style="font-family:var(--mono);font-size:18px">D'+l.pin+' · 0 V</span>';});
+      el.innerHTML=hc+'</div><p id="'+id+'-now" class="mono" style="font-size:17px;color:#93A3B8;margin-top:8px;white-space:pre-wrap;line-height:1.35">Şu an: —</p>';return;}
+    var h='<table class="pt"><tr><th>Pin</th><th>Mod</th><th>Gerilim</th><th>Akım</th><th>LED</th></tr>';
+    leds.forEach(function(l,i){h+='<tr><td>D'+l.pin+'</td><td id="'+id+'-pm'+i+'">—</td><td id="'+id+'-pg'+i+'">0 V</td><td id="'+id+'-pa'+i+'">0,0 mA</td><td id="'+id+'-pl'+i+'"><span class="chip lo">söndü</span></td></tr>';});
+    bcfg.forEach(function(b,i){h+='<tr><td>D'+b.pin+'</td><td id="'+id+'-bm'+i+'">—</td><td id="'+id+'-bg'+i+'">0 V</td><td>—</td><td id="'+id+'-bl'+i+'"><span class="chip lo">bırakıldı</span></td></tr>';});
+    h+='</table><p id="'+id+'-now" class="mono" style="font-size:19px;color:#93A3B8;margin-top:8px;white-space:pre-wrap">Şu an: —</p>';
+    el.innerHTML=h;}
+  function render(levels){
+    leds.forEach(function(l,i){
+      var lv=levels[l.pin]||0;
+      Ckt.setLevel(id,i,lv,l.pin);
+      var c=Ckt.LEDC[l.color]||Ckt.LEDC.red,ma=lv*(5-c.vf)/220*1000;
+      var pm=$(id+'-pm'+i);if(pm){var mode=rt.mode[l.pin];pm.textContent=mode==='OUTPUT'?'OUTPUT':(mode?'INPUT':'—');pm.style.color=mode==='OUTPUT'?'#9BE38B':'#FF8A80';}
+      var pg=$(id+'-pg'+i);if(pg)pg.textContent=(lv>0.5?'5':'0')+' V';
+      var pa=$(id+'-pa'+i);if(pa)pa.textContent=ma.toFixed(1).replace('.',',')+' mA';
+      var pb=$(id+'-pb'+i);if(pb){var onb=lv>0.5;pb.textContent='D'+l.pin+' · '+(onb?'5':'0')+' V';pb.className='chip '+(onb?'hi':'lo');pb.style.background=onb?(CHIPS[l.color]||'#2E8540'):'';}
+      var pl=$(id+'-pl'+i);if(pl){var on=lv>0.5;pl.innerHTML=on?'<span class="chip hi">yanıyor</span>':(lv>0.03?'<span class="chip lo">çok soluk</span>':'<span class="chip lo">söndü</span>');}});
+    bcfg.forEach(function(b,i){
+      var st=btnState[b.pin],lv=rt.inLevel(b.pin),pr=st.pressed?1:0;
+      Ckt.setButton(id,i,b.pin,pr,lv>0.5&&lv<=1?1:0);
+      var bm=$(id+'-bm'+i);if(bm){var md=rt.mode[b.pin];bm.textContent=md==='OUTPUT'?'OUTPUT':(md?'INPUT':'INPUT (varsayılan)');bm.style.color=md==='OUTPUT'?'#FF8A80':'#9BE38B';}
+      var bg=$(id+'-bg'+i);if(bg)bg.textContent=(lv>0.5?'5':'0')+' V';
+      var bl=$(id+'-bl'+i);if(bl)bl.innerHTML=pr?'<span class="chip hi">basılı</span>':'<span class="chip lo">bırakıldı</span>';});
+    if(scene&&scene.update)scene.update(levels);
+    if($(id+'-tl'))Ckt.timelineDraw(id,rows,rt,tlW,win,rh);
+    var now=$(id+'-now');
+    if(now){var c=rt.cur,tx='Şu an: '+(c?c.txt+'  (satır '+c.line+')':'—');
+      if(c&&c.res&&c.res!==c.txt)tx+='\n→ '+c.res;
+      if(c&&c.vars)tx+='   ['+c.vars+']';
+      tx+='\nSanal süre: '+(rt.t/1000).toFixed(1).replace('.',',')+' sn · loop turu: '+rt.loopRuns;
+      if(rt.stuck)tx+='\nDURDU: '+rt.stuck;
+      now.textContent=tx;}
+  }
+  function load(p){
+    prog=p;rt=new Engine.Runtime(p);rt.setButtons(btnState);
+    if(scene&&scene.edge)rt.onEdge(scene.edge);
+    if(scene&&scene.reset)scene.reset();}
+  function frame(now){
+    if(!running)return;
+    var dt=Math.min(100,now-last)*speed;last=now;
+    var lv=rt.advance(dt);render(lv);
+    raf=requestAnimationFrame(frame);}
+  function start(){if(running)return;running=true;last=performance.now();raf=requestAnimationFrame(frame);setBtn();}
+  function pause(){running=false;cancelAnimationFrame(raf);setBtn();}
+  function restart(){load(prog);var lv=rt.advance(0);render(lv);if(!running)start();}
+  function setBtn(){var b=$(id+'-play');if(b){b.textContent=running?'⏸ Duraklat':'▶ Başlat';b.setAttribute('aria-pressed',running?'false':'false');}}
+
+  var ctl=$(id+'-ctl');
+  if(ctl){var lockBtns=bcfg.map(function(b,i){return '<button type="button" id="'+id+'-lock'+i+'" aria-pressed="false">Düğmeye bas ve tut</button>';}).join('');
+    ctl.innerHTML=(lockBtns?'<div class="stp" style="margin-bottom:6px">'+lockBtns+'<span class="cnt">Devredeki düğmeye fareyle bas</span></div>':'')+'<div class="stp"><button type="button" class="go" id="'+id+'-play">⏸ Duraklat</button><button type="button" id="'+id+'-rst">↺ Başa döndür</button>'
+    +'<span class="cnt" style="margin-left:8px">Hız:</span><button type="button" data-sp="1" class="sel">1×</button><button type="button" data-sp="2">2×</button><button type="button" data-sp="5">5×</button></div>';
+    $(id+'-play').onclick=function(){running?pause():start();};
+    $(id+'-rst').onclick=restart;
+    [].forEach.call(ctl.querySelectorAll('[data-sp]'),function(b){b.onclick=function(){speed=+b.getAttribute('data-sp');
+      [].forEach.call(ctl.querySelectorAll('[data-sp]'),function(x){x.classList.toggle('sel',x===b);});};});}
+  pinTable();
+
+  /* düğme: fareyle basılı tut ya da kilitle */
+  bcfg.forEach(function(b,i){
+    var g=$(id+'-pb'+i),st=btnState[b.pin];if(!g)return;
+    function set(v){var np=(v||st.lock)?1:0;if(np===st.pressed)return;st.pressed=np;if(rt){rt.noteInput(b.pin);if(!running)render(rt.advance(0));}}
+    g.addEventListener('pointerdown',function(e){e.preventDefault();set(1);});
+    ['pointerup','pointerleave','pointercancel'].forEach(function(ev){g.addEventListener(ev,function(){set(0);});});
+    g.addEventListener('keydown',function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();e.stopPropagation();set(1);}});
+    g.addEventListener('keyup',function(e){if(e.key===' '||e.key==='Enter'){e.stopPropagation();set(0);}});
+    var lk=$(id+'-lock'+i);
+    if(lk)lk.onclick=function(){st.lock=st.lock?0:1;lk.setAttribute('aria-pressed',st.lock?'true':'false');lk.textContent=st.lock?'Düğmeyi bırak':'Düğmeye bas ve tut';lk.classList.toggle('sel',!!st.lock);set(0);};});
+
+  /* editör ve derleyici */
+  var ed=$(id+'-ed'),con=$(id+'-con');
+  function log(h){if(con)con.innerHTML=h;}
+  function compileAndLoad(){
+    var src=ed?ed.value:cfg.code,p=Engine.compile(src),h='<span class="dm">Derleniyor…</span>\n';
+    if(p.errors.length){
+      p.errors.forEach(function(e){h+='<span class="er">'+(e.line?'satır '+e.line+': ':'')+'error: '+esc(e.msg)+'</span>\n';});
+      h+='<span class="er">Derleme hatası. Karttaki eski program çalışmaya devam eder.</span>';
+      log(h);return false;}
+    var w=[],an=Engine.analyze(p);
+    an.warns.forEach(function(x){w.push(x);});
+    if(an.stuck)w.push(an.stuck);
+    Object.keys(an.written).forEach(function(pn){pn=+pn;
+      if(pn<0||pn>13)return;
+      if(pins.indexOf(pn)<0&&!btnState[pn])w.push('D'+pn+' pinine devrede LED bağlı değil: bu pindeki değişim görünmez.');
+      else if(!an.modes[pn])w.push('D'+pn+' için pinMode('+pn+', OUTPUT) yok: pin giriş modunda kalır, LED çok soluk yanar.');});
+    pins.forEach(function(pn){if(!an.written[pn])w.push('D'+pn+' pinine hiç digitalWrite yazılmadı: LED hep sönük kalır.');});
+    bcfg.forEach(function(b){if(an.modes[b.pin])w.push('D'+b.pin+' çıkış yapılmış ama düğmeye bağlı: düğme okunamaz. pinMode('+b.pin+', INPUT) yaz.');});
+    if(an.loopWrite&&!an.loopDelay)w.push('loop() içinde delay yok: pin saniyede binlerce kez değişir, LED yarı parlak görünür.');
+    h+='<span>Derleme tamam. Karta yüklendi (simülasyon).</span>\n';
+    w.forEach(function(x){h+='<span class="wr">uyarı: '+esc(x)+'</span>\n';});
+    log(h);load(p);var lv=rt.advance(0);render(lv);start();return true;}
+  if(ed){
+    ed.value=cfg.code;
+    ed.addEventListener('keydown',function(e){if(e.key==='Tab'){e.preventDefault();var s=ed.selectionStart,t=ed.selectionEnd;ed.value=ed.value.slice(0,s)+'  '+ed.value.slice(t);ed.selectionStart=ed.selectionEnd=s+2;}
+      if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();compileAndLoad();}});
+    var bt=$(id+'-btn');if(bt)bt.onclick=compileAndLoad;
+    var rs=$(id+'-orig');if(rs)rs.onclick=function(){ed.value=cfg.code;compileAndLoad();};
+    var sb=$(id+'-sol');if(sb&&cfg.solution)sb.onclick=function(){ed.value=cfg.solution;compileAndLoad();};}
+  /* ilk yükleme: derleme hatası olsa bile (hata avı) eski çalışan program yerine boş program */
+  var first=Engine.compile(cfg.code);
+  if(first.errors.length){
+    load(Engine.EMPTY);
+    if(con){var h='<span class="dm">Derleniyor…</span>\n';first.errors.forEach(function(e){h+='<span class="er">'+(e.line?'satır '+e.line+': ':'')+'error: '+esc(e.msg)+'</span>\n';});log(h+'<span class="er">Derleme hatası: önce hataları düzelt.</span>');}}
+  else{load(first);if(con&&ed)log('<span class="dm">Kod hazır. “Derle ve yükle” ile (veya Ctrl+Enter) karta yükle.</span>');}
+  render(rt.advance(0));
+  window.hooks[id]={enter:function(){setBtn();start();},leave:pause};
+  Sim.list[id]={start:start,pause:pause,restart:restart,step:function(ms){render(rt.advance(ms));},rt:function(){return rt;}};
+};
+Sim.list={};
+root.Sim=Sim;
+})(window);
+
+window.EXCFG=[{"id": "ex1", "leds": [{"pin": 13, "color": "red", "tag": "D13 LED"}], "buttons": null, "scene": null, "map": null, "win": 4000, "code": "void setup() {\n  pinMode(13, OUTPUT);     // D13 pinini çıkış yap\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);  // LED'i yak (5 V)\n  delay(1000);             // 1000 ms = 1 saniye bekle\n  digitalWrite(13, LOW);   // LED'i söndür (0 V)\n  delay(1000);             // 1 saniye bekle\n}\n", "lines": ["void setup() {", "  pinMode(13, OUTPUT);     // D13 pinini çıkış yap", "}", "", "void loop() {", "  digitalWrite(13, HIGH);  // LED'i yak (5 V)", "  delay(1000);             // 1000 ms = 1 saniye bekle", "  digitalWrite(13, LOW);   // LED'i söndür (0 V)", "  delay(1000);             // 1 saniye bekle", "}"], "notes": [{"l": 0, "t": "setup(): hazırlık", "x": "Kart açılınca ya da reset’lenince bir kez çalışır. Hazırlık komutları buraya yazılır.", "s": "Program başladı."}, {"l": 1, "t": "pinMode(13, OUTPUT)", "x": "D13 pini çıkış yapılır: kart bu pinden LED’e akım verebilir. Çıkış yapmazsak pin LED’i yakacak kadar güçlü akım vermez.", "s": "D13: OUTPUT · 0 V"}, {"l": 2, "t": "setup biter", "x": "Hazırlık tamam. setup bir daha çalışmaz; sıra loop’ta.", "s": "Sıra loop()’ta."}, {"l": 4, "t": "loop(): sürekli tekrar", "x": "Süslü parantez içindeki komutlar sırayla çalışır; bitince program başa döner. Bu döngü kart kapanana kadar sürer.", "s": "loop 1. tur"}, {"l": 5, "t": "digitalWrite(13, HIGH)", "x": "D13’e HIGH yazılır: pin 5 V verir. Akım dirençten ve LED’den geçer, LED yanar.", "s": "D13: HIGH (5 V) · LED yanıyor"}, {"l": 6, "t": "delay(1000): yanık kal", "x": "Program 1000 milisaniye (1 saniye) bekler. Bu sürede pin durumu aynı kalır, LED yanık görünür.", "s": "D13: HIGH · 1000 ms"}, {"l": 7, "t": "digitalWrite(13, LOW)", "x": "D13’e LOW yazılır: pin 0 V olur. Akım durur, LED söner.", "s": "D13: LOW (0 V) · LED söndü"}, {"l": 8, "t": "delay(1000): sönük kal", "x": "LED 1 saniye sönük kalır. İki bekleme eşit olduğu için yanma ve sönme süreleri aynıdır.", "s": "D13: LOW · 1000 ms"}, {"l": 9, "t": "loop sonu: başa dön", "x": "Program loop’un başına döner (setup’a değil). Bir tur 2000 ms sürdü; LED sonsuza dek yanıp söner.", "s": "Tur süresi: 2000 ms"}]}, {"id": "ex2", "leds": [{"pin": 8, "color": "yellow", "tag": "D8 durum"}], "buttons": null, "scene": null, "map": null, "win": 4400, "code": "void setup() {\n  pinMode(8, OUTPUT);      // D8: durum LED'i çıkış\n}\n\nvoid loop() {\n  digitalWrite(8, HIGH);   // 1. kısa çakma: yan\n  delay(200);              // 200 ms yanık kal\n  digitalWrite(8, LOW);    // sön\n  delay(200);              // 200 ms sönük kal\n  digitalWrite(8, HIGH);   // 2. kısa çakma: yan\n  delay(200);              // 200 ms yanık kal\n  digitalWrite(8, LOW);    // sön\n  delay(200);              // 200 ms sönük kal\n  digitalWrite(8, HIGH);   // 3. kısa çakma: yan\n  delay(200);              // 200 ms yanık kal\n  digitalWrite(8, LOW);    // sön\n  delay(1200);             // uzun bekleme: desen biter, baştan başlar\n}\n", "lines": ["void setup() {", "  pinMode(8, OUTPUT);      // D8: durum LED'i çıkış", "}", "", "void loop() {", "  digitalWrite(8, HIGH);   // 1. kısa çakma: yan", "  delay(200);              // 200 ms yanık kal", "  digitalWrite(8, LOW);    // sön", "  delay(200);              // 200 ms sönük kal", "  digitalWrite(8, HIGH);   // 2. kısa çakma: yan", "  delay(200);              // 200 ms yanık kal", "  digitalWrite(8, LOW);    // sön", "  delay(200);              // 200 ms sönük kal", "  digitalWrite(8, HIGH);   // 3. kısa çakma: yan", "  delay(200);              // 200 ms yanık kal", "  digitalWrite(8, LOW);    // sön", "  delay(1200);             // uzun bekleme: desen biter, baştan başlar", "}"], "notes": [{"l": 0, "t": "setup(): hazırlık", "x": "Kart açılınca bir kez çalışır.", "s": "Program başladı."}, {"l": 1, "t": "D8 çıkış", "x": "LED D8’e bağlı; pini çıkış yapıyoruz.", "s": "D8: OUTPUT"}, {"l": 2, "t": "setup biter", "x": "Hazırlık bitti.", "s": "Sıra loop()’ta."}, {"l": 4, "t": "loop(): desen", "x": "Bir tur 3 kısa çakma ve uzun bekleme içerir. Bitince tekrar başlar.", "s": "loop 1. tur"}, {"l": 5, "t": "1. çakma: yan", "x": "D8 HIGH: LED yanar.", "s": "D8: HIGH · LED yanıyor"}, {"l": 6, "t": "delay(200): yanık kal", "x": "LED 200 ms yanık kalır; bu çok kısa bir çakmadır.", "s": "D8: HIGH · 200 ms"}, {"l": 7, "t": "sön", "x": "D8 LOW: LED söner.", "s": "D8: LOW · LED söndü"}, {"l": 8, "t": "delay(200): sönük kal", "x": "İki çakma arasındaki kısa ara: 200 ms.", "s": "D8: LOW · 200 ms"}, {"l": 9, "t": "2. çakma", "x": "Aynı kalıp bir kez daha: yan, 200 ms bekle, sön, 200 ms bekle.", "s": "D8: HIGH · 2. çakma"}, {"l": 13, "t": "3. çakma", "x": "Üçüncü çakma. Üç çakma “pil azaldı” anlamına gelir.", "s": "D8: HIGH · 3. çakma"}, {"l": 16, "t": "delay(1200): uzun bekleme", "x": "Desen biter ve LED 1200 ms sönük kalır. Bu uzun ara, çakma sayısını okunur yapar. Tur: 5 × 200 + 1200 = 2200 ms.", "s": "D8: LOW · 1200 ms"}, {"l": 17, "t": "loop sonu", "x": "Başa dön: desen sürekli tekrarlanır.", "s": "Tur süresi: 2200 ms"}]}, {"id": "ex3", "leds": [{"pin": 13, "color": "red", "tag": "D13 sol"}, {"pin": 8, "color": "red", "tag": "D8 sağ"}], "buttons": null, "scene": null, "map": null, "win": 3000, "code": "void setup() {\n  pinMode(13, OUTPUT);     // D13: sol ışık çıkış\n  pinMode(8, OUTPUT);      // D8: sağ ışık çıkış\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);  // sol ışık yanar\n  digitalWrite(8, LOW);    // sağ ışık sönük\n  delay(500);              // yarım saniye bekle\n  digitalWrite(13, LOW);   // sol ışık söner\n  digitalWrite(8, HIGH);   // sağ ışık yanar\n  delay(500);              // yarım saniye bekle\n}\n", "lines": ["void setup() {", "  pinMode(13, OUTPUT);     // D13: sol ışık çıkış", "  pinMode(8, OUTPUT);      // D8: sağ ışık çıkış", "}", "", "void loop() {", "  digitalWrite(13, HIGH);  // sol ışık yanar", "  digitalWrite(8, LOW);    // sağ ışık sönük", "  delay(500);              // yarım saniye bekle", "  digitalWrite(13, LOW);   // sol ışık söner", "  digitalWrite(8, HIGH);   // sağ ışık yanar", "  delay(500);              // yarım saniye bekle", "}"], "notes": [{"l": 0, "t": "setup(): iki pin hazırlığı", "x": "Kart açılınca bir kez çalışır.", "s": "Program başladı."}, {"l": 1, "t": "D13: sol ışık çıkış", "x": "Her pin için ayrı pinMode yazılır.", "s": "D13: OUTPUT"}, {"l": 2, "t": "D8: sağ ışık çıkış", "x": "İkinci LED için ikinci pinMode.", "s": "D8: OUTPUT"}, {"l": 3, "t": "setup biter", "x": "İki pin de çıkış oldu.", "s": "Sıra loop()’ta."}, {"l": 5, "t": "loop(): dönüşüm", "x": "İki durum sırayla tekrarlanır: önce sol, sonra sağ ışık yanar.", "s": "loop 1. tur"}, {"l": 6, "t": "Sol ışık yanar", "x": "D13 HIGH: sol LED yanar.", "s": "D13: HIGH · sol yanıyor"}, {"l": 7, "t": "Sağ ışık sönük", "x": "D8 LOW: sağ LED sönüktür. İki LED aynı anda yanmaz.", "s": "D8: LOW · sağ sönük"}, {"l": 8, "t": "delay(500): yarım saniye", "x": "Bu durum 500 ms sürer.", "s": "D13: HIGH · D8: LOW · 500 ms"}, {"l": 9, "t": "Sol ışık söner", "x": "D13 LOW: sol LED söner.", "s": "D13: LOW · sol söndü"}, {"l": 10, "t": "Sağ ışık yanar", "x": "D8 HIGH: sağ LED yanar. Roller değişti.", "s": "D8: HIGH · sağ yanıyor"}, {"l": 11, "t": "delay(500): yarım saniye", "x": "İkinci durum da 500 ms. Tur toplamı 1000 ms.", "s": "D13: LOW · D8: HIGH · 500 ms"}, {"l": 12, "t": "loop sonu", "x": "Başa dön: ışıklar sürekli dönüşümlü yanar.", "s": "Tur süresi: 1000 ms"}]}, {"id": "ex4", "leds": [{"pin": 6, "color": "green", "tag": "D6 yeşil"}, {"pin": 7, "color": "yellow", "tag": "D7 sarı"}], "buttons": null, "scene": null, "map": null, "win": 7000, "code": "void setup() {\n  pinMode(6, OUTPUT);      // D6: yeşil ışık çıkış\n  pinMode(7, OUTPUT);      // D7: sarı ışık çıkış\n}\n\nvoid loop() {\n  digitalWrite(6, HIGH);   // yeşil yan: robot durdu, güvenli\n  delay(2000);             // 2 saniye güvenli süre\n  digitalWrite(6, LOW);    // yeşil sön: uyarı başlıyor\n  digitalWrite(7, HIGH);   // sarı 1. çakma\n  delay(250);              // 250 ms yanık\n  digitalWrite(7, LOW);    // sarı sön\n  delay(250);              // 250 ms sönük\n  digitalWrite(7, HIGH);   // sarı 2. çakma\n  delay(250);              // 250 ms yanık\n  digitalWrite(7, LOW);    // sarı sön\n  delay(250);              // 250 ms sönük\n  digitalWrite(7, HIGH);   // sarı 3. çakma\n  delay(250);              // 250 ms yanık\n  digitalWrite(7, LOW);    // sarı sön\n  delay(250);              // 250 ms sönük: robot hareket eder, tur biter\n}\n", "lines": ["void setup() {", "  pinMode(6, OUTPUT);      // D6: yeşil ışık çıkış", "  pinMode(7, OUTPUT);      // D7: sarı ışık çıkış", "}", "", "void loop() {", "  digitalWrite(6, HIGH);   // yeşil yan: robot durdu, güvenli", "  delay(2000);             // 2 saniye güvenli süre", "  digitalWrite(6, LOW);    // yeşil sön: uyarı başlıyor", "  digitalWrite(7, HIGH);   // sarı 1. çakma", "  delay(250);              // 250 ms yanık", "  digitalWrite(7, LOW);    // sarı sön", "  delay(250);              // 250 ms sönük", "  digitalWrite(7, HIGH);   // sarı 2. çakma", "  delay(250);              // 250 ms yanık", "  digitalWrite(7, LOW);    // sarı sön", "  delay(250);              // 250 ms sönük", "  digitalWrite(7, HIGH);   // sarı 3. çakma", "  delay(250);              // 250 ms yanık", "  digitalWrite(7, LOW);    // sarı sön", "  delay(250);              // 250 ms sönük: robot hareket eder, tur biter", "}"], "notes": [{"l": 0, "t": "setup(): iki ışık hazırlığı", "x": "Kart açılınca bir kez çalışır.", "s": "Program başladı."}, {"l": 1, "t": "D6: yeşil çıkış", "x": "Yeşil LED D6’ya bağlı.", "s": "D6: OUTPUT"}, {"l": 2, "t": "D7: sarı çıkış", "x": "Sarı LED D7’ye bağlı.", "s": "D7: OUTPUT"}, {"l": 3, "t": "setup biter", "x": "Hazırlık tamam.", "s": "Sıra loop()’ta."}, {"l": 5, "t": "loop(): güvenlik kalıbı", "x": "Önce yeşil yanar, sonra sarı üç kez çakar; bitince başa döner.", "s": "loop 1. tur"}, {"l": 6, "t": "Yeşil yanar", "x": "D6 HIGH: yeşil LED yanar. Robot durdu.", "s": "D6: HIGH · yeşil yanıyor"}, {"l": 7, "t": "delay(2000): güvenli süre", "x": "Yeşil 2 saniye yanık kalır. Bu sürede çalışan robota yaklaşabilir.", "s": "D6: HIGH · 2000 ms"}, {"l": 8, "t": "Yeşil söner", "x": "D6 LOW: yeşil LED söner. Artık güvenli değil.", "s": "D6: LOW · yeşil söndü"}, {"l": 9, "t": "Sarı 1. çakma", "x": "D7 HIGH: sarı uyarı LED’i yanar.", "s": "D7: HIGH · sarı yanıyor"}, {"l": 10, "t": "delay(250): kısa yanık", "x": "Hızlı çakma: 250 ms.", "s": "D7: HIGH · 250 ms"}, {"l": 12, "t": "delay(250): kısa ara", "x": "D7 LOW, 250 ms sönük.", "s": "D7: LOW · 250 ms"}, {"l": 13, "t": "Sarı 2. çakma", "x": "İkinci çakma: aynı 4 satırın tekrarı.", "s": "D7: HIGH · 2. çakma"}, {"l": 17, "t": "Sarı 3. çakma", "x": "Üçüncü çakma. Üç çakmadan sonra robot hareket eder.", "s": "D7: HIGH · 3. çakma"}, {"l": 20, "t": "Tur biter", "x": "Son 250 ms’lik ara de bittiğinde robot hareket eder. Toplam: 2000 + 3 × 500 = 3500 ms.", "s": "D7: LOW · 250 ms"}, {"l": 21, "t": "loop sonu", "x": "Başa dön: yeşil yeniden yanar.", "s": "Tur süresi: 3500 ms"}]}];
+/* ORTAK ETKİLEŞİMLER: oylama, tıkla-öğren şema (+ "bul" sınavı), adım adım (veri tabanlı), eşleştirme/doğru-yanlış, örnek (EXCFG) slaytları.
+   Slaytlar HTML'de data-* öznitelikleriyle tanımlanır; hafta betiği (extra.js) yalnızca o haftaya özgü etkileşimleri ekler. */
+(function(){
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function each(list,fn){[].forEach.call(list,fn);}
+function json(sec,cls){var s=sec.querySelector('script.'+cls);return s?JSON.parse(s.textContent):null;}
+
+/* ---------- kod renklendirme + balonlar (Arduino) ---------- */
+var TIPS=window.KIT_TIPS={
+ 'void':'void: “değer döndürmez” demektir. setup ve loop birer görev (fonksiyon) gibidir. Örnek: void setup() { ... }',
+ 'int':'int: tam sayı türü. Örnek: int sayac = 0;',
+ 'setup':'setup(): kart açılınca veya reset’e basılınca yalnızca bir kez çalışır. Hazırlık işleri buraya yazılır.',
+ 'loop':'loop(): setup bitince başlar, kart açık kaldıkça sürekli baştan tekrarlanır.',
+ 'pinMode':'pinMode(pin, mod): pinin giriş mi çıkış mı olacağını söyler. Örnek: pinMode(8, OUTPUT); → D8 çıkış olur.',
+ 'digitalWrite':'digitalWrite(pin, değer): pini 5 V (HIGH) veya 0 V (LOW) yapar. Örnek: digitalWrite(8, HIGH); LED yanar.',
+ 'digitalRead':'digitalRead(pin): pindeki gerilimi okur; 5 V ise HIGH, 0 V ise LOW verir. Örnek: digitalRead(2);',
+ 'delay':'delay(ms): programı o kadar milisaniye bekletir. 1000 ms = 1 saniye. Örnek: delay(250); çeyrek saniye bekler.',
+ 'LED_BUILTIN':'LED_BUILTIN: kart üzerindeki yerleşik LED’in pin numarası yerine kullanılan ad. Uno’da 13’tür.',
+ 'OUTPUT':'OUTPUT: çıkış modu. Kart pinden akım verir (LED yakmak gibi).',
+ 'INPUT':'INPUT: giriş modu. Kart pindeki gerilimi okur (buton gibi).',
+ 'INPUT_PULLUP':'INPUT_PULLUP: giriş modu + karttaki iç direnç. Düğme için dış direnç gerekmez; basılınca LOW okunur. Örnek: pinMode(2, INPUT_PULLUP);',
+ 'if':'if (koşul) { ... }: koşul doğruysa süslü parantez içindeki komutlar çalışır. Örnek: if (buttonState == HIGH) → düğmeye basılmışsa.',
+ 'else':'else { ... }: if koşulu yanlışsa çalışacak komutlar. Örnek: düğmeye basılmadıysa LED’i söndür.',
+ 'buttonState':'buttonState: düğmenin durumunu tutan değişken adı. digitalRead sonucu (HIGH veya LOW) buraya yazılır.',
+ 'HIGH':'HIGH: 5 V, yani “açık”. 1 yazılabilir ama HIGH daha okunaklıdır.',
+ 'LOW':'LOW: 0 V, yani “kapalı”. 0 yerine LOW yaz.'};
+var KW={void:1,int:1,OUTPUT:1,INPUT:1,INPUT_PULLUP:1,HIGH:1,LOW:1,LED_BUILTIN:1,if:1,else:1};
+function colorCode(s){
+  var keys=Object.keys(TIPS).sort(function(a,b){return b.length-a.length;});
+  var re=new RegExp('\\b('+keys.join('|')+')\\b|\\b(\\d+)\\b','g');
+  return esc(s).replace(re,function(m,w,n){
+    if(n)return '<span class="n">'+n+'</span>';
+    var cls=KW[w]?'k':'t';
+    return '<span class="'+cls+' tip" tabindex="0" data-tip="'+esc(TIPS[w])+'">'+w+'</span>';});}
+function splitLine(l){var i=l.indexOf('//');if(i<0)return{code:l,cm:''};return{code:l.slice(0,i).replace(/\s+$/,''),cm:l.slice(i)};}
+function colorLine(l){var p=splitLine(l);return colorCode(p.code)+(p.cm?(p.code?'  ':'')+'<span class="c">'+esc(p.cm)+'</span>':'');}
+window.Kit={$:$,esc:esc,colorCode:colorCode,splitLine:splitLine,colorLine:colorLine,each:each};
+
+/* ---------- oylama ---------- */
+each(document.querySelectorAll('[data-poll]'),function(sec){
+ var btns=sec.querySelectorAll('[data-vote]'),cnt=[];each(btns,function(){cnt.push(0);});
+ function draw(){var tot=cnt.reduce(function(a,b){return a+b;},0);each(btns,function(b,i){b.querySelector('.cn').textContent=cnt[i];b.querySelector('.bar').style.width=(tot?cnt[i]/tot*240:0)+'px';});}
+ each(btns,function(b){b.addEventListener('click',function(){cnt[+b.getAttribute('data-vote')]++;draw();});});});
+
+/* ---------- tıkla-öğren şema (+ bul sınavı) ---------- */
+each(document.querySelectorAll('[data-hotspot]'),function(sec){
+ var data=json(sec,'hs-data')||[],by={};data.forEach(function(d){by[d.id]=d;});
+ var zones=[].slice.call(sec.querySelectorAll('.hs')),list=sec.querySelector('.hs-list');
+ var T=sec.querySelector('.hs-t'),X=sec.querySelector('.hs-x'),Q=sec.querySelector('.hs-q'),SC=sec.querySelector('.hs-score');
+ var quiz=false,target=null,score=0,asked=0,locked=false,pool=[];
+ function sel(id){zones.forEach(function(z){z.classList.toggle('sel',z.getAttribute('data-id')===id);});
+  if(list)each(list.children,function(b){b.classList.toggle('sel',b.getAttribute('data-id')===id);});
+  var d=by[id];if(!d)return;T.textContent=d.t;X.textContent=d.x;}
+ if(list)data.forEach(function(d){var b=document.createElement('button');b.type='button';b.className='cbtn';b.setAttribute('data-id',d.id);b.textContent=d.t;b.onclick=function(){if(!quiz)sel(d.id);};list.appendChild(b);});
+ zones.forEach(function(z){z.addEventListener('click',function(){var id=z.getAttribute('data-id');if(!quiz){sel(id);return;}answer(z,id);});});
+ var qb=sec.querySelector('.hs-quiz-btn');
+ function clearMarks(){zones.forEach(function(z){z.classList.remove('good','bad','sel');});}
+ function ask(){clearMarks();locked=false;if(!pool.length){pool=data.map(function(d){return d.id;}).sort(function(){return Math.random()-.5;});}
+  target=pool.pop();Q.textContent='Bul: '+by[target].t;X.textContent='Şemadaki doğru yere tıkla.';SC.textContent='Puan: '+score+' / '+asked;}
+ function answer(z,id){if(locked)return;asked++;
+  if(id===target){score++;z.classList.add('good');Q.textContent='Doğru! '+by[target].t;X.textContent=by[target].x;locked=true;SC.textContent='Puan: '+score+' / '+asked;setTimeout(function(){if(quiz)ask();},1800);}
+  else{z.classList.add('bad');X.textContent='Hayır, burası: '+by[id].t+'. Tekrar dene.';SC.textContent='Puan: '+score+' / '+asked;setTimeout(function(){z.classList.remove('bad');},700);}}
+ if(qb)qb.onclick=function(){quiz=!quiz;qb.setAttribute('aria-pressed',String(quiz));qb.textContent=quiz?'Öğrenme moduna dön':'Bul bakalım (sınav modu)';
+  if(list)list.hidden=quiz;if(quiz){score=0;asked=0;pool=[];T.textContent='Sınav modu';ask();}else{clearMarks();Q.textContent='';SC.textContent='';T.textContent=data[0].t;X.textContent=data[0].x;sel(data[0].id);}};
+ if(data.length&&!sec.hasAttribute('data-nosel'))sel(data[0].id);
+ window.hooks=window.hooks||{};var hk=window.hooks[sec.id]||(window.hooks[sec.id]={});
+ hk.leave=function(){if(quiz&&qb)qb.onclick();};
+});
+
+/* ---------- adım adım (veri tabanlı): [data-s] ve [data-from] ögeleri ---------- */
+each(document.querySelectorAll('[data-steps]'),function(sec){
+ var steps=json(sec,'st-data')||[];
+ var T=sec.querySelector('.st-t'),M=sec.querySelector('.st-m');
+ function render(s,k){var n=k+1;
+  each(sec.querySelectorAll('[data-s]'),function(e){var on=(' '+e.getAttribute('data-s')+' ').indexOf(' '+n+' ')>=0;e.classList.toggle('on',on);e.classList.toggle('off',!on);});
+  each(sec.querySelectorAll('[data-from]'),function(e){e.style.display=n>=+e.getAttribute('data-from')?'':'none';});
+  each(sec.querySelectorAll('[data-only]'),function(e){e.style.display=(' '+e.getAttribute('data-only')+' ').indexOf(' '+n+' ')>=0?'':'none';});
+  if(T)T.textContent=s.t||'';if(M)M.textContent=s.m||'';
+  if(window.stepHooks&&window.stepHooks[sec.id])window.stepHooks[sec.id](s,k,sec);}
+ window.makeStepper(sec.id,steps,render);});
+
+/* ---------- eşleştirme / doğru-yanlış ---------- */
+each(document.querySelectorAll('[data-match]'),function(sec){
+ var rows=[].slice.call(sec.querySelectorAll('.mc-row')),res=sec.querySelector('.mc-res');
+ function paint(){var ok=0,ans=0;rows.forEach(function(r){var s=r.querySelector('select'),v=s.value;r.classList.remove('ok','bad');
+   var mk=r.querySelector('.mc-mark');mk.textContent='';
+   if(v===''){return;}ans++;var good=v===r.getAttribute('data-ok');if(good)ok++;r.classList.add(good?'ok':'bad');mk.textContent=good?'✓':'✗';});
+  return{ok:ok,ans:ans};}
+ var chk=sec.querySelector('.mc-check'),show=sec.querySelector('.mc-show'),rs=sec.querySelector('.mc-reset');
+ if(chk)chk.onclick=function(){var r=paint();res.textContent=r.ans<rows.length?'Önce hepsini seç ('+r.ans+' / '+rows.length+').':r.ok+' / '+rows.length+' doğru'+(r.ok===rows.length?' · Harika!':' · Kırmızıları tekrar düşün.');
+  if(r.ans===rows.length)rows.forEach(function(x){x.classList.add('show');});};
+ if(show)show.onclick=function(){rows.forEach(function(r){r.querySelector('select').value=r.getAttribute('data-ok');r.classList.add('show');});var r=paint();res.textContent='Doğru cevaplar gösterildi: '+r.ok+' / '+rows.length;};
+ if(rs)rs.onclick=function(){rows.forEach(function(r){r.querySelector('select').value='';r.classList.remove('show');});paint();res.textContent='';};
+ rows.forEach(function(r){r.querySelector('select').addEventListener('change',function(){r.classList.remove('ok','bad','show');r.querySelector('.mc-mark').textContent='';});});
+});
+
+/* ---------- örnek (EXCFG) slaytları: canlı devre + satır satır kod ---------- */
+(function(){
+ if(!window.EXCFG)return;
+ window.EXCFG.forEach(function(ex){
+  var base=ex.id;
+  Sim.mount(base+'-sen',{leds:ex.leds,buttons:ex.buttons,scene:ex.scene,map:ex.map,code:ex.code,win:ex.win||10000});
+  Sim.mount(base+'-dene',{leds:ex.leds,buttons:ex.buttons,code:ex.code,win:ex.win||10000,tlW:640});
+  var grid=$(base+'-grid');if(!grid)return;var h='';
+  ex.lines.forEach(function(l,i){var p=splitLine(l),only=!p.code.trim()&&p.cm;
+    h+='<div class="ln" data-l="'+i+'">'+(l===''?'':(i+1))+'</div>';
+    if(only)h+='<div class="cm" data-l="'+i+'" style="grid-column:span 2">'+esc(l.trim())+'</div>';
+    else h+='<div data-l="'+i+'">'+(l===''?' ':colorCode(p.code))+'</div><div class="cm" data-l="'+i+'">'+esc(p.cm)+'</div>';});
+  grid.innerHTML=h;
+  var byLine={};ex.notes.forEach(function(n,i){byLine[n.l]=i;});
+  function render(n){
+   each(grid.children,function(c){c.classList.toggle('hi',+c.getAttribute('data-l')===n.l&&!c.classList.contains('ln'));});
+   $(base+'-kod-c').textContent=ex.lines[n.l].trim();$(base+'-kod-t').textContent=n.t;$(base+'-kod-x').textContent=n.x;$(base+'-kod-s').textContent=n.s;}
+  var api=window.makeStepper(base+'-kod',ex.notes,render);
+  grid.addEventListener('click',function(e){var c=e.target.closest('[data-l]');if(!c)return;var l=+c.getAttribute('data-l');if(byLine[l]!==undefined)api.goto(byLine[l]);});
+ });
+})();
+
+/* ---------- kod bloğu (statik, renkli, balonlu): <pre class="code" data-code="..."> ---------- */
+each(document.querySelectorAll('pre.code[data-code]'),function(pre){
+ var lines=pre.getAttribute('data-code').split('\n');
+ pre.innerHTML=lines.map(function(l,i){return '<div class="kl" data-i="'+i+'">'+(l===''?' ':colorLine(l))+'</div>';}).join('');
+});
+})();
+
+
+window.__boot();
+
+</script>
