@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Etiketleri Rehberi</title>
+<meta name="description" content="HTML dersinde ezberlenmesi gereken tüm etiketler: sunum, ezber kartları, test ve yazarak çalışma.">
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#17202f;--mute:#5b667a;--line:#e2e7f0;--code:#0f172a;--codeink:#e5e9f5;--shadow:0 1px 2px rgba(20,30,60,.06),0 10px 30px rgba(20,30,60,.09);--ok:#0e9f6e;--okbg:#e3f7ef;--bad:#e11d48;--badbg:#fde8ed;--c:#2f5bea;--cbg:#e9efff;--tg:#7dd3fc;--at:#fcd34d;--st:#86efac;--cm:#94a3b8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f131b;--card:#181e2a;--ink:#eaeef6;--mute:#9aa6bb;--line:#273044;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);--okbg:#12342a;--badbg:#3a1822;--cbg:#1f2943}}
+:root[data-theme="dark"]{--bg:#0f131b;--card:#181e2a;--ink:#eaeef6;--mute:#9aa6bb;--line:#273044;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);--okbg:#12342a;--badbg:#3a1822;--cbg:#1f2943}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer;color:inherit}
+code,pre,.mono{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+.top{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 0 var(--line)}
+.top .in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:-.01em;font-size:1.05rem;white-space:nowrap}
+.logo b{color:var(--c)}
+.tabs{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:transparent;padding:7px 14px;border-radius:99px;font-weight:700;font-size:.9rem}
+.tab[aria-selected="true"]{background:var(--c);border-color:var(--c);color:#fff}
+.icon{border:1px solid var(--line);background:transparent;border-radius:10px;padding:6px 10px;font-weight:700}
+.back{font-size:.85rem;color:var(--mute);text-decoration:none;font-weight:600}
+.back:hover{color:var(--c)}
+main{max-width:1180px;margin:0 auto;padding:18px 16px 48px}
+.hidden{display:none!important}
+/* slide */
+.stagebar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.progress{flex:1;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--c);border-radius:99px;transition:width .25s}
+.count{font-size:.9rem;color:var(--mute);min-width:70px;text-align:right}
+.slide{background:var(--card);border-radius:22px;box-shadow:var(--shadow);border-top:6px solid var(--c);padding:28px 32px;min-height:460px;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide{animation:none}.progress i{transition:none}}
+.eyebrow{display:inline-block;padding:4px 12px;border-radius:99px;background:var(--cbg);color:var(--c);font-weight:800;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase}
+.slide h1,.slide h2{margin:10px 0 8px;letter-spacing:-.02em;line-height:1.15}
+.slide h1{font-size:clamp(2rem,5vw,3.2rem)}
+.slide h2{font-size:clamp(1.5rem,3.2vw,2.1rem)}
+.lead{color:var(--mute);font-size:1.1rem;max-width:760px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:5px 12px;font-weight:700;font-size:.9rem}
+button.chip:hover{border-color:var(--c);color:var(--c)}
+.chip.yes{background:var(--okbg);border-color:transparent;color:var(--ok)}
+.chip.no{background:var(--badbg);border-color:transparent;color:var(--bad)}
+.chip.mid{background:var(--cbg);border-color:transparent;color:var(--c)}
+.tagslide{display:grid;grid-template-columns:1fr 1.15fr;gap:28px;margin-top:6px}
+@media (max-width:860px){.tagslide{grid-template-columns:1fr}.slide{padding:20px 18px}}
+.tagname{font-family:ui-monospace,Consolas,monospace;font-size:clamp(2rem,5vw,3.1rem);font-weight:800;color:var(--c);line-height:1.1;word-break:break-word}
+.ac{color:var(--mute);margin:2px 0 12px}
+.gorev{font-size:1.15rem;margin:10px 0 14px}
+.box{border-radius:14px;padding:12px 14px;margin:10px 0;font-size:.97rem}
+.box b{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.tip{background:var(--cbg)}
+.warn{background:var(--badbg)}
+.attrs{margin:10px 0;padding:0;list-style:none}
+.attrs li{padding:6px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
+.attrs code{background:var(--cbg);color:var(--c);padding:1px 7px;border-radius:6px;font-weight:700;font-size:.88rem}
+pre.code{background:var(--code);color:var(--codeink);border-radius:14px;padding:16px 18px;margin:0 0 12px;overflow:auto;font-size:.92rem;line-height:1.6;tab-size:2}
+.tg{color:var(--tg)}.at{color:var(--at)}.st{color:var(--st)}.cm{color:var(--cm);font-style:italic}
+.pvl{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:8px 0 4px}
+.preview{width:100%;height:170px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.sonuc{border:1px dashed var(--line);border-radius:12px;padding:14px;color:var(--mute);background:var(--bg)}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px}
+.btn{border:0;background:var(--c);color:#fff;padding:10px 20px;border-radius:12px;font-weight:800}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:hover:not(:disabled){filter:brightness(1.08)}
+.menu{position:fixed;inset:0 auto 0 0;width:min(340px,92vw);background:var(--card);box-shadow:var(--shadow);z-index:40;padding:18px;overflow:auto;transform:translateX(-105%);transition:transform .2s}
+.menu.open{transform:none}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:35}
+.menu h3{margin:14px 0 6px;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.menu button.item{display:block;width:100%;text-align:left;border:0;background:transparent;padding:6px 10px;border-radius:8px;font-weight:600}
+.menu button.item:hover{background:var(--cbg)}
+.menu button.item.seen::after{content:" ✓";color:var(--ok)}
+.menu button.item.cur{background:var(--cbg);color:var(--c)}
+table.t{width:100%;border-collapse:collapse;font-size:.95rem;margin:10px 0}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+table.t td:first-child{font-family:ui-monospace,Consolas,monospace;font-weight:800;color:var(--c);white-space:nowrap}
+.panel{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:24px 28px}
+.panel h2{margin:0 0 6px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}
+select,input[type=text]{font:inherit;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input[type=text]{min-width:min(100%,280px);font-family:ui-monospace,Consolas,monospace;font-size:1.1rem}
+.flash{perspective:1000px;margin:14px 0}
+.fc{min-height:260px;border-radius:20px;border:2px solid var(--c);background:var(--card);padding:26px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;box-shadow:var(--shadow);width:100%}
+.fc .big{font-family:ui-monospace,Consolas,monospace;font-size:clamp(1.8rem,5vw,3rem);font-weight:800;color:var(--c)}
+.fc .role{font-size:1.4rem;font-weight:700}
+.fc .small{color:var(--mute);margin-top:8px}
+.fc pre.code{text-align:left;margin-top:14px;max-width:100%}
+.opts{display:grid;gap:10px;grid-template-columns:1fr 1fr;margin:14px 0}
+@media (max-width:640px){.opts{grid-template-columns:1fr}}
+.opt{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:13px 16px;text-align:left;font-weight:700}
+.opt.mono{font-family:ui-monospace,Consolas,monospace}
+.opt:hover:not(:disabled){border-color:var(--c)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.qtext{font-size:1.3rem;font-weight:700;margin:6px 0}
+.fb{border-radius:12px;padding:12px 14px;margin:10px 0}
+.fb.ok{background:var(--okbg)}.fb.bad{background:var(--badbg)}
+.score{font-size:3rem;font-weight:800;color:var(--c)}
+.blur{filter:blur(6px);cursor:pointer;user-select:none}
+.muted{color:var(--mute)}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0;color:var(--mute)}
+.stats b{display:block;font-size:1.8rem;color:var(--ink)}
+.mist li{margin:4px 0}
+@media print{.top,.nav,.row,.stagebar,.menu,.scrim,.noprint{display:none!important}body{background:#fff;color:#000}.panel{box-shadow:none;padding:0}main{padding:0}table.t td:first-child{color:#000}.blur{filter:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <div class="logo"><b>&lt;/&gt;</b> HTML Etiketleri</div>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <a class="back noprint" href="../../index.html">← Web dersi</a>
+  <button class="icon" id="themeBtn" title="Açık / koyu tema" aria-label="Tema değiştir">◐</button>
+</div></header>
+
+<main>
+  <section id="m-sunum">
+    <div class="stagebar">
+      <button class="icon" id="menuBtn" aria-label="İçindekiler">☰ İçindekiler</button>
+      <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+      <div class="count" id="count"></div>
+      <button class="icon" id="fsBtn" title="Tam ekran (F)" aria-label="Tam ekran">⛶</button>
+    </div>
+    <article class="slide" id="slide" aria-live="polite"></article>
+    <div class="nav">
+      <button class="btn ghost" id="prev">← Önceki</button>
+      <span class="muted" style="font-size:.85rem">Ok tuşları · Boşluk · kaydırma (telefon)</span>
+      <button class="btn" id="next">Sonraki →</button>
+    </div>
+  </section>
+  <section id="m-kartlar" class="hidden"></section>
+  <section id="m-test" class="hidden"></section>
+  <section id="m-yaz" class="hidden"></section>
+  <section id="m-ozet" class="hidden"></section>
+</main>
+
+<div class="scrim hidden" id="scrim"></div>
+<aside class="menu" id="menu" aria-label="İçindekiler"></aside>
+
+<script>
+"use strict";
+/* ============ VERİ ============ */
+const GROUPS = [
+  {id:"iskelet", ad:"Belge İskeleti", konu:"1.2", renk:"#2f5bea", ozet:"Her HTML belgesi aynı iskeletle başlar: türünü bildir (DOCTYPE), kökü aç (html), teknik bilgileri head'e, görünen içeriği body'ye yaz."},
+  {id:"metin", ad:"Metin ve İçerik", konu:"1.3", renk:"#d946a8", ozet:"Metne görevine göre etiket ver: başlık, paragraf, önem, vurgu, alıntı, kod, simge. Görünüşü değil, anlamı seçersin."},
+  {id:"liste", ad:"Liste ve Gruplama", konu:"1.4", renk:"#0e9f6e", ozet:"Öğelerin sırası önemliyse ol, değilse ul. Terim–açıklama çiftleri için dl. Uygun etiket yoksa nötr kapsayıcı: div (blok), span (satır içi)."},
+  {id:"baglanti", ad:"Bağlantı", konu:"1.5", renk:"#f59e0b", ozet:"Tek etiket, çok iş: a. Ne yaptığını href belirler: sayfa, bölüm (#id), e-posta, telefon, indirme."},
+  {id:"medya", ad:"Görsel ve Medya", konu:"1.6", renk:"#7a3df0", ozet:"Görsel, ses ve videoyu sayfaya ekle; alternatif metin, açıklama, kapak ve altyazı ile erişilebilir yap."},
+  {id:"semantik", ad:"Semantik Yapı", konu:"1.7", renk:"#0891b2", ozet:"Sayfayı görevine göre bölgelere ayır: giriş, gezinme, asıl içerik, bölüm, bağımsız yazı, yan içerik, alt bilgi, iletişim."},
+  {id:"tablo", ad:"Tablo", konu:"1.8", renk:"#e11d48", ozet:"Satır ve sütun ilişkisiyle anlam kazanan veri için tablo: satırı sen açarsın (tr), sütunlar hücre sırasından oluşur."}
+];
+
+const TAGS = [
+/* ---- Belge iskeleti ---- */
+{g:"iskelet", t:"<!DOCTYPE html>", keys:["doctype","!doctype","!doctype html","doctype html"], ac:"Document Type — belge türü", k:"Belge türünü bildirir (en üst satır)",
+ gorev:"Tarayıcıya belgenin modern HTML standardına göre okunacağını söyler. Her belgenin en üst satırıdır.", kapanis:"yok", oz:[],
+ ipucu:"Etiket değil, “bildirim”dir; bu yüzden kapanışı ve içeriği yoktur.", hata:"Eksik bırakılırsa bazı tarayıcılar eski uyumluluk moduna geçer ve yerleşim bozulabilir.",
+ code:"<!DOCTYPE html>", demo:false, sonuc:"Ekranda görünmez; tarayıcının standart modda çalışmasını sağlar."},
+{g:"iskelet", t:"<html>", keys:["html"], ac:"HyperText Markup Language", k:"Belgenin kök elementi",
+ gorev:"Belgenin kök (en dış) elementidir; head ve body'yi sarar.", kapanis:"var",
+ oz:[["lang=\"tr\"","Belgenin ana dilini bildirir (ekran okuyucu, arama motoru, çeviri araçları)"]],
+ ipucu:"Belgede tek bir tane olur. Türkçe için lang=\"tr\", İngilizce için lang=\"en\".", hata:"lang unutulursa ekran okuyucu Türkçe metni yanlış telaffuzla okuyabilir.",
+ code:"<html lang=\"tr\">\n  <head>...</head>\n  <body>...</body>\n</html>", demo:false, sonuc:"Ekranda görünmez; tüm belgeyi kapsar ve dili bildirir."},
+{g:"iskelet", t:"<head>", keys:["head"], ac:"head — baş, üst bilgi", k:"Teknik belge bilgileri (görünmez)",
+ gorev:"Belge hakkındaki teknik bilgileri taşır (title, meta, link). İçeriğinin çoğu sayfanın içinde görünmez.", kapanis:"var", oz:[],
+ ipucu:"“Kafa”: sayfayı tanıtır ama sayfanın içinde görünmez. head ≠ header!", hata:"h1 veya p gibi görünür içeriği head içine yazma; o body'nin işidir.",
+ code:"<head>\n  <meta charset=\"UTF-8\">\n  <title>Ev Bul</title>\n</head>", demo:false, sonuc:"Sayfanın içinde görünmez; yalnızca sekme başlığı gibi sonuçları görürsün."},
+{g:"iskelet", t:"<body>", keys:["body"], ac:"body — gövde", k:"Görünen içeriğin tamamı",
+ gorev:"Kullanıcıya gösterilen bütün içeriği (başlık, paragraf, görsel…) taşır.", kapanis:"var", oz:[],
+ ipucu:"Ekranda gördüğün her şey body içindedir.", hata:"meta gibi teknik ayarları body içine koyma; head'e ait.",
+ code:"<body>\n  <h1>Merhaba</h1>\n  <p>Bu bir sayfadır.</p>\n</body>", onizleme:"<h1>Merhaba</h1>\n<p>Bu bir sayfadır.</p>"},
+{g:"iskelet", t:"<meta>", keys:["meta"], ac:"metadata — üst veri", k:"Karakter kodlaması ve viewport gibi ayarlar",
+ gorev:"Belgeye teknik ayar bildirir. En az iki meta ezberlenir: charset ve viewport.", kapanis:"yok",
+ oz:[["charset=\"UTF-8\"","Karakter kodlaması; ç, ğ, ı, ö, ş, ü doğru görünsün"],["name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"","Mobilde sayfa cihaz genişliğinde, 1:1 ölçekte açılır"]],
+ ipucu:"İkisi de head içinde yazılır. charset head'in başına yakın olmalı.", hata:"<meta></meta> yazılmaz; kapanışı yoktur. Metin “Güzel” gibi bozuk görünüyorsa charset eksiktir.",
+ code:"<meta charset=\"UTF-8\">\n<meta name=\"viewport\"\n  content=\"width=device-width, initial-scale=1.0\">", demo:false, sonuc:"Görünmez; Türkçe karakterleri ve mobil ölçeği düzenler."},
+{g:"iskelet", t:"<title>", keys:["title"], ac:"title — başlık", k:"Sekmede görünen sayfa adı",
+ gorev:"Tarayıcı sekmesinde, yer imlerinde ve arama sonuçlarında görünen sayfa adıdır. head içinde yazılır.", kapanis:"var", oz:[],
+ ipucu:"title sekmede, h1 sayfanın içinde görünür. Aynı şey değiller.", hata:"Kapanış etiketini unutursan sonraki kod başlığın parçası sanılır.",
+ code:"<title>Ev Bul | Ana Sayfa</title>", demo:false, sonuc:"Tarayıcı sekmesinde “Ev Bul | Ana Sayfa” yazar; sayfanın içinde görünmez."},
+{g:"iskelet", t:"<link>", keys:["link"], ac:"link — bağlantı (ilişki)", k:"Harici CSS dosyasını bağlar",
+ gorev:"Sayfaya dış kaynak bağlar; en sık harici stil (CSS) dosyasını bağlamak için kullanılır.", kapanis:"yok",
+ oz:[["rel=\"stylesheet\"","Bağlanan şeyin bir stil dosyası olduğunu söyler"],["href=\"stil.css\"","Dosyanın adresi"]],
+ ipucu:"a ile karıştırma: a tıklanır ve body'dedir; link görünmez ve head'de çalışır.", hata:"CSS yolunu alt klasördeki sayfada ../stil.css olarak yazmayı unutma.",
+ code:"<link rel=\"stylesheet\" href=\"stil.css\">", demo:false, sonuc:"Görünmez; stil.css içindeki kurallar sayfaya uygulanır."},
+{g:"iskelet", t:"<!-- -->", keys:["yorum","!--","<!-- -->","comment","--"], ac:"comment — yorum", k:"Ekranda görünmeyen kod notu",
+ gorev:"Kod içine açıklama notu yazar; ekranda görünmez.", kapanis:"özel",
+ oz:[["<!-- ile aç, --> ile kapat","Yorumun kendi açılış ve kapanışı vardır"]],
+ ipucu:"Kaynak kodu açan herkes yorumları okuyabilir: parola, anahtar, kişisel veri yazma.", hata:"Yorumu --> ile kapatmayı unutursan altındaki kodun hepsi yorum olur.",
+ code:"<!-- Ana sayfa başlık alanı -->\n<h1>Merhaba</h1>", onizleme:"<!-- Ana sayfa başlık alanı -->\n<h1>Merhaba</h1>", sonuc:""},
+
+/* ---- Metin ---- */
+{g:"metin", t:"<h1> – <h6>", keys:["h1","h2","h3","h4","h5","h6","h1-h6","h1–h6","h1 h6","baslik","başlık"], ac:"heading — başlık", k:"Başlık hiyerarşisi (h1 en önemli)",
+ gorev:"Başlık hiyerarşisini kurar: h1 sayfanın ana konusu (tek), h2 bölümler, h3 alt bölümler… h6'ya kadar.", kapanis:"var", oz:[],
+ ipucu:"Seviyeyi yazı boyutuna göre değil içerik ilişkisine göre seç; boyutu CSS ayarlar.", hata:"Başlık küçük görünsün diye h1 yerine h5 kullanma.",
+ code:"<h1>Satılık Evler</h1>\n<h2>Atakum</h2>\n<h3>2+1 Daireler</h3>"},
+{g:"metin", t:"<p>", keys:["p"], ac:"paragraph — paragraf", k:"Paragraf",
+ gorev:"Aynı düşünceyi anlatan cümleleri bir paragrafta toplar.", kapanis:"var", oz:[],
+ ipucu:"Yeni fikir = yeni p. Boşluk bırakmak için boş p veya art arda br kullanma (boşluk CSS işi).", hata:"p içine başka bir p yazılmaz; paragraflar kardeş olur.",
+ code:"<p>İlk düşünce.</p>\n<p>İkinci düşünce.</p>"},
+{g:"metin", t:"<strong>", keys:["strong"], ac:"strong — güçlü, önemli", k:"Ciddi önem",
+ gorev:"İçeriğin ciddi veya kritik öneme sahip olduğunu bildirir (genelde kalın görünür).", kapanis:"var", oz:[],
+ ipucu:"Kalın görünsün diye değil, ÖNEMLİ olduğu için kullan. strong = önem, em = vurgu.", hata:"Sadece kalın yazı istiyorsan bu CSS'in işidir.",
+ code:"<p><strong>Başvurular 30 Kasım'da sona erer.</strong></p>"},
+{g:"metin", t:"<em>", keys:["em"], ac:"emphasis — vurgu", k:"Vurgu",
+ gorev:"Cümle içinde bir kelimeye veya ifadeye vurgu yapar; okuma tonunu değiştirir (genelde italik görünür).", kapanis:"var", oz:[],
+ ipucu:"“mutlaka” kelimesini okurken sesini nasıl değiştirirsen, em o kelimedir.", hata:"em'i yalnızca italik olsun diye kullanma.",
+ code:"<p>Önceden <em>mutlaka</em> arayın.</p>"},
+{g:"metin", t:"<br>", keys:["br"], ac:"break — kırılma", k:"Zorunlu satır sonu",
+ gorev:"Aynı içerik içinde zorunlu satır sonu verir (adres, şiir, kısa iletişim bilgisi).", kapanis:"yok", oz:[],
+ ipucu:"Boş element: <br></br> yazılmaz. Boşluk bırakmak için değil, satır düzeninin anlam taşıdığı yerde kullan.", hata:"Art arda br ile aralık açmaya çalışma.",
+ code:"<p>Ev Bul Emlak<br>Atatürk Bulvarı 10<br>Samsun</p>"},
+{g:"metin", t:"<hr>", keys:["hr"], ac:"horizontal rule — yatay çizgi", k:"Konu/bölüm geçişi çizgisi",
+ gorev:"İçerikte konu veya bölüm geçişi olduğunu gösterir.", kapanis:"yok", oz:[],
+ ipucu:"Çizgi çizmek için değil, konu değişimini anlatmak için kullan. Çizginin biçimi CSS ile değişir.", hata:"Süs olsun diye her yere hr koyma.",
+ code:"<p>İlk konu.</p>\n<hr>\n<p>Yeni konu.</p>"},
+{g:"metin", t:"<q>", keys:["q"], ac:"quote — alıntı", k:"Cümle içi kısa alıntı",
+ gorev:"Cümlenin içindeki KISA alıntıyı işaretler; tarayıcı genelde tırnak işaretini kendisi ekler.", kapanis:"var", oz:[],
+ ipucu:"q = kısa (cümle içi), blockquote = uzun (ayrı blok).", hata:"q içine ayrıca tırnak yazma; tarayıcı ekler.",
+ code:"<p>Mimar şöyle dedi: <q>Yaşam alanı insana göre tasarlanır.</q></p>"},
+{g:"metin", t:"<blockquote>", keys:["blockquote"], ac:"block quotation — blok alıntı", k:"Ayrı blok uzun alıntı",
+ gorev:"Ayrı bir blok olarak sunulan uzun alıntı (bir veya daha fazla cümle).", kapanis:"var",
+ oz:[["cite=\"adres\"","Alıntının geldiği kaynağın adresi (ekranda görünmez)"]],
+ ipucu:"İçine p yazılabilir; kaynağın adı için cite ELEMANI kullanılır.", hata:"cite özniteliği (adres) ile cite elemanı (eser adı) farklı şeylerdir.",
+ code:"<blockquote cite=\"https://evbul.example/kitap\">\n  <p>İyi bir konut, bir yaşam biçimidir.</p>\n</blockquote>"},
+{g:"metin", t:"<cite>", keys:["cite"], ac:"citation — atıf", k:"Eser/kaynak adı",
+ gorev:"Alıntının geldiği eserin (kitap, film, rapor…) adını işaretler.", kapanis:"var", oz:[],
+ ipucu:"Genellikle eser adı içindir; kişi adını otomatik olarak cite içine koyma.", hata:"Kaynak adresi için değil, kaynak adı içindir.",
+ code:"<p>Kaynak: <cite>Kent ve Yaşam</cite></p>"},
+{g:"metin", t:"<code>", keys:["code"], ac:"code — kod", k:"Kod parçası",
+ gorev:"Metnin bir kod parçası, komut veya dosya adı olduğunu bildirir.", kapanis:"var", oz:[],
+ ipucu:"Etiketi ekranda göstermek için < yerine &lt; , > yerine &gt; yaz (aksi hâlde tarayıcı onu gerçek etiket sanır).", hata:"<h1> diye yazarsan ekranda h1 görünmez, gerçek bir başlık oluşur.",
+ code:"<p>Başlık için <code>&lt;h1&gt;</code> etiketi kullanılır.</p>"},
+{g:"metin", t:"<pre>", keys:["pre"], ac:"preformatted — biçimi korunmuş", k:"Boşluk ve satır sonlarını korur",
+ gorev:"Satır sonlarını ve ardışık boşlukları olduğu gibi korur; çok satırlı kod bloklarında genellikle code ile birlikte kullanılır.", kapanis:"var", oz:[],
+ ipucu:"Normal metinde 5 boşluk tek boşluğa iner; pre içinde olduğu gibi kalır.", hata:"Kaynak dosyadaki fazladan girintiler de ekrana yansır; dikkatli yaz.",
+ code:"<pre><code>Blok A\n  Kat 5\n    Daire 12</code></pre>"},
+{g:"metin", t:"<sub>", keys:["sub"], ac:"subscript — alt simge", k:"Alt simge",
+ gorev:"Metni taban çizgisinin altında gösterir; konumun anlam taşıdığı yerde kullanılır (kimyasal formül).", kapanis:"var", oz:[],
+ ipucu:"sub = aşağıda (sub-marine = denizaltı).", hata:"Sırf küçük yazı için kullanma.",
+ code:"<p>Su: H<sub>2</sub>O</p>"},
+{g:"metin", t:"<sup>", keys:["sup"], ac:"superscript — üst simge", k:"Üst simge",
+ gorev:"Metni taban çizgisinin üstünde gösterir: m², x³, dipnot numarası.", kapanis:"var", oz:[],
+ ipucu:"sup = yukarıda (super-man = yukarı uçan).", hata:"sub ile sup'ı karıştırma: sub aşağı, sup yukarı.",
+ code:"<p>Alan: 120 m<sup>2</sup></p>"},
+
+/* ---- Liste ---- */
+{g:"liste", t:"<ul>", keys:["ul"], ac:"unordered list — sırasız liste", k:"Sırasız liste",
+ gorev:"Sırası anlamı değiştirmeyen öğelerin listesi (alışveriş listesi, özellikler).", kapanis:"var", oz:[],
+ ipucu:"Karar sorusu: öğelerin yerini değiştirsem anlam bozulur mu? Bozulmuyorsa ul.", hata:"Doğrudan metin yazma; her öğe li içinde olur.",
+ code:"<ul>\n  <li>Ekmek</li>\n  <li>Süt</li>\n  <li>Kahve</li>\n</ul>"},
+{g:"liste", t:"<ol>", keys:["ol"], ac:"ordered list — sıralı liste", k:"Sıralı liste",
+ gorev:"Sırası anlamlı öğelerin listesi (tarif, kurulum adımları, sıralama). Numaraları tarayıcı kendisi üretir.", kapanis:"var",
+ oz:[["start=\"5\"","Numaralandırmayı 5'ten başlatır (tam sayı yazılır)"],["reversed","Azalan sıra; boolean öznitelik"],["type=\"A\"","İşaret biçimi: 1, a, A, i, I"]],
+ ipucu:"reversed=\"false\" onu kapatmaz! Boolean özniteliklerde varlık yeterlidir; kapatmak için tamamen sil.", hata:"Numaraları metne elle yazma; li eklendikçe tarayıcı günceller.",
+ code:"<ol start=\"3\">\n  <li>Evrakları hazırlayın</li>\n  <li>Randevuya gelin</li>\n  <li>Sözleşmeyi imzalayın</li>\n</ol>"},
+{g:"liste", t:"<li>", keys:["li"], ac:"list item — liste öğesi", k:"Liste öğesi",
+ gorev:"ul veya ol içindeki tek bir liste öğesi.", kapanis:"var",
+ oz:[["value=\"5\"","Bu öğenin sıra değerini değiştirir (ol içinde); sonrakiler ondan devam eder"]],
+ ipucu:"İç içe liste, ilgili li KAPANMADAN önce içine yazılır.", hata:"li ul/ol dışında tek başına kullanılmaz.",
+ code:"<ul>\n  <li>Blok A\n    <ul>\n      <li>2+1 daireler</li>\n      <li>3+1 daireler</li>\n    </ul>\n  </li>\n</ul>"},
+{g:"liste", t:"<dl>", keys:["dl"], ac:"description list — tanım listesi", k:"Terim–açıklama listesi",
+ gorev:"Ad–değer, terim–açıklama çiftlerini bir arada tutar (bir konutun özellikleri gibi).", kapanis:"var", oz:[],
+ ipucu:"Tek bir nesnenin özellikleri için dl; birçok kaydı karşılaştırmak için table.", hata:"dl içine doğrudan metin yazma; dt ve dd kullan.",
+ code:"<dl>\n  <dt>Oda sayısı</dt>\n  <dd>3+1</dd>\n  <dt>Isıtma</dt>\n  <dd>Kombi</dd>\n</dl>"},
+{g:"liste", t:"<dt>", keys:["dt"], ac:"description term — tanım terimi", k:"Tanım listesinde terim/ad",
+ gorev:"dl içinde ad, terim veya soru kısmını taşır.", kapanis:"var", oz:[],
+ ipucu:"dt = Terim, dd = Detay. Önce dt gelir, ardından dd.", hata:"dt ve dd'yi dl dışında kullanma.",
+ code:"<dl>\n  <dt>RAM</dt>\n  <dd>Geçici hafıza</dd>\n</dl>"},
+{g:"liste", t:"<dd>", keys:["dd"], ac:"description details — tanım ayrıntısı", k:"Tanım listesinde açıklama/değer",
+ gorev:"dl içinde dt'ye ait açıklama veya değeri taşır.", kapanis:"var", oz:[],
+ ipucu:"dt = Terim, dd = Detay (açıklama/değer).", hata:"Bir dt'nin birden fazla dd'si olabilir; yine de dt'siz dd yazma.",
+ code:"<dl>\n  <dt>SSD</dt>\n  <dd>Hızlı depolama birimi</dd>\n</dl>"},
+{g:"liste", t:"<div>", keys:["div"], ac:"division — bölüm", k:"Nötr blok kapsayıcı",
+ gorev:"Anlamı olmayan nötr BLOK kapsayıcıdır; uygun bir semantik etiket yoksa içerikleri CSS/JS hedefi için gruplar.", kapanis:"var",
+ oz:[["class=\"duyuru\"","Gruba CSS/JS için ortak bir ad verir"]],
+ ipucu:"Önce uygun semantik etiketi ara (p, ul, section…). Bulamazsan ve gruplama gerekiyorsa div.", hata:"Başlığı div ile taklit etme (h1–h6 kullan). Amacı olmayan gereksiz div ekleme.",
+ code:"<div class=\"duyuru\">\n  <p>Birinci paragraf</p>\n  <p>İkinci paragraf</p>\n</div>"},
+{g:"liste", t:"<span>", keys:["span"], ac:"span — aralık", k:"Nötr satır içi kapsayıcı",
+ gorev:"Anlamı olmayan nötr SATIR İÇİ kapsayıcıdır; cümle içindeki küçük bir parçayı hedefler.", kapanis:"var",
+ oz:[["class=\"fiyat\"","Parçaya CSS/JS için ad verir"]],
+ ipucu:"div = blok, span = satır içi. span önem (strong) veya vurgu (em) anlamı eklemez.", hata:"Önemli bir yeri işaretlemek istiyorsan span değil strong kullan.",
+ code:"<p>Fiyat: <span class=\"fiyat\">4.150.000 TL</span></p>"},
+
+/* ---- Bağlantı ---- */
+{g:"baglanti", t:"<a>", keys:["a"], ac:"anchor — çapa / bağlantı", k:"Bağlantı",
+ gorev:"Bağlantı kurar. Gidilecek adresi href belirler; href yoksa gerçek bir bağlantı olmaz.", kapanis:"var",
+ oz:[["href=\"...\"","Hedef: dosya yolu, #id, mailto:, tel: veya tam URL"],["target=\"_blank\"","Bağlantıyı yeni sekmede açar"],["rel=\"noopener noreferrer\"","Yeni sekmede açılan bağlantılar için güvenlik"],["download","Hedefi açmak yerine kaydetme (indirme) niyetini bildirir"]],
+ ipucu:"Bağlantı metni hedefi anlatsın: “Buraya tıklayın” yerine “Güncel fiyatları inceleyin”.", hata:"Boş # yazma; gerçek bir id hedefi kullan. Ayrıca target=\"_blank\" ile download birlikte kullanılmaz.",
+ code:"<a href=\"sayfalar/iletisim.html\">İletişim</a>\n<a href=\"#hakkinda\">Hakkında bölümüne git</a>\n<a href=\"mailto:bilgi@ornek.com\">E-posta gönder</a>\n<a href=\"https://example.com\" target=\"_blank\"\n  rel=\"noopener noreferrer\">Dış site (yeni sekme)</a>"},
+
+/* ---- Medya ---- */
+{g:"medya", t:"<img>", keys:["img"], ac:"image — görüntü", k:"Görsel ekler",
+ gorev:"Sayfaya bir görsel yerleştirir.", kapanis:"yok",
+ oz:[["src","Görsel dosyasının yolu (nerede?)"],["alt","Görselin metin alternatifi; ekranda görünmez (ne anlatıyor?)"],["width / height","Gösterim ölçüsü; birimsiz sayı: 300 (300px değil)"],["loading=\"lazy\"","Ekrandan uzaktaki görselin yüklemesini erteler"],["srcset","Aynı görselin alternatif boyutlu kaynakları"]],
+ ipucu:"src = nerede, alt = ne anlatıyor. Süs görselinde alt=\"\" (boş); alt'ın hiç olmaması ile aynı değildir.", hata:"width=\"300px\" yazma. width ile küçültmek dosyanın indirilen boyutunu azaltmaz.",
+ code:"<img src=\"kedi.jpg\" alt=\"Pencerede oturan gri kedi\"\n  width=\"300\" height=\"200\">"},
+{g:"medya", t:"<figure>", keys:["figure"], ac:"figure — şekil / görsel grubu", k:"Görsel + açıklama grubu",
+ gorev:"Kendi içinde bütün olan görsel, çizim vb. içeriği ve açıklamasını gruplar.", kapanis:"var", oz:[],
+ ipucu:"Birden fazla görsel tek açıklama altında toplanabilir. Her görseli figure içine almak zorunlu değil.", hata:"figure galeri düzeni oluşturmaz; yan yana dizilim CSS işidir.",
+ code:"<figure>\n  <img src=\"on.jpg\" alt=\"Bilgisayarın ön görünümü\"\n    width=\"220\" height=\"140\">\n  <figcaption>Bilgisayarın ön görünümü</figcaption>\n</figure>"},
+{g:"medya", t:"<figcaption>", keys:["figcaption"], ac:"figure caption — şekil yazısı", k:"Figure'ün görünür açıklaması",
+ gorev:"figure içindeki içeriğin GÖRÜNÜR açıklamasıdır. figure'ün ilk veya son çocuğu olur; en fazla bir tane.", kapanis:"var", oz:[],
+ ipucu:"alt görünmez, figcaption görünür. İkisi birbirinin yerine geçmez.", hata:"figure dışında kullanılmaz.",
+ code:"<figure>\n  <img src=\"arka.jpg\" alt=\"Arka paneldeki bağlantı noktaları\"\n    width=\"220\" height=\"140\">\n  <figcaption>Arka panel</figcaption>\n</figure>"},
+{g:"medya", t:"<picture>", keys:["picture"], ac:"picture — resim", k:"Ekrana/biçime göre görsel seçimi",
+ gorev:"Alternatif kaynakları gruplar: ekrana göre farklı kadraj (media) veya dosya biçimine göre seçim (type). Asıl görüntü içindeki img'dir.", kapanis:"var", oz:[],
+ ipucu:"source'lar img'den ÖNCE gelir. alt metni yalnızca img üzerinde yazılır.", hata:"picture slayt gösterisi değildir; aynı anda tek kaynak gösterilir.",
+ code:"<picture>\n  <source media=\"(max-width: 600px)\" srcset=\"dikey.jpg\">\n  <img src=\"yatay.jpg\" alt=\"Bahçeli evin ön cephesi\"\n    width=\"400\" height=\"260\">\n</picture>", demo:false, sonuc:"Ekran 600 piksel ve altındaysa dikey.jpg, daha genişse yatay.jpg yüklenir."},
+{g:"medya", t:"<source>", keys:["source"], ac:"source — kaynak", k:"Alternatif medya kaynağı",
+ gorev:"picture, audio ve video içinde alternatif kaynak / dosya biçimi sunar.", kapanis:"yok",
+ oz:[["picture içinde","srcset, media, type kullanılır"],["audio / video içinde","src ve type kullanılır"]],
+ ipucu:"picture içindeki source srcset kullanır; audio/video içindeki source src kullanır.", hata:"source'un kapanış etiketi yoktur.",
+ code:"<audio controls>\n  <source src=\"rehber.mp3\" type=\"audio/mpeg\">\n  <source src=\"rehber.ogg\" type=\"audio/ogg\">\n</audio>"},
+{g:"medya", t:"<audio>", keys:["audio"], ac:"audio — ses", k:"Ses oynatıcı",
+ gorev:"Ses kaydını sayfaya ekler.", kapanis:"var",
+ oz:[["controls","Oynat/duraklat/ses denetimlerini gösterir"],["preload=\"metadata\"","Yalnızca temel bilgiyi önceden yükleme ipucu"],["loop · muted · autoplay","Boolean özniteliklerdir (yazılması = etkin)"]],
+ ipucu:"controls=\"false\" denetimleri GİZLEMEZ; kapatmak için özniteliği sil. İçindeki metin, etiketi desteklemeyen tarayıcı içindir.", hata:"Otomatik ses başlatma; kullanıcıya denetim ver. audio üzerinde alt kullanılmaz.",
+ code:"<audio controls preload=\"metadata\">\n  <source src=\"rehber.mp3\" type=\"audio/mpeg\">\n  Tarayıcınız audio desteklemiyor.\n</audio>"},
+{g:"medya", t:"<video>", keys:["video"], ac:"video — görüntü kaydı", k:"Video oynatıcı",
+ gorev:"Görüntülü medyayı (varsa sesiyle) oynatır.", kapanis:"var",
+ oz:[["controls","Oynatıcı denetimleri"],["poster=\"kapak.jpg\"","Video başlamadan önce görünen kapak görseli"],["width / height","Gösterim ölçüsü ve oran (16:9 gibi)"],["playsinline","Mobilde sayfa içinde oynatmayı teşvik eder"]],
+ ipucu:"Kapak (poster) videonun oranıyla aynı olursa daha tutarlı görünür.", hata:"MP4/WebM kapsayıcıdır; uzantı tek başına oynatılabilirliği garanti etmez.",
+ code:"<video controls poster=\"kapak.jpg\" width=\"320\" height=\"180\">\n  <source src=\"tur.mp4\" type=\"video/mp4\">\n  Tarayıcınız video desteklemiyor.\n</video>"},
+{g:"medya", t:"<track>", keys:["track"], ac:"track — iz (altyazı)", k:"Video altyazısı (.vtt)",
+ gorev:"video'ya zamana bağlı metin (altyazı) ekler; dosya WebVTT biçiminde ve .vtt uzantılıdır.", kapanis:"yok",
+ oz:[["src","Altyazı dosyası (.vtt)"],["kind=\"captions\"","Konuşmalar ve anlamlı sesler (subtitles: dil desteği/çeviri)"],["srclang=\"tr\"","Dil kodu"],["label=\"Türkçe\"","Menüde görünen ad"],["default","Varsayılan seçim ipucu"]],
+ ipucu:"Altyazı görünmüyorsa: dosya .vtt mi (.vtt.txt değil), ilk satır WEBVTT mi, yol doğru mu, oynatıcıda Türkçe seçili mi?", hata:"source'lar track'ten önce yazılır. track'in kapanışı yoktur.",
+ code:"<video controls src=\"tur.mp4\">\n  <track src=\"altyazi.vtt\" kind=\"captions\"\n    srclang=\"tr\" label=\"Türkçe\" default>\n</video>", demo:false, sonuc:"Videoda altyazı menüsünden “Türkçe” seçilince .vtt içindeki metinler zamanı gelince görünür."},
+
+/* ---- Semantik ---- */
+{g:"semantik", t:"<header>", keys:["header"], ac:"header — üstlük", k:"Giriş/tanıtım alanı",
+ gorev:"Sayfanın veya bir içerik bölümünün giriş / tanıtım alanıdır (kurum adı, logo, gezinme).", kapanis:"var", oz:[],
+ ipucu:"head ≠ header: head belge bilgisi (görünmez), header görünür giriş alanıdır.", hata:"header içine başka bir header veya footer konmaz.",
+ code:"<header>\n  <p>Örnek Müze</p>\n</header>"},
+{g:"semantik", t:"<nav>", keys:["nav"], ac:"navigation — gezinme", k:"Önemli gezinme bağlantıları",
+ gorev:"Önemli gezinme bağlantılarını gruplar (ana menü, “bu sayfada” menüsü).", kapanis:"var",
+ oz:[["aria-label=\"Ana\"","Bölgenin yardımcı teknolojilere sunulan adı (görünmez)"]],
+ ipucu:"Her bağlantı grubu nav olmaz; yalnızca önemli gezinme. İçinde liste kullanmak yaygındır.", hata:"Paragraf içindeki tek kaynak bağlantısı nav gerektirmez.",
+ code:"<nav aria-label=\"Ana\">\n  <ul>\n    <li><a href=\"index.html\">Ana sayfa</a></li>\n    <li><a href=\"iletisim.html\">İletişim</a></li>\n  </ul>\n</nav>"},
+{g:"semantik", t:"<main>", keys:["main"], ac:"main — ana", k:"Sayfanın asıl içeriği",
+ gorev:"Sayfanın asıl, baskın içeriğini taşır.", kapanis:"var", oz:[],
+ ipucu:"Statik sayfada TEK main. header, footer, article, section, nav veya aside içine konmaz.", hata:"Birden fazla main kullanma (hidden olmayan).",
+ code:"<main>\n  <h1>Ziyaret bilgileri</h1>\n  <p>Müze salıdan pazara açıktır.</p>\n</main>"},
+{g:"semantik", t:"<section>", keys:["section"], ac:"section — bölüm", k:"Konu etrafında içerik grubu",
+ gorev:"Aynı konu etrafındaki içerikleri gruplar; genellikle konusunu anlatan bir başlık taşır.", kapanis:"var", oz:[],
+ ipucu:"section = konu grubu, article = bağımsız içerik. Yalnızca gruplama için div kullanılır.", hata:"Her kutuyu veya paragrafı section yapma.",
+ code:"<section>\n  <h2>Müzeden haberler</h2>\n  <p>Son gelişmeler burada.</p>\n</section>"},
+{g:"semantik", t:"<article>", keys:["article"], ac:"article — makale / yazı", k:"Bağımsız içerik (haber, yazı)",
+ gorev:"Kendi başına anlamlı, bağımsız içerik bütünüdür: haber, yazı, gönderi.", kapanis:"var", oz:[],
+ ipucu:"Başka bir yere taşınınca da anlamını koruyor mu? Haber/yazı ise article.", hata:"Bağımsızlık ayrı bir HTML dosyası olması demek değildir.",
+ code:"<article>\n  <h3>Yeni eserler ziyarete açıldı</h3>\n  <p>Koleksiyon arkeoloji salonunda.</p>\n</article>"},
+{g:"semantik", t:"<aside>", keys:["aside"], ac:"aside — yan / kenar", k:"Tamamlayıcı yan içerik",
+ gorev:"Çevresindeki içerikle ilişkili ama ana anlatımdan ayrı ele alınabilen tamamlayıcı alandır (ilgili haber önerisi).", kapanis:"var", oz:[],
+ ipucu:"Sağda görünmesi gerekmez; konumu CSS belirler, anlamı HTML.", hata:"Sağdaki her kutu aside değildir; ana içeriğin parçası olabilir.",
+ code:"<aside>\n  <h2>İlgili haber</h2>\n  <p><a href=\"haber2.html\">Eserler nasıl hazırlandı?</a></p>\n</aside>"},
+{g:"semantik", t:"<footer>", keys:["footer"], ac:"footer — altlık", k:"Kapanış/telif bilgileri",
+ gorev:"Sayfa veya bölüm hakkında kapanış bilgilerini taşır: telif, iletişim.", kapanis:"var", oz:[],
+ ipucu:"Ekranın altına yapışmaz; bu CSS'in işidir.", hata:"footer içine başka bir footer veya header konmaz.",
+ code:"<footer>\n  <p>© 2026 Örnek Müze</p>\n</footer>"},
+{g:"semantik", t:"<address>", keys:["address"], ac:"address — adres", k:"İletişim bilgileri",
+ gorev:"En yakın article'ın (yoksa sayfanın) sorumlusunun iletişim bilgilerini belirtir: e-posta, telefon, adres.", kapanis:"var", oz:[],
+ ipucu:"Her adres address değildir. İçinde başlık, section, nav, header, footer olmaz; telif bilgisi dışarıda kalır.", hata:"Tarayıcı italik gösterir; italik için seçme.",
+ code:"<address>\n  <p><a href=\"mailto:bilgi@ornek.com\">bilgi@ornek.com</a></p>\n  <p><a href=\"tel:+903625550000\">0362 555 00 00</a></p>\n</address>"},
+
+/* ---- Tablo ---- */
+{g:"tablo", t:"<table>", keys:["table"], ac:"table — tablo", k:"Tablo",
+ gorev:"Satır ve sütun ilişkisiyle anlam kazanan veriyi gösterir (ders programı, fiyat listesi, sipariş özeti).", kapanis:"var", oz:[],
+ ipucu:"Karar sorusu: satır ve sütun başlıkları olmadan okuyunca anlam kaybolur mu? Kayboluyorsa tablo. Sayfa yerleşimi için KULLANILMAZ.", hata:"Tablo çizgi ve renk vermez; görünüm CSS işidir.",
+ code:"<table>\n  <tr><th>Ürün</th><th>Stok</th></tr>\n  <tr><td>Defter</td><td>24</td></tr>\n  <tr><td>Kalem</td><td>60</td></tr>\n</table>"},
+{g:"tablo", t:"<caption>", keys:["caption"], ac:"caption — başlık / yazı", k:"Tablo başlığı",
+ gorev:"Tabloya ad verir; table'ın ilk çocuğudur.", kapanis:"var", oz:[],
+ ipucu:"caption = tablonun adı. figure'ün figcaption'ı ile karıştırma.", hata:"caption table'ın dışına yazılmaz.",
+ code:"<table>\n  <caption>Stok durumu</caption>\n  <tr><th>Ürün</th><th>Stok</th></tr>\n  <tr><td>Defter</td><td>24</td></tr>\n</table>"},
+{g:"tablo", t:"<thead>", keys:["thead"], ac:"table head — tablo başı", k:"Tablo başlık satırları grubu",
+ gorev:"Başlık satır(lar)ını gruplar.", kapanis:"var", oz:[],
+ ipucu:"thead / tbody / tfoot = baş / gövde / alt.", hata:"Sıralama: thead, tbody, tfoot (tfoot sonda anlatılır).",
+ code:"<table>\n  <thead>\n    <tr><th>Ürün</th><th>Stok</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>Defter</td><td>24</td></tr>\n  </tbody>\n</table>"},
+{g:"tablo", t:"<tbody>", keys:["tbody"], ac:"table body — tablo gövdesi", k:"Tablo veri satırları grubu",
+ gorev:"Veri satırlarını gruplar.", kapanis:"var", oz:[],
+ ipucu:"Veri satırları tbody içindedir.", hata:"Başlık satırları thead'e aittir.",
+ code:"<table>\n  <thead>\n    <tr><th>Ürün</th><th>Fiyat</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>Defter</td><td>30 TL</td></tr>\n    <tr><td>Kalem</td><td>10 TL</td></tr>\n  </tbody>\n</table>"},
+{g:"tablo", t:"<tfoot>", keys:["tfoot"], ac:"table foot — tablo altı", k:"Tablo toplam/özet satırları grubu",
+ gorev:"Toplam veya özet satırlarını gruplar.", kapanis:"var", oz:[],
+ ipucu:"Toplam satırı tfoot içinde yazılır; çoğunlukla ilk hücre th scope=\"row\" olur.", hata:"Toplam satırını tbody içine karıştırma.",
+ code:"<table>\n  <tbody>\n    <tr><td>Defter</td><td>30 TL</td></tr>\n    <tr><td>Kalem</td><td>10 TL</td></tr>\n  </tbody>\n  <tfoot>\n    <tr><th scope=\"row\">Toplam</th><td>40 TL</td></tr>\n  </tfoot>\n</table>"},
+{g:"tablo", t:"<tr>", keys:["tr"], ac:"table row — tablo satırı", k:"Tablo satırı",
+ gorev:"Bir satırın hücrelerini bir arada tutar.", kapanis:"var", oz:[],
+ ipucu:"Sütun etiketi yoktur: sütunlar, her satırda hücrelerin aynı sırada olmasından oluşur. Her satırdaki hücre sayısını say!", hata:"tr içine doğrudan metin yazma; metin hücrenin içinde durur.",
+ code:"<table>\n  <tr>\n    <th>Ürün</th>\n    <th>Stok</th>\n  </tr>\n  <tr>\n    <td>Defter</td>\n    <td>24</td>\n  </tr>\n</table>"},
+{g:"tablo", t:"<th>", keys:["th"], ac:"table header — tablo başlık hücresi", k:"Tablo başlık hücresi",
+ gorev:"Başlık hücresi: diğer hücrelerdeki verinin neyi ifade ettiğini belirtir.", kapanis:"var",
+ oz:[["scope=\"col\"","Kendi SÜTUNUNDAKİ verilerin başlığı"],["scope=\"row\"","Kendi SATIRINDAKİ verilerin başlığı"],["colspan · rowspan","Hücre birleştirme (aşağıda td'de)"]],
+ ipucu:"Kalın görünsün diye değil, başlık görevi taşıdığı için th. scope yalnızca th'de olur, td'de olmaz.", hata:"scope görünümü değiştirmez; ekran okuyucuya yardım eder.",
+ code:"<table>\n  <tr><th scope=\"col\">Ürün</th><th scope=\"col\">Stok</th></tr>\n  <tr><th scope=\"row\">Defter</th><td>24</td></tr>\n</table>"},
+{g:"tablo", t:"<td>", keys:["td"], ac:"table data — tablo veri hücresi", k:"Tablo veri hücresi",
+ gorev:"Veri hücresi: ilgili değeri veya içeriği taşır.", kapanis:"var",
+ oz:[["colspan=\"2\"","Hücreyi iki SÜTUNA yayar (yatay birleştirme)"],["rowspan=\"2\"","Hücreyi iki SATIRA yayar (dikey birleştirme)"]],
+ ipucu:"col = column = sütun → yatay; row = satır → dikey. Birleştirdikten sonra diğer satırlarda hücre sayısını yeniden say.", hata:"td'yi doğrudan table içine yazma; önce tr gerekir.",
+ code:"<table>\n  <tr><th>Gün</th><th colspan=\"2\">Ders</th></tr>\n  <tr><td rowspan=\"2\">Pazartesi</td><td>Web</td><td>Robotik</td></tr>\n  <tr><td>Kodlama</td><td>NTP</td></tr>\n</table>"}
+];
+
+/* karıştırılan çiftler */
+const PAIRS = [
+  ["<title> – <h1>","title sekmede (head), h1 sayfanın içinde (body) görünür."],
+  ["<head> – <header>","head belge bilgisi (görünmez); header görünür giriş alanı."],
+  ["<strong> – <em>","strong = ciddi önem; em = cümle içi vurgu."],
+  ["<q> – <blockquote>","q = cümle içi kısa alıntı; blockquote = ayrı blok uzun alıntı."],
+  ["<ul> – <ol>","Sıra anlamlıysa ol, değilse ul."],
+  ["<div> – <span>","div = nötr blok; span = nötr satır içi."],
+  ["<section> – <article>","section = konu grubu; article = bağımsız içerik."],
+  ["alt – <figcaption>","alt görünmez metin alternatifi; figcaption görünür açıklama."],
+  ["colspan – rowspan","colspan yatay (sütun) birleştirir; rowspan dikey (satır) birleştirir."],
+  ["<th> – <td>","th başlık hücresi (scope alır); td veri hücresi."],
+  ["<sub> – <sup>","sub alt simge (H₂O); sup üst simge (m²)."],
+  ["<a href> – <img src>","href gidilecek adres; src yüklenecek kaynak."]
+];
+
+/* ============ YARDIMCILAR ============ */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const gOf = id=>GROUPS.find(g=>g.id===id);
+const KAP = {var:["Kapanış etiketi VAR","yes"], yok:["Kapanışı YOK (boş element)","no"], özel:["Kendi kapanışı: --> ","mid"]};
+const norm = s=>s.toLowerCase().replace(/[<>\/\s]/g,"");
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function hl(code){
+  return code.replace(/(<!--[\s\S]*?-->)|(<\/?[!A-Za-z][^>]*>)|([^<]+|<)/g,(m,c,t,x)=>{
+    if(c) return '<span class="cm">'+esc(c)+'</span>';
+    if(t){
+      const mm=t.match(/^<(\/?)([^\s>\/]+)([\s\S]*?)(\/?)>$/);
+      if(!mm) return esc(t);
+      const attrs=mm[3].replace(/([A-Za-z_:][\w:.-]*)(="[^"]*")?/g,(a,n,v)=>'<span class="at">'+esc(n)+'</span>'+(v?'=<span class="st">'+esc(v.slice(1))+'</span>':''));
+      return '<span class="tg">&lt;'+mm[1]+esc(mm[2])+'</span>'+attrs+'<span class="tg">'+mm[4]+'&gt;</span>';
+    }
+    return esc(m);
+  });
+}
+const PLACE = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect width="300" height="200" fill="#c7d2fe"/><text x="150" y="108" font-family="Arial" font-size="22" text-anchor="middle" fill="#312e81">Görsel</text></svg>');
+function previewDoc(tag){
+  let body = tag.onizleme || tag.code;
+  body = body.replace(/(src|poster)="[^"]+\.(jpg|png|webp)"/g,'$1="'+PLACE+'"');
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>body{font:15px/1.5 system-ui,sans-serif;margin:12px;color:#17202f;background:#fff}img{max-width:100%;height:auto}table,th,td{border:1px solid #94a3b8;border-collapse:collapse;padding:5px 9px}</style></head><body>'+body+'</body></html>';
+}
+const store = {
+  get(){try{return JSON.parse(localStorage.getItem("htmlEtiketleri.v1"))||{}}catch(e){return {}}},
+  set(o){try{localStorage.setItem("htmlEtiketleri.v1",JSON.stringify(o))}catch(e){}}
+};
+let S = Object.assign({known:{},seen:{},best:null,weak:{},theme:null},store.get());
+const save = ()=>store.set(S);
+
+/* ============ SEKMELER ============ */
+const MODES = [["sunum","Sunum"],["kartlar","Kartlar"],["test","Test"],["yaz","Yazarak"],["ozet","Özet tablo"]];
+const tabsEl = $("#tabs");
+MODES.forEach(([id,ad])=>{
+  const b=document.createElement("button");b.className="tab";b.id="tab-"+id;b.textContent=ad;b.setAttribute("role","tab");
+  b.onclick=()=>setMode(id);tabsEl.appendChild(b);
+});
+let mode="sunum";
+function setMode(m,keepHash){
+  mode=m;
+  MODES.forEach(([id])=>{
+    $("#m-"+id).classList.toggle("hidden",id!==m);
+    $("#tab-"+id).setAttribute("aria-selected",id===m);
+  });
+  if(!keepHash) history.replaceState(null,"","#"+m+(m==="sunum"?"/"+cur:""));
+  if(m==="kartlar") renderCards();
+  if(m==="test") renderTestSetup();
+  if(m==="yaz") renderTypeSetup();
+  if(m==="ozet") renderSummary();
+  closeMenu();
+  window.scrollTo({top:0});
+}
+
+/* ============ SLAYTLAR ============ */
+const SLIDES = [];
+SLIDES.push({type:"title"});
+SLIDES.push({type:"how"});
+GROUPS.forEach(g=>{
+  SLIDES.push({type:"group",g:g.id});
+  TAGS.filter(t=>t.g===g.id).forEach(t=>SLIDES.push({type:"tag",tag:t}));
+  if(g.id==="baglanti") SLIDES.push({type:"href"});
+  SLIDES.push({type:"recap",g:g.id});
+});
+SLIDES.push({type:"pairs"});
+SLIDES.push({type:"end"});
+let cur = 0;
+
+function chipsFor(gid){
+  return TAGS.filter(t=>t.g===gid).map(t=>{
+    const i=SLIDES.findIndex(s=>s.tag===t);
+    return '<button class="chip" data-go="'+i+'">'+esc(t.t)+'</button>';
+  }).join("");
+}
+function slideHTML(s){
+  if(s.type==="title"){
+    return `<span class="eyebrow">Web Tabanlı Uygulama Geliştirme · HTML</span>
+    <h1>HTML Etiketleri Rehberi</h1>
+    <p class="lead">Derste öğrendiğin <b>${TAGS.length} etiketin</b> hepsi tek yerde: ne işe yarar, kapanışı var mı, nasıl yazılır, ekranda nasıl görünür. Sonra kartlarla, testle ve yazarak pekiştir.</p>
+    <div class="chips">${GROUPS.map(g=>'<span class="chip" style="border-color:'+g.renk+';color:'+g.renk+'">'+g.konu+' '+g.ad+'</span>').join("")}</div>
+    <div class="row"><button class="btn" data-go="1">Başla →</button><button class="btn ghost" data-mode="kartlar">Doğrudan kartlara geç</button></div>`;
+  }
+  if(s.type==="how"){
+    return `<span class="eyebrow">Nasıl çalışmalı?</span><h2>Üç adımda ezber</h2>
+    <div class="tagslide" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+      <div class="box tip"><b>1 · Gör</b>Sunumu gez. Her etiket için görevini, açılımını ve ipucunu oku; kodu ve ekran görüntüsünü karşılaştır.</div>
+      <div class="box tip"><b>2 · Tekrar et</b><em>Kartlar</em> sekmesinde etiketi görüp görevini, görevi görüp etiketi hatırla. “Biliyorum / Tekrar” ile ilerlemeni işaretle.</div>
+      <div class="box tip"><b>3 · Sına</b><em>Test</em> ve <em>Yazarak</em> sekmelerinde kendini ölç. Yanlışlar bir sonraki çalışmada öne çıkar.</div>
+    </div>
+    <div class="box warn"><b>Ezber ipucu</b>Etiketlerin çoğu İngilizce kelimenin kısaltmasıdır (<code>ul</code> = unordered list, <code>tr</code> = table row…). Açılımı bilirsen etiketi unutmazsın; her slaytta açılımı göreceksin.</div>
+    <p class="muted">İlerleme tarayıcında saklanır; kimseyle paylaşılmaz.</p>`;
+  }
+  if(s.type==="group"){
+    const g=gOf(s.g);const n=TAGS.filter(t=>t.g===g.id).length;
+    return `<span class="eyebrow">Bölüm ${g.konu}</span><h2>${esc(g.ad)}</h2><p class="lead">${esc(g.ozet)}</p>
+    <p class="muted"><b>${n} etiket</b> — birine tıklayarak doğrudan git:</p><div class="chips">${chipsFor(g.id)}</div>`;
+  }
+  if(s.type==="tag"){
+    const t=s.tag, g=gOf(t.g), kp=KAP[t.kapanis]||KAP.var;
+    const oz = t.oz.length ? '<ul class="attrs">'+t.oz.map(([a,b])=>'<li><code>'+esc(a)+'</code> — '+esc(b)+'</li>').join("")+'</ul>' : "";
+    const right = (t.demo===false)
+      ? '<pre class="code">'+hl(t.code)+'</pre><div class="pvl">Ekranda ne görünür?</div><div class="sonuc">'+esc(t.sonuc)+'</div>'
+      : '<pre class="code">'+hl(t.code)+'</pre><div class="pvl">Ekranda böyle görünür</div><iframe class="preview" sandbox="" title="Örnek sonuç"></iframe>'+(t.sonuc?'<div class="sonuc" style="margin-top:8px">'+esc(t.sonuc)+'</div>':"");
+    return `<span class="eyebrow">${g.konu} · ${esc(g.ad)}</span>
+    <div class="tagslide"><div>
+      <div class="tagname">${esc(t.t)}</div><div class="ac">${esc(t.ac)}</div>
+      <div class="chips" style="margin:0 0 6px"><span class="chip ${kp[1]}">${kp[0]}</span></div>
+      <p class="gorev">${esc(t.gorev)}</p>${oz}
+      <div class="box tip"><b>Ezber ipucu</b>${esc(t.ipucu)}</div>
+      <div class="box warn"><b>Sık hata</b>${esc(t.hata)}</div>
+    </div><div>${right}</div></div>`;
+  }
+  if(s.type==="href"){
+    return `<span class="eyebrow">1.5 · Bağlantı</span><h2>href değerleri — hedef nereye gidiyor?</h2>
+    <p class="lead">Aynı <code>&lt;a&gt;</code> etiketi, href'e yazdığın değere göre farklı işler yapar. Göreli yol, bağlantının YAZILDIĞI dosyanın klasörüne göre hesaplanır.</p>
+    <table class="t"><thead><tr><th>href değeri</th><th>Ne yapar?</th></tr></thead><tbody>
+    <tr><td>sayfa.html</td><td>Aynı klasördeki dosyaya gider</td></tr>
+    <tr><td>sayfalar/iletisim.html</td><td>Alt klasördeki dosyaya gider</td></tr>
+    <tr><td>../index.html</td><td>Bir üst klasöre çıkıp dosyaya gider (her ../ = bir klasör yukarı)</td></tr>
+    <tr><td>#hakkinda</td><td>Aynı sayfada id="hakkinda" olan elemana gider</td></tr>
+    <tr><td>sayfa.html#blok-a</td><td>Başka sayfanın belirli bölümüne gider</td></tr>
+    <tr><td>mailto:bilgi@ornek.com</td><td>E-posta uygulamasını açar (göndermez)</td></tr>
+    <tr><td>tel:+903625550000</td><td>Telefon uygulamasını açar (+90, boşluksuz, baştaki 0 yok)</td></tr>
+    <tr><td>https://example.com</td><td>Başka sitenin tam adresi (mutlak URL)</td></tr></tbody></table>`;
+  }
+  if(s.type==="recap"){
+    const g=gOf(s.g), list=TAGS.filter(t=>t.g===g.id);
+    return `<span class="eyebrow">Özet · ${g.konu}</span><h2>${esc(g.ad)} — hepsi bir arada</h2>
+    <p class="muted">Görevleri kapatıp kendini dene: bir hücreye tıklayınca açılır.</p>
+    <div class="row"><button class="btn ghost" id="hideBtn">Görevleri gizle</button></div>
+    <table class="t" id="recapT"><thead><tr><th>Etiket</th><th>Görevi</th><th>Kapanış</th></tr></thead><tbody>
+    ${list.map(t=>'<tr><td>'+esc(t.t)+'</td><td class="role">'+esc(t.k)+'</td><td>'+(t.kapanis==="yok"?"yok":t.kapanis==="özel"?"-->":"var")+'</td></tr>').join("")}</tbody></table>`;
+  }
+  if(s.type==="pairs"){
+    return `<span class="eyebrow">Sınavda karıştırılanlar</span><h2>Sık karıştırılan çiftler</h2>
+    <table class="t"><thead><tr><th>Çift</th><th>Fark</th></tr></thead><tbody>
+    ${PAIRS.map(([a,b])=>'<tr><td>'+esc(a)+'</td><td>'+esc(b)+'</td></tr>').join("")}</tbody></table>`;
+  }
+  if(s.type==="end"){
+    const known=Object.keys(S.known).filter(k=>S.known[k]).length;
+    return `<span class="eyebrow">Bitti 🎉</span><h2>Şimdi sıra pekiştirmede</h2>
+    <p class="lead">Sunumu bitirdin. Etiketleri unutmamak için tekrar yapmak şart: kartlar ve test kısa sürer.</p>
+    <div class="stats"><div><b>${TAGS.length}</b>etiket</div><div><b>${known}</b>“biliyorum” dediğin</div></div>
+    <div class="row"><button class="btn" data-mode="kartlar">Kartlarla tekrar et</button><button class="btn ghost" data-mode="test">Teste geç</button><button class="btn ghost" data-mode="yaz">Yazarak dene</button><button class="btn ghost" data-mode="ozet">Özet tabloyu aç</button></div>`;
+  }
+  return "";
+}
+function renderSlide(i,noHash){
+  cur=Math.max(0,Math.min(SLIDES.length-1,i));
+  const s=SLIDES[cur], el=$("#slide");
+  const g = s.g? gOf(s.g) : (s.tag? gOf(s.tag.g) : null);
+  const col = g? g.renk : "#2f5bea";
+  el.style.setProperty("--c",col);el.style.borderTopColor=col;
+  el.style.setProperty("--cbg",col+"22");
+  el.innerHTML=slideHTML(s);
+  el.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>renderSlide(+b.dataset.go));
+  el.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+  const ifr=$("iframe.preview",el); if(ifr) ifr.srcdoc=previewDoc(s.tag);
+  if(s.type==="recap"){
+    const hb=$("#hideBtn",el), roles=el.querySelectorAll("td.role");
+    hb.onclick=()=>{const on=hb.dataset.on!=="1";hb.dataset.on=on?"1":"";hb.textContent=on?"Görevleri göster":"Görevleri gizle";
+      roles.forEach(r=>r.classList.toggle("blur",on));};
+    roles.forEach(r=>r.onclick=()=>r.classList.remove("blur"));
+  }
+  S.seen[cur]=1; save();
+  $("#prog").style.width=(cur/(SLIDES.length-1)*100)+"%";
+  $("#count").textContent=(cur+1)+" / "+SLIDES.length;
+  $("#prev").disabled=cur===0; $("#next").disabled=cur===SLIDES.length-1;
+  if(!noHash && mode==="sunum") history.replaceState(null,"","#sunum/"+cur);
+  renderMenu();
+}
+$("#prev").onclick=()=>renderSlide(cur-1);
+$("#next").onclick=()=>renderSlide(cur+1);
+document.addEventListener("keydown",e=>{
+  if(mode!=="sunum"||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if(e.key==="ArrowRight"||e.key==="PageDown"||e.key===" "){e.preventDefault();renderSlide(cur+1)}
+  else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();renderSlide(cur-1)}
+  else if(e.key==="Home"){renderSlide(0)} else if(e.key==="End"){renderSlide(SLIDES.length-1)}
+  else if(e.key==="f"||e.key==="F"){toggleFs()}
+  else if(e.key==="Escape"){closeMenu()}
+});
+let tx=null;
+$("#slide").addEventListener("touchstart",e=>{tx=e.touches[0].clientX},{passive:true});
+$("#slide").addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;tx=null;
+  if(Math.abs(dx)>70) renderSlide(cur+(dx<0?1:-1));});
+function toggleFs(){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); }
+$("#fsBtn").onclick=toggleFs;
+
+/* menü */
+function renderMenu(){
+  const m=$("#menu"); let h='<button class="icon" id="closeM" style="float:right">✕</button><h3 style="margin-top:4px">İçindekiler</h3>';
+  h+='<button class="item'+(cur===0?" cur":"")+(S.seen[0]?" seen":"")+'" data-i="0">Başlangıç</button><button class="item'+(cur===1?" cur":"")+(S.seen[1]?" seen":"")+'" data-i="1">Nasıl çalışmalı?</button>';
+  GROUPS.forEach(g=>{
+    const gi=SLIDES.findIndex(s=>s.type==="group"&&s.g===g.id);
+    h+='<h3>'+g.konu+' · '+esc(g.ad)+'</h3><button class="item'+(cur===gi?" cur":"")+'" data-i="'+gi+'">Bölüm başlangıcı</button>';
+    TAGS.filter(t=>t.g===g.id).forEach(t=>{const i=SLIDES.findIndex(s=>s.tag===t);
+      h+='<button class="item mono'+(cur===i?" cur":"")+(S.seen[i]?" seen":"")+'" data-i="'+i+'">'+esc(t.t)+'</button>';});
+  });
+  const pi=SLIDES.findIndex(s=>s.type==="pairs");
+  h+='<h3>Son</h3><button class="item" data-i="'+pi+'">Karıştırılan çiftler</button><button class="item" data-i="'+(SLIDES.length-1)+'">Bitiş</button>';
+  m.innerHTML=h;
+  m.querySelectorAll("button.item").forEach(b=>b.onclick=()=>{renderSlide(+b.dataset.i);closeMenu()});
+  $("#closeM").onclick=closeMenu;
+}
+function openMenu(){$("#menu").classList.add("open");$("#scrim").classList.remove("hidden")}
+function closeMenu(){$("#menu").classList.remove("open");$("#scrim").classList.add("hidden")}
+$("#menuBtn").onclick=openMenu;$("#scrim").onclick=closeMenu;
+
+/* ============ KARTLAR ============ */
+const CS = {group:"all", only:false, dir:"t2r", deck:[], i:0, flip:false};
+function groupSelect(id,val){
+  return '<select id="'+id+'"><option value="all">Tüm bölümler</option>'+GROUPS.map(g=>'<option value="'+g.id+'"'+(val===g.id?" selected":"")+'>'+g.konu+' · '+esc(g.ad)+'</option>').join("")+'</select>';
+}
+function buildDeck(){
+  let d=TAGS.filter(t=>CS.group==="all"||t.g===CS.group);
+  if(CS.only) d=d.filter(t=>!S.known[t.t]);
+  CS.deck=shuffle(d);CS.i=0;CS.flip=false;
+}
+function renderCards(){
+  const el=$("#m-kartlar");
+  const known=TAGS.filter(t=>S.known[t.t]).length;
+  el.innerHTML=`<div class="panel"><h2>Ezber kartları</h2>
+  <p class="muted">Kartı çevirmek için karta tıkla (veya Boşluk). Biliyorsan “Biliyorum”, bilmiyorsan “Tekrar”.</p>
+  <div class="row">${groupSelect("cg",CS.group)}
+    <select id="cd"><option value="t2r"${CS.dir==="t2r"?" selected":""}>Etiket → görevi söyle</option><option value="r2t"${CS.dir==="r2t"?" selected":""}>Görev → etiketi söyle</option></select>
+    <label><input type="checkbox" id="co"${CS.only?" checked":""}> Sadece bilmediklerim</label>
+    <button class="btn ghost" id="cs">Karıştır</button>
+    <button class="btn ghost" id="cr">İlerlemeyi sıfırla</button></div>
+  <div class="stats"><div><b>${known}/${TAGS.length}</b>“biliyorum”</div><div><b id="cpos"></b>bu destede</div></div>
+  <div id="cardArea"></div></div>`;
+  $("#cg").onchange=e=>{CS.group=e.target.value;buildDeck();drawCard()};
+  $("#cd").onchange=e=>{CS.dir=e.target.value;CS.flip=false;drawCard()};
+  $("#co").onchange=e=>{CS.only=e.target.checked;buildDeck();drawCard()};
+  $("#cs").onclick=()=>{buildDeck();drawCard()};
+  $("#cr").onclick=()=>{if(confirm("Tüm “biliyorum” işaretleri silinsin mi?")){S.known={};save();buildDeck();renderCards()}};
+  if(!CS.deck.length||CS.i>=CS.deck.length) buildDeck();
+  drawCard();
+}
+function drawCard(){
+  const a=$("#cardArea"); if(!a) return;
+  $("#cpos").textContent=CS.deck.length?(CS.i+1)+" / "+CS.deck.length:"0";
+  if(!CS.deck.length){a.innerHTML='<div class="fb ok">Bu seçimde kart kalmadı. Harika! 🎉 Filtreyi değiştirebilir veya ilerlemeyi sıfırlayabilirsin.</div>';return}
+  const t=CS.deck[CS.i], g=gOf(t.g);
+  let front,back;
+  if(CS.dir==="t2r"){front='<div class="big">'+esc(t.t)+'</div><div class="small">'+g.konu+' · '+esc(g.ad)+'</div>';
+    back='<div class="big" style="font-size:1.6rem">'+esc(t.t)+'</div><div class="role">'+esc(t.k)+'</div><div class="small">'+esc(t.ac)+' · '+(KAP[t.kapanis]||KAP.var)[0]+'</div><pre class="code">'+hl(t.code)+'</pre><div class="small">'+esc(t.ipucu)+'</div>';}
+  else{front='<div class="role">'+esc(t.k)+'</div><div class="small">Hangi etiket? ('+g.konu+' · '+esc(g.ad)+')</div>';
+    back='<div class="big">'+esc(t.t)+'</div><div class="small">'+esc(t.ac)+' · '+(KAP[t.kapanis]||KAP.var)[0]+'</div><pre class="code">'+hl(t.code)+'</pre>';}
+  a.innerHTML='<div class="flash"><button class="fc" id="fc" style="border-color:'+g.renk+'" aria-label="Kartı çevir">'+(CS.flip?back:front)+'</button></div>'+
+  '<div class="row"><button class="btn ghost" id="cb">← Geri</button><button class="btn ghost" id="cf">Çevir</button><span style="flex:1"></span><button class="btn bad" id="ca">↻ Tekrar</button><button class="btn ok" id="ck">✓ Biliyorum</button></div>';
+  $("#fc").onclick=$("#cf").onclick=()=>{CS.flip=!CS.flip;drawCard()};
+  $("#cb").onclick=()=>{CS.i=(CS.i-1+CS.deck.length)%CS.deck.length;CS.flip=false;drawCard()};
+  $("#ck").onclick=()=>{S.known[t.t]=true;save();CS.deck.splice(CS.i,1);if(CS.i>=CS.deck.length)CS.i=0;CS.flip=false;renderCardsStatsOnly();drawCard()};
+  $("#ca").onclick=()=>{S.known[t.t]=false;save();const x=CS.deck.splice(CS.i,1)[0];CS.deck.push(x);if(CS.i>=CS.deck.length)CS.i=0;CS.flip=false;renderCardsStatsOnly();drawCard()};
+}
+function renderCardsStatsOnly(){const b=$("#m-kartlar .stats b");if(b)b.textContent=TAGS.filter(t=>S.known[t.t]).length+"/"+TAGS.length}
+document.addEventListener("keydown",e=>{
+  if(mode!=="kartlar"||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if(e.key===" "&&$("#cf")){e.preventDefault();$("#cf").click()}
+});
+
+/* ============ TEST ============ */
+let Q=null;
+function renderTestSetup(){
+  const el=$("#m-test");
+  const weak=Object.keys(S.weak).filter(k=>S.weak[k]>0).length;
+  el.innerHTML=`<div class="panel"><h2>Test</h2>
+  <p class="muted">Çoktan seçmeli sorular: görevden etiketi, etiketten görevi, açılımdan etiketi ve kapanış kuralını bil.</p>
+  <div class="row">${groupSelect("tg","all")}
+   <select id="tn"><option value="10">10 soru</option><option value="20" selected>20 soru</option><option value="40">40 soru</option></select>
+   <label><input type="checkbox" id="tw"> Zayıf olduklarımdan başla (${weak})</label>
+   <button class="btn" id="ts">Başlat</button></div>
+  ${S.best!=null?'<p class="muted">En iyi sonucun: <b>%'+S.best+'</b></p>':""}</div>`;
+  $("#ts").onclick=()=>startTest($("#tg").value,+$("#tn").value,$("#tw").checked);
+}
+function pickOpts(correct,pool,n,key){
+  const others=shuffle(pool.filter(x=>x!==correct)).slice(0,n-1);
+  return shuffle([correct,...others]).map(x=>({v:x,ok:x===correct}));
+}
+function makeQuestion(t,pool){
+  const same=pool.filter(x=>x.g===t.g), mixed=same.length>=4?same:TAGS;
+  const types=["g2t","t2g","t2g","ac"];
+  if(t.kapanis!=="özel") types.push("kap");
+  if(!t.ac) types.splice(types.indexOf("ac"),1);
+  const ty=types[Math.floor(Math.random()*types.length)];
+  if(ty==="g2t") return {t,type:ty,q:"“"+t.k+"” görevini hangi etiket üstlenir?",mono:true,opts:pickOpts(t,mixed,4).map(o=>({v:o.v.t,ok:o.ok}))};
+  if(ty==="t2g") return {t,type:ty,q:t.t+" etiketinin görevi nedir?",mono:false,opts:pickOpts(t,mixed,4).map(o=>({v:o.v.k,ok:o.ok}))};
+  if(ty==="ac"){const en=t.ac.split("—")[0].trim();return {t,type:ty,q:"“"+t.ac+"” açılımı hangi etiketindir?",mono:true,opts:pickOpts(t,mixed,4).map(o=>({v:o.v.t,ok:o.ok}))}}
+  return {t,type:"kap",q:t.t+" etiketinin kapanış etiketi var mı?",mono:false,opts:[{v:"Evet, kapanış etiketi var",ok:t.kapanis==="var"},{v:"Hayır, boş elementtir (kapanışı yok)",ok:t.kapanis==="yok"},{v:"Evet, ama kendine özgü kapanışı var (-->)",ok:t.kapanis==="özel"}].filter((o,i)=>t.kapanis==="özel"||i<2)};
+}
+function startTest(gid,n,weakFirst){
+  let pool=TAGS.filter(t=>gid==="all"||t.g===gid);
+  let picks=shuffle(pool);
+  if(weakFirst) picks=picks.sort((a,b)=>(S.weak[b.t]||0)-(S.weak[a.t]||0));
+  const qs=[];
+  for(let i=0;qs.length<Math.min(n,Math.max(pool.length,n));i++){
+    qs.push(makeQuestion(picks[i%picks.length],TAGS));
+    if(qs.length>=n) break;
+  }
+  Q={qs,i:0,score:0,wrong:[],answered:false};
+  drawQ();
+}
+function drawQ(){
+  const el=$("#m-test");
+  if(Q.i>=Q.qs.length){return endTest()}
+  const q=Q.qs[Q.i];
+  el.innerHTML=`<div class="panel"><div class="stagebar"><div class="progress"><i style="width:${Q.i/Q.qs.length*100}%"></i></div><div class="count">${Q.i+1} / ${Q.qs.length}</div></div>
+  <div class="qtext">${esc(q.q)}</div>
+  <div class="opts">${q.opts.map((o,i)=>'<button class="opt'+(q.mono?" mono":"")+'" data-i="'+i+'">'+esc(o.v)+'</button>').join("")}</div>
+  <div id="fb"></div><div class="row" id="qn"></div></div>`;
+  Q.answered=false;
+  el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answerQ(+b.dataset.i));
+}
+function answerQ(i){
+  if(Q.answered) return; Q.answered=true;
+  const q=Q.qs[Q.i], ok=q.opts[i].ok;
+  document.querySelectorAll("#m-test .opt").forEach((b,j)=>{b.disabled=true;if(q.opts[j].ok)b.classList.add("right");else if(j===i)b.classList.add("wrong")});
+  if(ok){Q.score++;S.weak[q.t.t]=Math.max(0,(S.weak[q.t.t]||0)-1)}
+  else{Q.wrong.push(q);S.weak[q.t.t]=(S.weak[q.t.t]||0)+1}
+  save();
+  $("#fb").innerHTML='<div class="fb '+(ok?"ok":"bad")+'"><b>'+(ok?"Doğru!":"Yanlış.")+'</b> '+esc(q.t.t)+' — '+esc(q.t.k)+'. '+esc(q.t.ipucu)+'</div>';
+  $("#qn").innerHTML='<button class="btn" id="nq">'+(Q.i===Q.qs.length-1?"Sonucu gör":"Sonraki soru →")+'</button>';
+  $("#nq").onclick=()=>{Q.i++;drawQ()};$("#nq").focus();
+}
+function endTest(){
+  const pct=Math.round(Q.score/Q.qs.length*100);
+  if(S.best==null||pct>S.best){S.best=pct;save()}
+  const uniq=[...new Map(Q.wrong.map(q=>[q.t.t,q.t])).values()];
+  $("#m-test").innerHTML=`<div class="panel"><h2>Sonuç</h2><div class="score">%${pct}</div>
+  <p>${Q.qs.length} sorudan <b>${Q.score}</b> tanesini doğru yaptın. ${pct>=85?"Harika, etiketler oturmuş! 🎯":pct>=60?"İyi gidiyorsun; yanlışlarına bir daha bak.":"Sorun değil: kartlarla biraz daha tekrar et."}</p>
+  ${uniq.length?'<h3>Tekrar etmen gerekenler</h3><ul class="mist">'+uniq.map(t=>'<li><b class="mono">'+esc(t.t)+'</b> — '+esc(t.k)+'</li>').join("")+'</ul>':""}
+  <div class="row"><button class="btn" id="again">Yeni test</button>${uniq.length?'<button class="btn ghost" id="redo">Yanlışlarımı tekrar çöz</button>':""}<button class="btn ghost" data-mode="kartlar" id="tocards">Kartlara git</button></div></div>`;
+  $("#again").onclick=renderTestSetup;
+  $("#tocards").onclick=()=>setMode("kartlar");
+  if($("#redo")) $("#redo").onclick=()=>{Q={qs:shuffle(uniq).map(t=>makeQuestion(t,TAGS)),i:0,score:0,wrong:[],answered:false};drawQ()};
+}
+
+/* ============ YAZARAK ============ */
+let Y=null;
+function renderTypeSetup(){
+  $("#m-yaz").innerHTML=`<div class="panel"><h2>Yazarak çalış</h2>
+  <p class="muted">Görev gösterilir; etiketin adını yaz (<code>&lt;p&gt;</code> ya da <code>p</code> — ikisi de olur). Başlıklar için <code>h1</code> yazman yeterli.</p>
+  <div class="row">${groupSelect("yg","all")}<button class="btn" id="ys">Başlat</button></div></div>`;
+  $("#ys").onclick=()=>{const gid=$("#yg").value;Y={list:shuffle(TAGS.filter(t=>gid==="all"||t.g===gid)),i:0,ok:0,miss:[],hint:0,tries:0};drawY()};
+}
+function drawY(){
+  const el=$("#m-yaz");
+  if(Y.i>=Y.list.length){
+    el.innerHTML=`<div class="panel"><h2>Bitti</h2><div class="score">${Y.ok} / ${Y.list.length}</div><p>İlk denemede doğru bildiklerin sayılır.</p>
+    ${Y.miss.length?'<h3>Tekrar et</h3><ul class="mist">'+Y.miss.map(t=>'<li><b class="mono">'+esc(t.t)+'</b> — '+esc(t.k)+'</li>').join("")+'</ul>':'<div class="fb ok">Hiç hata yapmadın! 🎉</div>'}
+    <div class="row"><button class="btn" id="yr">Yeniden başla</button></div></div>`;
+    $("#yr").onclick=renderTypeSetup;return;
+  }
+  const t=Y.list[Y.i], g=gOf(t.g);Y.tries=0;Y.hint=0;
+  el.innerHTML=`<div class="panel"><div class="stagebar"><div class="progress"><i style="width:${Y.i/Y.list.length*100}%"></i></div><div class="count">${Y.i+1} / ${Y.list.length}</div></div>
+  <span class="eyebrow">${g.konu} · ${esc(g.ad)}</span>
+  <div class="qtext">${esc(t.k)}</div>
+  <p class="muted">${esc(t.gorev)}</p>
+  <form id="yf" class="row" autocomplete="off"><input type="text" id="yi" placeholder="etiket adı" aria-label="Etiket adı" autocapitalize="off" spellcheck="false"><button class="btn" type="submit">Kontrol et</button><button type="button" class="btn ghost" id="yh">İpucu</button><button type="button" class="btn ghost" id="yp">Geç</button></form>
+  <div id="yfb"></div></div>`;
+  const inp=$("#yi");inp.focus();
+  $("#yf").onsubmit=e=>{e.preventDefault();
+    const v=norm(inp.value); if(!v) return;
+    if(t.keys.map(norm).includes(v)){
+      if(Y.tries===0&&!Y.hint) Y.ok++;
+      $("#yfb").innerHTML='<div class="fb ok"><b>Doğru!</b> <span class="mono">'+esc(t.t)+'</span> — '+esc(t.ac)+'</div><div class="row"><button class="btn" id="yn" autofocus>'+(Y.i===Y.list.length-1?"Bitir":"Sonraki →")+'</button></div>';
+      inp.disabled=true;$("#yn").onclick=()=>{Y.i++;drawY()};$("#yn").focus();
+    }else{
+      Y.tries++;
+      if(!Y.miss.includes(t)) Y.miss.push(t);
+      S.weak[t.t]=(S.weak[t.t]||0)+1;save();
+      $("#yfb").innerHTML='<div class="fb bad"><b>Olmadı.</b> Tekrar dene'+(Y.tries>=2?' — ipucu: açılım “'+esc(t.ac)+'”':"")+'.</div>';
+      inp.select();
+    }};
+  $("#yh").onclick=()=>{Y.hint++;const k=t.keys[0].replace(/[<>!]/g,"");
+    $("#yfb").innerHTML='<div class="fb bad">İpucu: '+k.length+' harfli, <b class="mono">'+esc(k.slice(0,Y.hint))+"…</b></div>"; if(!Y.miss.includes(t)) Y.miss.push(t); inp.focus()};
+  $("#yp").onclick=()=>{if(!Y.miss.includes(t)) Y.miss.push(t);
+    $("#yfb").innerHTML='<div class="fb bad">Cevap: <b class="mono">'+esc(t.t)+'</b> — '+esc(t.ac)+'</div><div class="row"><button class="btn" id="yn">Sonraki →</button></div>';
+    inp.disabled=true;$("#yn").onclick=()=>{Y.i++;drawY()};$("#yn").focus();};
+}
+
+/* ============ ÖZET ============ */
+function renderSummary(){
+  const el=$("#m-ozet");
+  el.innerHTML=`<div class="panel"><h2>Özet tablo (kopya kâğıdı)</h2>
+  <p class="muted">${TAGS.length} etiket tek sayfada. Kendini denemek için bir sütunu gizle; gizli hücreye tıklayınca açılır. Yazdırabilirsin.</p>
+  <div class="row noprint"><button class="btn ghost" data-h="etiket">Etiketleri gizle</button><button class="btn ghost" data-h="gorev">Görevleri gizle</button><button class="btn ghost" data-h="">Hepsini göster</button><button class="btn" id="pr">Yazdır</button></div>
+  ${GROUPS.map(g=>'<h3 style="color:'+g.renk+'">'+g.konu+' · '+esc(g.ad)+'</h3><table class="t"><thead><tr><th>Etiket</th><th>Açılımı</th><th>Görevi</th><th>Kapanış</th></tr></thead><tbody>'+
+   TAGS.filter(t=>t.g===g.id).map(t=>'<tr><td class="c-e">'+esc(t.t)+'</td><td>'+esc(t.ac)+'</td><td class="c-g">'+esc(t.k)+'</td><td>'+(t.kapanis==="yok"?"yok":t.kapanis==="özel"?"-->":"var")+'</td></tr>').join("")+'</tbody></table>').join("")}
+  <h3>Sık karıştırılan çiftler</h3><table class="t"><tbody>${PAIRS.map(([a,b])=>'<tr><td>'+esc(a)+'</td><td>'+esc(b)+'</td></tr>').join("")}</tbody></table></div>`;
+  el.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{
+    el.querySelectorAll(".blur").forEach(x=>x.classList.remove("blur"));
+    if(b.dataset.h==="etiket") el.querySelectorAll(".c-e").forEach(x=>x.classList.add("blur"));
+    if(b.dataset.h==="gorev") el.querySelectorAll(".c-g").forEach(x=>x.classList.add("blur"));
+  });
+  el.querySelectorAll(".c-e,.c-g").forEach(x=>x.addEventListener("click",()=>x.classList.remove("blur")));
+  $("#pr").onclick=()=>window.print();
+}
+
+/* ============ TEMA + BAŞLATMA ============ */
+function applyTheme(){ if(S.theme) document.documentElement.setAttribute("data-theme",S.theme); else document.documentElement.removeAttribute("data-theme"); }
+$("#themeBtn").onclick=()=>{
+  const dark = S.theme? S.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  S.theme = dark? "light":"dark"; save(); applyTheme();
+};
+applyTheme();
+
+(function init(){
+  const h=location.hash.replace("#","").split("/");
+  const m=MODES.find(x=>x[0]===h[0]);
+  if(h[0]==="sunum"&&h[1]!==undefined&&!isNaN(+h[1])) cur=+h[1];
+  renderSlide(cur,true);
+  setMode(m?m[0]:"sunum",true);
+})();
+</script>
+</body>
+</html>
