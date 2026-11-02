@@ -191,10 +191,10 @@ function timelineSvg(p,rows,w,rh){
   rh=rh||52;var h=rows.length*rh+22,s='<svg id="'+p+'-tls" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pin zaman çizelgesi" style="width:100%;height:auto">';
   s+='<rect width="'+w+'" height="'+h+'" rx="12" fill="#0B121B"/>';
   rows.forEach(function(r,i){var y=10+i*rh;
-    s+='<text x="12" y="'+(y+Math.round(rh/2)+5)+'" font-family="JetBrains Mono,monospace" font-size="18" font-weight="700" fill="'+r.col+'">D'+r.pin+'</text>';
+    s+='<text x="12" y="'+(y+Math.round(rh/2)+5)+'" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" fill="'+r.col+'">D'+r.pin+'</text>';
     s+='<line x1="62" y1="'+(y+4)+'" x2="'+(w-10)+'" y2="'+(y+4)+'" stroke="#1F2E40" stroke-dasharray="3 5"/><line x1="62" y1="'+(y+rh-12)+'" x2="'+(w-10)+'" y2="'+(y+rh-12)+'" stroke="#1F2E40"/>';
     s+='<path id="'+p+'-tl'+i+'" d="" fill="none" stroke="'+r.col+'" stroke-width="3" stroke-linejoin="round"/>';});
-  s+='<text x="62" y="'+(h-4)+'" font-family="Rubik,Arial" font-size="13" fill="#6B7C90">geçmiş</text><text x="'+(w-10)+'" y="'+(h-4)+'" text-anchor="end" font-family="Rubik,Arial" font-size="13" fill="#6B7C90">şimdi</text>';
+  s+='<text x="62" y="'+(h-4)+'" font-family="Rubik,Arial" font-size="17" fill="#6B7C90">geçmiş</text><text x="'+(w-10)+'" y="'+(h-4)+'" text-anchor="end" font-family="Rubik,Arial" font-size="17" fill="#6B7C90">şimdi</text>';
   s+='<line x1="'+(w-10)+'" y1="4" x2="'+(w-10)+'" y2="'+(h-16)+'" stroke="#FF9F5A" stroke-width="2"/></svg>';
   return s;}
 function timelineDraw(p,rows,rt,w,win,rh){

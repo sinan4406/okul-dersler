@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hafta 8 - Bağlantılar ve Formlar</title>
+<style>
+:root{
+  --bg:#f4f5ff;--panel:#ffffff;--panel2:#eceefb;--text:#0e1230;--muted:#434a6d;--line:#c9cfea;
+  --accent:#5b36f2;--accent2:#00a3c4;--pink:#e8337f;--ok:#0b8a45;--bad:#d63a3f;--warn:#c76a00;
+  --grad:linear-gradient(135deg,#5b36f2 0%,#9a3cf0 55%,#f0407f 100%);
+  --code-bg:#ffffff;--c-tag:#c2185b;--c-attr:#1550d0;--c-str:#0a7a3e;--c-com:#6b7390;--c-css:#a35a00;--c-text:#0e1230;
+}
+:root[data-theme="dark"]{
+  --bg:#090c1c;--panel:#141935;--panel2:#1d2348;--text:#ffffff;--muted:#c3c9ea;--line:#38417a;
+  --accent:#a592ff;--accent2:#3cd8f5;--pink:#ff7ab0;--ok:#55e08f;--bad:#ff8085;--warn:#ffc04d;
+  --grad:linear-gradient(135deg,#7a5cff 0%,#b05cff 55%,#ff6fae 100%);
+  --code-bg:#0e1229;--c-tag:#ff86bd;--c-attr:#86bcff;--c-str:#7ef0a8;--c-com:#8c96bb;--c-css:#ffbf66;--c-text:#ffffff;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(16px,min(1.6vw,2.9vh),36px)}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Inter","Segoe UI Variable","Segoe UI",system-ui,Arial,sans-serif;line-height:1.35}
+button{font:inherit;color:inherit;cursor:pointer}
+code,pre,textarea{font-family:"JetBrains Mono","Cascadia Code",ui-monospace,Consolas,monospace}
+
+#prog{position:fixed;top:0;left:0;height:.6vh;min-height:5px;background:var(--grad);width:0;z-index:50;transition:width .4s}
+#stage{position:fixed;inset:0 0 9vh 0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;gap:1.3vh;padding:2.4vh 3vw 1vh;opacity:0;visibility:hidden;transform:translateX(5vw);transition:opacity .4s,transform .4s cubic-bezier(.2,.8,.2,1),visibility .4s;overflow:hidden}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.slide.past{transform:translateX(-5vw)}
+@media(max-aspect-ratio:1/1){.slide{overflow-y:auto}}
+.mod{align-self:flex-start;font-size:.55rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);padding:.15em .8em;border-radius:99px}
+.h{font-size:1.75rem;font-weight:800;line-height:1.12;letter-spacing:-.01em;margin:0}
+.say{font-size:1.05rem;margin:0;font-weight:500}
+.bn{font-size:.95rem;margin:0;color:var(--muted)}
+.bn b{color:var(--pink)}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:1.4vh}
+.grad-t{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* kapak / bölüm */
+.slide.hero,.slide.sec{background:var(--grad);color:#fff;justify-content:center;align-items:flex-start;padding:6vh 6vw;gap:2.5vh}
+.slide.hero .h,.slide.sec .h{font-size:2.6rem;color:#fff}
+.slide.hero .say,.slide.sec .say{font-size:1.3rem;color:#ffffffe6}
+.slide.sec .big{font-size:5rem;line-height:1}
+.slide.hero .mod,.slide.sec .mod{background:#ffffff30;color:#fff}
+
+/* kod + sonuç */
+.cr{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.cr.one{grid-template-columns:1fr}.cr.one .pane pre{font-size:1.1rem}
+@media(max-aspect-ratio:1/1){.cr{grid-template-columns:1fr}.slide{overflow-y:auto}.cr{flex:none}.pane{min-height:35vh}}
+.col{display:flex;flex-direction:column;gap:1vh;min-height:0;min-width:0}
+.pane{display:flex;flex-direction:column;min-height:0;min-width:0;border:2px solid var(--line);border-radius:1rem;overflow:hidden;background:var(--code-bg);flex:1}
+.pane.code{flex:none;max-height:100%}
+.col .pane.code{flex:0 1 auto}
+.pane-h{display:flex;justify-content:space-between;align-items:center;font-size:.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--panel2);padding:.25em .9em;border-bottom:2px solid var(--line)}
+.pane pre{margin:0;padding:.5em .8em;font-size:.82rem;line-height:1.5;color:var(--c-text);overflow:auto;white-space:pre;flex:1;min-height:0}
+.pane iframe{border:0;width:100%;flex:1;min-height:0;background:#fff}
+.pane textarea{flex:1;min-height:0;border:0;outline:0;resize:none;padding:.5em .8em;font-size:.82rem;line-height:1.5;background:var(--code-bg);color:var(--c-text)}
+.cp{border:2px solid var(--line);background:var(--panel);border-radius:.5em;padding:0 .6em;font-size:.5rem;text-transform:none;letter-spacing:0}
+.cp.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.t-tag{color:var(--c-tag);font-weight:800}.t-attr{color:var(--c-attr);font-weight:600}.t-str{color:var(--c-str);font-weight:600}.t-com{color:var(--c-com);font-style:italic}.t-pun{color:var(--c-com)}.t-cssp{color:var(--c-css)}
+.reg{background:rgba(245,158,11,.22);border-left:.25em solid #f59e0b;margin-left:-.8em;padding-left:.55em}
+.hot{background:#ffd43b;color:#14142b!important;border-radius:.2em;box-shadow:0 0 0 .1em #ffd43b;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 .22em #ffd43b66}}
+.balloon{align-self:flex-start;position:relative;background:#ffd43b;color:#14142b;border-radius:1rem;padding:.3em 1em;font-size:.95rem;font-weight:800;margin-top:.5em}
+.balloon::before{content:"";position:absolute;top:-.4em;left:1.4em;border:.45em solid transparent;border-top:0;border-bottom:.45em solid #ffd43b}
+.lbl{font-size:.8rem;font-weight:800;padding:.1em .8em;border-radius:99px;align-self:flex-start}
+.lbl.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.lbl.neu{background:var(--panel2);color:var(--accent)}
+.lbl.good{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+
+/* kontroller */
+.ctrls{display:flex;flex-wrap:wrap;gap:1vh 1.6vw;align-items:center;font-size:.8rem}
+.ctrls label{display:inline-flex;align-items:center;gap:.4em}
+.ctrls input[type=checkbox]{width:1em;height:1em;accent-color:var(--accent)}
+.ctrls input[type=range]{accent-color:var(--accent);width:10em}
+.ctrls input[type=text],.ctrls select{font-size:.75rem;padding:.1em .5em;border:2px solid var(--line);border-radius:.5em;background:var(--panel);color:var(--text)}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:.8em;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:.2em .9em;border-right:2px solid var(--line);font-size:.8rem}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--grad);color:#fff;font-weight:800}
+.pane-h .seg button{font-size:.55rem;padding:0 .7em;text-transform:none;letter-spacing:0}
+.btn{border:2px solid var(--line);background:var(--panel);border-radius:.8em;padding:.2em .9em;font-size:.8rem}
+.btn.pri{background:var(--grad);color:#fff;border:0;font-weight:800}
+
+/* fikir / liste / seçim kartları */
+.cards{flex:1;min-height:0;display:grid;gap:2vw;grid-template-columns:repeat(var(--n,3),1fr);align-items:stretch}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:1.2rem;padding:1.5vh 1.4vw;display:flex;flex-direction:column;justify-content:center;gap:.6vh;text-align:center}
+.card .em{font-size:5rem;line-height:1}
+.card b{font-size:1.5rem}
+.card span{font-size:1.1rem;color:var(--muted)}
+.card code{font-size:1.5rem;color:var(--c-tag);font-weight:800}
+.list{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2vh}
+.list .it{display:flex;align-items:center;gap:1.2vw;font-size:1.15rem;font-weight:600;background:var(--panel);border:2px solid var(--line);border-radius:1.2rem;padding:1.2vh 1.5vw}
+.list .it .em{font-size:2rem}
+.list.bad .it{border-left:.5rem solid var(--bad)}.list.good .it{border-left:.5rem solid var(--ok)}
+code.i{background:var(--panel2);padding:0 .3em;border-radius:.3em;border:1px solid var(--line);color:var(--c-tag);font-weight:700}
+
+/* sayfa haritası */
+.pmap{flex:1;min-height:0;display:grid;gap:.6vh;grid-template-columns:1fr 14vw;grid-template-rows:auto auto 1fr auto;grid-template-areas:"hd hd" "nv nv" "mn sd" "ft ft";padding:.8vh;background:var(--panel2);border-radius:1rem;border:2px solid var(--line)}
+.pmap .z{border:3px dashed var(--line);border-radius:.8rem;padding:.3em .8em;font-weight:800;font-size:.9rem;opacity:.15;transform:scale(.96);transition:all .5s;display:flex;align-items:center}
+.pmap .z.show{opacity:1;transform:none;border-style:solid}
+.z-hd{grid-area:hd;background:#ffe3d6;color:#7c2d12}.z-nv{grid-area:nv;background:#dbe9ff;color:#1e3a8a}.z-mn{grid-area:mn;background:#d9f5de;color:#14532d;flex-wrap:wrap;gap:.5em}.z-sd{grid-area:sd;background:#fff1bd;color:#713f12}.z-ft{grid-area:ft;background:#e7d8ff;color:#4c1d95}
+.pmap.soup .z{background:var(--panel);color:var(--text);border-color:var(--muted)}
+.pmap .z.hl{outline:4px solid var(--accent)}
+.mn-in{display:flex;gap:.5em;width:100%}
+.mn-in span{flex:1;border:3px dashed #2f855a;border-radius:.6rem;padding:0 .5em;font-size:.8rem;background:#ffffffaa;color:#14532d;opacity:.15;transition:opacity .5s}
+.pmap.soup .mn-in span{background:var(--panel);color:var(--text);border-color:var(--muted)}
+
+.tree{font-family:ui-monospace,Consolas,monospace;font-size:.8rem;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:1vh 1vw;overflow:auto;min-height:0}
+.tree div{padding:.05em .5em;border-radius:.4em;white-space:nowrap}
+.tree .f{cursor:pointer}.tree .f:hover{background:var(--panel2)}
+.tree .from{background:#ffd2bd;color:#7c2d12;font-weight:800}.tree .to{background:#bfeccf;color:#14532d;font-weight:800}
+.pathout{font-size:.9rem;padding:.5em .8em;background:var(--code-bg);border:2px solid var(--line);border-radius:1rem;overflow:auto}
+.bars{display:grid;gap:.8vh;font-size:.7rem}
+.bars .row{display:flex;align-items:center;gap:.6em}
+.bars .lab{width:11em;flex:none}
+.bars .bg{flex:1;height:.9em;background:var(--panel2);border-radius:.5em;overflow:hidden;border:1px solid var(--line)}
+.bars .fill{display:block;height:100%;background:var(--muted)}
+.bars .row.pick .fill{background:var(--ok)}.bars .row.pick .lab{font-weight:800;color:var(--ok)}
+.vp{border:3px solid var(--muted);border-radius:1rem;background:var(--panel2);padding:.4em;text-align:center;font-weight:800;font-size:.75rem;transition:width .15s;max-width:100%}
+.mediabox{flex:1;display:grid;place-items:center;background:var(--panel2);text-align:center;padding:.5em;min-height:0}
+.mediabox video,.mediabox audio{max-width:100%;max-height:100%;border-radius:.6em}
+.hintw{font-size:.6rem;color:var(--warn);font-weight:700}
+
+/* uygulama ara slaytları */
+.slide.app{background:linear-gradient(135deg,#0f766e 0%,#0891b2 55%,#2563eb 100%);color:#fff;border-top:.6vh dashed #fde047}
+.slide.app .h{color:#fff}.slide.app .mod{background:#ffffff30;color:#fff}
+.slide.app .body{flex:1;justify-content:center}
+.appbox{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+@media(max-aspect-ratio:1/1){.appbox{grid-template-columns:1fr}}
+.appbox .c{background:#ffffff1f;border:2px solid #ffffff66;border-radius:1rem;padding:1.2vh 1.2vw;font-size:.95rem}
+.appbox h3{margin:0 0 .3em;font-size:1rem;color:#fde047}.appbox p{margin:0 0 .6em}.appbox ul{margin:0;padding-left:1.2em}.appbox code{color:#fff;font-weight:800}
+.appbtn{align-self:flex-start;background:#fde047;color:#14142b;font-weight:800;font-size:1.05rem;padding:.4em 1.4em;border-radius:1rem;text-decoration:none}
+/* alt çubuk */
+#bottom{position:fixed;inset:auto 0 0 0;height:9vh;display:flex;align-items:center;justify-content:space-between;gap:1vw;padding:0 2vw;background:var(--panel);border-top:2px solid var(--line);z-index:40}
+.nbtn{background:var(--grad);color:#fff;border:0;border-radius:1rem;padding:.25em 1.6em;font-weight:800;font-size:1rem;min-width:7em;height:75%}
+.nbtn:disabled{opacity:.3}
+.sbtn{border:2px solid var(--line);background:var(--panel2);border-radius:1rem;padding:.25em .8em;font-size:.85rem;height:75%}
+#counter{font-size:.9rem;font-weight:700;color:var(--muted);min-width:5em;text-align:center}
+.mid{display:flex;align-items:center;gap:1vw;flex:1;justify-content:center}
+.drawer{position:fixed;top:0;bottom:9vh;left:0;width:min(30rem,92vw);background:var(--panel);border-right:2px solid var(--line);z-index:60;overflow:auto;padding:1vh 1vw;transform:translateX(-105%);transition:transform .3s}
+.drawer.open{transform:none}
+.mi{display:flex;gap:.6em;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:.25em .3em;font-size:.65rem}
+.mi:hover{background:var(--panel2)}.mi.cur{background:var(--panel2);font-weight:800;color:var(--accent)}
+.mi .n{width:2em;color:var(--muted)}
+.mh{font-size:.55rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin:.8em 0 .1em}
+@media(prefers-reduced-motion:reduce){.slide{transition:none}.hot{animation:none}}
+
+.try{flex:none;background:color-mix(in srgb,var(--warn) 16%,var(--panel));border:2px solid var(--warn);border-radius:1rem;padding:.35em 1em;font-size:.85rem}
+.flow{flex:1;min-height:0;position:relative;display:flex;justify-content:space-between;align-items:stretch;padding:1.5vh 2vw;background:var(--panel2);border:2px solid var(--line);border-radius:1rem}
+.fbox{width:34%;background:var(--panel);border:3px solid var(--line);border-radius:1rem;padding:.5em .8em;transition:border-color .4s,box-shadow .4s;overflow:auto}
+.fbox.act{border-color:var(--accent);box-shadow:0 0 0 .25em color-mix(in srgb,var(--accent) 25%,transparent)}
+.fbox h4{margin:0 0 .3em;font-size:.8rem;color:var(--accent)}
+.fbox .fl,.fbox .fr{font-size:.85rem}
+.fpk{position:absolute;top:50%;left:18%;transform:translate(-50%,-50%);background:#ffd43b;color:#14142b;border-radius:.8rem;padding:.25em .8em;font-weight:800;font-size:.8rem;transition:left 1s ease,opacity .4s;white-space:nowrap;box-shadow:0 3px 10px #0004;z-index:2}
+.fcap{flex:none;font-size:1rem;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.4em 1em}
+.addr{font-family:ui-monospace,Consolas,monospace;font-size:.85rem;padding:.5em .8em;overflow:auto;word-break:break-all}
+.addr mark{background:#ffd43b;color:#14142b;border-radius:.2em;padding:0 .2em}
+.why{font-size:.85rem;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.4em .9em}
+.hintbox{flex:none;font-size:.9rem;background:var(--panel);border:2px solid var(--accent);border-radius:1rem;padding:.3em 1em}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div id="stage"></div>
+<div id="menu" class="drawer"></div>
+<div id="bottom">
+  <button class="sbtn" id="bMenu" title="Slayt listesi (M)">&#9776;</button>
+  <div class="mid">
+    <button class="nbtn" id="prev">&larr; Geri</button>
+    <div id="counter"></div>
+    <button class="nbtn" id="next">İleri &rarr;</button>
+  </div>
+  <button class="sbtn" id="bTheme" title="Tema (T)">&#9680;</button>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escA(s){return esc(s).replace(/"/g,'&quot;')}
+const TIMERS=[];
+function clearTimers(){while(TIMERS.length)clearInterval(TIMERS.pop())}
+
+/* ---------- kod renklendirme ---------- */
+function hlCSS(css){
+  return esc(css).replace(/([^{}]+)\{([^{}]*)\}/g,(m,sel,body)=>'<span class="t-tag">'+sel+'</span>{'+body.replace(/([a-z-]+)(\s*:\s*)([^;]+)(;?)/g,(x,p,c,v,s)=>'<span class="t-cssp tk" data-k="c:'+p+'">'+p+'</span>'+c+'<span class="t-str">'+v+'</span>'+s)+'}');
+}
+function hl2(code){
+  const parts=[];let i=0;
+  const re=/(<!--[\s\S]*?-->)|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/g;let m;
+  while((m=re.exec(code))){
+    parts.push(esc(code.slice(i,m.index)));
+    if(m[1]){parts.push('<span class="t-com">'+esc(m[1])+'</span>');i=re.lastIndex;continue}
+    let a=m[4],self='';
+    if(/\/\s*$/.test(a)){self='/';a=a.replace(/\/\s*$/,'')}
+    const nm=m[3].toLowerCase();
+    const at=a.replace(/([^\s=]+)(?:(=)("[^"]*"|'[^']*'|[^\s]+))?/g,(x,n,e,v)=>'<span class="t-attr tk" data-k="a:'+escA(n)+'">'+esc(n)+'</span>'+(v?'<span class="t-pun">'+esc(e)+'</span><span class="t-str tk" data-k="a:'+escA(n)+'">'+esc(v)+'</span>':''));
+    parts.push('<span class="t-pun">&lt;'+esc(m[2])+'</span><span class="t-tag tk" data-k="t:'+nm+'">'+m[3]+'</span>'+at+'<span class="t-pun">'+self+'&gt;</span>');
+    i=re.lastIndex;
+    if(nm==='style'&&!m[2]){const e=code.indexOf('</style>',i);if(e>-1){parts.push(hlCSS(code.slice(i,e)));i=e;re.lastIndex=e}}
+  }
+  parts.push(esc(code.slice(i)));
+  return parts.join('');
+}
+function copyText(t,btn){
+  const done=()=>{const o=btn.textContent;btn.textContent='Kopyalandı';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok')},1200)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb();
+  function fb(){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()}
+}
+
+/* ---------- sonuç penceresi ---------- */
+function pageCss(mode,fs){
+  const base=`body{font:${fs}vw/1.4 system-ui,"Segoe UI",Arial,sans-serif;margin:0;color:#14183a;background:#fff;scroll-behavior:smooth}img{max-width:100%}`+
+  `label{display:block;font-weight:700;margin:.35em 0 .1em}input,select,textarea,button{font:inherit;padding:.15em .4em;margin:.1em 0;max-width:100%}input[type=checkbox],input[type=radio]{padding:0;margin:.1em .4em .1em 0}label>input{font-weight:400}`+
+  `button{background:#6d4aff;color:#fff;border:0;border-radius:.4em;padding:.25em .9em;font-weight:700;cursor:pointer}button[type=reset]{background:#6b7390}`+
+  `fieldset{border:1px solid #aab2d6;border-radius:.5em;margin:.4em 0;padding:.2em .7em}legend{font-weight:800;color:#5b36f2;padding:0 .3em}`+
+  `a.dugme,button.dugme{display:inline-block;background:#6d4aff;color:#fff;padding:.25em .9em;border-radius:.5em;border:0;text-decoration:none;font:inherit;font-weight:700}`+
+  `:target{background:#fff3b0!important}.sol{color:#8a90ab;font-weight:400}`;
+  if(mode==='plain')return '<style>'+base+'body{margin:.5em}h2{margin:.15em 0;font-size:1.3em}p{margin:.15em 0}a{color:#5b36f2}</style>';
+  return '<style>'+base+`body{background:#f3f4fb}header,.ust{background:linear-gradient(135deg,#6d4aff,#a14bff);color:#fff;padding:.4em .8em}header h1{margin:0;font-size:1.4em;font-weight:800}header p{margin:0}nav{background:#fff;padding:.3em .8em;border-bottom:1px solid #e2e6f3}nav a{margin-right:.7em}a{color:#6d4aff;font-weight:700}main{display:block;padding:.2em .6em}section,article,details,.kart{background:#fff;border-radius:.5em;padding:.3em .7em;margin:.3em 0;box-shadow:0 1px 5px #0002}h2,h3{margin:.1em 0;font-size:1.15em}p{margin:.1em 0}aside{background:#fff4c9;margin:.3em .6em;padding:.3em .7em;border-radius:.5em}footer{background:#232846;color:#cfd4ef;padding:.4em .8em;font-size:.85em}table{border-collapse:collapse}td,th{border:1px solid #bbb;padding:.1em .5em}</style>`;
+}
+const RUN_JS='<script>(function(){'+
+ 'var t;function toast(m){var d=document.getElementById("__t");if(!d){d=document.createElement("div");d.id="__t";d.style.cssText="position:fixed;left:.4em;right:.4em;bottom:.4em;background:#232846;color:#fff;padding:.4em .7em;border-radius:.5em;font:700 12px/1.3 system-ui,Arial;z-index:9;box-shadow:0 2px 8px #0006";document.body.appendChild(d)}d.textContent=m;d.style.display="block";clearTimeout(t);t=setTimeout(function(){d.style.display="none"},3500)}'+
+ 'document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(!a)return;var h=a.getAttribute("href");if(h===null){toast("href yok: bu bir bağlantı değil, tıklayınca bir şey olmaz");e.preventDefault();return}if(h.charAt(0)==="#"&&h.length>1)return;e.preventDefault();'+
+ 'var m;if(/^mailto:/.test(h))m="E-posta programı açılırdı: "+h.slice(7);else if(/^tel:/.test(h))m="Telefon araması başlardı: "+h.slice(4);else if(a.hasAttribute("download"))m="Dosya indirilirdi: "+h;else m="Giderdi: "+h+(a.getAttribute("target")==="_blank"?" (YENİ sekmede)":" (aynı sekmede)");toast(m)},true);'+
+ 'document.addEventListener("submit",function(e){e.preventDefault();var f=e.target,d=new FormData(f),s=[];d.forEach(function(v,k){s.push(k+"="+(v&&v.name!==undefined?v.name:v))});var o=document.getElementById("__out");if(!o){o=document.createElement("pre");o.id="__out";o.style.cssText="background:#e8f8ee;color:#064;padding:.4em;border-radius:.4em;font:700 .85em ui-monospace,Consolas,monospace;white-space:pre-wrap;margin:.3em .6em";f.parentNode.insertBefore(o,f.nextSibling)}o.textContent="Sunucuya giden: "+(s.join("&")||"(hiçbir şey: alanlarda name yok ya da hepsi boş)")},true);'+
+ '})()<\/script>';
+function runDoc(code,o){
+  const ol=o.outline?'<style>'+o.outline+'{outline:.2em dashed #f59e0b!important;outline-offset:-.1em;box-shadow:0 0 0 .3em #f59e0b66!important}</style>':'';
+  const sc=o.outline?'<script>try{var e=document.querySelector('+JSON.stringify(o.outline)+');if(e)e.scrollIntoView({block:"center"})}catch(x){}<\/script>':'';
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'+pageCss(o.css||'club',o.fs||3)+ol+'</head><body>'+code+RUN_JS+sc+'</body></html>'}
+/* "Özellik yok / var" önce-sonra düğmesi */
+function ctl(html){const d=document.createElement('div');d.className='ctrls';d.innerHTML=html;return d}
+function offSeg(host,before,apply){
+  const c=ctl('<div class="seg"><button data-v="0">Özellik yok</button><button data-v="1" class="on">Özellik var</button></div>');
+  host.insertBefore(c,before||null);
+  $$('button',c).forEach(x=>x.onclick=()=>{$$('button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');apply(x.dataset.v==='1')});
+}
+
+/* ---------- kod/sonuç parçaları ---------- */
+function mkPane(code,o){
+  o=o||{};
+  const p=document.createElement('div');p.className='pane code';
+  p.innerHTML='<div class="pane-h"><span>'+esc(o.name||'Kod')+'</span><button class="cp">Kopyala</button></div>';
+  const pre=document.createElement('pre');p.appendChild(pre);
+  const ta=document.createElement('textarea');ta.spellcheck=false;ta.style.display='none';p.appendChild(ta);
+  let cur=code,edit=false,onChange=null;
+  /* o.band: {s:'başlangıç satırı regex', e:'bitiş satırı regex (yoksa tek satır)'} ya da dizi */
+  const bands=()=>{const L=cur.split('\n'),R=[];
+    [].concat(o.band||[]).forEach(b=>{const rs=new RegExp(b.s);const a=L.findIndex(l=>rs.test(l));if(a<0)return;let z=a;
+      if(b.e){const re=new RegExp(b.e);for(let j=a;j<L.length;j++)if(re.test(L[j])){z=j;break}}
+      R.push([a,z])});
+    return R};
+  const render=()=>{let h=hl2(cur);
+    const R=bands();
+    if(R.length){const Ls=h.split('\n');h=Ls.map((l,i)=>R.some(r=>i>=r[0]&&i<=r[1])?'<span class="reg" style="display:block">'+(l||' ')+'</span>':l+(i<Ls.length-1?'\n':'')).join('')}
+    pre.innerHTML=h;(o.hl||[]).forEach(k=>$$('.tk[data-k="'+k+'"]',pre).forEach(x=>x.classList.add('hot')));
+    const r=$('.reg',pre);if(r)pre.scrollTop=Math.max(0,r.offsetTop-pre.clientHeight/3)};
+  render();
+  $('.cp',p).onclick=e=>copyText(cur,e.target);
+  if(o.edit){
+    const b=document.createElement('button');b.className='cp';b.textContent='✎ Düzenle';$('.pane-h',p).insertBefore(b,$('.cp',p));
+    b.onclick=()=>{edit=!edit;if(edit){ta.value=cur;ta.style.display='block';pre.style.display='none';b.textContent='✓ Bitti'}else{cur=ta.value;ta.style.display='none';pre.style.display='block';b.textContent='✎ Düzenle';render();onChange&&onChange(cur)}};
+    ta.addEventListener('input',()=>{cur=ta.value;onChange&&onChange(cur)});
+  }
+  return {el:p,set(c,h){cur=c;if(h)o.hl=h;render()},get:()=>cur,onChange(f){onChange=f}};
+}
+function mkRes(code,o){
+  o=o||{};
+  const p=document.createElement('div');p.className='pane';
+  p.innerHTML='<div class="pane-h"><span>Sonuç'+(o.outline?' <small>(turuncu çerçeve = bu parça)</small>':'')+'</span></div>';
+  const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts');fr.title='Sonuç';p.appendChild(fr);
+  const upd=c=>{fr.srcdoc=runDoc(c,o)};upd(code);
+  return {el:p,set:upd};
+}
+function codeRes(host,code,o){
+  o=o||{};
+  const cr=document.createElement('div');cr.className='cr'+(o.run===false?' one':'');
+  const left=document.createElement('div');left.className='col';
+  const cp=mkPane(code,o);left.appendChild(cp.el);
+  if(o.note){const b=document.createElement('div');b.className='balloon';b.innerHTML=o.note;left.appendChild(b)}
+  cr.appendChild(left);
+  let rs=null;
+  if(o.run!==false){rs=mkRes(code,o);cr.appendChild(rs.el)}
+  host.appendChild(cr);
+  if(o.edit&&rs)cp.onChange(c=>rs.set(c));
+  if(o.off&&rs)offSeg(host,cr,on=>{const c=on?code:code.replace(new RegExp(o.off,'g'),'');cp.set(c,on?o.hl:[]);rs.set(c)});
+  return {set(c,h){cp.set(c,h);if(rs)rs.set(c)},cp,rs};
+}
+
+/* ---------- Robotik Kulübü sayfası (tüm sunu boyunca aynı örnek) ---------- */
+const HDR='<header>\n  <h1>Robotik Kulübü</h1>\n</header>';
+const FTR='<footer>\n  <p>&copy; 2026 Robotik Kulübü</p>\n</footer>';
+const NAV3='<nav>\n  <a href="index.html">Ana Sayfa</a>\n  <a href="#kayit">Kayıt</a>\n  <a href="iletisim.html">İletişim</a>\n</nav>';
+function PG(main,nav){return HDR+'\n'+(nav||NAV3)+'\n<main>\n'+main+'\n</main>\n'+FTR}
+const SEC_ET='  <section id="etkinlikler">\n    <h2>Etkinlikler</h2>\n    <p>Her cuma 15.00\'te laboratuvardayız.</p>\n  </section>';
+const SEC_KY='  <section id="kayit">\n    <h2>Kayıt</h2>\n    <p>Kayıtlar ayın 15\'ine kadar sürüyor.</p>\n  </section>';
+const SEC_IL='  <section id="iletisim">\n    <h2>İletişim</h2>\n    <p><a href="mailto:kulup@okul.k12.tr">E-posta gönder</a></p>\n    <p><a href="tel:+905551234567">Bizi ara</a></p>\n  </section>';
+/* form sayfası: inner = form içeriği (6 boşluk girinti) */
+function FP(inner,fa){return PG('  <section id="kayit">\n    <h2>Kulübe katıl</h2>\n    <form'+(fa||' action="kayit.php" method="post"')+'>\n'+inner+'\n    </form>\n  </section>')}
+const L_AD='      <label for="ad">Adın</label>\n      <input type="text" id="ad" name="ad">';
+const BTN='      <button type="submit">Gönder</button>';
+const FINAL=PG(SEC_ET+'\n  <section id="kayit">\n    <h2>Kulübe katıl</h2>\n    <form action="kayit.php" method="post">\n      <fieldset>\n        <legend>Bilgilerin</legend>\n        <label for="ad">Adın</label>\n        <input type="text" id="ad" name="ad" required>\n        <label for="mail">E-posta</label>\n        <input type="email" id="mail" name="mail" required>\n        <label for="sinif">Sınıfın</label>\n        <select id="sinif" name="sinif">\n          <option value="9">9. sınıf</option>\n          <option value="10">10. sınıf</option>\n        </select>\n      </fieldset>\n      <label><input type="checkbox" name="ilgi" value="robot"> Robotik ilgimi çekiyor</label>\n      <label for="mesaj">Mesajın</label>\n      <textarea id="mesaj" name="mesaj" rows="3"></textarea>\n      <button type="submit">Gönder</button>\n    </form>\n  </section>\n  <section id="iletisim">\n    <h2>İletişim</h2>\n    <p><a href="mailto:kulup@okul.k12.tr">E-posta gönder</a></p>\n  </section>');
+
+/* ---------- slayt tanımları ---------- */
+const S=[];
+const add=o=>S.push(o);
+const MODA='A. Bağlantılar',MODB='B. Formlar: temel alanlar',MODC='C. Formlar: seçenekler ve gönderme';
+/* tg: parça slaytı; kod bütün sayfa içinde gösterilir, band = turuncu bant, sel = sonuçtaki turuncu çerçeve */
+function tg(mod,h,say,bn,code,o){add(Object.assign({t:'cr',mod:mod,h:h,say:say,bn:bn,code:code,page:true},o))}
+
+
+/* ===== GİRİŞ ===== */
+add({t:'hero',mod:'HTML5 · Hafta 8',h:'Sayfalar arasında <span style="text-decoration:underline wavy #ffffffa0">yol aç</span>,<br>ziyaretçiden bilgi topla',say:'Bağlantılar ve formlar: Robotik Kulübü sayfasına kayıt formu ekliyoruz'});
+add({t:'list',mod:'Giriş',h:'Bugün neler yapacağız?',items:[['🔗','Sayfaları birbirine bağlayacağız (bağlantı)'],['📝','Ziyaretçiden bilgi alan form kuracağız'],['📬','Formun bilgiyi nasıl gönderdiğini adım adım izleyeceğiz']]});
+add({t:'cards',mod:'Giriş',h:'Ön bilgi hatırlatması',n:3,items:[['🏷️','<code>header nav main footer</code>','Hafta 7: sayfanın odaları. Bağlantılar <code>nav</code> içine girer.'],['📋','<code>ul ol li</code>','Hafta 5: listeler. Menüler çoğu zaman listedir.'],['📊','<code>table</code>','Hafta 6: tablo. Bugün forma tablo gerekmez ama uygulamalarda kullanacağız.']],say:'Bugün bunları yeni etiketlerle birleştireceğiz.'});
+add({t:'result',mod:'Giriş',h:'Sonunda böyle bir sayfamız olacak',code:()=>FINAL,fs:1.7});
+add({t:'cards',mod:'Giriş',h:'Kodu nasıl okuyacağız?',n:3,items:[['🟧','Turuncu bant ve çerçeve','Kodda turuncu bant = anlatılan satırlar. Sonuçta turuncu kesikli çerçeve = aynı parça.'],['🟨','Sarı parlama','O an anlattığımız etiket ya da özellik.'],['✎','Düzenle ve dene','Kodu değiştir, sonuç anında değişir. "Dene" kutusu ne yapacağını söyler.']]});
+
+/* ===== A. BAĞLANTILAR ===== */
+add({t:'sec',mod:MODA,em:'🔗',h:'A. Bağlantılar',say:'link (lingk) = bağlantı, köprü'});
+add({t:'cards',mod:MODA,h:'Bağlantı nedir?',n:3,items:[['🌐','Başka sayfaya','Menüde "İletişim"e tıklayınca <code>iletisim.html</code> açılır.'],['⚓','Aynı sayfada bir yere','"Kayıt"a tıklayınca sayfa aşağıdaki kayıt bölümüne iner.'],['📬','Dışarıdaki bir işe','E-posta programını, telefonu ya da bir dosyayı indirmeyi açar.']],say:'Web = birbirine bağlı sayfalar ağı. Bağlantı olmasa her sayfa tek başına bir ada olurdu.'});
+tg(MODA,'&lt;a&gt; = bağlantı etiketi','<b>a</b> (anchor – çapa – "enkır"), tıklanınca ziyaretçiyi başka bir yere götüren etiketin adıdır. Olmazsa 20 sayfalık bir sitede ziyaretçi adres çubuğuna 20 adresi tek tek yazmak zorunda kalır. <b>Fark:</b> a bir yere <b>götürür</b>; yazı yazmak için paragraf (p) kullanılır.','🚪 <b>Benzetme:</b> kapı. Kapının üstündeki yazı (bağlantı metni) ne olduğunu söyler, kapı numarası (href) nereye gideceğini söyler.',
+  PG(SEC_ET),{band:{s:'<a href="iletisim.html"'},sel:'nav a:nth-of-type(3)',hl:['t:a'],note:'a = tıklanınca götüren etiket',edit:true,try:'Etiketin arasındaki "İletişim" yazısını "Bize ulaş" yap. Yazı değişir, gidilen yer değişmez. Sonra o bağlantıya tıkla: alttaki koyu kutu nereye gideceğini yazar.'});
+tg(MODA,'href = bağlantının adresi','<b>href</b> (hiperref – "hayper ref") bağlantının gideceği adrestir. href olmazsa a etiketi <b>bağlantı olmaz</b>: yazı mor ve altı çizili görünmez, tıklayınca bir şey olmaz. Adres olmadan kapı numarası olmayan bir kapı gibi.','📮 <b>Benzetme:</b> zarfın üstündeki adres. Adres yoksa postacı götürecek yer bulamaz.',
+  PG(SEC_ET),{band:{s:'<a href="iletisim.html"'},sel:'nav a:nth-of-type(3)',hl:['a:href'],off:' href="iletisim.html"',note:'href = gidilecek adres',edit:true,try:'"Özellik yok"a bas: İletişim bağlantısı sıradan yazıya döner. Sonra "Özellik var"a dön ve href değerini <code class="i">index.html</code> yap.'});
+add({t:'demo',mod:MODA,h:'Bağlantı tıklanınca ne olur?',say:'Oynat ve izle. Adım adım ilerlemek için okları kullan.',build:'flow',cfg:'link'});
+add({t:'demo',mod:MODA,h:'Yol gezgini: href içine ne yazılır?',say:'Önce hangi sayfada olduğunu seç, sonra gitmek istediğin sayfaya tıkla.',build:'path'});
+add({t:'cmp',mod:MODA,h:'Göreli yol mu, tam adres mi?',say:'İkisi de <b>href</b> yazar, ikisi de çalışır. Fark: <b>aynı sitedeki</b> sayfaya kısa yol (göreli), <b>başka siteye</b> tam adres (mutlak) yazılır. Göreli yol sitenin klasörü taşınsa bile çalışmaya devam eder.',
+  a:{lbl:'göreli yol: kendi sitemiz',cls:'neu',code:'<a href="iletisim.html">İletişim</a>\n<a href="sayfalar/galeri.html">Galeri</a>'},
+  b:{lbl:'mutlak adres: başka site',cls:'neu',code:'<a href="https://www.meb.gov.tr">MEB</a>\n<a href="https://tr.wikipedia.org">Vikipedi</a>'}});
+tg(MODA,'#kimlik = aynı sayfada bir yere git','Bir bölüme <b>id</b> (kimlik) verirsin; bağlantıda <b>#</b> işaretinden sonra o kimliği yazarsın. Uzun sayfada ziyaretçi kaydırmadan istediği bölüme gider. Olmazsa 3 ekran uzunluğundaki bir sayfada aradığını kaydırarak bulmak zorunda kalır.','⚓ <b>Benzetme:</b> kitabın içindekiler sayfası: "Kayıt, sayfa 40" deyince doğrudan oraya gidersin.',
+  PG(SEC_ET+'\n'+SEC_KY),{band:[{s:'<a href="#kayit"'},{s:'<section id="kayit"'}],sel:'a[href="#kayit"],#kayit',hl:['a:href','a:id'],note:'#kayit ↔ id="kayit" aynı olmalı',edit:true,try:'Menüdeki "Kayıt" bağlantısına tıkla: Kayıt bölümü sarı olur. Sonra <code class="i">id="kayit"</code> değerini <code class="i">id="kayit2"</code> yap ve yeniden tıkla: bölüm bulunamaz.'});
+tg(MODA,'target = bağlantı nerede açılsın?','<b>target</b> (hedef) bağlantının hangi sekmede açılacağını söyler. Varsayılan: aynı sekme; ziyaretçi sitenden çıkar. <code class="i">_blank</code> (blenk) yazarsan <b>yeni sekmede</b> açılır, sen sayfada kalırsın. <b>rel="noopener"</b> yeni sekmenin senin sayfanı yönetmesini engelleyen güvenlik notudur.','🪟 <b>Benzetme:</b> bir kitabı ödünç verirken kendi kitabını da yanında tutmak: yeni sekme yeni bir kitap açar.',
+  PG(SEC_ET+'\n  <p><a href="https://www.meb.gov.tr" target="_blank" rel="noopener">MEB\'in sitesine git</a></p>'),{band:{s:'target="_blank"'},sel:'main a',hl:['a:target','a:rel'],off:' target="_blank" rel="noopener"',note:'_blank = yeni sekme',edit:true,try:'Bağlantıya tıkla: koyu kutu "YENİ sekmede" yazar. "Özellik yok"ta "aynı sekmede" yazar. (Bu küçük pencere güvenlik için gerçekten sekme açmaz; kendi bilgisayarında dene.)'});
+tg(MODA,'mailto: ve tel: = e-posta ve telefon bağlantısı','<b>mailto:</b> yazarsan bağlantı e-posta programını, <b>tel:</b> yazarsan telefondaki arama ekranını açar. Olmazsa ziyaretçi numarayı elle seçip kopyalar, telefona yazar: mobilde herkes bu adımda sıkılır.','📞 <b>Benzetme:</b> telefon rehberinde numaraya dokununca aramanın başlaması.',
+  PG(SEC_ET+'\n'+SEC_IL),{band:[{s:'href="mailto'},{s:'href="tel'}],sel:'#iletisim a',hl:['a:href'],note:'mailto: / tel: ile biten adresler',edit:true,try:'<code class="i">kulup@okul.k12.tr</code> adresini kendi e-postanla değiştir, bağlantıya tıkla: kutu yeni adresi gösterir.'});
+tg(MODA,'download = tıklayınca indir','<b>download</b> (daunlod – indir) bağlantıyı bir dosya indirmeye çevirir. Olmazsa PDF tarayıcıda açılır; ziyaretçi dosyayı kaydetmek için ayrıca uğraşır. (Bu örnekteki dosya gerçekte yok; amaç yazımı görmek.)','📥 <b>Benzetme:</b> kütüphanede "oku" yerine "ödünç al" kutusu.',
+  PG(SEC_ET+'\n  <p><a href="dosyalar/program.pdf" download>Programı indir (PDF)</a></p>'),{band:{s:'download'},sel:'main p:last-of-type a',hl:['a:download'],off:' download',note:'download = dosyayı indir',edit:true,try:'"Özellik yok"a bas ve bağlantıya tıkla: indirmek yerine yalnızca "Giderdi" yazar.'});
+add({t:'cmp',mod:MODA,h:'a mı, button mı? Gözle aynı, anlamı farklı',say:'Biri bir yere <b>götürür</b>, diğeri bir şey <b>yapar</b>. Sayfa değiştiriyorsan <b>a</b>; formu göndermek, kutu açmak gibi iş yapıyorsan <b>button</b>. Yanlışını seçersen ekran okuyucu ve klavye yanlış tarif eder.',
+  a:{lbl:'a = bir yere GİDER',cls:'neu',code:'<a class="dugme" href="kayit.html">Kayıt ol</a>'},
+  b:{lbl:'button = bir şey YAPAR',cls:'neu',code:'<button class="dugme">Kayıt ol</button>'}});
+add({t:'cmp',mod:MODA,h:'Bağlantı metni: "tıkla" mı, anlatan yazı mı?',say:'Ziyaretçi ve ekran okuyucu bağlantıları <b>alt alta liste</b> olarak dinleyebilir. "Tıkla, tıkla, tıkla" hiçbir şey söylemez. Google da bağlantı metnine bakar.',
+  a:{lbl:'kötü: belirsiz',cls:'bad',code:'<p>Etkinlik takvimi için <a href="takvim.html">tıkla</a>.</p>\n<p>Kayıt formu için <a href="kayit.html">tıkla</a>.</p>'},
+  b:{lbl:'iyi: ne olduğunu söylüyor',cls:'good',code:'<p><a href="takvim.html">Etkinlik takvimini gör</a></p>\n<p><a href="kayit.html">Kayıt formunu doldur</a></p>'}});
+add({t:'app',mod:MODA,n:1,h:'🛠️ Uygulama 1: Okul Rehberi (bağlantılı sayfa)',know:[['a, href, #id, mailto, tel, target, download','A bölümü: bu hafta'],['header, nav, main, section, footer','Hafta 7'],['table, caption, th, td','Hafta 6'],['ol, li','Hafta 5'],['html, head, title, lang','Hafta 3-4']],goal:'Bitmiş okul rehberi sayfasını incele, aynısını baştan yaz. Menüden sayfa içi bölümlere giden bağlantılar, e-posta ve telefon bağlantısı, dışarı giden bağlantı ve indirme bağlantısı olacak.',time:'15-20 dakika'});
+add({t:'list',mod:MODA,cls:'bad',h:'Bağlantılarda sık yapılan hatalar',items:[['🔍','Bağlantı metni "buraya tıkla": ne olduğunu söyleyen yaz (<code class="i">Etkinlik takvimini gör</code>)'],['❌','<code class="i">href="#"</code> bırakmak: tıklayınca sayfa başa atlar. Adres hazır değilse bile gerçek dosya adını yaz'],['🔠','Dosya adında büyük-küçük harf, boşluk, Türkçe karakter: <code class="i">Iletisim Sayfasi.html</code> yerine <code class="i">iletisim.html</code>'],['🪟','Her bağlantıyı <code class="i">_blank</code> yapmak ve <code class="i">rel</code> yazmamak: yalnızca dış siteler için kullan']]});
+add({t:'list',mod:MODA,cls:'good',h:'Sektörde nasıl yapılıyor?',items:[['⏭️','Büyük sitelerin başında gizli bir "Ana içeriğe geç" bağlantısı vardır; klavyeyle gezenler menüyü atlar'],['🔎','Bağlantı metni arama motoru için de önemlidir; anlatan metin sıralamaya yardım eder'],['📞','Mobil odaklı sitelerde telefon ve adres <code class="i">tel:</code> / harita bağlantısı olur'],['🔒','Dış site bağlantılarında <code class="i">rel="noopener"</code> yazmak alışkanlıktır']]});
+
+/* ===== B. FORMLAR: TEMEL ALANLAR ===== */
+add({t:'sec',mod:MODB,em:'📝',h:'B. Formlar',say:'form = ziyaretçiden bilgi alan sayfa parçası'});
+add({t:'cards',mod:MODB,h:'Form nedir?',n:3,items:[['📄','Kâğıt başvuru formu','Okul kayıt kâğıdı gibi: boşlukları doldurursun, teslim edersin.'],['🌐','Webde her yerde','Giriş yap, arama kutusu, sipariş, üyelik, anket: hepsi formdur.'],['🧩','Dört ana parça','<code>form</code> kutuyu, <code>label</code> adı, <code>input</code> kutucuğu, <code>button</code> göndermeyi yapar.']],say:'Bugüne kadar sayfalar sadece <b>gösteriyordu</b>. Formla sayfa ziyaretçiden bilgi <b>alır</b>.'});
+add({t:'demo',mod:MODB,h:'Form gönderilince ne olur?',say:'Oynat ve izle. Duraklatıp adım adım da ilerleyebilirsin.',build:'flow',cfg:'form'});
+tg(MODB,'&lt;form&gt; = bilgi toplayan zarf','<b>form</b> (form – "form"), içindeki alanları toplayıp bir adrese yollayan kutudur. Olmazsa alanlar ekranda durur ama hiçbiri bir yere gitmez. <b>action</b> = bilginin gideceği adres, <b>method</b> = gönderme biçimi. <b>Fark:</b> div de gruplar ama göndermez.','✉️ <b>Benzetme:</b> zarf. İçine mektupları (alanları) koyarsın, üstüne adres (action) yazarsın, postaya (method) verirsin.',
+  FP(L_AD+'\n'+BTN),{band:{s:'<form',e:'</form>'},sel:'form',hl:['t:form'],note:'form = alanları toplayıp gönderen zarf',edit:true,try:'Kutuya <b>Ali</b> yaz, Gönder\'e bas. Yeşil satır, tarayıcının sunucuya yollayacağı paketi gösterir. (Burada gerçek sunucu yok; paket gösterilir.)'});
+add({t:'demo',mod:MODB,h:'method: GET mi, POST mu?',say:'Kutuları doldur, GET ve POST arasında geç. Bilginin nerede göründüğüne bak.',build:'getpost'});
+tg(MODB,'&lt;label&gt; = alanın adı','<b>label</b> (leybıl – etiket) kutunun ne için olduğunu yazar. <b>for</b>, label ile kutuyu bağlar: label\'daki for değeri, kutunun <b>id</b> değeriyle aynı olur. Olmazsa kutuya yalnızca dokunmak gerekir (küçük kutuya parmakla basmak zor) ve ekran okuyucu "boş kutu" der.','🏷️ <b>Benzetme:</b> çekmecenin üstündeki yazı: "Çorap". Yazıya da dokunsan çekmece açılır.',
+  FP(L_AD+'\n'+BTN),{band:{s:'<label',e:'<input'},sel:'label,#ad',hl:['t:label','a:for'],off:' for="ad"',note:'label for="ad" ↔ input id="ad"',edit:true,try:'"Adın" yazısına tıkla: imleç kutuya geçer. "Özellik yok"ta (for kalkınca) aynı tıklama kutuya geçmez.'});
+tg(MODB,'&lt;input&gt;: bilgi kutusu, name: paketin etiketi','<b>input</b> (inpıt – girdi) ziyaretçinin bilgi yazdığı kutudur; <b>type</b> kutunun türünü söyler. <b>id</b> label ile bağlamak içindir (sayfa içi kimlik). <b>name</b> sunucuya giden paketteki <b>adı</b> yazar: ad=Ali. <b>name yoksa o alan hiç gönderilmez.</b>','📦 <b>Benzetme:</b> kargo kolisinin üstündeki "Ad: Ali" etiketi. Etiketsiz koliyi kimse teslim almaz.',
+  FP(L_AD+'\n'+BTN),{band:{s:'<input'},sel:'#ad',hl:['t:input','a:name','a:id'],off:' name="ad"',note:'name = sunucuya giden ad',edit:true,try:'Kutuya Ali yaz, Gönder\'e bas: <b>ad=Ali</b>. Sonra "Özellik yok"a bas (name kalkar), tekrar dene: paket <b>boş</b> gider.'});
+add({t:'demo',mod:MODB,h:'input türleri: type değiştikçe kutu değişir',say:'Bir tür seç; kodu ve sonucu izle. Kutuya bir şey yaz, Gönder\'e bas.',build:'type'});
+tg(MODB,'placeholder = silinen ipucu','<b>placeholder</b> (pleysholder – yer tutucu) kutunun içinde soluk yazan örnektir; yazmaya başlayınca kaybolur. Olmazsa ziyaretçi kutuya ne yazacağını (örn. soyad da mı?) bilemez. Ancak label\'ın <b>yerine geçmez</b>.','📝 <b>Benzetme:</b> kâğıttaki kurşun kalemle yazılmış örnek. Üstüne yazınca silinir.',
+  FP(L_AD.replace('name="ad">','name="ad" placeholder="Örn. Ayşe Yılmaz">')+'\n'+BTN),{band:{s:'placeholder'},sel:'#ad',hl:['a:placeholder'],off:' placeholder="[^"]*"',note:'placeholder = örnek yazı',edit:true,try:'Kutuya bir harf yaz: soluk yazı kaybolur. Placeholder metnini kendi adınla değiştir.'});
+add({t:'cmp',mod:MODB,h:'label mı, placeholder mı? Gözle benzer, anlamı farklı',say:'Placeholder yazmaya başlayınca <b>kaybolur</b>; ziyaretçi neyi doldurduğunu unutur. Ekran okuyucular da placeholder\'ı güvenilir okumaz. Kalıcı ad için <b>label</b>; ek örnek için placeholder.',
+  a:{lbl:'label = kalıcı ad',cls:'good',code:'<form>\n  <label for="ad">Adın</label>\n  <input type="text" id="ad" name="ad">\n</form>'},
+  b:{lbl:'sadece placeholder: ad kaybolur',cls:'bad',code:'<form>\n  <input type="text" name="ad"\n         placeholder="Adın">\n</form>'}});
+tg(MODB,'required = boş bırakılamaz','<b>required</b> (rikvayırd – zorunlu) alanın doldurulmasını şart koşar. Olmazsa 100 kişiden 20\'si adını boş yollar, elinde adsız kayıtlar kalır. Tarayıcı boşsa formu göndermez ve uyarı gösterir.','🚧 <b>Benzetme:</b> kapıdaki bilet kontrolü: bileti göstermeyen içeri giremez.',
+  FP('      <label for="mail">E-posta</label>\n      <input type="email" id="mail" name="mail" required>\n'+BTN),{band:{s:'<input'},sel:'#mail',hl:['a:required'],off:' required',note:'required = zorunlu',edit:true,try:'Kutuyu boş bırakıp Gönder\'e bas: tarayıcı uyarır. "Özellik yok"ta aynısını yap: boş paket gider. Sonra "a" yaz (e-posta değil): yine uyarır, çünkü <code class="i">type="email"</code> biçimi de denetler.'});
+tg(MODB,'minlength, maxlength, min, max = sınırlar','<b>minlength / maxlength</b> yazının en az-en çok harf sayısını, <b>min / max</b> sayının en küçük-en büyük değerini belirler. Olmazsa yaş kutusuna 300 ya da ad kutusuna tek harf girilebilir. Sınırı aşarsa tarayıcı uyarır.','📏 <b>Benzetme:</b> lunaparktaki boy sınırı: çok kısa ya da çok uzun giremez.',
+  FP('      <label for="ad">Adın (3-20 harf)</label>\n      <input type="text" id="ad" name="ad" minlength="3" maxlength="20">\n      <label for="yas">Yaşın (9-18)</label>\n      <input type="number" id="yas" name="yas" min="9" max="18">\n'+BTN),{band:[{s:'type="text"'},{s:'type="number"'}],sel:'#ad,#yas',hl:['a:minlength','a:maxlength','a:min','a:max'],off:' min="9" max="18"| minlength="3" maxlength="20"',note:'sınırlar: en az / en çok',edit:true,try:'Adına "Al" (2 harf), yaşına 30 yaz, Gönder\'e bas: iki uyarı da gelir. Sonra "Özellik yok"ta tekrar dene.'});
+add({t:'app',mod:MODB,n:2,h:'🛠️ Uygulama 2: Kulüp Kayıt Formu',know:[['form, label, input, placeholder, required','B bölümü: bu hafta'],['a, #id (menüden forma git)','A bölümü: bu hafta'],['header, nav, main, section, footer','Hafta 7'],['h1, h2, p','Hafta 4-5'],['html, head, title, lang','Hafta 3-4']],goal:'Bitmiş kayıt formu sayfasını incele, aynısını baştan yaz: ad ve e-posta kutuları label ile bağlanacak, zorunlu alanlar işaretlenecek, Gönder düğmesi olacak.',time:'15 dakika'});
+
+/* ===== C. FORMLAR: SEÇENEKLER VE GÖNDERME ===== */
+add({t:'sec',mod:MODC,em:'☑️',h:'C. Seçenekler ve gönderme',say:'checkbox, radio, select, textarea, button'});
+tg(MODC,'checkbox = birden çok seçim (kutucuk)','<b>checkbox</b> (çekboks – onay kutusu) kutucuğu istediğin kadar işaretlersin. Olmazsa "hangi alanlar ilgini çekiyor?" gibi çok seçimli sorular için 5 ayrı soru yazmak gerekir. Aynı <b>name</b> ile gruplanır; işaretli olanların <b>value</b>\'ları gider. Label\'ı kutucuğun etrafına sararsan <b>for/id</b> yazmak gerekmez.','☑️ <b>Benzetme:</b> alışveriş listesi: istediğin maddelerin yanına tik atarsın.',
+  FP('      <p>İlgi alanların:</p>\n      <label><input type="checkbox" name="ilgi" value="robot"> Robotik</label>\n      <label><input type="checkbox" name="ilgi" value="yazilim"> Yazılım</label>\n'+BTN),{band:{s:'name="ilgi" value="robot"',e:'value="yazilim"'},sel:'input[type=checkbox]',hl:['a:type','a:value'],note:'checkbox = çoklu seçim',edit:true,try:'İkisini de işaretle, Gönder\'e bas: ilgi=robot&ilgi=yazilim. Hiçbirini işaretlemezsen paket boş gider.'});
+tg(MODC,'radio = yalnızca bir seçim (yuvarlak)','<b>radio</b> (reydiyo – seçenek düğmesi) gruptan <b>yalnızca birini</b> seçtirir. Aynı gruptaki düğmelerin <b>name</b> değeri <b>aynı</b> olmak zorundadır; tarayıcı bu sayede birini seçince diğerini kapatır. name farklıysa hepsi ayrı bir grup olur.','📻 <b>Benzetme:</b> eski radyonun tuşları: birine basınca diğeri yukarı çıkar.',
+  FP('      <p>Seviyen:</p>\n      <label><input type="radio" name="seviye" value="yeni"> Yeni başlıyorum</label>\n      <label><input type="radio" name="seviye" value="orta"> Biraz biliyorum</label>\n'+BTN),{band:{s:'name="seviye" value="yeni"',e:'value="orta"'},sel:'input[type=radio]',hl:['a:name'],off:' name="seviye"',note:'aynı name = tek seçim',edit:true,try:'İki düğmeyi sırayla seç: biri kapanır. "Özellik yok"ta (name kalkar) aynısını yap: ikisi birden seçilir, üstelik paket boş gider.'});
+add({t:'cmp',mod:MODC,h:'checkbox mı, radio mu?',say:'Gözle ikisi de küçük bir işaret kutusu. Fark: <b>kare = çok seçim</b> (istediğini işaretle), <b>yuvarlak = tek seçim</b> (biri kalır). Kural: "birden çok olabilir mi?" Olabilirse checkbox.',
+  a:{lbl:'checkbox: birden çok olabilir',cls:'neu',code:'<p>Hangi dersleri seviyorsun?</p>\n<label><input type="checkbox" name="ders" value="mat"> Matematik</label>\n<label><input type="checkbox" name="ders" value="fen"> Fen</label>'},
+  b:{lbl:'radio: yalnızca biri',cls:'neu',code:'<p>Hangi sınıftasın?</p>\n<label><input type="radio" name="sinif" value="9"> 9. sınıf</label>\n<label><input type="radio" name="sinif" value="10"> 10. sınıf</label>'}});
+tg(MODC,'&lt;select&gt; = açılır liste','<b>select</b> (silekt – seçim) açılır listedir; her satırı bir <b>option</b> (opşın – seçenek) etiketi yazar. Olmazsa 40 şehri radio ile alt alta dizmek gerekir ve sayfa uzar. <b>value</b> sunucuya giden değerdir, option\'ın arasındaki yazı ise ziyaretçinin gördüğüdür.','🍽️ <b>Benzetme:</b> menüdeki içecek listesi: bir yerde durur, tıklayınca açılır.',
+  FP('      <label for="sinif">Sınıfın</label>\n      <select id="sinif" name="sinif">\n        <option value="9">9. sınıf</option>\n        <option value="10">10. sınıf</option>\n        <option value="11">11. sınıf</option>\n      </select>\n'+BTN),{band:{s:'<select',e:'</select>'},sel:'select',hl:['t:select','t:option'],note:'select > option = açılır liste',edit:true,try:'10. sınıfı seç, Gönder\'e bas: <b>sinif=10</b> gider (ekranda yazan "10. sınıf" değil, value). <code class="i">value="10"</code> değerini <code class="i">value="onuncu"</code> yap ve tekrar dene.'});
+add({t:'cmp',mod:MODC,h:'select mi, radio mu?',say:'İkisi de tek seçim yaptırır. Fark: <b>az seçenek (2-5)</b> varsa radio: hepsi görünür, tek dokunuş yeter. <b>Çok seçenek</b> varsa select: yer tutmaz.',
+  a:{lbl:'radio: az seçenek, hepsi görünür',cls:'neu',code:'<label><input type="radio" name="g" value="k"> Kız</label>\n<label><input type="radio" name="g" value="e"> Erkek</label>'},
+  b:{lbl:'select: çok seçenek, yer tutmaz',cls:'neu',code:'<label for="s">Şehir</label>\n<select id="s" name="s">\n  <option>Ankara</option>\n  <option>İzmir</option>\n  <option>Samsun</option>\n</select>'}});
+tg(MODC,'&lt;textarea&gt; = çok satırlı yazı kutusu','<b>textarea</b> (tekst eria – yazı alanı) uzun yazılar içindir: mesaj, yorum, açıklama. Olmazsa tek satırlık kutuya 3 paragraf yazmak çok zordur. <b>rows</b> görünen satır sayısını belirler. input gibi tek etiket değil, <b>açılış ve kapanış</b> etiketi vardır.','🗒️ <b>Benzetme:</b> sınav kâğıdındaki açık uçlu cevap boşluğu.',
+  FP('      <label for="mesaj">Mesajın</label>\n      <textarea id="mesaj" name="mesaj" rows="4"></textarea>\n'+BTN),{band:{s:'<textarea'},sel:'textarea',hl:['t:textarea','a:rows'],off:' rows="4"',note:'textarea = uzun yazı kutusu',edit:true,try:'<code class="i">rows="4"</code> değerini 8 yap: kutu uzar. Birkaç satır yazıp Enter ile yeni satıra geç ve Gönder\'e bas.'});
+add({t:'cmp',mod:MODC,h:'input mı, textarea mı?',say:'Kısa, tek satırlık cevap (ad, e-posta) için <b>input</b>. Uzun, birkaç satırlık cevap (mesaj) için <b>textarea</b>. Biri kendi kendine kapanır, öbürünün kapanış etiketi vardır.',
+  a:{lbl:'input: tek satır',cls:'neu',code:'<label for="konu">Konu</label>\n<input type="text" id="konu" name="konu">'},
+  b:{lbl:'textarea: çok satır',cls:'neu',code:'<label for="m">Mesaj</label>\n<textarea id="m" name="m" rows="3"></textarea>'}});
+tg(MODC,'&lt;button&gt; = gönder, temizle','<b>button</b> (batın – düğme) tıklanınca iş yapar. <b>type="submit"</b> formu gönderir, <b>type="reset"</b> kutuları ilk haline döndürür, <b>type="button"</b> hiçbir şey yapmaz (ileride JavaScript\'le çalışacak). Dikkat: form içinde type yazmazsan düğme gönderir.','🛎️ <b>Benzetme:</b> asansördeki "Kat seç" ve "Hepsini iptal" düğmeleri.',
+  FP(L_AD+'\n      <button type="submit">Gönder</button>\n      <button type="reset">Temizle</button>'),{band:{s:'<button',e:'Temizle'},sel:'button',hl:['t:button','a:type'],note:'submit = gönder, reset = temizle',edit:true,try:'Adın yaz, Temizle\'ye bas: kutu boşalır. Sonra Gönder\'e bas ve paketi izle.'});
+add({t:'cmp',mod:MODC,h:'button mı, input type="submit" mi? Gözle aynı',say:'İkisi de bir gönder düğmesi gösterir ve aynı işi yapar. Fark: <b>button</b> arasına yazı, simge, <b>kalın yazı</b> koyabilirsin; <b>input</b> yalnızca düz yazıdır. Yeni sayfalarda <b>button</b> tercih edilir.',
+  a:{lbl:'button: içine etiket girer',cls:'neu',code:'<button type="submit">\n  <strong>Gönder</strong> ➜\n</button>'},
+  b:{lbl:'input submit: sadece düz yazı',cls:'neu',code:'<input type="submit" value="Gönder">'}});
+tg(MODC,'&lt;fieldset&gt; ve &lt;legend&gt; = alan grubu','<b>fieldset</b> (fiyldset – alan kümesi) birbiriyle ilgili alanları çerçeveye alır, <b>legend</b> (lecend – başlık) çerçevenin başlığını yazar. Olmazsa uzun formda "bu radyo düğmeleri neyin?" karışır; ekran okuyucu grubun adını okuyamaz.','🗂️ <b>Benzetme:</b> dosya klasöründeki ayraç kâğıdı: "Kişisel bilgiler".',
+  FP('      <fieldset>\n        <legend>Seviyen</legend>\n        <label><input type="radio" name="seviye" value="yeni"> Yeni başlıyorum</label>\n        <label><input type="radio" name="seviye" value="orta"> Biraz biliyorum</label>\n      </fieldset>\n'+BTN),{band:{s:'<fieldset',e:'</fieldset>'},sel:'fieldset',hl:['t:fieldset','t:legend'],note:'fieldset = çerçeveli grup',edit:true,try:'<code class="i">Seviyen</code> yazısını "Deneyimin" yap. Başlık çerçevenin üstünde değişir.'});
+add({t:'cmp',mod:MODC,h:'fieldset mi, div mi? Gözle benzer, anlamı farklı',say:'İkisi de alanları gruplar. <b>div</b> sadece taşıyıcıdır, anlamı yoktur. <b>fieldset</b> ise "bunlar tek bir sorunun parçaları" der ve legend ile grubun adını söyler. Radio/checkbox gruplarında fieldset kullan.',
+  a:{lbl:'fieldset: anlamlı grup',cls:'good',code:'<fieldset>\n  <legend>Seviyen</legend>\n  <label><input type="radio" name="s" value="1"> Yeni</label>\n  <label><input type="radio" name="s" value="2"> Orta</label>\n</fieldset>'},
+  b:{lbl:'div: grup adı yok',cls:'bad',code:'<div>\n  <p>Seviyen</p>\n  <label><input type="radio" name="s" value="1"> Yeni</label>\n  <label><input type="radio" name="s" value="2"> Orta</label>\n</div>'}});
+add({t:'app',mod:MODC,n:3,h:'🛠️ Uygulama 3: İletişim Sayfası',know:[['select, option, textarea, checkbox, button, fieldset','C bölümü: bu hafta'],['form, label, input, required','B bölümü: bu hafta'],['mailto:, tel:, #id','A bölümü: bu hafta'],['header, nav, main, section, footer','Hafta 7'],['table, th, td','Hafta 6'],['ul, li','Hafta 5']],goal:'Bitmiş iletişim sayfasını incele, aynısını baştan yaz: çalışma saatleri tablosu, e-posta ve telefon bağlantıları ve konu seçimi, mesaj kutusu ile onay kutusu olan bir iletişim formu.',time:'20 dakika'});
+add({t:'demo',mod:MODC,h:'Form atölyesi: formu kendin kur',say:'Alanları aç/kapat; kodun ve formun nasıl değiştiğini izle.',build:'lab'});
+add({t:'result',mod:MODC,h:'Sayfamız şimdi: kayıt formu hazır',code:()=>FINAL,fs:2.1});
+add({t:'list',mod:MODC,cls:'bad',h:'Formlarda sık yapılan hatalar',items:[['📦','Alana <code class="i">name</code> yazmamak: bilgi sunucuya hiç gitmez'],['🏷️','Label yerine sadece placeholder kullanmak: yazmaya başlayınca ne sorulduğu kaybolur'],['🔢','İki alana aynı <code class="i">id</code> vermek: id sayfada tek olmalı. Radio\'da ise <code class="i">name</code> aynı, id farklı olur'],['🔑','Parola kutusunu <code class="i">type="text"</code> yapmak: şifre ekranda okunur. <code class="i">type="password"</code> yaz']]});
+add({t:'list',mod:MODC,cls:'good',h:'Sektörde nasıl yapılıyor?',items:[['🛡️','Tarayıcı denetimi (<code class="i">required</code>) kolaylıktır; asıl denetim <b>sunucuda</b> yapılır, çünkü kötü niyetli biri tarayıcıyı atlayabilir'],['📱','Doğru <code class="i">type</code> (<code class="i">email</code>, <code class="i">tel</code>, <code class="i">number</code>) mobilde doğru klavyeyi açar; <code class="i">autocomplete</code> adresi tarayıcının doldurmasını sağlar'],['✂️','Formlar kısa tutulur: her fazladan alan, formu bırakanların sayısını artırır'],['☁️','Küçük siteler form verisini kendi sunucusuna yazmak yerine hazır form servislerine yollar (örneğin form barındırma hizmetleri)']]});
+add({t:'app',mod:MODC,n:4,h:'🛠️ Uygulama 4: Okul Etkinlik Sitesi',know:[['form, select, radio, checkbox, textarea','B ve C bölümleri: bu hafta'],['a, #id, mailto:, target','A bölümü: bu hafta'],['figure, figcaption, img, alt','Hafta 7'],['article, aside, header, nav, main, footer','Hafta 7'],['table, caption, th, td','Hafta 6'],['ul, li','Hafta 5']],goal:'Bu haftaki ve önceki haftaların tüm bilgilerini birleştir: menüsü, resimli duyuruları, program tablosu ve katılım formu olan etkinlik sitesini baştan yaz.',time:'20-25 dakika'});
+add({t:'list',mod:'Pekiştirme',h:'Alıştırmalar: 4 uygulama',items:[['1️⃣','Kolay: <b>Uygulama 1</b> (okul rehberi) ve <b>Uygulama 2</b> (kayıt formu) bittiyse bir bağlantıya <code class="i">target="_blank"</code> ve <code class="i">rel="noopener"</code> ekle'],['2️⃣','Orta: <b>Uygulama 3</b> (iletişim sayfası) bittiyse forma bir <code class="i">fieldset</code> + <code class="i">radio</code> grubu ekle'],['3️⃣','Zor: <b>Uygulama 4</b> (etkinlik sitesi) bittiyse menüye "Başa dön" bağlantısı ve forma <code class="i">minlength</code> / <code class="i">max</code> sınırları ekle']]});
+add({t:'list',mod:'Pekiştirme',h:'Mini proje ve quiz',items:[['🛠️','Dört uygulama: <b>Hafta-08-Ek-Uygulamalar</b> dosyasında (yapamadığını evde tamamla)'],['🏠','Mini proje: kendi kulübün için <b>kayıt sayfası</b> yaz: menü, 2 bölüm, 5 alanlı form'],['✅','Mini quiz: öğretmenin vereceği ayrı dosya']]});
+add({t:'cards',mod:'Pekiştirme',h:'Özet',n:3,items:[['🔗','<code>a href</code>','Götüren etiket: sayfa, #bölüm, mailto:, tel:'],['📝','<code>form label input</code>','Bilgi toplayan zarf, adı ve kutusu'],['☑️','<code>checkbox radio select textarea button</code>','Seçenekler ve gönderme']],say:'Sonraki hafta: CSS ile sayfayı boyuyoruz.'});
+
+
+/* ---------- demo yapıcıları ---------- */
+const FLOWS={
+ link:{ls:'Tarayıcı',rs:'Sunucu',steps:[
+  {t:'Ziyaretçi menüde "İletişim" bağlantısına tıklar.',l:'Sayfa: <b>index.html</b><br>🖱️ İletişim',r:'Bekliyor…',x:18,pk:''},
+  {t:'Tarayıcı bağlantının <b>href</b> değerini okur: <code>iletisim.html</code>.',l:'&lt;a href="<b>iletisim.html</b>"&gt;',r:'Bekliyor…',x:18,pk:''},
+  {t:'Tarayıcı bu dosyayı sunucudan ister (<b>istek</b>).',l:'İstek gönderiliyor…',r:'İstek geldi: iletisim.html',x:82,pk:'📨 iletisim.html lazım'},
+  {t:'Sunucu dosyayı bulur ve geri yollar (<b>yanıt</b>).',l:'Yanıt bekleniyor…',r:'📄 Dosya bulundu',x:18,pk:'📄 iletisim.html'},
+  {t:'Tarayıcı eski sayfayı kapatır, yeni sayfayı çizer.',l:'Sayfa: <b>iletisim.html</b> ✔',r:'Bekliyor…',x:18,pk:''}]},
+ form:{ls:'Tarayıcı (ziyaretçi)',rs:'Sunucu (kayit.php)',steps:[
+  {t:'Ziyaretçi alanları doldurur.',l:'Adın: <b>Ali</b><br>E-posta: <b>ali@mail.com</b>',r:'Bekliyor…',x:18,pk:''},
+  {t:'<b>Gönder</b> düğmesine basar.',l:'Adın: Ali<br>E-posta: ali@mail.com<br>🖱️ <b>[ Gönder ]</b>',r:'Bekliyor…',x:18,pk:''},
+  {t:'Tarayıcı önce <b>kontrol eder</b>: required boş mu? E-posta biçimi doğru mu?',l:'✔ Boş alan yok<br>✔ E-posta biçimi doğru',r:'Bekliyor…',x:18,pk:''},
+  {t:'Her alanın <b>name</b> ve değerini paketler.',l:'📦 <b>ad=Ali</b><br><b>mail=ali@mail.com</b>',r:'Bekliyor…',x:18,pk:''},
+  {t:'Paket, <b>action</b> adresindeki sunucuya yollanır (method="post").',l:'Paket yolda…',r:'Paket geldi',x:82,pk:'📦 ad=Ali&amp;mail=…'},
+  {t:'Sunucu bilgiyi okur ve <b>kaydeder</b>.',l:'Bekliyor…',r:'💾 Kayıt eklendi: Ali',x:82,pk:''},
+  {t:'Sunucu "Teşekkürler" sayfasını yollar; tarayıcı gösterir.',l:'Teşekkürler Ali! 🎉',r:'Bekliyor…',x:18,pk:'📄 Teşekkürler sayfası'}]}
+};
+const DEMOS={
+ flow(b,s){
+  const F=FLOWS[s.cfg];let i=0;
+  const c=ctl('<button class="btn" data-a="p">&larr; Önceki</button><button class="btn pri" data-a="play">&#9654; Oynat</button><button class="btn" data-a="n">Sonraki &rarr;</button><button class="btn" data-a="r">↺ Baştan</button><span class="hintw" id="fcnt" style="color:var(--muted)"></span>');
+  b.appendChild(c);
+  const v=document.createElement('div');v.className='flow';
+  v.innerHTML='<div class="fbox"><h4>🖥️ '+F.ls+'</h4><div class="fl"></div></div><div class="fpk"></div><div class="fbox"><h4>🗄️ '+F.rs+'</h4><div class="fr"></div></div>';
+  b.appendChild(v);
+  const cap=document.createElement('div');cap.className='fcap';b.appendChild(cap);
+  const draw=()=>{const st=F.steps[i];
+    $('.fl',v).innerHTML=st.l;$('.fr',v).innerHTML=st.r;
+    const pk=$('.fpk',v);pk.style.left=st.x+'%';pk.innerHTML=st.pk;pk.style.opacity=st.pk?1:0;
+    cap.innerHTML='<b>Adım '+(i+1)+'/'+F.steps.length+':</b> '+st.t;
+    $('#fcnt',c).textContent='';
+    $$('.fbox',v).forEach((x,k)=>x.classList.toggle('act',(k===0&&st.x<50)||(k===1&&st.x>50)));
+  };
+  let tm=null;const stop=()=>{if(tm){clearInterval(tm);tm=null}$('[data-a=play]',c).innerHTML='&#9654; Oynat'};
+  c.addEventListener('click',e=>{const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
+    if(a==='n'){stop();i=Math.min(F.steps.length-1,i+1);draw()}
+    else if(a==='p'){stop();i=Math.max(0,i-1);draw()}
+    else if(a==='r'){stop();i=0;draw()}
+    else if(a==='play'){if(tm){stop();return}if(i>=F.steps.length-1)i=0;draw();
+      $('[data-a=play]',c).innerHTML='&#10074;&#10074; Duraklat';
+      tm=setInterval(()=>{if(i>=F.steps.length-1){stop();return}i++;draw()},2600);TIMERS.push(tm)}
+  });
+  draw();
+ },
+ getpost(b){
+  let m='get';
+  const c=ctl('<label>Ad: <input type="text" id="gp1" value="Ali" size="8"></label><label>Yaş: <input type="text" id="gp2" value="15" size="4"></label><div class="seg"><button data-v="get" class="on">GET</button><button data-v="post">POST</button></div>');
+  b.appendChild(c);
+  const cr=document.createElement('div');cr.className='cr';b.appendChild(cr);
+  const left=document.createElement('div');left.className='col';cr.appendChild(left);
+  const cp=mkPane('',{name:'Kod'});left.appendChild(cp.el);
+  const right=document.createElement('div');right.className='col';
+  right.innerHTML='<div class="pane"><div class="pane-h"><span>Tarayıcının adres çubuğu</span></div><div class="addr" id="gpa"></div></div><div class="pane"><div class="pane-h"><span>Paketin içi (adreste görünmez)</span></div><div class="addr" id="gpb"></div></div><div class="why" id="gpw"></div>';
+  cr.appendChild(right);
+  const draw=()=>{
+    const a=$('#gp1',c).value,y=$('#gp2',c).value;
+    const q='ad='+encodeURIComponent(a)+'&yas='+encodeURIComponent(y);
+    cp.set('<form action="kayit.php" method="'+m+'">\n  <label for="ad">Ad</label>\n  <input type="text" id="ad" name="ad">\n  <label for="yas">Yaş</label>\n  <input type="text" id="yas" name="yas">\n  <button type="submit">Gönder</button>\n</form>',['a:method']);
+    $('#gpa',right).innerHTML='https://kulup.com/kayit.php'+(m==='get'?'<mark>?'+esc(q)+'</mark>':'');
+    $('#gpb',right).innerHTML=m==='post'?'<mark>'+esc(q)+'</mark>':'<span style="color:var(--muted)">(boş: bilgi adresin sonuna yazıldı)</span>';
+    $('#gpw',right).innerHTML=m==='get'?'<b>GET</b> (get – "get" – al): bilgi adrese yazılır. Adresi kopyalayıp arkadaşına atabilirsin. <b>Arama kutuları</b> için uygun. Parola gibi gizli bilgi için <b>kullanılmaz</b>.':'<b>POST</b> (post – "poust" – gönder): bilgi adreste görünmez, paketin içinde gider. <b>Kayıt, giriş, sipariş</b> formları için uygun.';
+  };
+  $$('input',c).forEach(i=>i.oninput=draw);
+  $$('.seg button',c).forEach(x=>x.onclick=()=>{$$('.seg button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');m=x.dataset.v;draw()});
+  draw();
+ },
+ path(b){
+  const FILES=[['kulup-sitesi',0,1],['kulup-sitesi/index.html',1],['kulup-sitesi/iletisim.html',1],['kulup-sitesi/sayfalar',1,1],['kulup-sitesi/sayfalar/etkinlikler.html',2],['kulup-sitesi/sayfalar/galeri.html',2]];
+  let from='kulup-sitesi/index.html',to='kulup-sitesi/iletisim.html';
+  const c=ctl('<span>Bulunduğum sayfa:</span><div class="seg"><button data-v="kulup-sitesi/index.html" class="on">index.html</button><button data-v="kulup-sitesi/sayfalar/galeri.html">sayfalar/galeri.html</button></div>');
+  b.appendChild(c);
+  const cr=document.createElement('div');cr.className='cr';cr.innerHTML='<div class="tree" id="tr"></div><div class="col"><div style="font-size:.85rem">Yazman gereken <b>href</b>:</div><div class="pathout" id="po"></div><div id="pw" style="font-size:.8rem;color:var(--muted)"></div></div>';
+  b.appendChild(cr);
+  const rel=(f,t)=>{const a=f.split('/').slice(0,-1),z=t.split('/');let i=0;while(i<a.length&&i<z.length-1&&a[i]===z[i])i++;return '../'.repeat(a.length-i)+z.slice(i).join('/')};
+  const draw=()=>{
+    const T=$('#tr');T.innerHTML='<div style="font-size:.6rem;color:var(--muted)">Gitmek istediğin sayfaya tıkla</div>';
+    FILES.forEach(([p,d,dir])=>{const x=document.createElement('div');x.style.paddingLeft=(.5+d*1.2)+'em';x.textContent=(dir?'📁 ':'📄 ')+p.split('/').pop();
+      if(!dir&&p!==from){x.className='f';x.onclick=()=>{to=p;draw()}}
+      if(p===from)x.classList.add('from');if(p===to)x.classList.add('to');T.appendChild(x)});
+    const r=rel(from,to);$('#po').innerHTML=hl2('<a href="'+r+'">Git</a>');
+    const u=(r.match(/\.\.\//g)||[]).length;$('#pw').textContent=u?'Bir klasör yukarı çıkıyoruz (../), sonra hedefe iniyoruz.':'Aynı klasördeyiz ya da altındayız: klasör adlarını yazarız.';
+  };
+  $$('.seg button',c).forEach(x=>x.onclick=()=>{$$('.seg button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');from=x.dataset.v;if(to===from)to=from.endsWith('index.html')?'kulup-sitesi/iletisim.html':'kulup-sitesi/index.html';draw()});
+  draw();
+ },
+ type(b){
+  const TY=[['text','Her türlü kısa yazı. Hiçbir biçim şartı yok.'],['email','"@" yoksa tarayıcı uyarır. Mobilde "@" tuşlu klavye açar.'],['password','Yazılanlar nokta olarak görünür; yan tarafta okunmaz.'],['number','Yalnızca rakam girilir; yukarı-aşağı okları çıkar.'],['tel','Mobilde telefon tuş takımı açar.'],['url','Adres biçimi ister: https://... ile başlamalı.'],['date','Takvimden tarih seçtirir.'],['color','Renk seçici açar.'],['range','Kaydırıcı olur; sürükleyerek değer seçilir.']];
+  const c=ctl('<div class="seg">'+TY.map((t,k)=>'<button data-v="'+k+'"'+(k===1?' class="on"':'')+'>'+t[0]+'</button>').join('')+'</div>');
+  b.appendChild(c);
+  const gen=k=>'<label for="x">Deneme kutusu</label>\n<input type="'+TY[k][0]+'" id="x" name="x">\n<button type="submit">Gönder</button>';
+  const hint=document.createElement('div');hint.className='hintbox';
+  const cr=codeRes(b,gen(1),{css:'plain',hl:['a:type'],fs:3});
+  b.appendChild(hint);
+  const show=k=>{hint.innerHTML='<b>'+TY[k][0]+':</b> '+TY[k][1];cr.set(gen(k),['a:type'])};
+  show(1);
+  $$('.seg button',c).forEach(x=>x.onclick=()=>{$$('.seg button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');show(+x.dataset.v)});
+ },
+ lab(b){
+  const K=[['ad','Ad',1],['mail','E-posta',1],['parola','Parola',0],['sinif','Sınıf',0],['mesaj','Mesaj',0],['onay','Onay kutusu',0]];
+  const c=ctl(K.map(k=>'<label><input type="checkbox" value="'+k[0]+'"'+(k[2]?' checked':'')+'> '+k[1]+'</label>').join(''));
+  b.appendChild(c);
+  const gen=()=>{const on={};$$('input',c).forEach(i=>on[i.value]=i.checked);const L=[];
+    if(on.ad)L.push('  <label for="ad">Adın</label>\n  <input type="text" id="ad" name="ad" required>');
+    if(on.mail)L.push('  <label for="mail">E-posta</label>\n  <input type="email" id="mail" name="mail" required>');
+    if(on.parola)L.push('  <label for="parola">Parola</label>\n  <input type="password" id="parola" name="parola" minlength="6">');
+    if(on.sinif)L.push('  <label for="sinif">Sınıf</label>\n  <select id="sinif" name="sinif">\n    <option value="9">9. sınıf</option>\n    <option value="10">10. sınıf</option>\n  </select>');
+    if(on.mesaj)L.push('  <label for="mesaj">Mesaj</label>\n  <textarea id="mesaj" name="mesaj" rows="3"></textarea>');
+    if(on.onay)L.push('  <label><input type="checkbox" name="onay" value="evet" required> Kuralları kabul ediyorum</label>');
+    L.push('  <button type="submit">Gönder</button>');
+    return '<form action="kayit.php" method="post">\n'+L.join('\n')+'\n</form>'};
+  const cr=codeRes(b,gen(),{css:'plain',fs:2.4,edit:true});
+  $$('input',c).forEach(i=>i.onchange=()=>cr.set(gen()));
+ }
+};
+
+/* ---------- slaytları kur ---------- */
+const stage=$('#stage');
+S.forEach((s,idx)=>{
+  const el=document.createElement('section');el.className='slide '+(s.t==='hero'?'hero':s.t==='sec'?'sec':s.t==='app'?'app':'');
+  el.dataset.title=(s.h||'').replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>');el.dataset.mod=s.mod;
+  let h='<span class="mod">'+esc(s.mod)+'</span>';
+  if(s.t==='sec')h+='<div class="big">'+s.em+'</div>';
+  h+='<h2 class="h">'+s.h+'</h2>';
+  if(s.say)h+='<p class="say">'+s.say+'</p>';
+  if(s.bn)h+='<p class="bn">'+s.bn+'</p>';
+  el.innerHTML=h;
+  const body=document.createElement('div');body.className='body';
+  if(s.t==='hero'||s.t==='sec'){el.appendChild(body);body.style.display='none'}
+  else el.appendChild(body);
+  s.el=el;s.body=body;s.built=false;
+  stage.appendChild(el);
+});
+function buildSlide(s){
+  if(s.built)return;s.built=true;const b=s.body;
+  if(s.t==='cards'){b.innerHTML='<div class="cards" style="--n:'+Math.min(s.n,3)+'">'+s.items.map(i=>'<div class="card"><div class="em">'+i[0]+'</div><b>'+i[1]+'</b><span>'+i[2]+'</span></div>').join('')+'</div>'}
+  else if(s.t==='list'){b.innerHTML='<div class="list '+(s.cls||'')+'">'+s.items.map(i=>'<div class="it"><span class="em">'+i[0]+'</span><span>'+i[1]+'</span></div>').join('')+'</div>'}
+  else if(s.t==='cr'){
+    codeRes(b,s.code,{hl:s.hl,note:s.note,css:s.css,run:s.run,fs:s.page?1.9:3,off:s.off,band:s.band,outline:s.sel,edit:s.edit});
+    if(s.try)b.insertAdjacentHTML('beforeend','<div class="try">🧪 <b>Dene:</b> '+s.try+'</div>');
+  }
+  else if(s.t==='app'){
+    b.innerHTML='<div class="appbox"><div class="c"><h3>📚 Şimdiye kadar öğrendiklerimiz</h3><ul>'+s.know.map(k=>'<li><code>'+k[0]+'</code> <small>('+k[1]+')</small></li>').join('')+'</ul></div><div class="c"><h3>🎯 Hedef</h3><p>'+s.goal+'</p><h3>⏱️ Süre önerisi</h3><p>'+s.time+'</p></div></div><a class="appbtn" target="_blank" rel="noopener" href="Hafta-08-Ek-Uygulamalar-Baglanti-ve-Form.html#uygulama-'+s.n+'">Ek uygulamalar dosyasını aç &rarr; '+s.n+'. sekme</a><p class="hintw" style="color:#fff">Bitmiş siteye bak, kendi editöründe baştan yaz. Bitirince sunuya dön ve devam et.</p>'}
+  else if(s.t==='cmp'){
+    const g=document.createElement('div');g.className='cr';b.appendChild(g);
+    [s.a,s.b].forEach(x=>{
+      const col=document.createElement('div');col.className='col';
+      col.innerHTML='<span class="lbl '+x.cls+'">'+(x.cls==='bad'?'✗ ':x.cls==='good'?'✓ ':'')+x.lbl+'</span>';
+      col.appendChild(mkPane(x.code,{name:'Kod'}).el);
+      if(s.run!==false)col.appendChild(mkRes(x.code,{css:x.css||'plain',fs:2.8}).el);
+      g.appendChild(col);
+    });
+  }
+  else if(s.t==='result'){
+    const r=mkRes(s.code(),{fs:s.fs,css:'club'});r.el.style.flex='1';b.appendChild(r.el);
+  }
+  else if(s.t==='demo'){DEMOS[s.build](b,s)}
+}
+
+/* ---------- gezinme ---------- */
+let cur=0;
+const KEY='web-h8-son-slayt-v1';
+function buildMenu(){
+  const m=$('#menu');m.innerHTML='';let last='';
+  S.forEach((s,i)=>{if(s.mod!==last){last=s.mod;m.insertAdjacentHTML('beforeend','<div class="mh">'+esc(last)+'</div>')}
+    const b=document.createElement('button');b.className='mi'+(i===cur?' cur':'');b.innerHTML='<span class="n">'+(i+1)+'</span><span>'+esc(S[i].el.dataset.title)+'</span>';
+    b.onclick=()=>{go(i);m.classList.remove('open')};m.appendChild(b)});
+}
+function go(i){
+  i=Math.max(0,Math.min(S.length-1,i));
+  clearTimers();
+  S.forEach((s,k)=>{s.el.classList.toggle('active',k===i);s.el.classList.toggle('past',k<i)});
+  cur=i;buildSlide(S[i]);if(S[i+1])setTimeout(()=>buildSlide(S[i+1]),400);
+  $('#counter').textContent=(i+1)+' / '+S.length;
+  $('#prog').style.width=((i+1)/S.length*100)+'%';
+  $('#prev').disabled=i===0;$('#next').disabled=i===S.length-1;
+  document.title='Hafta 8 - '+S[i].el.dataset.title;
+  try{localStorage.setItem(KEY,String(i))}catch(e){}
+  $$('.mi').forEach((x,k)=>x.classList.toggle('cur',k===i));
+}
+$('#next').onclick=()=>go(cur+1);$('#prev').onclick=()=>go(cur-1);
+$('#bMenu').onclick=()=>$('#menu').classList.toggle('open');
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea,select'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' ')go(cur+1);
+  else if(e.key==='ArrowLeft'||e.key==='PageUp')go(cur-1);
+  else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);
+  else if(e.key==='m'||e.key==='M')$('#bMenu').click();
+  else if(e.key==='t'||e.key==='T')$('#bTheme').click();
+  else if(e.key==='Escape')$('#menu').classList.remove('open');
+});
+let tx=null;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;tx=null;
+  if(e.target.closest('textarea,input,iframe,pre,.mediabox,.tree,.drawer'))return;if(Math.abs(dx)>70)go(cur+(dx<0?1:-1))},{passive:true});
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('web-tema',t)}catch(e){}}
+let th=null;try{th=localStorage.getItem('web-tema')}catch(e){}
+if(!th)th=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+setTheme(th);
+$('#bTheme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+buildMenu();
+let start=0;try{start=parseInt(localStorage.getItem(KEY)||'0',10)||0}catch(e){}
+go(start);
+window.__S=S;
+
+</script>
+</body>
+</html>

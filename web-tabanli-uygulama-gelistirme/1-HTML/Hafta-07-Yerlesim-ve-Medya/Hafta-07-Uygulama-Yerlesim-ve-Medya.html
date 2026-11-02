@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hafta 7 Uygulama - Okul Kulübü Sayfası</title>
+<style>
+:root{--bg:#f3f4fb;--panel:#fff;--panel2:#f0f2fb;--text:#1b2040;--muted:#5d6584;--line:#dfe3f3;--accent:#6d4aff;--ok:#188a4b;--warn:#b45309;--code:#fbfbfe;--tag:#c2410c;--attr:#1c6ed5;--str:#188a4b;--com:#8a93a8}
+:root[data-theme="dark"]{--bg:#0c0f1f;--panel:#171b34;--panel2:#1f2445;--text:#eceffd;--muted:#9aa3c7;--line:#2b3260;--accent:#9b84ff;--ok:#4ade80;--warn:#fbbf24;--code:#12162a;--tag:#ff9d73;--attr:#7db4ff;--str:#7ee2a0;--com:#7b86a6}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1000px 500px at 100% -10%,var(--panel2),transparent),var(--bg);color:var(--text);font:16.5px/1.65 "Inter","Segoe UI",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+header.top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h1{font-size:clamp(26px,4.5vw,40px);margin:.3em 0;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,#6d4aff,#ff5fa2);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:22px;margin:1.4em 0 .4em}
+code,pre,textarea{font-family:ui-monospace,Consolas,"Cascadia Mono",monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.92em}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:6px 14px;cursor:pointer;font:inherit}
+.btn:hover{border-color:var(--accent)} .btn.pri{background:linear-gradient(135deg,#6d4aff,#ff5fa2);color:#fff;border:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px 18px;margin:14px 0;box-shadow:0 10px 30px rgba(60,50,140,.10)}
+.card.note{border-left:6px solid var(--warn)} .card.goal{border-left:6px solid var(--accent)}
+.meta{color:var(--muted);font-size:14px}
+.step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+.step input{margin-top:6px;width:18px;height:18px;flex:none}
+.step.done label{opacity:.55;text-decoration:line-through}
+.tree{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-family:ui-monospace,Consolas,monospace;font-size:14px;white-space:pre;overflow:auto}
+.pane{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--code);margin:10px 0}
+.pane-h{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:var(--panel2);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.pane pre{margin:0;padding:10px 14px;overflow:auto;font-size:13.5px;line-height:1.5}
+.t-tag{color:var(--tag);font-weight:600}.t-attr{color:var(--attr)}.t-str{color:var(--str)}.t-com{color:var(--com);font-style:italic}
+.cp{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:7px;padding:1px 9px;font-size:12px;cursor:pointer}
+.cp.ok{background:var(--ok);color:#fff}
+iframe{width:100%;height:480px;border:1px solid var(--line);border-radius:12px;background:#fff}
+details.sol{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:12px 0}
+details.sol>summary{cursor:pointer;font-weight:700}
+.bar{height:8px;background:var(--panel2);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+.rubric{width:100%;border-collapse:collapse;font-size:15px}.rubric td,.rubric th{border:1px solid var(--line);padding:6px 10px;text-align:left}.rubric th{background:var(--panel2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div><span class="meta">Web Tabanlı Uygulama Geliştirme 11 &middot; Hafta 7 (26-30 Ekim) &middot; Yerleşim ve Medya Elemanları</span>
+  <h1>&#129302; Uygulama: Robotik Kulübü Tanıtım Sayfası</h1></div>
+  <button class="btn" id="th">&#9680; Tema</button>
+</header>
+
+<div class="card goal">
+  <b>Amaç.</b> Bu haftaki iki konuyu tek bir mini projede birleştireceksin: <b>anlamsal yerleşim elemanlarıyla</b> sayfa iskeleti kurmak ve sayfaya <b>resim, slider, video ve ses</b> eklemek.<br>
+  <b>Süre:</b> yaklaşık 2 ders saati. <b>Araç:</b> Visual Studio Code (veya Not Defteri) ve bir tarayıcı. <b>Önkoşul:</b> HTML5 belge yapısı, başlık, paragraf, bağlantı.
+</div>
+
+<h2>1. Hazırlık: klasör yapısı</h2>
+<p>Masaüstünde <code>okul-kulubu</code> adında bir klasör aç. İçini şöyle oluştur (Türkçe karakter ve boşluk kullanma):</p>
+<div class="tree">okul-kulubu/
+ ├─ index.html
+ ├─ resimler/
+ │   ├─ kulup.jpg      (kulüp/etkinlik fotoğrafı)
+ │   ├─ galeri1.jpg
+ │   ├─ galeri2.jpg
+ │   └─ galeri3.jpg
+ ├─ ses/
+ │   └─ kulup-marsi.mp3  (Türkçe karakter kullanma)
+ ├─ video/
+ │   ├─ tanitim.mp4
+ │   └─ kapak.jpg      (video afişi)
+ └─ sayfalar/
+     └─ galeri.html</div>
+<p class="meta">Dosyaları kendi telefonundan/bilgisayarından al, ya da telif sorunu olmayan kaynaklardan indir (kendi çektiğin fotoğraf en iyisi). Dosyan yoksa sayfa yine çalışır; resim yerine <code>alt</code> metni görünür, bu da bir kontrol fırsatıdır.</p>
+
+<h2>2. Yönerge (adımları işaretle)</h2>
+<div class="bar"><i id="pb"></i></div><p class="meta" id="pt"></p>
+<div id="steps"></div>
+
+<div class="card note">
+  <b>Beklenen davranışlar:</b> Sayfada tek <code>h1</code> ve tek <code>main</code> olacak; her resimde anlamlı <code>alt</code>; <code>galeri.html</code> içindeki resimler <code>../</code> ile çağrılacak; video ve ses kontrol düğmeleriyle gelecek, kendiliğinden ses çalmayacak.
+</div>
+
+<h2>3. Değerlendirme ölçeği (öz değerlendirme)</h2>
+<table class="rubric">
+<tr><th>Ölçüt</th><th>Puan</th></tr>
+<tr><td>Anlamsal iskelet (header, nav, main, footer) doğru ve eksiksiz</td><td>20</td></tr>
+<tr><td><code>section / article / aside</code> uygun yerde kullanıldı, gereksiz <code>div</code> yok</td><td>15</td></tr>
+<tr><td>Resimler: <code>src</code>, <code>alt</code>, <code>width/height</code>, <code>figure/figcaption</code></td><td>20</td></tr>
+<tr><td>Slider çalışıyor</td><td>10</td></tr>
+<tr><td>Video ve ses: <code>controls</code>, <code>source type</code>, <code>poster</code></td><td>20</td></tr>
+<tr><td>Dosya yolları doğru (<code>../</code> dahil), klasör düzeni temiz</td><td>15</td></tr>
+</table>
+
+<h2>4. Çözüm</h2>
+<p class="meta">Önce kendin dene. Takıldığında önce ipucuna, en son tam çözüme bak.</p>
+
+<details class="sol"><summary>İpucu A: iskeleti nasıl kurarım?</summary>
+<p>Sırayla: <code>header</code> &rarr; <code>nav</code> &rarr; <code>main</code> (içinde <code>section</code>, <code>article</code>, <code>aside</code>) &rarr; <code>footer</code>. <code>div</code> yazmak istediğinde "bunun anlamlı bir etiketi var mı?" diye sor.</p></details>
+<details class="sol"><summary>İpucu B: slider için ne lazım?</summary>
+<p>Resimleri saran bir kutuya <code>display:flex; overflow-x:auto; scroll-snap-type:x mandatory;</code> ver. Her resme <code>flex:none; width:100%; scroll-snap-align:center;</code> yaz.</p></details>
+<details class="sol"><summary>İpucu C: alt sayfada resim görünmüyor</summary>
+<p><code>sayfalar/galeri.html</code> bir klasör içinde olduğu için bir üst klasöre çıkman gerekir: <code>../resimler/galeri1.jpg</code>.</p></details>
+
+<details class="sol"><summary>Tam çözüm: index.html</summary>
+<div class="pane"><div class="pane-h">index.html <button class="cp" data-c="sol1">Kopyala</button></div><pre id="sol1c"></pre></div>
+<p><b>Canlı önizleme</b> (dosyalar yerine örnek görsel/ses kullanılır):</p>
+<iframe id="prev1" title="index.html önizleme"></iframe>
+</details>
+
+<details class="sol"><summary>Tam çözüm: sayfalar/galeri.html</summary>
+<div class="pane"><div class="pane-h">sayfalar/galeri.html <button class="cp" data-c="sol2">Kopyala</button></div><pre id="sol2c"></pre></div>
+</details>
+
+<details class="sol"><summary>Çözümün satır satır açıklaması</summary>
+<ul>
+<li><code>&lt;header&gt;</code>: kulübün adı ve sloganı. Sayfanın tek <code>h1</code>'i burada.</li>
+<li><code>&lt;nav&gt;</code>: yalnızca ana gezinme bağlantıları. Galeri sayfasına <code>sayfalar/galeri.html</code> ile gidilir.</li>
+<li><code>&lt;main&gt;</code>: sayfanın ana içeriği; içinde konu bölümleri <code>section</code>, bağımsız duyuru <code>article</code>, yan bilgi <code>aside</code>.</li>
+<li><code>figure + figcaption</code>: resim ve altyazısı birlikte. <code>width</code> ve <code>height</code> sayfa yüklenirken kaymayı önler.</li>
+<li>Slider: yalnızca CSS ile; <code>scroll-snap</code> her resmin ortada durmasını sağlar.</li>
+<li><code>&lt;video poster controls preload="metadata"&gt;</code>: kapak resmi, oynatma düğmeleri; <code>source type="video/mp4"</code> tarayıcının doğru biçimi seçmesine yardım eder.</li>
+<li><code>&lt;audio controls&gt;</code>: <code>autoplay</code> yok; ses yalnızca kullanıcı isterse çalar. MP3 için tür <code>audio/mpeg</code>.</li>
+<li><code>galeri.html</code>: bir üst klasördeki resimler için <code>../</code> kullanıldı.</li>
+</ul></details>
+
+<h2>4b. Çözümdeki etiket ve özellikler (kısa sözlük)</h2>
+<p class="meta">Sunudaki "Kodu parça parça oku" bölümünün özeti. Çözümde geçen her önemli parça:</p>
+<table class="rubric">
+<tr><th>Etiket / özellik</th><th>Ne işe yarar?</th><th>Çözümdeki değeri</th></tr>
+<tr><td><code>&lt;header&gt;</code></td><td>Sayfanın üst kısmı</td><td>Kulüp adı (h1) ve slogan</td></tr>
+<tr><td><code>&lt;nav&gt;</code></td><td>Ana gezinme bağlantıları</td><td>Ana Sayfa, Galeri, İletişim</td></tr>
+<tr><td><code>&lt;main&gt;</code></td><td>Sayfanın tek ana içeriği</td><td>section, article, aside içerir</td></tr>
+<tr><td><code>&lt;section&gt; / &lt;article&gt; / &lt;aside&gt;</code></td><td>Konu bölümü / bağımsız duyuru / yan bilgi</td><td>Hakkımızda, Galeri, Video; Duyuru; Hatırlatma</td></tr>
+<tr><td><code>&lt;footer&gt;</code></td><td>Alt bilgi</td><td>Telif ve e-posta bağlantısı</td></tr>
+<tr><td><code>&lt;figure&gt; + &lt;figcaption&gt;</code></td><td>Resim ve altyazısı</td><td>Şekil 1 - Cuma atölyesinden bir kare</td></tr>
+<tr><td><code>src</code></td><td>Dosya yolu</td><td><code>resimler/kulup.jpg</code>; alt sayfada <code>../resimler/galeri1.jpg</code></td></tr>
+<tr><td><code>alt</code></td><td>Resmin yazılı tarifi (erişilebilirlik, arama motoru, kırık resim)</td><td>"Kulüp üyeleri robot kolunu programlıyor"</td></tr>
+<tr><td><code>width / height</code></td><td>Boyut (piksel); sayfa kaymasını önler</td><td>480 x 270</td></tr>
+<tr><td><code>loading="lazy"</code></td><td>Resmi ekrana yaklaşınca yükler</td><td>galeri.html'deki resimler</td></tr>
+<tr><td><code>class="slider"</code> + CSS</td><td>Yatay kaydırmalı galeri</td><td><code>display:flex; overflow-x:auto; scroll-snap-type:x mandatory</code></td></tr>
+<tr><td><code>controls</code></td><td>Oynat/durdur/ses/tam ekran düğmeleri</td><td>video ve audio'da var</td></tr>
+<tr><td><code>poster</code></td><td>Video başlamadan önce görünen kapak</td><td><code>video/kapak.jpg</code></td></tr>
+<tr><td><code>preload="metadata"</code></td><td>Sadece süre/boyut bilgisini önden indir</td><td>video ve audio</td></tr>
+<tr><td><code>&lt;source src type&gt;</code></td><td>Dosya ve türü; tarayıcı uygun olanı seçer</td><td><code>video/mp4</code>, <code>audio/mpeg</code></td></tr>
+<tr><td><code>href</code></td><td>Bağlantı adresi</td><td><code>sayfalar/galeri.html</code>, <code>#iletisim</code>, <code>mailto:</code></td></tr>
+</table>
+
+<h2>5. Ek görev (isteğe bağlı)</h2>
+<ul>
+<li>Resimlerden birini <code>&lt;picture&gt;</code> ile WebP + JPG olarak sun.</li>
+<li>Büyük resimlerde <code>loading="lazy"</code> kullan (sayfanın ilk ekranındaki hariç).</li>
+<li>Videoya <code>&lt;track kind="subtitles" src="altyazi.vtt" srclang="tr" label="Türkçe"&gt;</code> ekle.</li>
+</ul>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function hl(code){
+  const parts=[];let i=0;
+  const re=/(<!--[\s\S]*?-->)|<(\/?)([a-zA-Z!][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/g;let m;
+  while((m=re.exec(code))){
+    parts.push(esc(code.slice(i,m.index)));
+    if(m[1])parts.push('<span class="t-com">'+esc(m[1])+'</span>');
+    else{let a=m[4],self='';if(/\/\s*$/.test(a)){self='/';a=a.replace(/\/\s*$/,'')}
+      const at=a.replace(/([^\s=]+)(?:(=)("[^"]*"|'[^']*'|[^\s]+))?/g,(x,n,e,v)=>'<span class="t-attr">'+esc(n)+'</span>'+(v?esc(e)+'<span class="t-str">'+esc(v)+'</span>':''));
+      parts.push('&lt;'+esc(m[2])+'<span class="t-tag">'+m[3]+'</span>'+at+self+'&gt;')}
+    i=re.lastIndex;
+  }
+  parts.push(esc(code.slice(i)));return parts.join('');
+}
+const SOL1=`<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robotik Kulübü</title>
+  <style>
+    .slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:8px}
+    .slider img{flex:none;width:100%;height:200px;object-fit:cover;scroll-snap-align:center}
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Robotik Kulübü</h1>
+    <p>Üreten, deneyen, paylaşan öğrenciler</p>
+  </header>
+
+  <nav>
+    <a href="index.html">Ana Sayfa</a> |
+    <a href="sayfalar/galeri.html">Galeri</a> |
+    <a href="#iletisim">İletişim</a>
+  </nav>
+
+  <main>
+    <section>
+      <h2>Hakkımızda</h2>
+      <figure>
+        <img src="resimler/kulup.jpg" alt="Kulüp üyeleri robot kolunu birlikte programlıyor"
+             width="480" height="270">
+        <figcaption>Şekil 1 - Cuma atölyesinden bir kare</figcaption>
+      </figure>
+      <p>Her cuma 15.00'te laboratuvarda buluşur, robot ve yazılım projeleri geliştiririz.</p>
+    </section>
+
+    <section>
+      <h2>Etkinlik galerisi</h2>
+      <div class="slider">
+        <img src="resimler/galeri1.jpg" alt="Birinci etkinlik" width="480" height="200">
+        <img src="resimler/galeri2.jpg" alt="İkinci etkinlik" width="480" height="200">
+        <img src="resimler/galeri3.jpg" alt="Üçüncü etkinlik" width="480" height="200">
+      </div>
+    </section>
+
+    <section>
+      <h2>Tanıtım videosu</h2>
+      <video controls preload="metadata" poster="video/kapak.jpg" width="480">
+        <source src="video/tanitim.mp4" type="video/mp4">
+        Tarayıcınız video öğesini desteklemiyor.
+      </video>
+    </section>
+
+    <article>
+      <h2>Duyuru: Robot Yarışması</h2>
+      <p>Okullar arası yarışma kaydı ayın 15'ine kadar sürüyor.</p>
+      <h3>Kulüp marşı</h3>
+      <audio controls preload="metadata">
+        <source src="ses/kulup-marsi.mp3" type="audio/mpeg">
+        Tarayıcınız ses öğesini desteklemiyor.
+      </audio>
+    </article>
+
+    <aside>
+      <h3>Hatırlatma</h3>
+      <p>Atölyeye laptopunuzu getirmeyi unutmayın.</p>
+    </aside>
+  </main>
+
+  <footer id="iletisim">
+    <p>&copy; 2026 Robotik Kulübü &middot;
+      <a href="mailto:kulup@ornek.com">kulup@ornek.com</a></p>
+  </footer>
+
+</body>
+</html>`;
+const SOL2=`<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galeri - Robotik Kulübü</title>
+</head>
+<body>
+  <header>
+    <h1>Etkinlik Galerisi</h1>
+  </header>
+  <nav>
+    <a href="../index.html">Ana Sayfa</a>
+  </nav>
+  <main>
+    <figure>
+      <img src="../resimler/galeri1.jpg" alt="Birinci etkinlik" width="320" height="200" loading="lazy">
+      <figcaption>Birinci etkinlik</figcaption>
+    </figure>
+    <figure>
+      <img src="../resimler/galeri2.jpg" alt="İkinci etkinlik" width="320" height="200" loading="lazy">
+      <figcaption>İkinci etkinlik</figcaption>
+    </figure>
+  </main>
+  <footer>
+    <p>&copy; 2026 Robotik Kulübü</p>
+  </footer>
+</body>
+</html>`;
+$('#sol1c').innerHTML=hl(SOL1);$('#sol2c').innerHTML=hl(SOL2);
+const TXT={sol1:SOL1,sol2:SOL2};
+document.querySelectorAll('.cp').forEach(b=>b.onclick=()=>{
+  const t=TXT[b.dataset.c];
+  const ok=()=>{const o=b.textContent;b.textContent='Kopyalandı';b.classList.add('ok');setTimeout(()=>{b.textContent=o;b.classList.remove('ok')},1200)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,ok);
+  else{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();ok()}
+});
+/* önizleme: gerçek dosyalar yerine örnek SVG */
+function svg(w,h,l,c){const s=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="${c}"/><text x="50%" y="50%" text-anchor="middle" fill="#fff" font-family="Arial" font-size="${h*0.12}">${l}</text></svg>`;return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s)}
+const MAP={'resimler/kulup.jpg':svg(480,270,'kulup.jpg','#5b45e0'),'resimler/galeri1.jpg':svg(480,200,'galeri1.jpg','#ef4444'),'resimler/galeri2.jpg':svg(480,200,'galeri2.jpg','#10b981'),'resimler/galeri3.jpg':svg(480,200,'galeri3.jpg','#3b82f6'),'video/kapak.jpg':svg(480,270,'video afişi (poster)','#b45309')};
+let prev=SOL1;for(const k in MAP)prev=prev.split('"'+k+'"').join('"'+MAP[k]+'"');
+$('#prev1').srcdoc=prev;
+/* adımlar */
+const STEPS=[
+ 'Klasör yapısını yukarıdaki gibi oluştur ve <code>index.html</code> dosyasında HTML5 iskeletini (<code>DOCTYPE, html lang="tr", head, meta charset, title, body</code>) yaz.',
+ '<code>body</code> içine sırasıyla <code>header</code> (kulüp adı <code>h1</code> ile + slogan), <code>nav</code> (3 bağlantı) ve <code>footer</code> ekle.',
+ 'Aradaki kısma tek bir <code>main</code> koy. İçine "Hakkımızda" için <code>section</code>, bir duyuru için <code>article</code>, hatırlatma için <code>aside</code> yerleştir.',
+ '"Hakkımızda" bölümüne <code>figure</code> + <code>img</code> + <code>figcaption</code> ekle. <code>src, alt, width, height</code> özelliklerini yaz.',
+ 'Yeni bir <code>section</code> içinde 3 resimlik bir <b>slider</b> yap (<code>scroll-snap</code>). Her resme anlamlı <code>alt</code> yaz.',
+ 'Başka bir <code>section</code> içine <code>video</code> ekle: <code>controls</code>, <code>poster</code>, <code>source type="video/mp4"</code>, yedek metin.',
+ 'Duyuru <code>article</code> içine <code>audio</code> ekle: <code>controls</code>, <code>source type="audio/mpeg"</code>. <code>autoplay</code> kullanma!',
+ '<code>sayfalar/galeri.html</code> dosyasını oluştur; iki resmi <code>../resimler/...</code> yoluyla ekle ve <code>nav</code> içinde ana sayfaya geri dönen bağlantı ver.',
+ 'Dosyaları kaydedip tarayıcıda aç. Resimler, video ve ses çalışıyor mu? Kırık bir yer varsa yolu ve dosya adını (büyük/küçük harf!) kontrol et.',
+ 'Öz değerlendirme tablosuyla kendi puanını hesapla; bir arkadaşınla sayfaları değiştirip sayfa kaynağını (<code>Ctrl+U</code>) incele.'
+];
+const KEY='web-h7-uygulama';let st=[];try{st=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}
+function drawSteps(){
+  $('#steps').innerHTML=STEPS.map((s,i)=>`<div class="step ${st.includes(i)?'done':''}"><input type="checkbox" id="c${i}" ${st.includes(i)?'checked':''}><label for="c${i}"><b>Adım ${i+1}.</b> ${s}</label></div>`).join('');
+  document.querySelectorAll('#steps input').forEach((c,i)=>c.onchange=()=>{st=c.checked?[...new Set([...st,i])]:st.filter(x=>x!==i);try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}drawSteps()});
+  $('#pb').style.width=(st.length/STEPS.length*100)+'%';$('#pt').textContent=st.length+' / '+STEPS.length+' adım tamamlandı';
+}
+drawSteps();
+/* tema */
+function setT(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('web-tema',t)}catch(e){}}
+let t=null;try{t=localStorage.getItem('web-tema')}catch(e){}
+setT(t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+$('#th').onclick=()=>setT(document.documentElement.dataset.theme==='dark'?'light':'dark');
+</script>
+</body>
+</html>

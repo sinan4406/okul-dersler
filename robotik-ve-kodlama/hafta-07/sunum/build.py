@@ -121,63 +121,81 @@ EX = [
 def a_slide(ex):
     ids = ex['id']
     big = len(ex['leds']) >= 4
-    sw = 480 if big else 560
-    scene = '<div style="max-width:%dpx"><div id="%s-sen-scene" style="border-radius:16px;overflow:hidden"></div></div>' % (sw, ids)
-    return f'''<section id="{ids}-sen" class="sl light tight tight2">
-<div class="hd"><p class="eb">Örnek {ex['n']} · {ex['level']} · Canlı devre ve simülasyon</p><h2 class="ttl">{ex['title']}: {ex['sub']}</h2>
-<p style="font-size:24px;line-height:1.35;color:#3D4A5C;max-width:1740px">{ex['scn']}</p></div>
+    sw = 520 if big else 780
+    scene = '<div style="max-width:%dpx"><div id="%s-sen-scene" style="border-radius:18px;overflow:hidden"></div></div>' % (sw, ids)
+    return f"""<section id="{ids}-sen" class="sl light tight tight2">
+<div class="hd" style="gap:6px"><p class="eb">Örnek {ex['n']} · {ex['level']} · Canlı devre ve simülasyon</p><h2 class="ttl">{ex['title']}: {ex['sub']}</h2>
+<p style="font-size:29px;line-height:1.3;color:#3D4A5C">{ex['scn']}</p></div>
 <div class="row" style="gap:28px;align-items:flex-start">
-<div class="col" style="width:920px;gap:12px">
+<div class="col" style="width:{880 if big else 910}px;gap:12px">
 <div class="ckt" id="{ids}-sen-ckt"></div>
-<div class="card warn" style="padding:12px 22px;gap:4px"><h3 style="font-size:23px">Dene</h3><p style="font-size:21px;line-height:1.35">{ex['dene']}</p></div>
+<div class="card warn" style="padding:12px 26px;gap:2px"><h3 style="font-size:30px">Dene</h3><p style="font-size:27px;line-height:1.3">{ex['dene']}</p></div>
 </div>
 <div class="col f1" style="gap:10px">
 {scene}
 <div id="{ids}-sen-ctl"></div>
-<div id="{ids}-sen-tl" style="max-width:640px"></div>
-<div class="codebox" style="padding:12px 18px"><div id="{ids}-sen-pins"></div></div>
+<div id="{ids}-sen-tl"></div>
+<div class="codebox" style="padding:12px 20px"><div id="{ids}-sen-pins"></div></div>
 </div>
 </div>
-<p class="foot">Malzeme: {ex['malz']}</p>
+<p class="foot" style="font-size:24px;bottom:16px">Malzeme: {ex['malz']}</p>
 <aside>{ex['note_a']} Tinkercad’de kurma adımları: {ex['tink']}</aside>
 </section>
-'''
+"""
+
+def kod_static(ex):
+    ids = ex['id']
+    cf, cl, cc = ('40px', '52px', '28px') if ex['n'] == 2 else ('31px', '40px', '25px')
+    eb = 'Kodu oku · Altı çizgili kelimenin üzerine getir' if ex.get('tips') else 'Kodu oku · Yorumlar her satırı açıklıyor'
+    steps = ' '.join('%s: %s' % (n[1], n[2]) for n in ex['notes'])
+    return f"""<section id="{ids}-kod" class="sl dark tight tight2" style="--cf:{cf};--cl:{cl};--cc:{cc}">
+<div class="hd" style="gap:6px"><p class="eb">Örnek {ex['n']} · {eb}</p><h2 class="ttl">{ex['title']}: kod</h2></div>
+<div class="codebox" style="padding:18px 30px"><div class="cgrid" id="{ids}-grid"></div></div>
+<p class="foot" style="font-size:28px;bottom:18px;color:#BFCAD6">{KOD_LINE[ex['n']]}</p>
+<aside>Kodu yukarıdan aşağı birlikte okuyun; her satırın yanındaki yorum ne yaptığını söyler. Öğrencilerden bir sonraki satırın ne yapacağını tahmin etmelerini isteyin. Satır satır açıklama notları: {steps} Hazır dosya: Hafta07_Arduino/{ex['folder']}/{ex['folder']}.ino</aside>
+</section>
+"""
 
 def kod_slide(ex):
     ids = ex['id']
-    return f'''<section id="{ids}-kod" class="sl dark tight">
-<div class="hd"><p class="eb">Örnek {ex['n']} · Kodu satır satır oku · İmleci altı çizgili kelimelerin üzerine getir, satıra tıkla</p><h2 class="ttl">{ex['title']}: kodun açıklaması</h2></div>
-<div class="row" style="gap:28px;align-items:flex-start">
-<div class="codebox" style="width:1160px;padding:18px 24px"><div class="cgrid" id="{ids}-grid"></div></div>
-<div class="col f1" style="gap:12px">
-<div class="card dk" style="gap:10px;min-height:400px"><p style="font-size:20px;letter-spacing:2px;text-transform:uppercase;color:#93A3B8">Bu satır ne yapar?</p>
-<p id="{ids}-kod-c" class="mono" style="font-size:22px;color:#F2CC60;white-space:pre-wrap;word-break:break-all"></p>
-<h3 id="{ids}-kod-t" style="font-size:30px"></h3><p id="{ids}-kod-x" style="font-size:25px;line-height:1.4"></p>
-<div style="margin-top:auto;background:#0B121B;border-radius:10px;padding:10px 16px"><p id="{ids}-kod-s" class="mono" style="font-size:22px;color:#9BE38B"></p></div></div>
+    if not ex['panel']:
+        return kod_static(ex)
+    eb = 'Kodu satır satır oku · İmleci altı çizgili kelimelerin üzerine getir, satıra tıkla'
+    return f"""<section id="{ids}-kod" class="sl dark tight tight2" style="--cf:32px;--cl:46px;--cc:23px">
+<div class="hd" style="gap:6px"><p class="eb">Örnek {ex['n']} · {eb}</p><h2 class="ttl">{ex['title']}: kodun açıklaması</h2></div>
+<div class="row f1" style="gap:28px;align-items:stretch;min-height:0">
+<div class="col" style="width:1210px;gap:16px">
+<div class="codebox" style="padding:16px 24px"><div class="cgrid" id="{ids}-grid"></div></div>
 <div class="stp"><button type="button" data-act="first">⏮</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto" aria-pressed="false">Otomatik oynat</button><span class="cnt">Adım 1</span></div>
 </div>
+<div class="col f1" style="gap:12px">
+<div class="card dk f1" style="gap:14px;padding:26px 30px"><p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#93A3B8">Bu satır ne yapar?</p>
+<p id="{ids}-kod-c" class="mono" style="font-size:30px;color:#F2CC60;white-space:pre-wrap;word-break:break-all"></p>
+<h3 id="{ids}-kod-t" style="font-size:40px;line-height:1.15"></h3><p id="{ids}-kod-x" style="font-size:32px;line-height:1.4"></p>
+<div style="margin-top:auto;background:#0B121B;border-radius:12px;padding:14px 20px"><p id="{ids}-kod-s" class="mono" style="font-size:28px;color:#9BE38B"></p></div></div>
 </div>
-<aside>Kodu satır satır okuyun. İleri düğmesi sıradaki açıklamalı satıra geçer; satıra tıklayarak da atlayabilirsiniz. Her satırdaki komut sade Türkçe yorumla yazılmıştır; sağdaki kutu bu satırdan sonra pinin ve LED’in durumunu özetler. Öğrencilerden bir sonraki satırın ne yapacağını tahmin etmelerini isteyin. Hazır dosya: Hafta07_Arduino/{ex['folder']}/{ex['folder']}.ino</aside>
+</div>
+<aside>Kodu satır satır okuyun. İleri düğmesi sıradaki açıklamalı satıra geçer; satıra tıklayarak da atlayabilirsiniz. Sağdaki kutu bu satırın ne yaptığını ve pinin durumunu özetler. Öğrencilerden bir sonraki satırın ne yapacağını tahmin etmelerini isteyin.{ex.get('kod_note','')} Hazır dosya: Hafta07_Arduino/{ex['folder']}/{ex['folder']}.ino</aside>
 </section>
-'''
+"""
 
 def dene_slide(ex):
     ids = ex['id']
     big = len(ex['leds']) >= 4
-    cw = 520 if big else 620
+    cw = 500 if big else 620
     nl = len(ino_code(ex['folder']))
-    th = 'height:%dpx' % min(470, int(nl * 27.5 + 40))
+    th = 'height:%dpx' % min(520, int(nl * 33 + 44))
     t1, a1 = ex['tasks'][0]
     t2, a2 = ex['tasks'][1]
-    return f'''<section id="{ids}-dene" class="sl dark tight tight2">
-<div class="hd"><p class="eb">Örnek {ex['n']} · Değiştir ve gözle</p><h2 class="ttl">{ex['title']}: kodu değiştir, sonucu izle</h2></div>
+    return f"""<section id="{ids}-dene" class="sl dark tight tight2">
+<div class="hd" style="gap:6px"><p class="eb">Örnek {ex['n']} · Değiştir ve gözle</p><h2 class="ttl">{ex['title']}: kodu değiştir, sonucu izle</h2></div>
 <div class="row" style="gap:26px;align-items:flex-start">
-<div class="col" style="width:880px;gap:10px">
-<textarea class="ed" id="{ids}-dene-ed" spellcheck="false" aria-label="Arduino kodu" style="{th};font-size:19px"></textarea>
+<div class="col" style="width:1040px;gap:10px">
+<textarea class="ed" id="{ids}-dene-ed" spellcheck="false" aria-label="Arduino kodu" style="{th};font-size:22px"></textarea>
 <div class="stp"><button type="button" class="go" id="{ids}-dene-btn">Derle ve yükle</button><button type="button" id="{ids}-dene-orig">Başlangıç kodu</button></div>
-<div class="conso" id="{ids}-dene-con" style="min-height:70px;max-height:90px;font-size:17px"></div>
-<div class="row" style="gap:14px;align-items:flex-start"><div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:20px"><b style="color:#FF9F5A">1)</b> {t1}</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:19px">{a1}</div></div>
-<div class="card dk f1" style="padding:10px 16px;gap:6px"><p style="font-size:20px"><b style="color:#FF9F5A">2)</b> {t2}</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden style="font-size:19px">{a2}</div></div></div>
+<div class="conso" id="{ids}-dene-con" style="min-height:76px;max-height:100px;font-size:21px"></div>
+<div class="row" style="gap:14px;align-items:flex-start"><div class="card dk f1" style="padding:10px 18px;gap:6px;position:relative"><p style="font-size:25px;line-height:1.3"><b style="color:#FF9F5A">1)</b> {t1}</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans pa" hidden>{a1}</div></div>
+<div class="card dk f1" style="padding:10px 18px;gap:6px;position:relative"><p style="font-size:25px;line-height:1.3"><b style="color:#FF9F5A">2)</b> {t2}</p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans pa" hidden>{a2}</div></div></div>
 </div>
 <div class="col f1" style="gap:10px">
 <div class="ckt" id="{ids}-dene-ckt" style="max-width:{cw}px"></div>
@@ -188,11 +206,21 @@ def dene_slide(ex):
 </div>
 <aside>Eşli çalışma, 8–10 dakika. Soldaki kutuda kodu değiştirin, “Derle ve yükle” (veya Ctrl+Enter) ile karta yükleyin. Derleme hatası olursa konsol satır numarasıyla gösterir; eski program çalışmaya devam eder. “Başlangıç kodu” düğmesi her şeyi geri alır. İki görevi öğrenciler tahmin edip denesin, sonra cevabı açın. Tinkercad’de aynı değişikliği de denetin.</aside>
 </section>
-'''
+"""
+
+TIPS_ON = {1: {'pinMode': 1, 'digitalWrite': 1}, 2: None, 3: None, 4: {'int': 1, 'i--': 1}}
+PANEL = {1: True, 2: False, 3: False, 4: False}
+KOD_LINE = {2: 'Aynı komutlar, iki ayrı pin: önce kırmızı D4 iki kez, sonra mavi D5 iki kez çakar. delay süreleri çakışın ritmini belirler.',
+ 3: 'Beş LED, beş pin: D6’dan D2’ye sırayla yanar (şarj dolar), sonra aynı sırayla söner (boşalır).',
+ 4: 'int i; sayaç. İlk for i++ ile 2’den 8’e ileri, ikinci for i-- ile 7’den 3’e geri tarar; içindeki üç komut aynıdır.'}
+KOD_NOTE = {1: ' Kaynak notu: kitap s.63–70 HIGH/LOW yerine 1 ve 0 yazar (digitalWrite(2, 1)); ikisi aynı işi yapar, biz okunaklı olduğu için HIGH/LOW kullandık.'}
 
 def make_examples():
     parts, cfg = {}, []
     for ex in EX:
+        ex['tips'] = TIPS_ON[ex['n']]
+        ex['kod_note'] = KOD_NOTE.get(ex['n'], '')
+        ex['panel'] = PANEL[ex['n']]
         lines = ino_code(ex['folder'])
         notes, pos = [], 0
         for key, t, x, s in ex['notes']:
@@ -203,14 +231,51 @@ def make_examples():
             if idx is None:
                 raise SystemExit('Not bulunamadı: %s / %r' % (ex['id'], key))
             notes.append(dict(l=idx, t=t, x=x, s=s)); pos = idx + 1
-        cfg.append(dict(id=ex['id'], leds=ex['leds'], scene=ex['scene'], map=ex['map'], win=ex['win'],
+        cfg.append(dict(id=ex['id'], tips=ex['tips'], leds=ex['leds'], scene=ex['scene'], map=ex['map'], win=ex['win'],
                         code='\n'.join(lines) + '\n', lines=lines, notes=notes))
         parts['EX%d' % ex['n']] = a_slide(ex) + kod_slide(ex) + dene_slide(ex)
     return parts, cfg
 
+
+QUIZ = [
+ ('1 LED’li devrede akım hangi yolu izler?', ['GND → LED → direnç → D8', 'D8 → direnç → LED → GND', '5 V → GND doğrudan', 'LED → D8 → GND'], 1, 'Pinden çıkar, dirençten ve LED’in anodundan geçer, katottan GND’ye döner.'),
+ ('5 LED’li devrede kaç adet 220 Ω direnç gerekir?', ['1', '2', '5', '10'], 2, 'Her LED’in kendi direnci olur; iki LED tek dirence bağlanmaz.'),
+ ('D0 ve D1 pinleri neden LED için seçilmez?', ['Hiç çalışmazlar', 'Bilgisayarla seri haberleşmede kullanılırlar', '3,3 V verirler', 'Direnç istemezler'], 1, 'D0 (RX) ve D1 (TX) USB haberleşmesi içindir; LED’e D2’den başlarız.'),
+ ('<span class="mono">pinMode(6, OUTPUT);</span> komutu ne yapar?', ['D6’yı 5 V yapar', 'D6’yı çıkış olarak ayarlar', '6 saniye bekler', 'LED’i söndürür'], 1, 'Pinin görevini belirler. 5 V vermek için digitalWrite(6, HIGH) gerekir.'),
+ ('D5’te HIGH, delay(500), LOW, delay(500) komutları loop içinde sırayla çalışıyor. LED saniyede kaç kez yanar?', ['1', '2', '0,5', '4'], 0, 'Bir tur 500 + 500 = 1000 ms = 1 saniyedir; LED saniyede 1 kez yanar.'),
+ ('<span class="mono">for (i = 2; i &lt;= 6; i++)</span> döngüsü kaç tur döner?', ['4', '5', '6', '7'], 1, 'i = 2, 3, 4, 5, 6: beş tur. i = 7’de koşul yanlış olur.'),
+ ('<span class="mono">i++</span> ne demektir?', ['i’yi sıfırla', 'i’yi 1 artır', 'i’yi 2 ile çarp', 'i’yi sil'], 1, 'i = i + 1 ile aynıdır. i-- ise i’yi 1 azaltır.'),
+ ('7 LED’i yakıp söndüren kodda for döngüsü neden tercih edilir?', ['LED’ler daha parlak yanar', 'Kod kısalır, değiştirmesi kolaylaşır', 'Direnç gerekmez', 'Kart hızlanır'], 1, 'Tekrarlı satırlar tek bir döngüye sığar; LED sayısı değişince yalnız koşul değişir.'),
+ ('<span class="mono">for (i = 8; i &gt;= 5; i--)</span> içinde digitalWrite(i, HIGH) var. Pinler hangi sırayla yanar?', ['5, 6, 7, 8', '8, 7, 6, 5', '8, 5', '5, 8'], 1, 'i 8’den başlar ve her turda 1 azalır: D8, D7, D6, D5.'),
+ ('Her biri yaklaşık 13,6 mA çeken 7 LED aynı anda yanarsa toplam akım yaklaşık kaçtır?', ['13,6 mA', '95 mA', '950 mA', '5 A'], 1, '7 × 13,6 = 95,2 mA. Çipin toplam sınırı yaklaşık 200 mA olduğundan güvenlidir.'),
+]
+QUIZ_ASIDE = [
+ 'İlk iki soru devre bilgisi. Doğru cevaplar: 1-B, 2-C. Öğrenci bir şık seçince doğru ya da yanlış hemen renkle ve işaretle görünür; “Cevabı göster” doğru şıkkı işaretler.',
+ 'Soru 3-4: D0/D1 ve pinMode. Doğru cevaplar: 3-B, 4-B.',
+ 'Soru 5-6: bekleme süresi ve for turu. Doğru cevaplar: 5-A, 6-B. Yanlış yapan öğrenciden 6. soruda i değerlerini kâğıda yazmasını isteyin.',
+ 'Soru 7-8: i++ ve for’un faydası. Doğru cevaplar: 7-B, 8-B.',
+ 'Soru 9-10: azalan for ve akım hesabı. Doğru cevaplar: 9-B, 10-B. 10. soruda 7 × 13,6 çarpımını tahtada yaptırın. Ödev ayrıca hazırlanır.',
+]
+
+def quiz_slides():
+    out = ''
+    for k in range(5):
+        qs = ''
+        for n in (2 * k, 2 * k + 1):
+            q, opts, ok, why = QUIZ[n]
+            ob = ''.join(f'<button type="button" class="qb" data-i="{i}"><span class="lt">{"ABCD"[i]}</span><span class="qx">{o}</span><span class="ic"></span></button>' for i, o in enumerate(opts))
+            qs += f'<div class="q" data-ok="{ok}"><p class="qt"><span class="no">{n+1})</span>{q}</p><div class="qo">{ob}</div><div class="qrow"><button class="ans-btn sm qshow" type="button">Cevabı göster</button><span class="hint">Bir şık seç</span></div><div class="qf" hidden><b>{"ABCD"[ok]}.</b> {why}</div></div>'
+        out += f"""<section id="test{k+1}" class="sl light tight tight2">
+<div class="hd" style="gap:4px"><p class="eb">Test · Soru {2*k+1}–{2*k+2} · {k+1} / 5</p><h2 class="ttl">Bildiklerini yokla</h2></div>
+<div class="qz">{qs}</div>
+<aside>{QUIZ_ASIDE[k]}</aside>
+</section>
+"""
+    return out
+
 ORDER = ['01_cover', '02_hedefler', '03_dikkat', '04_tekrar', '05_tek_led', '06_kur_coklu',
          'EX1', 'EX2', 'EX3', '10_satir', '11_for_kalip', '12_for_anim', '13_for_tahmin', '14_baglanti7', 'EX4',
-         '31_hata_avi', '32_kitap', '33_ozet', '34_test1', '35_test2', '36_kapanis']
+         '31_hata_avi', '33_ozet', 'QUIZ', '36_kapanis']
 
 def main():
     head = read(os.path.join(SRC, 'head.html'))
@@ -218,7 +283,7 @@ def main():
     ex_parts, cfg = make_examples()
     body = read(os.path.join(SRC, 'slides', '00_style.html'))
     for k in ORDER:
-        body += ex_parts[k] if k.startswith('EX') else read(os.path.join(SRC, 'slides', k + '.html'))
+        body += ex_parts[k] if k.startswith('EX') else (quiz_slides() if k == 'QUIZ' else read(os.path.join(SRC, 'slides', k + '.html')))
     js = ''
     for n in ('core.js', 'circuit.js', 'engine.js', 'ui.js'):
         js += read(os.path.join(SRC, n)) + '\n'

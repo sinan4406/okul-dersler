@@ -22,18 +22,23 @@ var TIPS={
  'HIGH':'HIGH: 5 V, yani “açık”. 1 yazılabilir ama HIGH daha okunaklıdır.',
  'LOW':'LOW: 0 V, yani “kapalı”. 0 yerine LOW yaz.'};
 var KW={void:1,int:1,OUTPUT:1,INPUT:1,HIGH:1,LOW:1,for:1};
-function colorCode(s){
+function colorCode(s,allow,seen){
+  var notip=!allow;
+  seen=seen||{};
   return esc(s).replace(/\b(void|int|for|setup|loop|pinMode|digitalWrite|delay|OUTPUT|INPUT|HIGH|LOW|i)\b(\+\+|--)?|(&lt;=|&gt;=)|\b(\d+)\b/g,function(m,w,inc,cmp,n){
     if(n)return '<span class="n">'+n+'</span>';
-    if(cmp)return '<span class="k tip" tabindex="0" data-tip="'+esc(TIPS.cmp)+'">'+cmp+'</span>';
+    if(cmp)return '<span class="k">'+cmp+'</span>';
+    if(false)return '<span class="k tip" tabindex="0" data-tip="'+esc(TIPS.cmp)+'">'+cmp+'</span>';
     var key=w+(inc||''),cls=w==='i'?'e':(KW[w]?'k':'t');
     if(w==='i')cls='n';
+    if(notip||allow===true||!allow[key]||seen[key])return '<span class="'+cls+'">'+key+'</span>';
+    seen[key]=1;
     return '<span class="'+cls+' tip" tabindex="0" data-tip="'+esc(TIPS[key]||TIPS[w])+'">'+key+'</span>';});}
 function splitLine(l){var i=l.indexOf('//');if(i<0)return{code:l,cm:''};return{code:l.slice(0,i).replace(/\s+$/,''),cm:l.slice(i)};}
 
 /* ---------- oylama ---------- */
 (function(){var sec=$('dikkat');if(!sec)return;var btns=sec.querySelectorAll('[data-vote]'),cnt=[0,0,0];
- function draw(){var tot=cnt[0]+cnt[1]+cnt[2];btns.forEach(function(b,i){b.querySelector('.cn').textContent=cnt[i];b.querySelector('.bar').style.width=(tot?cnt[i]/tot*240:0)+'px';});}
+ function draw(){var tot=cnt[0]+cnt[1]+cnt[2];btns.forEach(function(b,i){b.querySelector('.cn').textContent=cnt[i];b.querySelector('.bar').style.width=(tot?cnt[i]/tot*300:0)+'px';});}
  btns.forEach(function(b){b.addEventListener('click',function(){cnt[+b.getAttribute('data-vote')]++;draw();});});})();
 
 /* ---------- 1 LED'in çalışma mantığı ---------- */
@@ -91,8 +96,8 @@ function splitLine(l){var i=l.indexOf('//');if(i<0)return{code:l,cm:''};return{c
   for(k=0;k<n;k++)L.push('  digitalWrite('+(k+2)+', HIGH); delay(500);');
   for(k=0;k<n;k++)L.push('  digitalWrite('+(k+2)+', LOW);  delay(500);');
   L.push('}');
-  var max=22,shown=L.slice(0,max),rest=L.length-max;
-  $('st-code').innerHTML=shown.map(function(l){var p=splitLine(l);return colorCode(p.code);}).join('\n')+(rest>0?'\n<span class="c">… '+rest+' satır daha</span>':'');}
+  var max=20,shown=L.slice(0,max),rest=L.length-max;
+  $('st-code').innerHTML=shown.map(function(l){var p=splitLine(l);return colorCode(p.code,true);}).join('\n')+(rest>0?'\n<span class="c">… '+rest+' satır daha</span>':'');}
  sl.addEventListener('input',upd);upd();
 })();
 
@@ -118,7 +123,7 @@ function splitLine(l){var i=l.indexOf('//');if(i<0)return{code:l,cm:''};return{c
 (function(){
  var pre=$('fa-code');if(!pre)return;
  var L=['for (i = 2; i <= 8; i++) {','  digitalWrite(i, HIGH);','  delay(500);','}'];
- pre.innerHTML=L.map(function(l,i){return '<div class="kl" data-i="'+i+'">'+colorCode(l)+'</div>';}).join('');
+ var seenFa={};pre.innerHTML=L.map(function(l,i){return '<div class="kl" data-i="'+i+'">'+colorCode(l,{'for':1,'i++':1},seenFa)+'</div>';}).join('');
  var leds=$('fa-leds');leds.innerHTML=[2,3,4,5,6,7,8].map(function(p){return '<div class="lb" data-p="'+p+'">D'+p+'</div>';}).join('');
  var S=[{l:[],i:null,c:null,on:0,t:'Hazır',x:'Döngü başlamadı. Değişken i henüz yok.'},
   {l:[0],i:2,c:null,on:0,t:'Başlangıç',x:'for başladı: birinci kural i = 2 yalnız bir kez çalışır. Artık i = 2.'}];
@@ -145,16 +150,17 @@ if($('hata-avi'))Sim.mount('hata-avi',{leds:[{pin:2,color:'red'},{pin:3,color:'r
  if(!window.EXCFG)return;
  window.EXCFG.forEach(function(ex){
   var base=ex.id;
-  Sim.mount(base+'-sen',{leds:ex.leds,scene:ex.scene,map:ex.map,code:ex.code,win:ex.win||10000});
-  Sim.mount(base+'-dene',{leds:ex.leds,code:ex.code,win:ex.win||10000,tlW:640});
+  Sim.mount(base+'-sen',{leds:ex.leds,scene:ex.scene,map:ex.map,code:ex.code,win:ex.win||10000,tlW:ex.leds.length>=4?640:560});
+  Sim.mount(base+'-dene',{leds:ex.leds,code:ex.code,win:ex.win||10000,tlW:560});
   /* kod açıklama */
   var grid=$(base+'-grid');if(!grid)return;
-  var h='';
+  var h='',seenTips={};
   ex.lines.forEach(function(l,i){var p=splitLine(l),only=!p.code.trim()&&p.cm;
     h+='<div class="ln" data-l="'+i+'">'+(l===''?'':(i+1))+'</div>';
     if(only)h+='<div class="cm" data-l="'+i+'" style="grid-column:span 2">'+esc(l.trim())+'</div>';
-    else h+='<div data-l="'+i+'">'+(l===''?' ':colorCode(p.code))+'</div><div class="cm" data-l="'+i+'">'+esc(p.cm)+'</div>';});
+    else h+='<div data-l="'+i+'">'+(l===''?' ':colorCode(p.code,ex.tips,seenTips))+'</div><div class="cm" data-l="'+i+'">'+esc(p.cm)+'</div>';});
   grid.innerHTML=h;
+  if(!$(base+'-kod-c'))return;
   var byLine={};ex.notes.forEach(function(n,i){byLine[n.l]=i;});
   function render(n){
    [].forEach.call(grid.children,function(c){c.classList.toggle('hi',+c.getAttribute('data-l')===n.l&&!c.classList.contains('ln'));});
@@ -164,5 +170,16 @@ if($('hata-avi'))Sim.mount('hata-avi',{leds:[{pin:2,color:'red'},{pin:3,color:'r
  });
 })();
 
+/* ---------- test: şık seçince anında geri bildirim ---------- */
+[].forEach.call(document.querySelectorAll('.q'),function(q){
+ var ok=+q.getAttribute('data-ok'),bs=[].slice.call(q.querySelectorAll('.qb')),f=q.querySelector('.qf'),hint=q.querySelector('.hint'),show=q.querySelector('.qshow');
+ function mark(b,good){b.classList.add(good?'right':'wrong');b.querySelector('.ic').textContent=good?'✓':'✗';}
+ function done(){bs.forEach(function(x){x.disabled=true;});f.hidden=false;q.classList.add('done');}
+ bs.forEach(function(b,i){b.addEventListener('click',function(){
+  if(b.disabled)return;
+  if(i===ok){mark(b,true);done();hint.textContent='Doğru!';hint.style.color='#1F6B30';}
+  else{mark(b,false);b.disabled=true;hint.textContent='Yanlış, tekrar dene.';hint.style.color='#B71C1C';}});});
+ show.addEventListener('click',function(){mark(bs[ok],true);done();hint.textContent='Doğru cevap işaretlendi.';hint.style.color='#1F6B30';show.disabled=true;});
+});
 window.__boot();
 })();

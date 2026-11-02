@@ -1,0 +1,57 @@
+<section id="anahtar" class="sl dark tight tight2">
+<div class="hd" style="gap:6px"><p class="eb">Anahtar nedir? · Kitap s.75 · Tıkla ve gör</p><h2 class="ttl">Anahtar akım halkasını açar ya da kapar</h2></div>
+<div class="row f1" style="gap:28px;align-items:stretch;min-height:0">
+<div class="col" style="width:1130px;gap:14px">
+<div class="ckt" style="padding:8px"><svg viewBox="0 0 1000 440" role="img" aria-label="Anahtarlı LED devresi">
+<defs><radialGradient id="ang"><stop offset="0" stop-color="#FF5252" stop-opacity=".95"/><stop offset="1" stop-color="#FF5252" stop-opacity="0"/></radialGradient></defs>
+<rect x="20" y="50" width="130" height="370" rx="12" fill="#0E7C86" stroke="#0A5A62" stroke-width="4"/>
+<text x="85" y="250" text-anchor="middle" font-family="Rubik,Arial" font-size="26" font-weight="700" fill="#E8F7F8">ARDUINO</text>
+<text x="90" y="86" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="30" font-weight="700" fill="#FFE0B2">5V</text>
+<text x="90" y="396" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="28" fill="#D5F3F6">GND</text>
+<path d="M150 100 H240 M400 100 H480 M480 100 H500" stroke="#F97316" stroke-width="8" fill="none" stroke-linejoin="round"/>
+<path d="M500 100 L516 100 L528 72 L552 128 L576 72 L600 128 L624 72 L636 100 H680 H800 V170" stroke="#D9BC8C" stroke-width="8" fill="none" stroke-linejoin="round"/>
+<text x="568" y="52" text-anchor="middle" font-family="Rubik,Arial" font-size="28" fill="#C9D1D9">220 Ω</text>
+<circle cx="240" cy="100" r="10" fill="#E5E7EB"/><circle cx="400" cy="100" r="10" fill="#E5E7EB"/>
+<line id="an-lever" x1="240" y1="100" x2="400" y2="100" stroke="#E5E7EB" stroke-width="10" stroke-linecap="round" transform="rotate(-26 240 100)"/>
+<text x="320" y="58" text-anchor="middle" font-family="Rubik,Arial" font-size="28" fill="#C9D1D9">anahtar</text>
+<circle id="an-glow" cx="800" cy="235" r="105" fill="url(#ang)" opacity="0"/>
+<path d="M765 170 H835 L800 235 Z" fill="#9AA5B1" stroke="#E5E7EB" stroke-width="5" stroke-linejoin="round"/><path d="M762 238 H838" stroke="#E5E7EB" stroke-width="8"/>
+<circle id="an-led" cx="800" cy="195" r="14" fill="#FF6B6B" opacity="0"/>
+<path d="M800 238 V400 H150" stroke="#263238" stroke-width="8" fill="none" stroke-linejoin="round"/>
+<g id="an-flow" style="display:none"><path class="flow" d="M150 100 H240 M240 100 H400 M400 100 H800 V170 M800 238 V400 H150" stroke="#FFD54F" stroke-width="5" fill="none"/></g>
+</svg></div>
+<div class="row" style="gap:14px;align-items:center"><button type="button" class="big-btn" id="an-btn" style="font:700 36px var(--sans)">Anahtarı kapat</button><p id="an-st" style="font-size:36px;font-weight:700;color:#FF8A80">AÇIK: halka kopuk, akım yok</p></div>
+</div>
+<div class="col f1" style="gap:14px">
+<div class="card dk" style="gap:8px"><h3>Günlük hayattan</h3><p style="font-size:32px">Oda ışığının düğmesi: bir konuma getirince elektrik yolu kapanır, lamba yanar; öbür konumda yol açılır, lamba söner.</p></div>
+<div class="card info" style="padding:16px 24px;gap:8px"><h3 style="font-size:36px">İki durum</h3><p style="font-size:32px;line-height:1.3"><b>Açık:</b> kontaklar ayrı, akım geçmez.<br><b>Kapalı:</b> kontaklar birleşik, akım geçer.</p></div>
+<div class="card warn" style="padding:16px 24px;gap:8px"><h3 style="font-size:36px">Fark</h3><p style="font-size:32px;line-height:1.3">Burada anahtar akımı doğrudan keser. Anahtarı Arduino’ya bilgi olarak okutmayı gelecek hafta öğreneceğiz.</p></div>
+</div>
+</div>
+<aside>Anahtar kavramı. Tanım (kitap s.75): anahtarlar, elektrik devrelerinde ve elektronik devrelerde bir devreye enerji vermek veya devreden enerji kesmek için, ya da birden fazla işlemin seçilmesini sağlamak için kullanılır. Devre: 5 V → anahtar → 220 Ω direnç → LED → GND. Düğmeye tıklayınca anahtar kolu kapanır, sarı akış animasyonu başlar ve LED yanar; tekrar tıklayınca kol açılır, akım durur. Bu devrede kod yok: anahtar akımı doğrudan keser. Anahtarın durumunu Arduino’ya okutmak (digitalRead, if) yıllık planda 9. haftadadır; bu hafta yalnız anahtarın kendisini ve çeşitlerini öğreniyoruz. Öğrencilere sorun: “Anahtarı LED’den sonra GND tarafına koysak LED yine söner mi?” (Evet: halkanın neresi kopsa akım durur.)</aside>
+</section>
+<section id="cesitler" class="sl light tight tight2">
+<div class="hd" style="gap:6px"><p class="eb">Anahtar çeşitleri · Birine tıkla · Kitap s.75 ve s.80</p><h2 class="ttl">Altı çeşit anahtar</h2></div>
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px" id="cs-cards"></div>
+<div class="row f1" style="gap:24px;align-items:stretch;min-height:0">
+<div class="ckt" style="width:560px;justify-content:center;align-items:center;padding:14px"><div id="cs-real" style="width:100%"></div></div>
+<div class="col f1" style="gap:12px;min-height:0">
+<div class="ckt f1" style="padding:12px;justify-content:center"><div id="cs-sym" style="width:100%"></div></div>
+<div class="stp"><button type="button" class="go" id="cs-act" style="font-size:34px;padding:12px 34px">Çevir</button><span id="cs-stt" class="cnt" style="font-size:34px;color:#14202E">Durum: açık</span></div>
+<div class="card dk" style="gap:6px;padding:16px 26px"><h3 id="cs-t" style="font-size:44px">Kaldıraç anahtar</h3><p id="cs-en" style="font-size:30px;color:#FFD9B8">Toggle switch</p><p id="cs-ty" style="font-size:34px;font-weight:600;color:#9BE38B">Kalıcı</p><p id="cs-us" style="font-size:33px;line-height:1.3">…</p></div>
+</div>
+</div>
+<span class="src kt">Kitap + araştırma</span>
+<aside>Altı çeşit anahtarı tek tek açın. Kitap s.75 Görsel 2.28’de kaldıraç ve şalter tipi anahtarları, s.80 Görsel 2.33’te basmalı butonu (tek buton ve 4×4 tuş takımı) gösterir. Biz sürgülü, DIP ve reed (mıknatıslı) anahtarı araştırmayla ekledik: bunlar küçük elektronik devrelerde ve güvenlik sensörlerinde çok yaygındır. İki ana ayrım: kalıcı (konumunda kalan: kaldıraç, sürgülü, şalter, DIP) ve geçici/anlık (momentary: basmalı düğme, reed — mıknatıs çekilince açılır). Her çeşidin sağ üstteki sembolü “Çevir/Bas” düğmesiyle açılıp kapanır. Reed switch: cam kapsül içinde iki ince metal dil; mıknatıs yaklaşınca birleşir. Okunuşlar: toggle “tıgıl”, rocker “rakır”, DIP “dip”, reed “rid”. Kaynak: SparkFun “Switch Basics” (learn.sparkfun.com/tutorials/switch-basics).</aside>
+</section>
+<section id="kontak" class="sl dark tight tight2">
+<div class="hd" style="gap:6px"><p class="eb">Anahtarın iç düzeni · Her kutuda düğmeye bas</p><h2 class="ttl">Normalde açık, normalde kapalı, iki yollu</h2></div>
+<div class="row f1" style="gap:20px;align-items:stretch;min-height:0">
+<div class="card dk f1" style="gap:8px;padding:14px 18px"><h3 style="font-size:36px">NO · normalde açık</h3><div id="kt-no"></div><button type="button" class="big-btn" data-kt="no" style="font:700 32px var(--sans);padding:10px 20px">Bas</button><p id="kt-no-x" style="font-size:34px;line-height:1.3;font-weight:600">Basılmadı: akım yok, lamba sönük.</p><p style="font-size:30px;color:#C9D6E3">Gerçekte: zil, yaya butonu, klavye tuşu.</p></div>
+<div class="card dk f1" style="gap:8px;padding:14px 18px"><h3 style="font-size:36px">NC · normalde kapalı</h3><div id="kt-nc"></div><button type="button" class="big-btn" data-kt="nc" style="font:700 32px var(--sans);padding:10px 20px">Bas</button><p id="kt-nc-x" style="font-size:34px;line-height:1.3;font-weight:600">Basılmadı: akım var, lamba yanık.</p><p style="font-size:30px;color:#C9D6E3">Gerçekte: buzdolabı lambası, acil durdurma düğmesi.</p></div>
+<div class="card dk f1" style="gap:8px;padding:14px 18px"><h3 style="font-size:36px">İki yollu (SPDT)</h3><div id="kt-sp"></div><button type="button" class="big-btn" data-kt="sp" style="font:700 32px var(--sans);padding:10px 20px">Çevir</button><p id="kt-sp-x" style="font-size:34px;line-height:1.3;font-weight:600">Kol yukarıda: yalnız A lambası yanar.</p><p style="font-size:30px;color:#C9D6E3">Gerçekte: koridor ışığını iki yerden açıp kapatmak.</p></div>
+</div>
+<div class="row" style="gap:20px"><div class="card info f1" style="padding:12px 22px"><p style="font-size:30px;line-height:1.3"><b>Hatırla:</b> Anahtarın normal (dinlenme) hâli vardır. Basınca ya da çevirince hâl değişir. Kitaptaki buton, NO tipidir.</p></div></div>
+<span class="src ar">Araştırma</span>
+<aside>Üç kutuda üç kontak düzeni. NO (Normally Open, “normalde açık”): basılmadığında kontak açıktır; basınca kapanır, lamba yanar. Kitaptaki basmalı buton (s.80) bu tiptir. NC (Normally Closed, “normalde kapalı”): basılmadığında kapalıdır, lamba yanar; basınca açılır, lamba söner (ör. kapı lambasının kapı kapanınca sönmesi, buzdolabı lambası). SPDT (tek kutuplu çift yollu): ortak uç iki yoldan birine bağlanır; kol çevrilince A ya da B lambası yanar (koridor ışığını iki yerden açıp kapatmak için “vaviyen” bunun benzeridir). “Kutup” (pole) anahtarın kaç ayrı devreyi aynı anda değiştirdiğini, “yol” (throw) her kutbun kaç konuma bağlanabildiğini gösterir; SPST = tek kutup tek yol, SPDT = tek kutup çift yol. Kaynak: SparkFun “Switch Basics”.</aside>
+</section>

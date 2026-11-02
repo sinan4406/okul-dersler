@@ -1,0 +1,34 @@
+<style>
+.v{color:#7EE0F0}
+.src{position:absolute;right:72px;top:46px;font-size:24px;font-weight:600;letter-spacing:1px;border-radius:999px;padding:4px 16px;color:#fff}
+.src.kt{background:#2F6FDE}.src.ar{background:#2E8540}.src.gn{background:#C2410C}
+@keyframes trR{0%,48%{opacity:1}52%,100%{opacity:.12}}
+@keyframes trY{0%,40%{opacity:.12}44%,56%{opacity:1}60%,84%{opacity:.12}88%,96%{opacity:1}100%{opacity:.12}}
+@keyframes trG{0%,52%{opacity:.12}56%,82%{opacity:1}86%,100%{opacity:.12}}
+.tr-r{animation:trR 8s infinite}.tr-y{animation:trY 8s infinite}.tr-g{animation:trG 8s infinite}
+@keyframes flow{to{stroke-dashoffset:-48}}
+.flow{stroke-dasharray:14 10;animation:flow 1s linear infinite}
+.flow.rev{animation-direction:reverse}
+.paused .flow{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.tr-r,.tr-y,.tr-g{animation:none}.tr-r{opacity:1}.flow{animation:none}}
+.pins14{display:grid;grid-template-columns:repeat(14,1fr);gap:10px}
+.pbtn{font:700 34px var(--mono);background:#1F2E40;color:#E6EDF3;border:3px solid #2A3B50;border-radius:14px;padding:22px 0 14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.pbtn small{font:500 20px var(--sans);color:#93A3B8;min-height:24px}
+.pbtn.rx{background:#4B1F1F;border-color:#8F3B3B}
+.pbtn.use{border-color:#FF9F5A}
+.pbtn.sel{background:#C2410C;border-color:#FFD9B8;color:#fff}.pbtn.sel small{color:#FFE9D6}
+.pbtn:focus-visible{outline:3px solid #FF9F5A;outline-offset:2px}
+.tbl2{width:100%;font-size:30px}
+.tbl2 td,.tbl2 th{padding:.3em .6em}
+.tbl2 tr.hl2 td{background:rgba(255,159,90,.25)!important;outline:none}
+.big-btn{font:700 40px var(--mono);border-radius:16px;padding:16px 30px;border:3px solid #5B6E85;background:#1F2E40;color:#F6F4EE;cursor:pointer}
+.big-btn.sel{background:#2E8540;border-color:#9BE38B}
+.big-btn.sel.lo{background:#3A4656;border-color:#93A3B8}
+.sty{font-size:30px;line-height:1.35}
+.sw-card{background:#1F2E40;border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border:3px solid #2A3B50;font:inherit;color:#F6F4EE}
+.sw-card.sel{border-color:#FF9F5A;background:#2A3B50}
+.sw-card span{font-size:28px;font-weight:600}
+.cmpbox{background:#0B121B;border-radius:14px;padding:18px 24px;font:30px/1.5 var(--mono);color:#E6EDF3;white-space:pre}
+.cmpbox .ch{background:rgba(255,138,128,.3);outline:2px solid #FF8A80;border-radius:4px}
+.cmpbox .ch.g{background:rgba(155,227,139,.3);outline-color:#9BE38B}
+</style>

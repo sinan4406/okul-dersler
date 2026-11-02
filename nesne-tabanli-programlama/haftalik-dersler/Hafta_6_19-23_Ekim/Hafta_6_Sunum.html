@@ -272,7 +272,7 @@ pre.code,.mono,.ftb,.loc{font-variant-ligatures:none;font-feature-settings:"liga
 <p style="font-size:28px;color:#BFCAD6">2. Öğrenme Birimi · Karar ve Döngü Yapıları · 6. Hafta</p>
 <p style="font-size:28px;color:#BFCAD6">19–23 Ekim 2026</p>
 </div>
-<p style="position:absolute;right:128px;top:128px;width:640px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6CB6FF">while (ogrenmeyeDevam) { }</p>
+<p style="position:absolute;right:128px;top:128px;width:640px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6CB6FF">while (puan &lt; 100) { }</p>
 <aside>Hoş geldiniz. Bu hafta 10 ders saati boyunca iki büyük konu işleyeceğiz: önce birden fazla koşulu tek satırda birleştiren mantıksal operatörler (1–4. saatler), sonra kodu tekrar tekrar çalıştıran döngüler (5–10. saatler). Kitapta sayfa 53–68 arası. Sağ üstteki kod parçasını sorun: “Bu satır ne anlama geliyor olabilir?” Hafta sonunda herkes cevaplayabilecek.</aside>
 </section>
 <section id="hedefler" style="background:#F6F4EE;color:#1B2533;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
@@ -367,18 +367,18 @@ pre.code,.mono,.ftb,.loc{font-variant-ligatures:none;font-feature-settings:"liga
 <div class="ans" hidden><b>“Hafta sonu”</b>. case 6 boş olduğu için case 7’nin koduna geçer.</div>
 </div>
 <div class="codebox f1">
-<p style="font-size:26px;font-weight:600;color:#FF9F5A">3 · bool</p>
-<pre class="code"><span class="t">bool</span> aktif = <span class="n">false</span>;
-<span class="k">if</span> (aktif)
+<p style="font-size:26px;font-weight:600;color:#FF9F5A">3 · koşul</p>
+<pre class="code"><span class="t">int</span> pil = <span class="n">0</span>;
+<span class="k">if</span> (pil &gt; <span class="n">0</span>)
     Yaz(<span class="s">"Açık"</span>);
 <span class="k">else</span>
     Yaz(<span class="s">"Kapalı"</span>);</pre>
 <button class="ans-btn sm" type="button">Cevabı göster</button>
-<div class="ans" hidden><b>“Kapalı”</b>. if (aktif) yazımı, if (aktif == true) ile aynıdır.</div>
+<div class="ans" hidden><b>“Kapalı”</b>. pil &gt; 0 yanlış (false) olduğu için else çalışır.</div>
 </div>
 </div>
 <p class="foot">Yaz(...) burada MessageBox.Show(...) yerine kısaltma olarak kullanıldı.</p>
-<aside>3 dakika. Her kart için öğrencilere 20 saniye verin, cevabı defterlerine yazsınlar, sonra düğmeye basıp açıklayın. 3. kart bu haftaki NOT (!) operatörüne köprüdür: if (!aktif) yazılsaydı ne olurdu?</aside>
+<aside>3 dakika. Her kart için öğrencilere 20 saniye verin, cevabı defterlerine yazsınlar, sonra düğmeye basıp açıklayın. 3. kart bu haftaki NOT (!) operatörüne köprüdür: koşulu !(pil &gt; 0) yazsak ne olurdu?</aside>
 </section>
 <section id="bolum-a" data-transition="push" style="background:#14202E;color:#F6F4EE;font-family:'Rubik', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:48px">
 <p style="font-size:28px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#FF9F5A">Bölüm 1 · 1–4. saatler · Kitap s. 53–59</p>
@@ -408,13 +408,13 @@ pre.code,.mono,.ftb,.loc{font-variant-ligatures:none;font-feature-settings:"liga
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
 <p style="font-size:28px;font-weight:600;color:#C2410C">İç içe if: okunması zor</p>
 <div style="flex:1;background:#16212E;border-radius:16px;padding:40px">
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF3"><span style="color:#FF9F5A">if</span> (kullaniciAdi == kayitliAd) {<br>&#160;&#160;<span style="color:#FF9F5A">if</span> (sifre == kayitliSifre) {<br>&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">if</span> (hesapAktif) {<br>&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">if</span> (hataliDeneme &lt; 3) {<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;GirisYap();<br>&#160;&#160;&#160;&#160;&#160;&#160;}<br>&#160;&#160;&#160;&#160;}<br>&#160;&#160;}<br>}</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF3"><span style="color:#FF9F5A">if</span> (kullaniciAdi == kayitliAd) {<br>&#160;&#160;<span style="color:#FF9F5A">if</span> (sifre == kayitliSifre) {<br>&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">if</span> (hesapDurumu == "aktif") {<br>&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">if</span> (hataliDeneme &lt; 3) {<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;GirisYap();<br>&#160;&#160;&#160;&#160;&#160;&#160;}<br>&#160;&#160;&#160;&#160;}<br>&#160;&#160;}<br>}</p>
 </div>
 </div>
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
 <p style="font-size:28px;font-weight:600;color:#2F6FDE">Mantıksal operatör: tek bakışta</p>
 <div style="background:#16212E;border-radius:16px;padding:40px">
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF3"><span style="color:#FF9F5A">if</span> (kullaniciAdi == kayitliAd<br>&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">&amp;&amp;</span> sifre == kayitliSifre<br>&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">&amp;&amp;</span> hesapAktif<br>&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">&amp;&amp;</span> hataliDeneme &lt; 3)<br>{<br>&#160;&#160;&#160;&#160;GirisYap();<br>}</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF3"><span style="color:#FF9F5A">if</span> (kullaniciAdi == kayitliAd<br>&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">&amp;&amp;</span> sifre == kayitliSifre<br>&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">&amp;&amp;</span> hesapDurumu == "aktif"<br>&#160;&#160;&#160;&#160;<span style="color:#FF9F5A">&amp;&amp;</span> hataliDeneme &lt; 3)<br>{<br>&#160;&#160;&#160;&#160;GirisYap();<br>}</p>
 </div>
 <p style="font-size:28px;line-height:1.4;color:#3D4A5C">Her koşul kendi satırında, aynı hizada. Yeni bir koşul eklemek için bir satır yeterli.</p>
 </div>
@@ -474,17 +474,16 @@ pre.code,.mono,.ftb,.loc{font-variant-ligatures:none;font-feature-settings:"liga
 <p style="font-size:26px;font-weight:600;color:#FF9F5A">Örnek: Dosya türü testi (kitaptaki 16. uygulamanın tamamı)</p>
 <p style="font-size:24px;line-height:1.4;color:#BFCAD6">Formda uzantı listesi (MP4, MOV, JPG, PNG) ve “Video” / “Resim” radyo düğmeleri var. Öğrenci uzantının türünü doğru işaretledi mi?</p>
 <pre class="code"><span class="t">string</span> secim = listBox1.SelectedItem.ToString(); <span class="c">// seçilen uzantı</span>
-<span class="t">bool</span> videoDedi = radioButton1.Checked;           <span class="c">// "Video" işaretli mi?</span>
 
 <span class="c">// HATALI: &amp;&amp; önce işlenir, MOV her zaman "Doğru" olur</span>
-<span class="k">if</span> (videoDedi &amp;&amp; secim == <span class="s">"MP4"</span> || secim == <span class="s">"MOV"</span>)
+<span class="k">if</span> (radioButton1.Checked &amp;&amp; secim == <span class="s">"MP4"</span> || secim == <span class="s">"MOV"</span>)
     MessageBox.Show(<span class="s">"Cevabınız Doğru"</span>);
 
 <span class="c">// DOĞRU: VEYA kısmı parantez içinde</span>
-<span class="k">if</span> (videoDedi &amp;&amp; (secim == <span class="s">"MP4"</span> || secim == <span class="s">"MOV"</span>))
+<span class="k">if</span> (radioButton1.Checked &amp;&amp; (secim == <span class="s">"MP4"</span> || secim == <span class="s">"MOV"</span>))
     MessageBox.Show(<span class="s">"Cevabınız Doğru"</span>);</pre>
 <button class="ans-btn sm" type="button">MOV seçip “Resim” işaretlersek hatalı kod ne der?</button>
-<div class="ans" hidden>“Cevabınız Doğru” der, ama cevap yanlıştır. Bilgisayar şöyle okur: <span class="mono">(videoDedi &amp;&amp; secim == "MP4") || (secim == "MOV")</span>. Sağ taraf tek başına true olduğu için radyo düğmesine hiç bakılmaz.</div>
+<div class="ans" hidden>“Cevabınız Doğru” der, ama cevap yanlıştır. Bilgisayar şöyle okur: <span class="mono">(radioButton1.Checked &amp;&amp; secim == "MP4") || (secim == "MOV")</span>. Sağ taraf tek başına true olduğu için radyo düğmesine hiç bakılmaz.</div>
 </div>
 </div>
 <aside>Önce hatalı kodu çalıştırtın: MOV seçip “Resim” işaretlesinler, “Cevabınız Doğru” mesajını görsünler. Sonra nedenini tahtada adım adım çözün. Etkinlik çıktısı: Her öğrenci “ne oldu, neden oldu, nasıl düzelttim” şeklinde 3 cümlelik bir hata raporu yazar. Altın kural: Öncelikten emin değilsen parantez kullan.</aside>
@@ -659,27 +658,25 @@ pre.code,.mono,.ftb,.loc{font-variant-ligatures:none;font-feature-settings:"liga
 {
     <span class="c">// 1) Kutudaki metni sayıya çevir</span>
     <span class="tip" tabindex="0" data-tip="Para için kullanılan ondalıklı sayı türü. double’dan farklı olarak 0,1 + 0,2 işleminin sonucunu tam 0,3 verir.">decimal</span> tutar = <span class="tip" tabindex="0" data-tip="Metni sayıya çevirir: &quot;150,75&quot; → 150,75. Kutuda sayı yoksa program hata verir; bunu gelecek hafta TryParse ile çözeceğiz.">decimal.Parse</span>(txtTutar<span class="tip" tabindex="0" data-tip="Kutuya yazılan metin. Kullanıcı rakam yazsa bile her zaman string (metin) türündedir.">.Text</span>);
-    <span class="c">// 2) Üye kutusu işaretli mi? true / false</span>
-    <span class="t">bool</span> uyeMi = chkUye<span class="tip" tabindex="0" data-tip="CheckBox işaretliyse true, işaretli değilse false verir.">.Checked</span>;
-    <span class="c">// 3) Kuponu temizle, büyük harfe çevir, karşılaştır</span>
-    <span class="t">bool</span> kuponVar = txtKupon.Text<span class="tip" tabindex="0" data-tip="Metnin başındaki ve sonundaki boşlukları siler: &quot;  kargo0 &quot; → &quot;kargo0&quot;. Ortadaki boşluklara dokunmaz.">.Trim()</span><span class="tip" tabindex="0" data-tip="Bütün harfleri büyük yapar: &quot;kargo0&quot; → &quot;KARGO0&quot;. Kullanıcı küçük harfle yazsa da kupon tanınır.">.ToUpper()</span> <span class="tip" tabindex="0" data-tip="İki metin birebir aynıysa true verir. Büyük-küçük harfe duyarlıdır: &quot;Kargo0&quot; == &quot;KARGO0&quot; false olur.">==</span> <span class="s">"KARGO0"</span>;
-    <span class="c">// 4) Kural: (500 TL ve üzeri VE üye) VEYA kupon</span>
-    <span class="t">bool</span> ucretsiz = (tutar &gt;= <span class="n">500</span> <span class="tip" tabindex="0" data-tip="VE: iki taraf da true ise true.">&amp;&amp;</span> uyeMi) <span class="tip" tabindex="0" data-tip="VEYA: taraflardan en az biri true ise true.">||</span> kuponVar;
-    <span class="c">// 5) Sonucu etikete yaz</span>
-    <span class="k">if</span> (ucretsiz)
+    <span class="c">// 2) Kuponu temizle ve büyük harfe çevir</span>
+    <span class="t">string</span> kupon = txtKupon.Text<span class="tip" tabindex="0" data-tip="Metnin başındaki ve sonundaki boşlukları siler: &quot;  kargo0 &quot; → &quot;kargo0&quot;. Ortadaki boşluklara dokunmaz.">.Trim()</span><span class="tip" tabindex="0" data-tip="Bütün harfleri büyük yapar: &quot;kargo0&quot; → &quot;KARGO0&quot;. Kullanıcı küçük harfle yazsa da kupon tanınır.">.ToUpper()</span>;
+    <span class="c">// 3) Kural: (500 TL ve üzeri VE üye) VEYA kupon, sonra sonucu etikete yaz</span>
+    <span class="k">if</span> ((tutar &gt;= <span class="n">500</span> <span class="tip" tabindex="0" data-tip="VE: iki taraf da true ise true.">&amp;&amp;</span> chkUye<span class="tip" tabindex="0" data-tip="CheckBox işaretliyse true, işaretli değilse false verir.">.Checked</span>)
+        <span class="tip" tabindex="0" data-tip="VEYA: taraflardan en az biri true ise true.">||</span> kupon <span class="tip" tabindex="0" data-tip="İki metin birebir aynıysa true verir. Büyük-küçük harfe duyarlıdır: &quot;Kargo0&quot; == &quot;KARGO0&quot; false olur.">==</span> <span class="s">"KARGO0"</span>)
         lblSonuc.Text = <span class="s">"Kargo ücretsiz"</span>;
     <span class="k">else</span>
         lblSonuc.Text = <span class="s">"Kargo ücreti: 49,90 TL"</span>;
 }</pre>
 </div>
 <div class="col" style="width:440px">
-<div class="card info"><h3>Neden bool değişkenler?</h3><p>uyeMi, kuponVar, ucretsiz gibi adlar koşulu okunur yapar. Debugger’da her birinin değeri ayrı ayrı izlenir.</p></div>
-<div class="card warn"><h3>Değiştir ve gözle</h3><p>4. adımdaki kuralı şöyle yaz:<br><span class="mono" style="font-size:22px">tutar &gt;= 500 &amp;&amp; (uyeMi || kuponVar)</span><br>Formda 100 TL + kupon dene. Sonuç değişir mi?</p>
+<div class="card info"><h3>Neden kupon değişkeni?</h3><p style="font-size:24px">Temizlenmiş kuponu saklamak koşulu kısa yapar.</p></div>
+<div class="card"><h3>Not · Daha sonra göreceğiz</h3><p style="font-size:22px">İleride kuralı bool bir değişkene atayıp <span class="mono">if (ucretsiz)</span> diye de yazabiliriz. Şimdilik gerekmiyor.</p></div>
+<div class="card warn"><h3>Değiştir ve gözle</h3><p style="font-size:24px">3. adımdaki kuralı şöyle yaz:<br><span class="mono" style="font-size:20px">tutar &gt;= 500 &amp;&amp; (chkUye.Checked || kupon == "KARGO0")</span><br>Formda 100 TL + kupon dene. Sonuç değişir mi?</p>
 <button class="ans-btn sm" type="button">Cevabı göster</button>
 <div class="ans" hidden>Değişir: artık “Kargo ücreti” der. Yeni kuralda 500 TL herkes için şart; kupon sadece üyeliğin yerine geçer.</div></div>
 </div>
 </div>
-<aside>Canlı kodlama: Kodu öğrencilerle birlikte, yorum satırlarını önce yazarak oluşturun (önce plan, sonra kod). Breakpoint’i bool ucretsiz satırına koyup Locals penceresinde değerleri gösterin. Kutuya harf yazıldığında decimal.Parse hata verir; bu, gelecek haftaki try-catch konusuna köprüdür.</aside>
+<aside>Canlı kodlama: Kodu öğrencilerle birlikte, yorum satırlarını önce yazarak oluşturun (önce plan, sonra kod). Breakpoint’i if satırına koyup Locals penceresinde tutar ve kupon değerlerini gösterin. Kutuya harf yazıldığında decimal.Parse hata verir; bu, gelecek haftaki try-catch konusuna köprüdür.</aside>
 </section>
 <section id="etkinlik-giris" style="background:#14202E;color:#F6F4EE;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
@@ -984,19 +981,18 @@ pre.code,.mono,.ftb,.loc{font-variant-ligatures:none;font-feature-settings:"liga
 <div class="row f1">
 <div class="codebox f1" style="justify-content:center">
 <pre class="code" style="line-height:1.6"><span class="c">// GÜÇLÜ: en az 8 karakter VE dört türden de en az bir tane</span>
-<span class="t">bool</span> guclu = sifre.Length &gt;= <span class="n">8</span>
-          &amp;&amp; rakam &gt; <span class="n">0</span>
-          &amp;&amp; buyuk &gt; <span class="n">0</span>
-          &amp;&amp; kucuk &gt; <span class="n">0</span>
-          &amp;&amp; ozel  &gt; <span class="n">0</span>;
-
+<span class="k">if</span> (sifre.Length &gt;= <span class="n">8</span>
+    &amp;&amp; rakam &gt; <span class="n">0</span>
+    &amp;&amp; buyuk &gt; <span class="n">0</span>
+    &amp;&amp; kucuk &gt; <span class="n">0</span>
+    &amp;&amp; ozel  &gt; <span class="n">0</span>)
+    lblGuc.Text = <span class="s">"Güçlü"</span>;
 <span class="c">// ZAYIF: 6'dan kısa VEYA hiç rakam ve özel karakter yok</span>
-<span class="t">bool</span> zayif = sifre.Length &lt; <span class="n">6</span> || (rakam == <span class="n">0</span> &amp;&amp; ozel == <span class="n">0</span>);
-
-<span class="c">// Sonucu yaz (else if: yalnızca bir dal çalışır)</span>
-<span class="k">if</span> (guclu)      lblGuc.Text = <span class="s">"Güçlü"</span>;
-<span class="k">else if</span> (zayif) lblGuc.Text = <span class="s">"Zayıf"</span>;
-<span class="k">else</span>            lblGuc.Text = <span class="s">"Orta"</span>;
+<span class="k">else if</span> (sifre.Length &lt; <span class="n">6</span> || (rakam == <span class="n">0</span> &amp;&amp; ozel == <span class="n">0</span>))
+    lblGuc.Text = <span class="s">"Zayıf"</span>;
+<span class="c">// Hiçbiri değilse (else if: yalnızca bir dal çalışır)</span>
+<span class="k">else</span>
+    lblGuc.Text = <span class="s">"Orta"</span>;
 <span class="c">// Renk de eklenebilir: lblGuc.ForeColor = Color.Green;</span></pre>
 </div>
 <div class="col" style="width:560px">
@@ -1005,6 +1001,10 @@ pre.code,.mono,.ftb,.loc{font-variant-ligatures:none;font-feature-settings:"liga
 <p class="mono" style="font-size:24px;color:#1B2533">abc · abcdef12 · Ab3!xyz9</p>
 <button class="ans-btn sm" type="button">Cevabı göster</button>
 <div class="ans" hidden>abc → <b>Zayıf</b> · abcdef12 → <b>Orta</b> · Ab3!xyz9 → <b>Güçlü</b></div>
+</div>
+<div class="card">
+<h3>Not · Daha sonra göreceğiz</h3>
+<p style="font-size:22px">Bu kodu ileride şöyle de yazabiliriz: koşulu bool bir değişkene atayıp <span class="mono">if (guclu)</span> ile kontrol etmek. Şimdilik gerekmiyor.</p>
 </div>
 <div class="card warn">
 <h3>Değiştir ve gözle</h3>
@@ -1421,7 +1421,7 @@ MessageBox.Show(<span class="s">"Döngü toplam "</span> + dongu_say.ToString()
 <span class="t">int</span> okuma = <span class="n">0</span>, uyariSayisi = <span class="n">0</span>;         <span class="c">// iki sayaç</span>
 <span class="t">double</span> toplam = <span class="n">0</span>;                       <span class="c">// ortalama için biriktirici</span>
 <span class="t">double</span> enYuksek = <span class="tip" tabindex="0" data-tip="double türünün alabileceği en küçük değer. İlk okuma her zaman bundan büyük olacağı için “en büyüğü bulma” böyle başlar.">double.MinValue</span>;       <span class="c">// en büyüğü bulmak için</span>
-<span class="t">bool</span> kritik = <span class="n">false</span>;                    <span class="c">// alarm durumu</span>
+<span class="t">string</span> durum = <span class="s">"Normal"</span>;               <span class="c">// son ölçümün durumu</span>
 lstLog.Items.Clear();
 
 <span class="k">do</span>
@@ -1429,7 +1429,7 @@ lstLog.Items.Clear();
     okuma++;                               <span class="c">// yeni ölçüm</span>
     <span class="t">double</span> sicaklik = <span class="n">18</span> + <span class="tip" tabindex="0" data-tip="0 ile 1 arasında ondalıklı rastgele sayı üretir. 18 + x × 20 ifadesi bunu 18–38 aralığına taşır.">rnd.NextDouble()</span> * <span class="n">20</span>;  <span class="c">// 18–38 °C</span>
     <span class="t">int</span> nem = rnd.Next(<span class="n">30</span>, <span class="n">96</span>);              <span class="c">// %30–95 (96 hariç)</span>
-    <span class="t">bool</span> duman = rnd.Next(<span class="n">100</span>) &lt; <span class="n">2</span>;         <span class="c">// %2 ihtimalle true</span>
+    <span class="t">int</span> duman = rnd.Next(<span class="n">100</span>);          <span class="c">// 0–99; 2’den küçükse duman var (%2)</span>
 
     toplam += sicaklik;                    <span class="c">// biriktir</span>
     <span class="k">if</span> (sicaklik &gt; enYuksek) enYuksek = sicaklik;  <span class="c">// yeni rekor mu?</span>
@@ -1440,7 +1440,7 @@ lstLog.Items.Clear();
 <div class="card">
 <h3>Bu örnekte bir arada</h3>
 <div style="display:flex;flex-wrap:wrap;gap:10px">
-<span class="pill">do-while</span><span class="pill">&amp;&amp; || !</span><span class="pill">sayaç</span><span class="pill">biriktirici</span><span class="pill">en büyüğü bulma</span><span class="pill">else if</span>
+<span class="pill">do-while</span><span class="pill">&amp;&amp; ||</span><span class="pill">sayaç</span><span class="pill">biriktirici</span><span class="pill">en büyüğü bulma</span><span class="pill">else if</span>
 </div>
 </div>
 </div>
@@ -1454,32 +1454,35 @@ lstLog.Items.Clear();
 </div>
 <div class="row f1">
 <div class="codebox f1" style="justify-content:center">
-<pre class="code" style="line-height:1.5">    <span class="c">// UYARI: (sıcak VE nemli) VEYA çok sıcak</span>
-    <span class="t">bool</span> uyari = (sicaklik &gt; <span class="n">32</span> &amp;&amp; nem &gt; <span class="n">80</span>) || sicaklik &gt; <span class="n">36</span>;
-    <span class="c">// KRİTİK: duman VEYA (aşırı sıcak VE aşırı nemli)</span>
-    kritik = duman || (sicaklik &gt; <span class="n">37</span> &amp;&amp; nem &gt; <span class="n">90</span>);
-
-    <span class="t">string</span> durum = <span class="s">"Normal"</span>;
-    <span class="k">if</span> (kritik) durum = <span class="s">"KRİTİK"</span>;              <span class="c">// önce en ağır durum</span>
-    <span class="k">else if</span> (uyari)
+<pre class="code" style="line-height:1.5">    <span class="c">// KRİTİK: duman VEYA (aşırı sıcak VE aşırı nemli)</span>
+    <span class="k">if</span> (duman &lt; <span class="n">2</span> || (sicaklik &gt; <span class="n">37</span> &amp;&amp; nem &gt; <span class="n">90</span>))
+        durum = <span class="s">"KRİTİK"</span>;              <span class="c">// önce en ağır durum</span>
+    <span class="c">// UYARI: (sıcak VE nemli) VEYA çok sıcak</span>
+    <span class="k">else if</span> ((sicaklik &gt; <span class="n">32</span> &amp;&amp; nem &gt; <span class="n">80</span>) || sicaklik &gt; <span class="n">36</span>)
     {
         durum = <span class="s">"Uyarı"</span>;
-        uyariSayisi++;                        <span class="c">// uyarıları say</span>
+        uyariSayisi++;                  <span class="c">// uyarıları say</span>
     }
-    lstLog.Items.Add(<span class="s">$"#{okuma<span class="tip" tabindex="0" data-tip="D3: sayıyı en az 3 basamak yazar, başa sıfır koyar: 7 → 007.">:D3</span>} {sicaklik<span class="tip" tabindex="0" data-tip="F1: virgülden sonra 1 basamak gösterir (N1’in binlik ayraçsız hâli). 25,347 → 25,3">:F1</span>}°C %{nem} {durum}"</span>);
-}
-<span class="k">while</span> (<span class="tip" tabindex="0" data-tip="! “değil” demektir: kritik false iken true olur. Döngü kritik olmadığı sürece sürer.">!kritik</span> &amp;&amp; okuma &lt; <span class="n">500</span>);  <span class="c">// kritik değil VE &lt; 500</span>
+    <span class="k">else</span>
+        durum = <span class="s">"Normal"</span>;
 
-lblRapor.Text = <span class="s">$"{okuma} okuma | Ort: {toplam / okuma:F1} °C"</span>;</pre>
+    lstLog.Items.Add(<span class="s">"#"</span> + okuma + <span class="s">" "</span> + <span class="tip" tabindex="0" data-tip="Math.Round(x, 1): virgülden sonra 1 basamağa yuvarlar. 25,347 → 25,3">Math.Round</span>(sicaklik, <span class="n">1</span>)
+                     + <span class="s">" °C %"</span> + nem + <span class="s">" "</span> + durum);
+}
+<span class="k">while</span> (durum != <span class="s">"KRİTİK"</span> &amp;&amp; okuma &lt; <span class="n">500</span>);  <span class="c">// kritik değil VE &lt; 500</span>
+
+lblRapor.Text = okuma + <span class="s">" okuma | Ort: "</span>
+              + Math.Round(toplam / okuma, <span class="n">1</span>) + <span class="s">" °C"</span>;</pre>
 </div>
 <div class="col" style="width:560px;gap:18px">
 <div class="col" style="gap:8px"><div style="display:flex;gap:14px;align-items:flex-start"><p class="f1" style="font-size:26px;line-height:1.35"><b style="color:#C2410C">1.</b> Neden while değil de do-while?</p><button class="ans-btn sm" type="button" data-for="sr-1">Cevap</button></div><div class="ans" id="sr-1" hidden>Kritik mi bilmek için en az bir ölçüm gerekir; koşula ölçümden sonra bakılır.</div></div>
 <div class="col" style="gap:8px"><div style="display:flex;gap:14px;align-items:flex-start"><p class="f1" style="font-size:26px;line-height:1.35"><b style="color:#C2410C">2.</b> okuma &lt; 500 silinirse ne risk oluşur?</p><button class="ans-btn sm" type="button" data-for="sr-2">Cevap</button></div><div class="ans" id="sr-2" hidden>Kritik durum çok geç gelebilir, program uzun süre donar. Üst sınır güvenlik ağıdır.</div></div>
 <div class="col" style="gap:8px"><div style="display:flex;gap:14px;align-items:flex-start"><p class="f1" style="font-size:26px;line-height:1.35"><b style="color:#C2410C">3.</b> Gerçek cihazda bu döngü neden Timer ile yazılır?</p><button class="ans-btn sm" type="button" data-for="sr-3">Cevap</button></div><div class="ans" id="sr-3" hidden>Döngü sürerken form donar. Saniyede bir çalışan Timer arayüzü canlı tutar.</div></div>
+<div class="card"><h3>Not · Daha sonra göreceğiz</h3><p style="font-size:22px">Bu kodu ileride şöyle de yazabiliriz: koşulları bool değişkenlere atayıp <span class="mono">if (kritik)</span> gibi kontrol etmek. Şimdilik gerekmiyor.</p></div>
 <div class="card warn"><h3>Değiştir</h3><p>Gece modu: uyarı eşiğini 32 °C yerine 28 °C yap. Uyarı sayısı artar mı?</p></div>
 </div>
 </div>
-<aside>Kural sırası önemli: önce kritik, sonra uyarı kontrol edilir; kritik bir durumun “Uyarı” diye geçmesi engellenir. D3 biçimi okuma numarasını 3 haneye tamamlar (007), F1 bir ondalık gösterir. Meydan okuma: uyarı sayısını ve en yüksek sıcaklığı rapora eklemek.</aside>
+<aside>Kural sırası önemli: önce kritik, sonra uyarı kontrol edilir; kritik bir durumun “Uyarı” diye geçmesi engellenir. durum değişkeni döngünün dışında tanımlı olduğu için while koşulu son ölçümün durumuna bakabilir; Math.Round sıcaklığı bir ondalığa yuvarlar. Meydan okuma: uyarı sayısını ve en yüksek sıcaklığı rapora eklemek.</aside>
 </section>
 <section id="hata-avi" class="sl dark nf">
 <div class="hd">
@@ -1517,9 +1520,8 @@ if (<span class="tip" tabindex="0" data-tip="Metnin belirli karakterine köşeli
 <div style="display:flex;gap:12px;align-items:flex-start"><button class="ans-btn sm" type="button">Çözüm</button><div class="ans f1" hidden>Sıra ters. Önce <b>ad.Length &gt; 0</b>; boş metinde ad[0] çöker.</div></div>
 </div>
 </div>
-<aside>Gruplara 5 dakika verin. Gruplar cevabın yanında nedenini de söylemeli; sonra çözümü açın. 1. kodda ayrıca toplam döngü dışında kullanılamaz (kapsam). 4. kod kısa devre slaytındaki kuralın aynısıdır: koruyucu koşul solda.</aside>
+<aside>Gruplara 5 dakika verin. Gruplar cevabın yanında nedenini de söylemeli; sonra çözümü açın. 1. kodda ayrıca toplam döngü dışında kullanılamaz (kapsam). 4. kod kısa devre slaytındaki kuralın aynısıdır: koruyucu koşul solda. Öğretmen için kitap notları (slayt olarak gösterilmez): s.66 while (şart); sonundaki ; sonsuz/boş döngü yapar; 28. uygulamada mesaj bir fazla (46 yerine 45); s.69 continue örneklerinde a++ continue’dan önce yazılmalı; s.58 !radioButton1.Checked == true gereksiz karşılaştırma; s.67 say.ToString() sonuna boşluk eklenmeli; s.70 Sıra Sizde’de continue Add’den önce olmalı; akıllı tırnaklar ve Convert.ToInt32 hata verebilir (TryParse 7. hafta).</aside>
 </section>
-<section id="kitap-notlari" class="sl light nf" style="gap:22px"><div class="hd"><p class="eb">Kitap notları</p><h2 class="ttl">Kitaptaki noktalar → Doğrusu</h2></div><table style="font-size:24px;color:#1B2533;background:#FFFFFF;border-radius:12px"><tr style="background:#14202E"><th style="color:#F6F4EE;width:30%">Kitapta</th><th style="color:#F6F4EE;width:30%">Sorun</th><th style="color:#F6F4EE">Doğrusu</th></tr><tr><td class="mono" style="font-size:22px">while (Şart ifadesi); (s.66)</td><td>Sondaki ; boş döngü yaratır, program donar</td><td>while (sart) { … }</td></tr><tr><td class="mono" style="font-size:22px">28. uygulama: “46 kez çalıştı” (s.66)</td><td>Döngü 45 kez çalışır (1+…+45 = 1035); sayaç bir fazla artmış</td><td>Mesajda dongu_say − 1 ya da ayrı tur sayacı</td></tr><tr><td class="mono" style="font-size:22px">continue örnekleri: while ve do-while (s.69)</td><td>a++ continue’dan sonra yazıldığı için a = 5’te sonsuz döngü olur</td><td>a++ continue’dan önce yaz (for’da artış başlıkta olduğu için sorun yok)</td></tr><tr><td class="mono" style="font-size:22px">!radioButton1.Checked == true (s.58)</td><td>Çalışır ama bool’u true ile karşılaştırmak gereksiz</td><td>!radioButton1.Checked</td></tr><tr><td class="mono" style="font-size:22px">30. uygulama: RichTextBox’a say.ToString() (s.67)</td><td>Sayılar ayraçsız eklenir: 01234567…</td><td>say.ToString() + " "</td></tr><tr><td class="mono" style="font-size:22px">Sıra Sizde: i=i+2 örneği, if (i >= 7) continue; (s.70)</td><td>continue Add’den sonra olduğu için hiçbir etkisi yok; tüm sayılar eklenir</td><td>continue, Add’den önce yazılmalı</td></tr><tr><td class="mono" style="font-size:22px">“Akıllı” tırnaklar ve Convert.ToInt32(textBox1.Text)</td><td>Kopyalanan kod derlenmez; boş/harf girince çöker</td><td>Düz tırnak " "; TryParse/try-catch (7. hafta)</td></tr></table><p class="foot">Kitap: NESNE TABANLI PROGRAMLAMA 10 (MEB, 2020). Sayfa numaraları kitaptaki basılı numaralardır.</p><aside>Kitaptan kopyalarken karşılaşılacak tuzaklar. continue örneği önemlidir: kitaptaki while ve do-while sürümleri aynen yazılırsa a = 5 olduğunda continue, a++ satırını atlar ve döngü sonsuza kadar sürer. Öğrenciler kodu çalıştırıp doğrulamalıdır (bkz. “Bir eksik” ve “Sonsuz döngü” slaytları). Bulunan hatalar MEB’e geri bildirim olarak iletilebilir.</aside></section>
 <section id="piyasa-1" class="sl light nf"><div class="hd"><p class="eb">Piyasada kullanım</p><h2 class="ttl">Koşullar ve döngüler gerçekte nerede çalışıyor?</h2></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:24px"><div class="card" style="gap:8px;padding:20px 26px"><span class="mk">PİYASADA</span><h3>Zune 30 (2008): döngü ilerlemedi</h3><p style="font-size:23px;line-height:1.35">366. günde iç koşul gun değerini değiştirmedi; döngü bitmedi ve cihazlar dondu (Wikipedia “Zune 30”, techenclave, leancrew).</p></div><div class="card" style="gap:8px;padding:20px 26px"><span class="mk">PİYASADA</span><h3>Heartbleed (2014): sınırsız kopyalama</h3><p style="font-size:23px;line-height:1.35">OpenSSL kullanıcının verdiği uzunluğu denetlemeden kullandı; sunucu belleğinden 64 KB’a kadar veri okundu (OWASP).</p></div><div class="card" style="gap:8px;padding:20px 26px"><span class="mk">PİYASADA</span><h3>Oyun döngüsü</h3><p style="font-size:23px;line-height:1.35">Oyunlar saniyede onlarca kez “girdiyi oku, durumu güncelle, çiz” döngüsü çalıştırır. Genel uygulama (Kitapta yok).</p></div><div class="card" style="gap:8px;padding:20px 26px"><span class="mk">PİYASADA</span><h3>Toplu işler: e-posta, fatura, rapor</h3><p style="font-size:23px;line-height:1.35">Binlerce müşteriyi for/foreach ile gezip koşula uyana işlem yapar. Genel uygulama.</p></div><div class="card" style="gap:8px;padding:20px 26px"><span class="mk">PİYASADA</span><h3>Yeniden deneme: do-while</h3><p style="font-size:23px;line-height:1.35">Ağ isteği başarısız olursa belirli sayıda yeniden denenir; en az bir deneme yapılır. Genel uygulama.</p></div><div class="card" style="gap:8px;padding:20px 26px"><span class="mk">PİYASADA</span><h3>Mülakat sorusu: FizzBuzz</h3><p style="font-size:23px;line-height:1.35">for + % + if: 1’den 100’e 3’e bölünene Fizz, 5’e bölünene Buzz. Yazılım mülakatlarının klasiği. Genel bilgi.</p></div></div><p class="foot">Kaynaklar: Wikipedia (Zune 30) · techenclave.com · leancrew.com · OWASP (Heartbleed). Son dört kart genel uygulamadır.</p><aside>Her kartı okutun. İlk iki kart belgelenmiş olaylardır (Wikipedia/techenclave/leancrew ve OWASP). Zune kodu ve Heartbleed 4. ve 5. haftada da geçti; burada döngü ve sınır denetimi bakışıyla tekrar edildi. Son dört kart genel sektör uygulamasıdır.</aside></section>
 <section id="piyasa-2" class="sl light nf"><div class="hd"><p class="eb">Piyasada kullanım</p><h2 class="ttl">Bu haftanın bilgisi gerçek ürünlerde nerede?</h2></div><table style="font-size:24px;color:#1B2533;background:#FFFFFF;border-radius:12px"><tr style="background:#14202E"><th style="color:#F6F4EE">Bu hafta öğrendiğin</th><th style="color:#F6F4EE">Gerçek ürünlerde karşılığı</th></tr><tr><td>&& / || / !</td><td>Arama filtreleri, yetki denetimi, kampanya kuralları (üye ve tutar ≥ 500 veya kupon)</td></tr><tr><td>Kısa devre (&&, ||)</td><td>Null ve sıfıra bölme koruması: if (liste != null && liste.Count > 0)</td></tr><tr><td>for</td><td>Tekrar sayısı belli işler: haftanın 7 günü, 12 aylık taksit tablosu, sayfalama</td></tr><tr><td>while</td><td>Koşul sağlanana dek süren işler: hedefe ulaşana kadar birikim, sunucudan veri bekleme</td></tr><tr><td>do-while</td><td>En az bir kez çalışan işler: menü gösterme, şifre iste, yeniden dene</td></tr><tr><td>Sonsuz döngü ve bir eksik hatası</td><td>Uygulamanın donması, yanlış sayfa sayısı, bir eksik/fazla kayıt: hata ayıklamada ilk bakılan yer</td></tr></table><p class="foot">Satırlar genel sektör uygulamasıdır (Kitapta yok); belgelenmiş olaylar önceki slaytta.</p><aside>Satırları okuyun ve “senin telefonunda bunun örneği nerede?” diye sorun.</aside></section>
 <section id="ozet" style="background:#F6F4EE;color:#1B2533;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
@@ -1589,7 +1591,7 @@ if (<span class="tip" tabindex="0" data-tip="Metnin belirli karakterine köşeli
 <p class="eb">Kapanış · Oylamanın cevabı</p>
 <h2 class="ttl" style="font-size:72px">Kargo ücretsiz: Cevap A · Evet</h2>
 <div style="background:#1F2E40;border-radius:16px;padding:28px 40px">
-<pre class="code lg" style="font-size:32px;line-height:1.6">(tutar &gt;= <span class="n">500</span> <span class="k">&amp;&amp;</span> uyeMi) <span class="t">||</span> kuponVar
+<pre class="code lg" style="font-size:32px;line-height:1.6">(tutar &gt;= <span class="n">500</span> <span class="k">&amp;&amp;</span> chkUye.Checked) <span class="t">||</span> kupon == <span class="s">"KARGO0"</span>
 (<span class="n">false</span>       &amp;&amp; <span class="n">false</span>) || <span class="n">true</span>     →  <span class="s">true</span></pre>
 </div>
 </div>
@@ -1791,7 +1793,7 @@ document.addEventListener('click',function(e){var o=e.target.closest&&e.target.c
 
   /* 16. uygulama: dosya türü */
   if($('df-btn')){
-    var BAD='if (videoDedi && secim == "MP4" || secim == "MOV")',GOOD='if (videoDedi && (secim == "MP4" || secim == "MOV"))';
+    var BAD='if (radioButton1.Checked && secim == "MP4" || secim == "MOV")',GOOD='if (radioButton1.Checked && (secim == "MP4" || secim == "MOV"))';
     function showCode(){$('df-code').textContent=$('df-good').checked?GOOD:BAD;}
     $('df-bad').onchange=$('df-good').onchange=showCode;showCode();
     $('df-btn').onclick=function(){

@@ -1,0 +1,70 @@
+<section id="dijital" class="sl dark tight tight2">
+<div class="hd" style="gap:6px"><p class="eb">Dijital port · Tıkla ve gör</p><h2 class="ttl">Dijital pin yalnız iki durumda olur</h2></div>
+<div class="row f1" style="gap:30px;align-items:stretch;min-height:0">
+<div class="col" style="width:1060px;gap:16px">
+<div class="ckt" style="padding:8px"><svg viewBox="0 0 1000 400" id="dj-svg" role="img" aria-label="D2 pininden LED’e giden devre">
+<defs><radialGradient id="djg"><stop offset="0" stop-color="#FF5252" stop-opacity=".95"/><stop offset="1" stop-color="#FF5252" stop-opacity="0"/></radialGradient></defs>
+<rect x="20" y="40" width="190" height="320" rx="14" fill="#0E7C86" stroke="#0A5A62" stroke-width="4"/>
+<text x="115" y="230" text-anchor="middle" font-family="Rubik,Arial" font-size="32" font-weight="700" fill="#E8F7F8">ARDUINO</text>
+<text x="115" y="130" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="38" font-weight="700" fill="#FFE0B2">D2</text>
+<text x="115" y="295" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="30" fill="#D5F3F6">GND</text>
+<path d="M210 130 H300" stroke="#F97316" stroke-width="8" fill="none"/>
+<path d="M300 130 L320 130 L332 100 L356 160 L380 100 L404 160 L428 100 L440 130 L470 130" stroke="#D9BC8C" stroke-width="8" fill="none" stroke-linejoin="round"/>
+<text x="385" y="82" text-anchor="middle" font-family="Rubik,Arial" font-size="28" fill="#C9D1D9">220 Ω</text>
+<path d="M470 130 H560" stroke="#F97316" stroke-width="8" fill="none"/>
+<circle id="dj-glow" cx="625" cy="130" r="95" fill="url(#djg)" opacity="0"/>
+<path d="M560 95 L560 165 L625 130 Z" fill="#9AA5B1" stroke="#E5E7EB" stroke-width="5" stroke-linejoin="round"/><path d="M628 92 V168" stroke="#E5E7EB" stroke-width="8"/>
+<circle id="dj-led" cx="595" cy="130" r="14" fill="#FF6B6B" opacity="0"/>
+<path d="M628 130 H760 V300 H210" stroke="#263238" stroke-width="8" fill="none" stroke-linejoin="round"/>
+<g id="dj-flow" style="display:none"><path class="flow" d="M210 130 H560 M628 130 H760 V300 H210" stroke="#FFD54F" stroke-width="5" fill="none"/></g>
+<rect x="780" y="40" width="200" height="120" rx="16" fill="#0B121B" stroke="#5B6E85" stroke-width="3"/>
+<text x="880" y="76" text-anchor="middle" font-family="Rubik,Arial" font-size="24" fill="#93A3B8">D2 gerilimi</text>
+<text id="dj-volt" x="880" y="136" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="60" font-weight="700" fill="#93A3B8">0 V</text>
+</svg></div>
+<div class="ckt" style="padding:8px"><svg viewBox="0 0 1000 230" role="img" aria-label="Pin gerilimi zaman çizelgesi"><rect width="1000" height="230" rx="10" fill="#0B121B"/>
+<text x="14" y="40" font-family="JetBrains Mono,monospace" font-size="34" font-weight="700" fill="#FF6B6B">D2</text>
+<text x="14" y="84" font-family="Rubik,Arial" font-size="30" fill="#93A3B8">5 V</text><text x="14" y="198" font-family="Rubik,Arial" font-size="30" fill="#93A3B8">0 V</text>
+<line x1="90" y1="50" x2="990" y2="50" stroke="#1F2E40" stroke-dasharray="4 6"/><line x1="90" y1="190" x2="990" y2="190" stroke="#1F2E40"/>
+<path id="dj-wave" d="M90 190 L990 190" fill="none" stroke="#FF6B6B" stroke-width="6" stroke-linejoin="round"/></svg></div>
+</div>
+<div class="col f1" style="gap:16px">
+<button type="button" class="big-btn lo sel" id="dj-lo">digitalWrite(2, LOW);</button>
+<button type="button" class="big-btn" id="dj-hi">digitalWrite(2, HIGH);</button>
+<div class="card dk f1" style="gap:8px;justify-content:center"><h3 id="dj-t" style="font-size:46px">LOW: 0 V</h3><p id="dj-x" style="font-size:36px">Pin 0 V verir. İki uç arasında gerilim farkı yok: akım akmaz, LED söner.</p></div>
+<div class="card info f1" style="padding:14px 24px;gap:6px;justify-content:center"><h3 style="font-size:40px">Dijital = iki değer</h3><p style="font-size:34px;line-height:1.3">Ev ışığı gibi: <b>açık</b> ya da <b>kapalı</b>. “Biraz açık” yoktur. Aradaki değerler analog konusudur, ileride.</p></div>
+</div>
+</div>
+<aside>Dijital kavramı: yalnız iki durum. “Digit” (dicit, “dijit”) sayı basamağı demektir; dijital sistem değerleri ayrık sayılarla gösterir. Burada pin yalnız HIGH (5 V) ya da LOW (0 V) olur. Öğrenciler düğmelere tıklayınca LED, voltmetre ve çizelge anında değişir. Çizelgede basamaklı çizgiye dikkat: gerilim yavaşça değil, bir anda atlar. Akış animasyonu (sarı kesikli çizgi) HIGH iken akım halkasını gösterir: D2 → direnç → LED → GND. Kitap s.75: “dijital portlar çıkış olarak kullanılabileceği gibi giriş olarak da kullanılabilir.” Sonraki iki slaytta pinleri ve yönlerini göreceğiz.</aside>
+</section>
+<section id="pinharita" class="sl light tight tight2">
+<div class="hd" style="gap:6px"><p class="eb">Dijital portlar · Bir pine tıkla</p><h2 class="ttl">Arduino Uno’nun 14 dijital pini</h2></div>
+<div class="pins14" id="pm-grid"></div>
+<div class="row" style="gap:12px;flex-wrap:wrap"><span class="pill" style="background:#4B1F1F;color:#fff">RX / TX: haberleşme</span><span class="pill" style="border:4px solid #FF9F5A">Bu hafta kullanılan pinler</span><span class="pill">~ işareti: analog benzeri (ileride)</span></div>
+<div class="row f1" style="gap:28px;align-items:stretch;min-height:0">
+<div class="card dk f1" style="gap:12px;justify-content:center"><h3 id="pm-t" style="font-size:62px">Bir pin seç</h3><p id="pm-x" style="font-size:44px;line-height:1.35">D2–D13 genel amaçlı pinlerdir: çıkış (OUTPUT) ya da giriş (INPUT) olabilir. LED’ler D2’den başlar.</p></div>
+<div class="col" style="width:640px;gap:18px"><div class="card ok f1" style="justify-content:center"><h3 style="font-size:38px">Sınır</h3><p style="font-size:32px">Pin başına en çok 20 mA önerilir. LED + 220 Ω ≈ 13,6 mA.</p></div>
+<div class="card info f1" style="justify-content:center"><h3 style="font-size:38px">Gerilim</h3><p style="font-size:32px">HIGH = 5 V, LOW = 0 V. Dijital pinler 5 V mantığıyla çalışır.</p></div></div>
+</div>
+<span class="src gn">Güncelleme</span>
+<aside>Pinlere tek tek tıklatın; sağ alttaki kutu açıklamayı gösterir. Bu hafta D2–D7 kullanılıyor (turuncu çerçeve). D0 ve D1 seri haberleşme (RX/TX): USB ile bilgisayarla konuşur; LED bağlanırsa program yüklemede sorun çıkabilir. D13’ün kart üzerinde “L” yazan yerleşik LED’i vardır (Blink uygulaması bu pini kullanır). ~ işaretli pinler (3, 5, 6, 9, 10, 11) PWM destekler: ileride parlaklık ve motor hızı için. Kitap s.75’te yalnız “dijital portlar” denir; pin sayısı, 20 mA sınırı ve D0/D1 uyarısı kitapta yoktur, kaynak: Arduino Uno Rev3 belgesi (docs.arduino.cc/hardware/uno-rev3). A0–A5 analog girişleri de dijital olarak kullanılabilir; bu ders kapsamı dışında bırakıldı.</aside>
+</section>
+<section id="giris-cikis" class="sl dark tight tight2">
+<div class="hd" style="gap:6px"><p class="eb">Pinin yönü · Akışı izle</p><h2 class="ttl">OUTPUT: kart verir · INPUT: kart okur</h2></div>
+<div class="row f1" style="gap:28px;align-items:stretch;min-height:0">
+<div class="card dk f1" style="gap:10px;padding:20px 26px"><h3 style="font-size:46px;color:#9BE38B">OUTPUT (çıkış)</h3>
+<svg viewBox="0 0 720 260" role="img" aria-label="Çıkış: karttan LED’e"><rect x="10" y="40" width="220" height="180" rx="14" fill="#0E7C86" stroke="#0A5A62" stroke-width="4"/><text x="120" y="140" text-anchor="middle" font-family="Rubik,Arial" font-size="34" font-weight="700" fill="#E8F7F8">Arduino</text>
+<path class="flow" d="M230 130 H480" stroke="#9BE38B" stroke-width="8" fill="none"/><path d="M480 105 L520 130 L480 155 Z" fill="#9BE38B"/>
+<circle cx="610" cy="130" r="70" fill="#FF5252" opacity=".25"/><circle cx="610" cy="130" r="38" fill="#FF6B6B"/><text x="610" y="240" text-anchor="middle" font-family="Rubik,Arial" font-size="30" fill="#E6EDF3">LED</text></svg>
+<p style="font-size:34px;line-height:1.35">Kart dış dünyaya komut verir: LED yak, ses çıkar.</p>
+<div class="codebox" style="padding:12px 20px"><pre class="code" style="font-size:34px"><span class="t">pinMode</span>(<span class="n">2</span>, <span class="k">OUTPUT</span>);</pre></div></div>
+<div class="card dk f1" style="gap:10px;padding:20px 26px"><h3 style="font-size:46px;color:#6CB6FF">INPUT (giriş)</h3>
+<svg viewBox="0 0 720 260" role="img" aria-label="Giriş: anahtardan karta"><rect x="490" y="40" width="220" height="180" rx="14" fill="#0E7C86" stroke="#0A5A62" stroke-width="4"/><text x="600" y="140" text-anchor="middle" font-family="Rubik,Arial" font-size="34" font-weight="700" fill="#E8F7F8">Arduino</text>
+<path class="flow rev" d="M240 130 H490" stroke="#6CB6FF" stroke-width="8" fill="none"/><path d="M240 105 L200 130 L240 155 Z" fill="#6CB6FF"/>
+<rect x="20" y="100" width="130" height="60" rx="10" fill="#9AA5B1"/><rect x="62" y="70" width="46" height="40" rx="6" fill="#E5E7EB"/><text x="85" y="210" text-anchor="middle" font-family="Rubik,Arial" font-size="30" fill="#E6EDF3">anahtar</text></svg>
+<p style="font-size:34px;line-height:1.35">Dış dünya karta bilgi verir: anahtar basıldı mı, sensör ne gördü?</p>
+<div class="codebox" style="padding:12px 20px"><pre class="code" style="font-size:34px"><span class="t">pinMode</span>(<span class="n">7</span>, <span class="k">INPUT</span>);</pre></div></div>
+</div>
+<div class="row" style="gap:20px;align-items:center"><button type="button" class="ans-btn" id="gc-play" style="font-size:30px">Animasyonu durdur</button><p style="font-size:30px;color:#AAB7C7">Bu hafta yalnız OUTPUT kullanıyoruz. INPUT’u okumak 9. haftanın konusu.</p></div>
+<span class="src kt">Kitap s.75</span>
+<aside>Yön kavramı. Pin tek yönlüdür ve pinMode ile ayarlanır. OUTPUT: kart akım verir (LED, buzzer). INPUT: kart pindeki gerilimi okur (anahtar, sensör). Animasyondaki yeşil akış karttan LED’e, mavi akış anahtardan karta gider. Kitap s.75’te “giriş için pinMode(port_no, INPUT);” yazar. Burada INPUT yalnız kavram olarak tanıtılır; digitalRead ve if bu hafta kullanılmaz, çünkü yıllık plan anahtarla dijital giriş uygulamalarını 9. haftaya koymuştur. Animasyonu “durdur” düğmesiyle dondurup soru sorabilirsiniz.</aside>
+</section>

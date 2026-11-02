@@ -1,0 +1,449 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><title>9. Hafta · Modeller ve Çeşitleri</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Düzen: 1920x1080 sabit sahne pencereye ölçeklenir; altta ince kumanda çubuğu; notlar çekmecesi isteğe bağlı. Tek koyu görünüm bilinçli seçim. */
+:root{
+  color-scheme:dark;
+  --ink:#0E1621; --bar:#18222F; --bar-fg:#E6EDF3; --muted:#8A97A8; --accent:#FF9F5A; --line:#2A3746;
+  --navy:#14202E; --cream:#F6F4EE; --org:#C2410C; --blue:#2F6FDE; --green:#2E8540;
+  --sans:'Rubik',Arial,sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--bar-fg);font-family:var(--sans);overflow:hidden;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+#app{height:100%;display:flex;flex-direction:column;gap:8px;padding-block:8px;box-sizing:border-box}
+#viewport{flex:1;position:relative;overflow:hidden;min-height:0}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#stage>section{position:absolute;left:0;top:0;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;
+  transition:opacity .25s ease;opacity:0;visibility:hidden;pointer-events:none}
+#stage>section.active{opacity:1;visibility:visible;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){#stage>section{transition:none}}
+#stage *{margin:0;box-sizing:border-box}
+#stage aside{display:none}
+#stage ul{padding-left:1.1em}
+#stage table{border-collapse:collapse;width:100%}
+#stage td,#stage th{padding:.3em .6em;border-bottom:1px solid rgba(20,32,46,.12);text-align:left;vertical-align:middle}
+#stage th{font-weight:600}
+#stage h1,#stage h2,#stage h3{text-wrap:balance}
+/* kumanda çubuğu */
+#bar{display:flex;align-items:center;gap:12px;height:48px;background:var(--bar);border-radius:12px;padding:0 12px;flex-wrap:nowrap;min-width:0}
+#bar button{font:500 15px var(--sans);color:var(--bar-fg);background:transparent;border:1px solid var(--line);border-radius:8px;height:34px;padding:0 12px;cursor:pointer;white-space:nowrap}
+#bar button:hover{background:#223042}
+#bar button:focus-visible,.ans-btn:focus-visible,.stp button:focus-visible,.tb:focus-visible,.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#count{font:500 15px var(--sans);font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+#stitle{flex:1;min-width:0;font-size:15px;color:var(--bar-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#prog{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);transition:width .2s}
+#barwrap{position:relative}
+#notes{position:absolute;left:0;right:0;bottom:0;max-height:45%;overflow:auto;background:#FBF8F1;color:#1B2533;font:18px/1.5 var(--sans);
+  padding:20px 24px;border-radius:12px 12px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.4);z-index:5}
+#notes b{display:block;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#C2410C;margin-bottom:6px}
+.hide-sm{display:inline}
+@media (max-width:640px){.hide-sm{display:none}#bar{gap:6px}#bar button{padding:0 8px}}
+
+/* slayt yapı taşları (sahne pikseli) */
+.sl{font-family:var(--sans);padding:80px 112px 112px;display:flex;flex-direction:column;gap:28px}
+.light{background:#F6F4EE;color:#1B2533}
+.dark{background:#14202E;color:#F6F4EE}
+.hd{display:flex;flex-direction:column;gap:10px}
+.eb{font-size:23px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C2410C}
+.dark .eb{color:#FF9F5A}
+.ttl{font-size:56px;font-weight:600;line-height:1.1;color:#14202E}
+.dark .ttl{color:#F6F4EE}
+.foot{position:absolute;left:112px;bottom:34px;width:1696px;font-size:22px;color:#6B7685}
+.dark .foot{color:#9FB0C3}
+.row{display:flex;flex-direction:row;gap:28px}
+.col{display:flex;flex-direction:column;gap:20px}
+.f1{flex:1;min-width:0}
+.g2,.g3,.g4{display:grid;gap:22px;align-items:stretch}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:#FFFFFF;border:1px solid #E2DED3;border-radius:16px;padding:22px 28px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h3{font-size:28px;font-weight:600;color:#14202E;line-height:1.2}
+.card p,.card li{font-size:25px;line-height:1.38;color:#3D4A5C}
+.card.warn{background:#FFF3E8;border:0;border-left:8px solid #C2410C}
+.card.info{background:#EAF1FD;border:0;border-left:8px solid #2F6FDE}
+.card.ok{background:#E8F5EC;border:0;border-left:8px solid #2E8540}
+.card.dk{background:#1F2E40;border:0}
+.card.dk h3{color:#FF9F5A}.card.dk p,.card.dk li{color:#E6EDF3}
+.dark .card{background:#1F2E40;border:0}
+.dark .card h3{color:#FF9F5A}.dark .card p,.dark .card li{color:#E6EDF3}
+.big{font-size:32px;line-height:1.35}
+.mid{font-size:28px;line-height:1.4}
+.sm{font-size:23px;line-height:1.4}
+.mute{color:#5B6878}.dark .mute{color:#A9B7C6}
+.org{color:#C2410C}.dark .org{color:#FF9F5A}
+.blu{color:#2F6FDE}.dark .blu{color:#6CB6FF}
+.grn{color:#2E8540}.dark .grn{color:#9BE38B}
+.red{color:#B42318}.dark .red{color:#FF8A80}
+.codebox{background:#16212E;border-radius:16px;padding:22px 30px;min-width:0;display:flex;flex-direction:column;gap:12px}
+pre.code{font-family:var(--mono);font-size:24px;line-height:1.5;color:#E6EDF3;white-space:pre-wrap;margin:0}
+.k{color:#FF9F5A}.t{color:#6CB6FF}.s{color:#9BE38B}.c{color:#93A3B8;font-style:italic}.n{color:#F2CC60}.e{color:#FF8A80}
+.mono{font-family:var(--mono)}
+.pill{display:inline-block;font-size:22px;font-weight:600;letter-spacing:1px;border-radius:999px;padding:5px 16px;background:#E9E5DA;color:#14202E}
+.dark .pill{background:#2A3B50;color:#F6F4EE}
+.pill.o{background:#FFE2CC;color:#7A2E0B}.pill.b{background:#DCE8FB;color:#1B3F86}.pill.g{background:#DDF1E3;color:#14301F}.pill.r{background:#FBE0DC;color:#7A1A10}
+.num{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:#C2410C;color:#FFF;font-weight:700;font-size:26px;flex:none}
+/* cevap göster */
+.ans-btn{font:600 23px var(--sans);background:#2F6FDE;color:#FFFFFF;border:0;border-radius:999px;padding:9px 24px;cursor:pointer;align-self:flex-start;white-space:nowrap}
+.ans-btn:hover{background:#2459B8}
+.ans-btn.sm{font-size:21px;padding:6px 18px}
+.ans-btn.alt{background:#C2410C}.ans-btn.alt:hover{background:#9E340A}
+.ans{background:#E3F4E8;color:#14301F;border-left:6px solid #2E8540;border-radius:10px;padding:10px 18px;font-size:23px;line-height:1.42}
+.dark .ans{background:#1D3B2A;color:#DDF5E4}
+.ans code,.ans .mono{font-family:var(--mono);font-size:21px}
+td .ans{padding:4px 12px;display:inline-block}
+/* balon açıklama */
+.tip{border-bottom:3px dotted #FF9F5A;cursor:help;position:relative;outline:none}
+.tip::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 12px);width:540px;background:#FFF8E6;color:#14202E;
+  font:400 23px/1.4 var(--sans);font-style:normal;white-space:normal;padding:14px 18px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.35);
+  opacity:0;visibility:hidden;transition:opacity .15s;z-index:20;pointer-events:none;text-transform:none;letter-spacing:0;font-weight:400}
+.tip.dn::after{bottom:auto;top:calc(100% + 12px)}
+.tip.lf::after{left:auto;right:0}
+.tip:hover::after,.tip:focus::after{opacity:1;visibility:visible}
+/* adım adım kumanda */
+.stp{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.stp button{font:600 23px var(--sans);border-radius:12px;padding:8px 20px;cursor:pointer;border:2px solid #14202E;background:#FFFFFF;color:#14202E}
+.dark .stp button{border-color:#6CB6FF;background:#1F2E40;color:#F6F4EE}
+.stp button.go{background:#14202E;color:#F6F4EE}
+.dark .stp button.go{background:#2F6FDE;border-color:#2F6FDE}
+.stp button[aria-pressed="true"]{background:#C2410C;border-color:#C2410C;color:#FFFFFF}
+.stp .cnt{font-size:23px;color:#6B7685;font-variant-numeric:tabular-nums}
+.dark .stp .cnt{color:#A9B7C6}
+.stmsg{font-size:27px;line-height:1.4;min-height:2.8em;background:#14202E;color:#F6F4EE;border-radius:12px;padding:14px 22px}
+.light .stmsg{background:#14202E}
+.dark .stmsg{background:#0E1621}
+.hl{background:rgba(255,159,90,.28);outline:3px solid #FF9F5A;border-radius:8px}
+/* sekmeler */
+.tabs{display:flex;gap:10px;flex-wrap:wrap}
+.tb{font:600 23px var(--sans);border-radius:999px;padding:8px 20px;cursor:pointer;border:2px solid #14202E;background:#FFFFFF;color:#14202E}
+.dark .tb{border-color:#6CB6FF;background:#1F2E40;color:#F6F4EE}
+.tb[aria-pressed="true"]{background:#C2410C;border-color:#C2410C;color:#FFF}
+.tp[hidden]{display:none!important}
+/* seçenek düğmeleri (sınıflandırma etkinlikleri) */
+.opt{font:600 21px var(--sans);border-radius:10px;padding:6px 14px;cursor:pointer;border:2px solid #9AA4B0;background:#FFFFFF;color:#14202E}
+.opt[aria-pressed="true"]{background:#2F6FDE;border-color:#2F6FDE;color:#FFF}
+.opt.right{background:#2E8540;border-color:#2E8540;color:#FFF}
+.opt.wrong{background:#B42318;border-color:#B42318;color:#FFF}
+/* girdiler */
+.inp,.sel,.ta{font:25px var(--sans);padding:8px 14px;border:2px solid #9AA4B0;border-radius:10px;background:#FFFFFF;color:#14202E;min-width:0}
+.ta{width:100%;resize:none;line-height:1.4}
+.dark .inp,.dark .sel,.dark .ta{background:#0E1621;color:#F6F4EE;border-color:#3E5068}
+input[type=range]{width:100%;accent-color:#C2410C;height:30px}
+.lbl{font-size:24px;font-weight:600;color:#14202E}.dark .lbl{color:#F6F4EE}
+.bar{height:30px;border-radius:15px;background:#E2DED3;overflow:hidden}
+.dark .bar{background:#2A3B50}
+.bar>i{display:block;height:100%;background:#C2410C;border-radius:15px;transition:width .25s}
+.dark .bar>i{background:#FF9F5A}
+.win{border:1px solid #9AA4B0;border-radius:10px;overflow:hidden;box-shadow:0 18px 40px rgba(20,32,46,.18);background:#F0F0F0;color:#1B2533}
+.win-bar{display:flex;align-items:center;gap:14px;background:#FFFFFF;padding:10px 18px;border-bottom:1px solid #D5D9DE;font-size:23px;color:#1B2533}
+.win-bar .ico{width:20px;height:20px;border-radius:5px;background:#2F6FDE;flex:none}
+.win-bar .wt{flex:1}
+.win-bar .wc{color:#6B7685;letter-spacing:14px}
+.chat{display:flex;flex-direction:column;gap:10px;background:#F0F3F8;border-radius:12px;padding:16px;min-height:200px}
+.msg{max-width:86%;padding:10px 16px;border-radius:14px;font-size:24px;line-height:1.35}
+.msg.u{align-self:flex-end;background:#2F6FDE;color:#FFF}
+.msg.b{align-self:flex-start;background:#FFFFFF;color:#14202E;border:1px solid #D5D9DE}
+.node{display:flex;align-items:center;justify-content:center;text-align:center;border-radius:14px;padding:12px 16px;font-size:24px;font-weight:600;min-width:0}
+.arrow{font-size:34px;color:#C2410C;align-self:center}
+.dark .arrow{color:#FF9F5A}
+.tl{display:flex;gap:0;align-items:flex-end}
+
+.cls .opt{font-size:25px;padding:8px 20px}
+.cls .why{font-size:23px!important}
+.cls.cmp .opt{font-size:21px;padding:5px 12px}.cls.cmp .crow{padding:6px 0!important}.cls.cmp .crow>span:first-child{font-size:26px!important;min-width:260px!important}.cls.cmp .why{font-size:21px!important}
+
+</style>
+<div id="app">
+<div id="viewport"><div id="stage">
+<section id="kapak" data-title="Hafta 9 · Modeller ve Çeşitleri" style="background:#14202E;color:#F6F4EE;font-family:Rubik,Arial,sans-serif;padding:112px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-size:28px;letter-spacing:4px;text-transform:uppercase;color:#FF9F5A">Bilişim Teknolojilerinin Temelleri · 9. Sınıf · Yapay Zekâ Teknolojileri</p>
+<div style="display:flex;flex-direction:column;gap:30px">
+<p style="font-size:44px;font-weight:600;color:#6CB6FF">9. Hafta · 09–13 Kasım 2026</p>
+<h1 style="font-size:120px;font-weight:700;line-height:1.05">Modeller ve<br>Çeşitleri</h1>
+<p style="font-size:40px;line-height:1.35;color:#BFCAD6;max-width:1400px">Yapay zekânın içindeki model: dil, görsel, ses, video ve kod modelleri.</p>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:end">
+<p style="font-size:28px;color:#BFCAD6">2. Öğrenme Birimi · Kitap dışı · güncel · Bölüm 2</p>
+<p style="font-size:28px;color:#BFCAD6">OMÜ MTAL · Bilişim Teknolojileri Alanı</p>
+</div>
+<aside>9. hafta sunusu. Eski tek parça “Yapay Zekâ Teknolojileri” sunusunun yıllık plandaki 9. haftaya ayrılmış parçasıdır (Bölüm 2). Bu hafta: Yapay zekânın içindeki model: dil, görsel, ses, video ve kod modelleri. Önce hedefleri ve önceki haftanın hatırlatmasını okuyun, sonra konuya geçin; sondaki özet slaytı dersin kapanışıdır.</aside>
+</section>
+
+<section id="hedefler" class="sl light"><div class="hd"><p class="eb">9. Hafta · Bu haftanın hedefleri</p><h2 class="ttl">Bu hafta sonunda şunları yapabileceksin</h2></div><div class="row " style="gap:36px"><div class="col f1" style=""><div class="col " style="gap:18px;"><div class="card " style="justify-content:center"><div class="row " style="gap:20px"><span class="num">1</span><p class="mid" style="">Modelin ne olduğunu token, sıcaklık ve dikkat kavramlarıyla açıklamak</p></div></div><div class="card " style="justify-content:center"><div class="row " style="gap:20px"><span class="num">2</span><p class="mid" style="">Başlıca model ailelerini; açık ve kapalı modelleri ayırt etmek</p></div></div><div class="card " style="justify-content:center"><div class="row " style="gap:20px"><span class="num">3</span><p class="mid" style="">Görsel, ses, video ve kod modellerini işlevlerine göre eşleştirmek</p></div></div></div></div><div class="col " style="width:640px"><div class="card info" style=""><h3>Hatırlatma · Geçen hafta</h3><p class="mid" style="">Halüsinasyon, gizlilik, önyargı ve tarihçeyi gördük. Bu cevapları üreten “model”in içine bakıyoruz.</p></div></div></div><p class="foot">Yıllık plan: BTT.2 Yapay zekâ teknolojilerini kullanabilme · Kitap dışı · güncel</p><aside>Hedefleri yüksek sesle okutun; her biri ölçülebilir bir eylem içerir. Sağdaki hatırlatma kartıyla önceki konuyu 1-2 dakikada canlandırın: öğrencilerden birine “geçen hafta ne öğrendik?” diye sorun, sonra karttaki özetle karşılaştırın. Hafta sonunda aynı hedeflere dönüp öğrencilere kendilerini 1-5 arası puanlatın.</aside></section>
+
+<section id="yol" class="sl light"><div class="hd"><p class="eb">Ders akışı · 2. Öğrenme Birimi</p><h2 class="ttl">Ünite yolculuğunda neredeyiz?</h2></div><table style="font-size:25px;background:#FFFFFF;color:#1B2533;border-radius:12px;overflow:hidden"><tr style="background:#14202E"><th style="color:#F6F4EE;width:9%;">Hafta</th><th style="color:#F6F4EE;width:17%;">Tarih</th><th style="color:#F6F4EE;width:58%;">Konu</th><th style="color:#F6F4EE;width:16%;">Kitap</th></tr><tr><td>7</td><td>26–30 Ekim</td><td>Yapay zekâ temelleri (1): çalışma mantığı, klasik programlama, öğrenme türleri, çeşitler</td><td>s. 68–72</td></tr><tr><td>8</td><td>02–06 Kasım</td><td>Yapay zekâ temelleri (2): günlük hayat, halüsinasyon, gizlilik, önyargı, tarihçe</td><td>s. 72–82</td></tr><tr><td><b style="color:#C2410C">9 ◀</b></td><td><b>09–13 Kasım</b></td><td><b>Modeller ve çeşitleri: dil, görsel, ses modelleri; açık ve kapalı modeller</b></td><td><b>güncel</b></td></tr><tr><td>10</td><td>16–20 Kasım</td><td><span style="color:#6B7685">1. Dönem Ara Tatili</span></td><td>–</td></tr><tr><td>11</td><td>23–27 Kasım</td><td>Etkili prompt yazımı: amaç, rol, görev, bağlam, kısıt, örnek</td><td>s. 83–91</td></tr><tr><td>12</td><td>30 Kas–04 Ara</td><td>Üretken yapay zekâyla içerik: görsel, ses, video, doğrulama</td><td>s. 92–108</td></tr><tr><td>13</td><td>07–11 Aralık</td><td>Yapay zekâ destekli otomasyon; hukuk, etik, sorumlu kullanım; ünite kapanışı</td><td>s. 108–123</td></tr></table><p class="foot">Yapay Zekâ Teknolojileri: temel kavramlar → üretken araçlar → otomasyon sistemleri</p><aside>Ünite altı haftaya yayılır (10. hafta ara tatildir). Koyu satır bu haftadır. Plan, takvime göre kaydırılabilir. Her bölümün sonunda cevaplı bir mini test vardır.</aside></section>
+
+<section id="model-nedir" class="sl light"><div class="hd"><p class="eb">Model nedir?</p><h2 class="ttl">Model: eğitimle ayarlanmış büyük bir sayı tablosu</h2></div><div class="g3" style=""><div class="card " style=""><h3>Parametre (ağırlık)</h3><p class="mid" style="">Modelin içindeki ayar sayıları. Eğitimde milyarlarca kez ince ayarlanır. Kütüphane değil, öğrenilmiş alışkanlıklar bütünüdür.</p></div><div class="card warn" style=""><h3>Eğitim</h3><p class="mid" style="">Dev veriyle yapılan, hatayı azaltan uzun ve pahalı süreç. Saatler değil haftalar, binlerce özel işlemci (GPU).</p></div><div class="card ok" style=""><h3>Çıkarım (inference)</h3><p class="mid" style="">Eğitilmiş modeli kullanmak: sen yazarsın, model hızlıca cevap hesaplar. Kullanırken model <b>öğrenmez</b>.</p></div></div><div class="row " style="gap:24px"><div class="card info" style=""><h3>Benzetme</h3><p class="mid" style="">Bir müzisyen yıllarca çalışarak (eğitim) parmaklarında ve kulağında alışkanlık biriktirir (parametreler). Konserde (çıkarım) yeni şarkıyı o alışkanlıkla çalar; sahnede yeniden öğrenmez.</p></div><div class="card " style=""><h3>Ölçek hakkında</h3><p class="mid" style="">Küçük modeller telefonda çalışabilir (milyonlar–birkaç milyar parametre). En büyük dil modelleri yüzlerce milyar parametre veya daha fazlasıdır; şirketler çoğunlukla sayıyı açıklamaz.</p></div></div><p class="foot">Eğitim bir kez (veya periyodik) yapılır; çıkarım her soruda yapılır.</p><aside>Model kavramını netleştirin: model, eğitimden çıkan dosyadır; yapay zekâ ürünü (uygulama) bu dosyayı kullanan yazılımdır. Çıkarım sırasında model ağırlıkları değişmez: bu yüzden sohbette "Hayır bu şeftaliydi" demek modeli kalıcı değiştirmez. Kitap s. 69 5. adımda bu nokta kısaltılmıştır. Soru: "Aynı soruyu iki kez sorsan neden bazen farklı cevap alırsın?" (temperature; birazdan göreceğiz).</aside></section>
+
+<section id="token" class="sl light"><div class="hd"><p class="eb">Canlı uygulama · Dil modelleri metni nasıl görür?</p><h2 class="ttl">Token: modelin okuduğu parçalar</h2></div><div class="row " style="gap:28px"><div class="col f1" style=""><div class="card " style=""><h3>Bir cümle yaz</h3><textarea id="tk-t" class="ta" rows="3" style="font-size:30px">Yapay zekâ ders çalışmama yardım ediyor</textarea></div><div class="card " style=""><h3>Modelin gördüğü parçalar (yaklaşık)</h3><div id="tk-out" style="display:flex;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:28px"></div></div></div><div class="col " style="width:700px;gap:18px"><div class="card info" style=""><h3>Sayılar</h3><div class="col " style="gap:6px"><p class="mid" style="">Kelime: <b id="tk-w" style="font-size:44px">0</b></p><p class="mid" style="">Token (tahmini): <b id="tk-n" style="font-size:44px">0</b></p></div></div><div class="card warn" style=""><h3>Neden önemli?</h3><ul class=""><li>Fiyat ve sınır token sayısıyla ölçülür.</li><li>Türkçe gibi ekli dillerde kelime çok parçaya bölünebilir.</li><li>Model harfleri değil token’ları görür: bu yüzden bazen harf saymada yanılır.</li></ul></div></div></div><p class="foot">Gösterim yaklaşıktır: gerçek tokenizer algoritmaları farklı bölebilir.</p><aside>Gerçek tokenizer algoritmaları (BPE gibi) bu basit bölmeden farklıdır; bu demo yaklaşık bir gösterimdir. Önemli fikir: dil modelleri kelimeleri değil, sık görülen harf parçalarını (token) işler. Türkçe gibi eklemeli dillerde bir kelime birkaç token olabilir; bu yüzden aynı anlam için Türkçe metin İngilizceye göre çoğu zaman daha fazla token tüketir. Deneyin: "Çekoslovakyalılaştıramadıklarımızdanmışsınız" yazın. Soru: "Bir yapay zekâ neden bazen kelimedeki harfleri yanlış sayar?" (Harfleri değil token’ları görür.)</aside></section>
+
+<section id="sicaklik" class="sl light"><div class="hd"><p class="eb">Canlı uygulama · Dil modeli nasıl yazar?</p><h2 class="ttl">Sonraki kelime: olasılık ve “sıcaklık” (temperature)</h2></div><div class="row " style="gap:28px"><div class="col f1" style=""><div class="card " style=""><h3>Cümle</h3><p id="tm-s" style="font-size:40px;font-weight:600;color:#14202E;min-height:2.6em">…</p></div><div id="tm-bars" class="col" style="gap:10px"></div></div><div class="col " style="width:720px;gap:18px"><div class="card " style=""><h3>Bağlam seç</h3><div class="tabs" id="tm-ctx"></div></div><div class="card info" style=""><h3>Sıcaklık: <b id="tm-tv">1.0</b></h3><input id="tm-t" type="range" min="1" max="30" value="10"><p class="sm mute">Düşük: hep en olası kelime (tutarlı) · Yüksek: sürpriz kelimeler (yaratıcı ama riskli)</p></div><div class="row " style="gap:12px"><button class="ans-btn" type="button" id="tm-go">Bir kelime seç (örnekle)</button><button class="ans-btn alt sm" type="button" id="tm-rs">Yeniden</button></div></div></div><p class="foot">Olasılıklar bu demoda örnek amaçlıdır; gerçek modeller on binlerce kelime üzerinde hesap yapar.</p><aside>Dil modeli, bir cümlenin devamı için her olası kelimeye olasılık verir; kullanıcıya gösterilen cevap, bu dağılımdan seçilen kelimelerle adım adım yazılır. Sıcaklık düşükken model neredeyse hep en olası kelimeyi seçer; yüksekken düşük olasılıklı kelimeler de seçilebilir. Deney: sıcaklığı 0,1 yapıp 5 kez "Bir kelime seç"e basın (hep aynı), sonra 2,0 yapıp tekrarlayın (farklı kelimeler). Aynı soruya her seferinde farklı cevap alınmasının nedeni budur. Bu, halüsinasyonun da bir nedenidir: model "bilmiyorum" demek yerine olası görünen bir kelime seçer.</aside></section>
+
+<section id="dikkat" class="sl light"><div class="hd"><p class="eb">Canlı uygulama · Transformer’ın temel fikri</p><h2 class="ttl">Dikkat (attention): kelimeler birbirine bakar</h2></div><div class="col " style=""><div id="at-words" style="display:flex;flex-wrap:wrap;gap:12px"></div><p class="big" style="">Bir kelimeye tıkla: model o kelimeyi anlarken hangi kelimelere ne kadar “dikkat” ediyor?</p><div class="row " style="gap:24px"><div class="card info" style=""><h3>Neden önemli?</h3><p class="mid" style="">“O” kelimesinin kimden bahsettiğini anlamak için cümledeki diğer kelimelere bakmak gerekir. Transformer mimarisi (2017) bunu çok iyi yapar.</p></div><div class="card warn" style=""><h3>Not</h3><p class="mid" style="">Gösterilen ağırlıklar öğretim amaçlı örnektir; gerçek modelde yüzlerce “dikkat başlığı” katman katman çalışır.</p></div></div></div><p class="foot">Transformer (2017): modern dil, görsel ve ses modellerinin ortak temeli.</p><aside>Cümle: "Ali, kitabı Ayşe’ye verdi çünkü o istedi." "o" kelimesine tıklayınca dikkat çoğunlukla "Ayşe’ye" kelimesine gider. "kitabı" kelimesine tıklayınca "verdi" ve "istedi" öne çıkar. Bu, modelin sadece yan yana kelimelere değil, uzaktaki ilişkilere de bakabildiğini gösterir. Transformer mimarisi 2017 tarihli "Attention Is All You Need" makalesinde tanıtıldı ve bugünkü büyük dil modellerinin temelidir. Sayılar öğretici örnektir.</aside></section>
+
+<section id="yasam" class="sl light"><div class="hd"><p class="eb">Adım adım animasyon · Bir sohbet modeli nasıl yapılır?</p><h2 class="ttl">Büyük dil modelinin hayat döngüsü</h2></div><div class="row " style="gap:8px"><div class="node" id="lc-1" style="flex:1;background:#2F6FDE;color:#FFF;flex-direction:column;gap:4px;height:120px"><span style="font-size:32px">1</span><span style="font-size:22px">Veri</span></div><span class="arrow">▶</span><div class="node" id="lc-2" style="flex:1;background:#2F6FDE;color:#FFF;flex-direction:column;gap:4px;height:120px"><span style="font-size:32px">2</span><span style="font-size:22px">Ön eğitim</span></div><span class="arrow">▶</span><div class="node" id="lc-3" style="flex:1;background:#2F6FDE;color:#FFF;flex-direction:column;gap:4px;height:120px"><span style="font-size:32px">3</span><span style="font-size:22px">İnce ayar</span></div><span class="arrow">▶</span><div class="node" id="lc-4" style="flex:1;background:#2F6FDE;color:#FFF;flex-direction:column;gap:4px;height:120px"><span style="font-size:32px">4</span><span style="font-size:22px">İnsan geri bildirimi</span></div><span class="arrow">▶</span><div class="node" id="lc-5" style="flex:1;background:#2F6FDE;color:#FFF;flex-direction:column;gap:4px;height:120px"><span style="font-size:32px">5</span><span style="font-size:22px">Kullanım</span></div></div><div id="lc-msg" class="stmsg" style="min-height:3.6em"></div><div class="stp"><button type="button" data-act="first">Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto">Otomatik oynat</button><span class="cnt"></span></div><div class="card warn" style=""><h3>Kitaba ek</h3><p class="sm" style="">Kitap s. 69: “Kullanıcı ‘Hayır’ derse yapay zekâ bilgilerini yeniden düzenler.” Doğrusu: kullanım sırasında model değişmez. Konuşma içinde düzeltmeyi hesaba katar, kalıcı güncelleme ancak yeni eğitim veya ince ayar sürecinde olur.</p></div><p class="foot">Ön eğitim pahalı ve nadir, kullanım ucuz ve sürekli.</p><aside>Beş aşamayı İleri düğmesiyle gösterin. Basit özet: (1) veri toplanır ve temizlenir, (2) ön eğitimde model sonraki kelimeyi tahmin etmeyi öğrenir (kendi kendine denetimli), (3) ince ayarda model talimat izlemeyi öğrenir, (4) insan geri bildirimi ve güvenlik eğitimiyle daha yardımcı ve zararsız hâle getirilir, (5) kullanıcıya sunulur; çoğu zaman arama ve araç bağlantılarıyla. Şirketlerin tam yöntemleri farklıdır; bu genel resimdir.</aside></section>
+
+<section id="aileler" class="sl light"><div class="hd"><p class="eb">Model ailesi tablosu · Ekim 2026</p><h2 class="ttl">Başlıca dil modeli aileleri</h2></div><table style="font-size:25px;background:#FFFFFF;color:#1B2533;border-radius:12px;overflow:hidden"><tr style="background:#14202E"><th style="color:#F6F4EE;width:22%;">Model ailesi</th><th style="color:#F6F4EE;width:20%;">Geliştirici</th><th style="color:#F6F4EE;width:26%;">Erişim biçimi</th><th style="color:#F6F4EE;width:32%;">Dikkat çeken</th></tr><tr><td>Claude</td><td>Anthropic</td><td>Kapalı: uygulama ve API</td><td>Uzun belge ve kod çalışması, güvenlik odağı</td></tr><tr><td>GPT (ChatGPT uygulaması)</td><td>OpenAI</td><td>Kapalı: uygulama ve API</td><td>Geniş kullanıcı kitlesi, çok kipli özellikler</td></tr><tr><td>Gemini</td><td>Google</td><td>Kapalı: uygulama ve API</td><td>Google ürünleri ve arama ile entegrasyon, çok kipli</td></tr><tr><td>Llama</td><td>Meta</td><td>Açık ağırlıklı</td><td>Kendi sunucunda çalıştırılabilir, özelleştirilebilir</td></tr><tr><td>Mistral</td><td>Mistral AI (Fransa)</td><td>Açık ağırlıklı ve ticari modeller</td><td>Avrupa kökenli, verimli modeller</td></tr><tr><td>Qwen</td><td>Alibaba</td><td>Büyük kısmı açık ağırlıklı</td><td>Çok dilli, farklı boyutlarda seçenekler</td></tr><tr><td>DeepSeek</td><td>DeepSeek (Çin)</td><td>Açık ağırlıklı modeller</td><td>Düşük maliyetli çalışma ile dikkat çekti</td></tr><tr><td>Gemma</td><td>Google</td><td>Açık ağırlıklı, küçük modeller</td><td>Dizüstünde ve cihazda çalışabilir boyutlar</td></tr></table><p class="mid" style="">Ürün adı ile model adı aynı değildir: <b>ChatGPT</b> bir uygulamadır, arkasındaki modeller <b>GPT</b> ailesidir. Sürüm numaraları aylar içinde değişir; ailenin türünü bilmek, numarayı ezberlemekten önemlidir.</p><p class="foot">Bilgiler Ekim 2026 itibarıyladır. Güncel sürüm ve lisans için şirketlerin resmî sayfalarına bak.</p><aside>Bu tablo bir sıralama değildir ve eksiksiz değildir; bir fikir vermek için başlıca aileleri gösterir. Sürüm numaralarını bilerek yazmadık: yeni sürümler çok sık çıkar. Güncel durum için her şirketin kendi duyuru sayfasına bakılmalıdır. "Açık ağırlıklı" ifadesi, model dosyalarının (ağırlıkların) indirilebildiği anlamına gelir; lisans koşulları aileye göre farklıdır. Eksik olan başka aileler de vardır; öğrenciler araştırıp ekleyebilir (ödev önerisi).</aside></section>
+
+<section id="urun-model" class="sl light"><div class="hd"><p class="eb">Etkinlik · Ürün mü, model mi, şirket mi?</p><h2 class="ttl">Adı doğru kutuya yerleştir</h2></div><div class="cls col" style="gap:0"><div class="crow" data-right="1" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">ChatGPT</span><button type="button" class="opt" data-v="1" aria-pressed="false">Uygulama (ürün)</button><button type="button" class="opt" data-v="2" aria-pressed="false">Model ailesi</button><button type="button" class="opt" data-v="3" aria-pressed="false">Şirket</button><span class="why sm mute" hidden style="flex-basis:100%">Uygulama (ürün). Arkasındaki modeller GPT ailesidir.</span></div><div class="crow" data-right="2" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">GPT</span><button type="button" class="opt" data-v="1" aria-pressed="false">Uygulama (ürün)</button><button type="button" class="opt" data-v="2" aria-pressed="false">Model ailesi</button><button type="button" class="opt" data-v="3" aria-pressed="false">Şirket</button><span class="why sm mute" hidden style="flex-basis:100%">Model ailesi. Uygulamalarda ve API’de kullanılır.</span></div><div class="crow" data-right="3" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">OpenAI</span><button type="button" class="opt" data-v="1" aria-pressed="false">Uygulama (ürün)</button><button type="button" class="opt" data-v="2" aria-pressed="false">Model ailesi</button><button type="button" class="opt" data-v="3" aria-pressed="false">Şirket</button><span class="why sm mute" hidden style="flex-basis:100%">Şirket.</span></div><div class="crow" data-right="2" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">Llama</span><button type="button" class="opt" data-v="1" aria-pressed="false">Uygulama (ürün)</button><button type="button" class="opt" data-v="2" aria-pressed="false">Model ailesi</button><button type="button" class="opt" data-v="3" aria-pressed="false">Şirket</button><span class="why sm mute" hidden style="flex-basis:100%">Model ailesi (Meta’nın açık ağırlıklı modelleri).</span></div><div class="crow" data-right="3" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">Meta</span><button type="button" class="opt" data-v="1" aria-pressed="false">Uygulama (ürün)</button><button type="button" class="opt" data-v="2" aria-pressed="false">Model ailesi</button><button type="button" class="opt" data-v="3" aria-pressed="false">Şirket</button><span class="why sm mute" hidden style="flex-basis:100%">Şirket.</span></div><div class="crow" data-right="1" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">Microsoft Copilot</span><button type="button" class="opt" data-v="1" aria-pressed="false">Uygulama (ürün)</button><button type="button" class="opt" data-v="2" aria-pressed="false">Model ailesi</button><button type="button" class="opt" data-v="3" aria-pressed="false">Şirket</button><span class="why sm mute" hidden style="flex-basis:100%">Uygulama (ürün). Arkasında farklı modeller kullanılabilir.</span></div><div class="row" style="gap:16px;align-items:center;margin-top:14px"><button type="button" class="ans-btn cls-check" style="background:#2F6FDE">Cevapları kontrol et</button><button type="button" class="ans-btn alt cls-reset sm">Sıfırla</button><span class="cls-score" style="font-size:26px;font-weight:600"></span></div></div><p class="foot">Şirket → model ailesi → uygulama (ürün)</p><aside>Üç kavramı ayırmak için kısa etkinlik. Öğrencilere sorun: "Gemini ve Claude hem uygulama hem model ailesi adıdır; bu durumda ne yapabiliriz?" (Bağlamdan anlarız: "Gemini uygulamasında" ya da "Gemini modeli".)</aside></section>
+
+<section id="acik-kapali" class="sl light"><div class="hd"><p class="eb">Karşılaştırma · Kitap dışı</p><h2 class="ttl">Kapalı model mi, açık ağırlıklı model mi?</h2></div><table style="font-size:25px;background:#FFFFFF;color:#1B2533;border-radius:12px;overflow:hidden"><tr style="background:#14202E"><th style="color:#F6F4EE;width:16%;">Ölçüt</th><th style="color:#F6F4EE;width:40%;">Kapalı model (uygulama / API)</th><th style="color:#F6F4EE;width:44%;">Açık ağırlıklı model</th></tr><tr><td>Erişim</td><td>Şirketin sunucusunda; internet gerekir</td><td>Dosya indirilebilir; kendi bilgisayarında veya sunucunda çalıştırılabilir</td></tr><tr><td>Gizlilik</td><td>Veri şirkete gider (ayar ve sözleşmeye bağlı)</td><td>Veri kendi ortamında kalabilir</td></tr><tr><td>Maliyet</td><td>Kullanıma göre ücret veya abonelik</td><td>Donanım ve işletme maliyeti sende</td></tr><tr><td>Güç / kalite</td><td>Genellikle en gelişmiş modeller burada</td><td>Hızla yetişiyor; küçük boyutta çok verimli seçenekler var</td></tr><tr><td>Özelleştirme</td><td>Sınırlı (ince ayar seçenekleri değişir)</td><td>Geniş: ince ayar, kendi veriyle uyarlama</td></tr><tr><td>Güncelleme</td><td>Şirket yönetir</td><td>Sen yönetirsin</td></tr></table><div class="row " style="gap:24px"><div class="card warn" style=""><h3>Dikkat: “açık kaynak” ile “açık ağırlıklı” aynı şey değildir</h3><p class="sm" style="">Açık ağırlıklı modelde dosyalar indirilebilir; ama eğitim verisi ve kodun tamamı paylaşılmayabilir, lisans kullanımı sınırlayabilir.</p></div><div class="card info" style=""><h3>Bulut mu, cihaz mı?</h3><p class="sm" style="">Bazı küçük modeller doğrudan telefonda veya bilgisayarda çalışır; veri cihazdan çıkmaz, internet gerekmez, ama güç sınırlıdır.</p></div></div><p class="foot">Doğru seçim, iş ve gizlilik ihtiyacına bağlıdır. “En iyi model” diye tek cevap yoktur.</p><aside>Okullar ve şirketler için gizlilik kritik bir ölçüttür: hassas veri kapalı bir servise gönderilmeden önce kurum kuralları kontrol edilmelidir. Cihazda çalışan modeller (telefonlardaki yerel asistanlar gibi) bu konuda avantaj sağlar. "Açık kaynak" ifadesi bağımsız bir tanıma bağlıdır (kaynak kodu, veri ve lisans koşulları); birçok "açık" model yalnızca ağırlıklarını paylaşır.</aside></section>
+
+<section id="yetenekler" class="sl light"><div class="hd"><p class="eb">Güncel · Dil modellerinin yeni yetenekleri</p><h2 class="ttl">Sadece sohbet değil: dört yeni yetenek</h2></div><div data-tabs class="col" style="gap:18px"><div class="tabs"><button type="button" class="tb" data-tab="ck" aria-pressed="false">Çok kipli</button><button type="button" class="tb" data-tab="ar" aria-pressed="false">Akıl yürüten</button><button type="button" class="tb" data-tab="aj" aria-pressed="false">Ajan</button><button type="button" class="tb" data-tab="rag" aria-pressed="false">RAG (arama destekli)</button></div><div class="tp" data-pane="ck" hidden><div class="g3" style=""><div class="card " style=""><h3>Ne demek?</h3><p class="" style="">Aynı model metin, görsel, ses (bazen video) alıp üretebilir.</p></div><div class="card " style=""><h3>Örnek</h3><p class="" style="">Fotoğraf yükleyip “bu bitkinin sorunu ne?” demek; grafiği okutup özetlettirmek.</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">Görseldeki yazıyı veya detayı yanlış okuyabilir; önemli kararda doğrula.</p></div></div></div><div class="tp" data-pane="ar" hidden><div class="g3" style=""><div class="card " style=""><h3>Ne demek?</h3><p class="" style="">Cevap vermeden önce uzun bir ara düşünme (adım adım çözüm) üretir.</p></div><div class="card " style=""><h3>Örnek</h3><p class="" style="">Zor matematik, kodlama ve mantık sorularında ek “düşünme süresi” kullanan modeller.</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">Daha yavaş ve pahalı olabilir; yine de yanlış çıkabilir.</p></div></div></div><div class="tp" data-pane="aj" hidden><div class="g3" style=""><div class="card " style=""><h3>Ne demek?</h3><p class="" style="">Hedefi verilir; arama yapar, dosya açar, program çalıştırır, adım adım ilerler.</p></div><div class="card " style=""><h3>Örnek</h3><p class="" style="">“Bu haftanın toplantı notlarını özetle, e-postayla gönder, takvime ekle.”</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">İzinsiz eylem riski: önemli adımda insan onayı gerekir.</p></div></div></div><div class="tp" data-pane="rag" hidden><div class="g3" style=""><div class="card " style=""><h3>Ne demek?</h3><p class="" style="">Model önce belge veya veri tabanında arar, bulduğu parçalara dayanarak cevap yazar.</p></div><div class="card " style=""><h3>Örnek</h3><p class="" style="">Okulun yönetmeliklerini okuyup öğrencinin sorusunu kaynakla cevaplayan bot.</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">Aranan belge kötü veya eskiyse cevap da kötü olur.</p></div></div></div></div><p class="foot">Bu yetenekler bölüm 5’te (otomasyon) yeniden karşımıza çıkacak.</p><aside>Son yıllarda dil modelleri dört yönde gelişti. Çok kipli: tek modelin birden çok veri türünü işlemesi. Akıl yürüten modeller: yanıttan önce uzun ara düşünme. Ajanlar: araç kullanarak çok adımlı iş yapar (e-posta, takvim, dosya, arama). RAG: modelin kendi belleği yerine belgeleri arayıp cevap vermesi. Bunlar 2.3 bölümündeki otomasyon konusunun da temelidir. Bir sonraki slayttaki RAG animasyonu halüsinasyon azaltma yöntemini gösterir.</aside></section>
+
+<section id="rag" class="sl light"><div class="hd"><p class="eb">Adım adım animasyon · RAG</p><h2 class="ttl">Cevabı uydurmak yerine önce belgede ara</h2></div><div class="row " style="gap:8px"><div class="node" id="rg-1" style="flex:1;background:#C2410C;color:#FFF;flex-direction:column;gap:2px;height:110px"><span style="font-size:30px">1</span><span style="font-size:21px">Soru</span></div><span class="arrow">▶</span><div class="node" id="rg-2" style="flex:1;background:#C2410C;color:#FFF;flex-direction:column;gap:2px;height:110px"><span style="font-size:30px">2</span><span style="font-size:21px">Belgelerde ara</span></div><span class="arrow">▶</span><div class="node" id="rg-3" style="flex:1;background:#C2410C;color:#FFF;flex-direction:column;gap:2px;height:110px"><span style="font-size:30px">3</span><span style="font-size:21px">Parçaları ekle</span></div><span class="arrow">▶</span><div class="node" id="rg-4" style="flex:1;background:#C2410C;color:#FFF;flex-direction:column;gap:2px;height:110px"><span style="font-size:30px">4</span><span style="font-size:21px">Cevabı yaz</span></div><span class="arrow">▶</span><div class="node" id="rg-5" style="flex:1;background:#C2410C;color:#FFF;flex-direction:column;gap:2px;height:110px"><span style="font-size:30px">5</span><span style="font-size:21px">Kaynağı göster</span></div></div><div class="row " style="gap:24px"><div class="card info" style=""><h3>Örnek belge (uydurma okul kuralı)</h3><p id="rg-doc" class="sm mono" style="line-height:1.5">…</p></div><div class="card ok" style=""><h3>Modelin cevabı</h3><p id="rg-ans" class="mid" style="min-height:4em">…</p></div></div><div id="rg-msg" class="stmsg"></div><div class="stp"><button type="button" data-act="first">Başa</button><button type="button" data-act="prev">◀ Geri</button><button type="button" class="go" data-act="next">İleri ▶</button><button type="button" data-act="auto">Otomatik oynat</button><span class="cnt"></span></div><p class="foot">RAG = arama + üretim. Halüsinasyonu azaltır, tamamen ortadan kaldırmaz.</p><aside>Örnek belge uydurmadır; amaç mantığı göstermektir. 1) Öğrenci soru sorar. 2) Sistem, kuralların tutulduğu belgelerde en ilgili parçayı bulur (arama). 3) Bulunan parça soruyla birlikte modele verilir. 4) Model cevabı bu parçaya dayanarak yazar. 5) Cevap kaynak belgeyi gösterir; kullanıcı doğrulayabilir. Böylece model "ezberinden" uydurmaz. Ama arama yanlış parçayı bulursa cevap yine yanlış olabilir: bu yüzden kaynak göstermek önemlidir.</aside></section>
+
+<section id="difuzyon" class="sl light"><div class="hd"><p class="eb">Canlı uygulama · Görsel modelleri nasıl çalışır?</p><h2 class="ttl">Difüzyon: gürültüden görüntüye</h2></div><div class="row " style="gap:28px"><div class="col f1" style="gap:14px;"><canvas id="df-c" width="640" height="400" style="width:100%;border-radius:14px;background:#0E1621"></canvas><div class="row " style="gap:16px"><p class="lbl" style="">Gürültü: <b id="df-v">100%</b></p><input id="df-s" type="range" min="0" max="100" value="100" style="flex:1"></div><div class="row " style="gap:12px"><button class="ans-btn" type="button" id="df-go">Görsel üret (animasyon)</button><button class="ans-btn alt sm" type="button" id="df-rs">Sıfırla</button></div></div><div class="col " style="width:760px;gap:18px"><div class="card info" style=""><h3>Fikir</h3><p class="mid" style="">Model, görüntüye adım adım gürültü eklenmesini tersine çevirmeyi öğrenir. Metin açıklaması (prompt) bu temizlemeyi yönlendirir.</p></div><div class="card sm" style=""><h3>Üç aile</h3><ul class=""><li><b>GAN</b>: iki ağ yarışır: biri üretir, biri gerçek mi sahte mi diye kontrol eder (eski, hızlı).</li><li><b>VAE</b>: görüntüyü sıkıştırıp yeniden açar.</li><li><b>Difüzyon</b>: gürültüyü adım adım temizler (bugünün baskın yöntemi).</li></ul></div></div></div><p class="foot">Kitap s. 92–93: Sistem hazır fotoğraf bulmaz, yeni görsel oluşturur.</p><aside>Kaydırıcıyı sola çekerek gürültüyü azaltın; "Görsel üret" düğmesi bunu animasyonla yapar. Bu demo yalnızca fikri gösterir: gerçek difüzyon modelleri her adımda bir sinir ağıyla "gürültüyü tahmin edip çıkarır" ve prompt bu süreci yönlendirir. Kitap s. 92-93: "sistem hazır bir fotoğrafı bulmaz, yeni bir görsel oluşturur" cümlesi bu yüzden doğrudur. Görsel modellerde de halüsinasyon vardır (fazladan parmak, bozuk yazı). Ürün örnekleri: Midjourney, DALL·E ailesi, Stable Diffusion ailesi, Adobe Firefly, Imagen (Google).</aside></section>
+
+<section id="ses-video" class="sl light"><div class="hd"><p class="eb">Kitap 2.2.2 ile bağlantılı · Modeller</p><h2 class="ttl">Ses, müzik, video ve kod modelleri</h2></div><div data-tabs class="col" style="gap:18px"><div class="tabs"><button type="button" class="tb" data-tab="tts" aria-pressed="false">Metinden sese</button><button type="button" class="tb" data-tab="stt" aria-pressed="false">Sesten yazıya</button><button type="button" class="tb" data-tab="mus" aria-pressed="false">Müzik</button><button type="button" class="tb" data-tab="vid" aria-pressed="false">Video</button><button type="button" class="tb" data-tab="kod" aria-pressed="false">Kod</button></div><div class="tp" data-pane="tts" hidden><div class="g3" style=""><div class="card " style=""><h3>Nasıl?</h3><p class="" style="">Metin → okunuş ve vurgu analizi → ses birimleri → ses dalgası.</p></div><div class="card " style=""><h3>Örnek ürünler</h3><p class="" style="">Telefondaki sesli okuma, ElevenLabs gibi ses servisleri, okul duyuru okuyucuları.</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">Ses klonlama izinsiz kullanılırsa dolandırıcılık ve kişilik hakkı ihlali olur.</p></div></div></div><div class="tp" data-pane="stt" hidden><div class="g3" style=""><div class="card " style=""><h3>Nasıl?</h3><p class="" style="">Ses → küçük parçalar → olası harf ve kelime dizisi → metin.</p></div><div class="card " style=""><h3>Örnek ürünler</h3><p class="" style="">Whisper tipi modeller, otomatik altyazı, toplantı notu uygulamaları.</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">Aksan, gürültü ve özel isimlerde hata yapar; kayıt izni gerekir.</p></div></div></div><div class="tp" data-pane="mus" hidden><div class="g3" style=""><div class="card " style=""><h3>Nasıl?</h3><p class="" style="">Metin açıklamasından ritim, ezgi ve ses üretir.</p></div><div class="card " style=""><h3>Örnek ürünler</h3><p class="" style="">Suno, ElevenLabs müzik, Udio benzeri servisler.</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">Telif ve lisans: müziğin kullanım hakkı serviste hangi planla alınır?</p></div></div></div><div class="tp" data-pane="vid" hidden><div class="g3" style=""><div class="card " style=""><h3>Nasıl?</h3><p class="" style="">Metin veya görselden kareler üretir; hareket ve ışık tutarlılığı için zaman boyutunu da modeller.</p></div><div class="card " style=""><h3>Örnek ürünler</h3><p class="" style="">Veo, Runway, Kling, Sora benzeri araçlar (hizmet ve koşulları sık değişir).</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">Gerçek sanılan sahte video (deepfake) riski; “yapay zekâ üretimi” diye belirt.</p></div></div></div><div class="tp" data-pane="kod" hidden><div class="g3" style=""><div class="card " style=""><h3>Nasıl?</h3><p class="" style="">Kod, dil gibi öğrenilir; model sonraki kod parçasını tahmin eder.</p></div><div class="card " style=""><h3>Örnek ürünler</h3><p class="" style="">GitHub Copilot, Claude Code, Cursor gibi geliştirme asistanları.</p></div><div class="card warn" style=""><h3>Dikkat</h3><p class="" style="">Çalışan kod güvenli kod demek değildir; kodu anlamadan kullanma, test et.</p></div></div></div></div><p class="foot">Her sekmenin son kutusu: dikkat edilecek risk.</p><aside>Kitap s. 99-108 ses ve video üretimini anlatır; burada arkadaki model türlerini görüyoruz. Ürün isimleri örnektir; hizmetler ve sürümler hızla değişir, bu yüzden yalnızca ailelerini tanıtın. Kod modelleri kitapta yoktur ama bilişim alanı öğrencileri için çok önemlidir: yapay zekâ kod yazar ama hata ve güvenlik açığı da üretebilir. Etik mesajı her sekmede tekrar edin.</aside></section>
+
+<section id="uzman" class="sl light"><div class="hd"><p class="eb">Dar yapay zekâ başarıları</p><h2 class="ttl">Tek işi çok iyi yapan modeller</h2></div><div class="cls col cmp" style="gap:0"><div class="crow" data-right="1" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">Go oyununda dünya şampiyonunu 4-1 yendi (2016)</span><button type="button" class="opt" data-v="1" aria-pressed="false">AlphaGo</button><button type="button" class="opt" data-v="2" aria-pressed="false">AlphaFold</button><button type="button" class="opt" data-v="3" aria-pressed="false">Deep Blue</button><button type="button" class="opt" data-v="4" aria-pressed="false">AlexNet</button><span class="why sm mute" hidden style="flex-basis:100%">AlphaGo (Google DeepMind): pekiştirmeli öğrenme ve derin ağlar.</span></div><div class="crow" data-right="2" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">Proteinlerin üç boyutlu şeklini tahmin etti; 2024 Kimya Nobel’inde anıldı</span><button type="button" class="opt" data-v="1" aria-pressed="false">AlphaGo</button><button type="button" class="opt" data-v="2" aria-pressed="false">AlphaFold</button><button type="button" class="opt" data-v="3" aria-pressed="false">Deep Blue</button><button type="button" class="opt" data-v="4" aria-pressed="false">AlexNet</button><span class="why sm mute" hidden style="flex-basis:100%">AlphaFold: biyolojide çığır açan yapay zekâ.</span></div><div class="crow" data-right="3" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">Satranç şampiyonu Kasparov’u yendi (1997)</span><button type="button" class="opt" data-v="1" aria-pressed="false">AlphaGo</button><button type="button" class="opt" data-v="2" aria-pressed="false">AlphaFold</button><button type="button" class="opt" data-v="3" aria-pressed="false">Deep Blue</button><button type="button" class="opt" data-v="4" aria-pressed="false">AlexNet</button><span class="why sm mute" hidden style="flex-basis:100%">Deep Blue (IBM): kural ve arama ağırlıklı; öğrenme değil, hız.</span></div><div class="crow" data-right="4" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid rgba(20,32,46,.12)"><span style="font-size:30px;flex:1;min-width:420px;line-height:1.3">2012’de görüntü tanıma yarışmasında derin öğrenmenin gücünü gösterdi</span><button type="button" class="opt" data-v="1" aria-pressed="false">AlphaGo</button><button type="button" class="opt" data-v="2" aria-pressed="false">AlphaFold</button><button type="button" class="opt" data-v="3" aria-pressed="false">Deep Blue</button><button type="button" class="opt" data-v="4" aria-pressed="false">AlexNet</button><span class="why sm mute" hidden style="flex-basis:100%">AlexNet: ImageNet yarışması, GPU ile eğitim.</span></div><div class="row" style="gap:16px;align-items:center;margin-top:14px"><button type="button" class="ans-btn cls-check" style="background:#2F6FDE">Cevapları kontrol et</button><button type="button" class="ans-btn alt cls-reset sm">Sıfırla</button><span class="cls-score" style="font-size:26px;font-weight:600"></span></div></div><div class="card info" style=""><h3>Ortak ders</h3><p class="mid" style="">Bu sistemlerin hiçbiri sohbet edemez veya başka bir işi yapamaz. Her biri tek alanda olağanüstüdür: dar yapay zekâ.</p></div><p class="foot">Tek alanda üstün = dar yapay zekâ (ANI).</p><aside>Tarihçedeki dönüm noktalarını model adlarıyla eşleştiriyoruz. AlphaFold (Google DeepMind), 2024 Kimya Nobel Ödülü’nü Demis Hassabis ve John Jumper ile paylaşan çalışmanın parçasıdır (üçüncü ödül sahibi David Baker). Deep Blue 1997’de Kasparov’u yendi; kitap s. 79’daki cümleyi güçlendirir.</aside></section>
+
+<section id="sihirbaz" class="sl light"><div class="hd"><p class="eb">Canlı uygulama · Model seçme sihirbazı</p><h2 class="ttl">Hangi iş için hangi tür model?</h2></div><div class="row " style="gap:28px"><div class="col f1" style=""><div class="card " style=""><h3>Yapmak istediğim iş</h3><select id="wz-s" class="sel" style="width:100%;font-size:30px"></select></div><p class="mid mute" style="">Bir iş seç, öneriyi ve dikkat edilecek noktayı gör. Sonra sınıfta tartış: sen başka ne seçerdin?</p></div><div class="col " style="width:960px;gap:16px"><div class="card ok" style=""><h3>Önerilen model türü</h3><p id="wz-t" class="big" style="font-weight:600"></p></div><div class="card info" style=""><h3>Örnek ürün veya aileler</h3><p id="wz-e" class="mid"></p></div><div class="card warn" style=""><h3>Dikkat</h3><p id="wz-d" class="mid"></p></div></div></div><p class="foot">Ürün adları örnektir ve değişebilir; model türünü anlamak asıl hedeftir.</p><aside>Sihirbaz basit bir eşleştirmedir; gerçek hayatta çoğu işte birden fazla seçenek vardır. Öğrencilere her iş için "Hangi gizlilik riski var?" ve "Hangi çıktı kontrol edilmeli?" diye sorun. Ürün adları örnektir.</aside></section>
+
+<section id="karsilastir" class="sl light"><div class="hd"><p class="eb">Etkinlik · 25 dakika</p><h2 class="ttl">Kendi testimizi yapalım: aynı prompt, farklı araçlar</h2></div><div class="row " style="gap:28px"><div class="col f1" style="gap:18px;"><div class="card info" style=""><h3>3 test promptu</h3><ul class=""><li>“Fotosentezi 9. sınıf öğrencisine 5 cümlede anlat.”</li><li>“Okulumuzdaki bilişim kulübü için kısa bir duyuru yaz.”</li><li>“1920’de Ankara’da ne oldu?” (yanıtı kaynakla doğrula)</li></ul></div><div class="card warn" style=""><h3>Kurallar</h3><ul class=""><li>Kişisel bilgi yazma.</li><li>Hesap açarken yaş sınırına ve okul kurallarına uy.</li><li>Cevapları puanlamadan önce doğrula.</li></ul></div></div><div class="col " style="width:820px"><table style="font-size:26px;background:#FFFFFF;color:#1B2533;border-radius:12px;overflow:hidden"><tr style="background:#14202E"><th style="color:#F6F4EE;width:40%;">Ölçüt (1-5 puan)</th><th style="color:#F6F4EE;width:20%;">Araç A</th><th style="color:#F6F4EE;width:20%;">Araç B</th><th style="color:#F6F4EE;width:20%;">Araç C</th></tr><tr><td>Doğruluk (kaynakla kontrol et)</td><td></td><td></td><td></td></tr><tr><td>Açıklık ve düzen</td><td></td><td></td><td></td></tr><tr><td>Türkçe doğallığı</td><td></td><td></td><td></td></tr><tr><td>Hız</td><td></td><td></td><td></td></tr><tr><td>Kaynak göstermesi</td><td></td><td></td><td></td></tr><tr><td>Toplam</td><td></td><td></td><td></td></tr></table></div></div><p class="foot">Önce doğrula, sonra puanla.</p><aside>Sınıfta erişilebilen en az iki araç kullanılır (okulun izin verdiği, yaş sınırına uygun olanlar). Kitap s. 101 öğrencilerden hesap oluşturmalarını istiyor; birçok araç kullanım koşullarında yaş sınırı ve veli izni ister. Güvenli yöntem: öğretmen hesabı veya okulun onayladığı araçla gösterim yapmak. Puanlama tablosu çalışma kâğıdına çıkartılabilir. Tartışma: Hangi araç hangi iş için daha iyiydi? Puanlar neden farklı?</aside></section>
+
+<section id="pano" class="sl light"><div class="hd"><p class="eb">Güncel durum panosu · Kaynak: web taraması, 20 Ekim 2026</p><h2 class="ttl">Hızlı değişen bir alan: neye güvenmeli?</h2></div><table style="font-size:24px;background:#FFFFFF;color:#1B2533;border-radius:12px;overflow:hidden"><tr style="background:#14202E"><th style="color:#F6F4EE;width:22%;">Konu</th><th style="color:#F6F4EE;width:48%;">Bugünkü durum (Ekim 2026)</th><th style="color:#F6F4EE;width:30%;">Ne yapmalı?</th></tr><tr><td>Model adları ve sürümleri</td><td>Aylar içinde yenilenir; blog yazıları birbiriyle çelişebilir</td><td>Aileyi ve ne işe yaradığını öğren; sürümü resmî sayfadan kontrol et</td></tr><tr><td>Claude ailesi (örnek)</td><td>Haiku (hızlı ve küçük), Sonnet (dengeli), Opus (en güçlü); 5. nesil: Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5</td><td>İsimlendirmeden boyut ve görev ilişkisini oku</td></tr><tr><td>Karşılaştırma kaynakları</td><td>LMArena gibi insan oylamasına dayanan sıralamalar ve bağımsız kıyaslamalar var</td><td>Tek sıralamaya güvenme; kendi işinde dene</td></tr><tr><td>Genel eğilimler</td><td>Ajanlar, çok kipli modeller, akıl yürüten modeller, cihazda çalışan küçük modeller</td><td>Bölüm 5’te ajan ve otomasyonu göreceğiz</td></tr><tr><td>Düzenleme</td><td>AB Yapay Zekâ Yasası kademeli uygulanıyor; Türkiye’de 2026-2030 Eylem Planı yayımlandı</td><td>Bölüm 6’da ayrıntı</td></tr></table><div class="card warn" style=""><h3>Kaynak notu</h3><p class="sm" style="">Sürüm ve sıralama bilgileri çoğunlukla blog ve karşılaştırma sitelerinden gelir; bu kaynaklar birbirini tutmayabilir. Kesin bilgi için şirketlerin resmî duyurularına bak.</p></div><p class="foot">Güncel kalma kuralı: iki bağımsız ve güvenilir kaynak.</p><aside>Bu slayt, güncelliğin kendisi bir ders olsun diye eklendi: öğrencilerle birlikte iki farklı kaynakta aynı modelin adını arayıp çelişkileri bulun. Claude ailesi bilgisi sistem tarafından doğrulanmış güncel model adlarıdır; diğer şirketler için bilerek sürüm numarası yazılmadı çünkü web taraması kaynaklar arasında tutarsız sonuçlar verdi. Öğretmenin derste kendi tarayıcısında resmî sayfalara bakıp bilgiyi güncellemesi önerilir.</aside></section>
+
+<section id="b2-test" class="sl light"><div class="hd"><p class="eb">Bölüm 2 · Mini test</p><h2 class="ttl">Sekiz soruda bölümü değerlendir</h2></div><button class="ans-btn" type="button" data-all="1">Tüm cevapları göster</button><div class="g2" style="gap:16px"><div class="col " style="gap:10px"><p class="sm" style=""><b>1.</b> Eğitilmiş bir model sohbet sırasında hangisini yapmaz? <span class="mute">A) Cevap hesaplar · B) Ağırlıklarını kalıcı değiştirir</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Kullanım (çıkarım) sırasında ağırlıklar değişmez.</div></div><div class="col " style="gap:10px"><p class="sm" style=""><b>2.</b> Dil modelinin temel işi nedir? <span class="mute">A) Sonraki token’ı tahmin etmek · B) İnternetten kopyala-yapıştır</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>A.</b> Sonraki token’ın olasılığını hesaplar.</div></div><div class="col " style="gap:10px"><p class="sm" style=""><b>3.</b> Sıcaklık (temperature) yükselirse ne olur? <span class="mute">A) Daha tutarlı · B) Daha çeşitli ve riskli</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Düşük olasılıklı seçenekler de seçilir.</div></div><div class="col " style="gap:10px"><p class="sm" style=""><b>4.</b> “ChatGPT” hangisidir? <span class="mute">A) Şirket · B) Uygulama</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Uygulama (ürün); modeller GPT ailesidir.</div></div><div class="col " style="gap:10px"><p class="sm" style=""><b>5.</b> Gizli veriyi dışarı göndermek istemeyen kurum hangisini düşünebilir? <span class="mute">A) Açık ağırlıklı model · B) Her veriyi kapalı servise yüklemek</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>A.</b> Kendi ortamında çalıştırma, gizliliği artırabilir.</div></div><div class="col " style="gap:10px"><p class="sm" style=""><b>6.</b> RAG neyi azaltmaya yardım eder? <span class="mute">A) Halüsinasyonu · B) İnterneti</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>A.</b> Belgeyi arayıp kaynağa dayanarak cevap yazar.</div></div><div class="col " style="gap:10px"><p class="sm" style=""><b>7.</b> Difüzyon modeli görüntüyü nasıl üretir? <span class="mute">A) Hazır fotoğraf arar · B) Gürültüyü adım adım temizler</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>B.</b> Gürültüden başlayıp prompt’a göre temizler.</div></div><div class="col " style="gap:10px"><p class="sm" style=""><b>8.</b> Aşağıdakilerden hangisi “dar” yapay zekâdır? <span class="mute">A) AlphaFold · B) Her işi yapan bilinçli robot</span></p><button class="ans-btn sm" type="button">Cevabı göster</button><div class="ans" hidden><b>A.</b> Tek alanda uzman sistemdir.</div></div></div><aside>Sekiz soruluk mini test. "Tüm cevapları göster" düğmesiyle sınıfça kontrol edin. Başarısız sorular için ilgili demo slaytına dönün: 1 → model-nedir, 3 → sicaklik, 6 → rag, 7 → difuzyon.</aside></section>
+
+<section id="hafta-ozet" class="sl light"><div class="hd"><p class="eb">9. Hafta · Özet</p><h2 class="ttl">Bu hafta ne öğrendik?</h2></div><div class="g3" style=""><div class="card " style=""><h3>Model</h3><p class="sm" style="">Eğitimle ayarlanmış büyük bir sayı tablosu. Veri → eğitim → model.</p></div><div class="card info" style=""><h3>Dil modeli</h3><p class="sm" style="">Metni token parçalarına böler; sonraki parçanın olasılığını hesaplar. Sıcaklık yaratıcılığı, dikkat bağlamı belirler.</p></div><div class="card ok" style=""><h3>Açık / kapalı</h3><p class="sm" style="">Kapalı model: kolay, hazır, veri şirkette. Açık ağırlıklı model: kendi bilgisayarında çalıştırılabilir.</p></div><div class="card warn" style=""><h3>RAG ve ajan</h3><p class="sm" style="">RAG: önce belgede ara, sonra yanıtla. Ajan: hedefi adım adım yürütür.</p></div><div class="card " style=""><h3>Görsel / ses / video</h3><p class="sm" style="">Görsel modeller gürültüden görüntü üretir (difüzyon); ses ve video modelleri aynı mantığı genişletir.</p></div><div class="card dk" style=""><h3>Temkin</h3><p class="sm" style="">Alan hızlı değişir: sürüm ve fiyat bilgisini resmî kaynaktan doğrula.</p></div></div><div class="card info" style=""><h3>Haftaya</h3><p class="mid" style="">10. hafta ara tatil. 11. hafta: etkili prompt yazımı (amaç, rol, görev, bağlam, kısıt, örnek).</p></div><aside>Her kartı bir öğrencinin kendi cümleleriyle anlatmasını isteyin. Son kart bir sonraki haftaya köprüdür. Kalan süre varsa hedefler slaytına dönüp öz değerlendirme yaptırın.</aside></section>
+</div>
+<div id="notes" hidden><b>Öğretmen notu</b><div id="notestxt"></div></div>
+</div>
+<div id="barwrap">
+<div id="bar">
+<button id="bprev" type="button" aria-label="Önceki slayt">◀<span class="hide-sm"> Önceki</span></button>
+<button id="bnext" type="button" aria-label="Sonraki slayt"><span class="hide-sm">Sonraki </span>▶</button>
+<span id="count">1 / 1</span>
+<span id="stitle"></span>
+<button id="bnotes" type="button" aria-pressed="false">Notlar<span class="hide-sm"> (N)</span></button>
+<button id="bfull" type="button">Tam ekran<span class="hide-sm"> (F)</span></button>
+</div>
+<div id="prog"></div>
+</div>
+</div>
+<script>window.__deckKey='btt-h9-son-slayt-v1';</script>
+<script>
+(function(){
+var stage=document.getElementById('stage'),vp=document.getElementById('viewport');
+var slides=[].slice.call(stage.children).filter(function(n){return n.tagName==='SECTION'});
+var cur=0;window.steppers={};window.__slides=slides;
+function fit(){var w=vp.clientWidth,h=vp.clientHeight,s=Math.min(w/1920,h/1080);
+  stage.style.transform='translate('+((w-1920*s)/2)+'px,'+((h-1080*s)/2)+'px) scale('+s+')';}
+function title(sec){var d=sec.getAttribute('data-title');if(d)return d;var h=sec.querySelector('h1,h2');if(!h)return '';var c=h.cloneNode(true);c.querySelectorAll('br').forEach(function(b){b.replaceWith(' ')});return c.textContent.replace(/\s+/g,' ').trim();}
+function go(n){n=Math.max(0,Math.min(slides.length-1,n));slides[cur].classList.remove('active');cur=n;var s=slides[cur];s.classList.add('active');
+  document.getElementById('count').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('stitle').textContent=title(s);
+  document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+  var a=s.querySelector('aside');document.getElementById('notestxt').textContent=a?a.textContent:'Bu slayt için not yok.';
+  try{history.replaceState(null,'','#'+s.id)}catch(e){}
+  if(window.__deckKey){try{localStorage.setItem(window.__deckKey,String(cur))}catch(e){}}}
+window.__go=go;
+function next(){var st=window.steppers[slides[cur].id];if(st&&st.next())return;go(cur+1);}
+function prev(){var st=window.steppers[slides[cur].id];if(st&&st.prev())return;go(cur-1);}
+document.getElementById('bnext').onclick=function(){go(cur+1)};
+document.getElementById('bprev').onclick=function(){go(cur-1)};
+function toggleNotes(){var n=document.getElementById('notes');n.hidden=!n.hidden;document.getElementById('bnotes').setAttribute('aria-pressed',String(!n.hidden));}
+function full(){try{if(document.fullscreenElement)document.exitFullscreen();else{var p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){});}}catch(e){}}
+document.getElementById('bnotes').onclick=toggleNotes;document.getElementById('bfull').onclick=full;
+document.addEventListener('keydown',function(e){var t=e.target,tn=t&&t.tagName;if(tn==='INPUT'||tn==='TEXTAREA'||tn==='SELECT')return;
+  if(tn==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();next();}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
+  else if(e.key==='Home'){go(0);}else if(e.key==='End'){go(slides.length-1);}
+  else if(e.key==='n'||e.key==='N'){toggleNotes();}else if(e.key==='f'||e.key==='F'){full();}});
+
+/* cevap düğmeleri */
+document.querySelectorAll('.ans-btn:not([data-all])').forEach(function(b){if(!b.getAttribute('data-on'))b.setAttribute('data-on',b.textContent);});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.ans-btn');if(!b)return;
+  var sec=b.closest('section');
+  if(b.hasAttribute('data-all')){var list=sec.querySelectorAll('.ans');var open=b.getAttribute('aria-pressed')!=='true';
+    list.forEach(function(x){x.hidden=!open});sec.querySelectorAll('.ans-btn:not([data-all])').forEach(function(x){x.textContent=open?(x.getAttribute('data-off')||'Gizle'):(x.getAttribute('data-on')||'Cevabı göster')});
+    b.setAttribute('aria-pressed',String(open));b.textContent=open?'Tüm cevapları gizle':'Tüm cevapları göster';return;}
+  var tg=b.getAttribute('data-for')?document.getElementById(b.getAttribute('data-for')):b.nextElementSibling;
+  if(!tg)return;tg.hidden=!tg.hidden;
+  if(!b.getAttribute('data-on'))b.setAttribute('data-on',b.textContent);
+  b.textContent=tg.hidden?b.getAttribute('data-on'):(b.getAttribute('data-off')||'Gizle');});
+
+/* sekmeler: [data-tabs] içinde .tb[data-tab] ve .tp[data-pane] */
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.tb[data-tab]');if(!b)return;
+  var g=b.closest('[data-tabs]');if(!g)return;var id=b.getAttribute('data-tab');
+  g.querySelectorAll('.tb[data-tab]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+  g.querySelectorAll('.tp[data-pane]').forEach(function(p){p.hidden=p.getAttribute('data-pane')!==id});});
+document.querySelectorAll('[data-tabs]').forEach(function(g){var f=g.querySelector('.tb[data-tab]');if(f)f.click();});
+
+/* sınıflandırma etkinliği: .cls > .crow[data-right] > .opt[data-v]; .cls-check, .cls-reset */
+document.addEventListener('click',function(e){
+  var o=e.target.closest&&e.target.closest('.cls .opt');
+  if(o){var row=o.closest('.crow');if(row.hasAttribute('data-done'))return;row.querySelectorAll('.opt').forEach(function(x){x.setAttribute('aria-pressed',String(x===o))});return;}
+  var c=e.target.closest&&e.target.closest('.cls-check');
+  if(c){var cls=c.closest('.cls'),ok=0,n=0;cls.querySelectorAll('.crow').forEach(function(r){n++;r.setAttribute('data-done','1');var rt=r.getAttribute('data-right');
+    r.querySelectorAll('.opt').forEach(function(x){var sel=x.getAttribute('aria-pressed')==='true',isR=x.getAttribute('data-v')===rt;
+      x.classList.remove('right','wrong');if(isR)x.classList.add('right');else if(sel)x.classList.add('wrong');if(sel&&isR)ok++;});
+    var ex=r.querySelector('.why');if(ex)ex.hidden=false;});
+    var sc=cls.querySelector('.cls-score');if(sc)sc.textContent=ok+' / '+n+' doğru';return;}
+  var rs=e.target.closest&&e.target.closest('.cls-reset');
+  if(rs){var cl=rs.closest('.cls');cl.querySelectorAll('.crow').forEach(function(r){r.removeAttribute('data-done');r.querySelectorAll('.opt').forEach(function(x){x.classList.remove('right','wrong');x.setAttribute('aria-pressed','false')});var ex=r.querySelector('.why');if(ex)ex.hidden=true;});
+    var sc2=cl.querySelector('.cls-score');if(sc2)sc2.textContent='';}
+});
+
+/* kopyala */
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-copy]');if(!b)return;
+  var el=document.getElementById(b.getAttribute('data-copy'));if(!el)return;var txt=el.value!==undefined&&el.tagName==='TEXTAREA'?el.value:el.textContent;
+  var old=b.textContent;function done(){b.textContent='Kopyalandı';setTimeout(function(){b.textContent=old},1500);}
+  try{navigator.clipboard.writeText(txt).then(done,function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Metin seçildi: Ctrl+C';});}catch(x){b.textContent='Metni seçip Ctrl+C';}});
+
+/* geri sayım: .timer[data-sec] içinde .t-val ve .t-go */
+document.querySelectorAll('.timer').forEach(function(t){var sec=+t.getAttribute('data-sec')||60,left=sec,iv=null,v=t.querySelector('.t-val'),g=t.querySelector('.t-go');
+  function show(){var m=Math.floor(left/60),s=left%60;v.textContent=m+':'+(s<10?'0':'')+s;}
+  show();g.addEventListener('click',function(){if(iv){clearInterval(iv);iv=null;left=sec;show();g.textContent='Başlat';return;}
+    g.textContent='Sıfırla';iv=setInterval(function(){left--;show();if(left<=0){clearInterval(iv);iv=null;g.textContent='Süre doldu · Tekrar';left=sec;}},1000);});});
+
+/* adım adım animasyon: id, steps[], render(step,index) */
+window.makeStepper=function(id,steps,render){var sec=document.getElementById(id);if(!sec)return;var k=0,timer=null;
+  var cnt=sec.querySelector('.stp .cnt'),auto=sec.querySelector('[data-act="auto"]');
+  function draw(){render(steps[k],k);if(cnt)cnt.textContent='Adım '+(k+1)+' / '+steps.length;}
+  function stop(){if(timer){clearInterval(timer);timer=null;if(auto){auto.setAttribute('aria-pressed','false');auto.textContent='Otomatik oynat';}}}
+  var api={next:function(){if(k<steps.length-1){k++;draw();return true}return false},prev:function(){if(k>0){k--;draw();return true}return false}};
+  sec.querySelectorAll('.stp [data-act]').forEach(function(btn){btn.addEventListener('click',function(){var a=btn.getAttribute('data-act');
+    if(a==='next'){stop();api.next();}else if(a==='prev'){stop();api.prev();}else if(a==='first'){stop();k=0;draw();}
+    else if(a==='auto'){if(timer){stop();}else{if(k>=steps.length-1){k=0;draw();}btn.setAttribute('aria-pressed','true');btn.textContent='Durdur';
+      timer=setInterval(function(){if(!api.next())stop();},3000);}}});});
+  window.steppers[id]=api;draw();};
+window.addEventListener('resize',fit);
+fit();
+var h=(location.hash||'').slice(1),start=0;slides.forEach(function(s,i){if(s.id===h)start=i});
+if(!h&&window.__deckKey){try{var sv=parseInt(localStorage.getItem(window.__deckKey)||'0',10);if(sv>0&&sv<slides.length)start=sv;}catch(e){}}
+slides.forEach(function(s){s.classList.remove('active')});slides[0].classList.add('active');go(start);
+window.__deckReady=true;document.dispatchEvent(new Event('deckready'));
+})();
+
+</script>
+<script>
+/* s2_modeller */
+(function(){
+function $(id){return document.getElementById(id);}
+function pct(x){return Math.round(x*100)+'%';}
+
+/* ---------- token ---------- */
+(function(){
+  if(!$('tk-t'))return;
+  var COL=['#DCE8FB','#FFE2CC','#DDF1E3','#EADCF8'];
+  function split(w){var out=[];while(w.length>6){out.push(w.slice(0,4));w=w.slice(4);}out.push(w);return out;}
+  function run(){
+    var t=$('tk-t').value,m=t.match(/[\p{L}\p{N}]+|[^\s\p{L}\p{N}]/gu)||[],toks=[],words=(t.match(/[\p{L}\p{N}]+/gu)||[]).length;
+    m.forEach(function(x){if(/^[\p{L}\p{N}]+$/u.test(x))split(x).forEach(function(y){toks.push(y)});else toks.push(x);});
+    var h='';toks.forEach(function(x,i){h+='<span style="background:'+COL[i%4]+';color:#14202E;border-radius:6px;padding:2px 8px">'+x.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span>';});
+    $('tk-out').innerHTML=h;$('tk-w').textContent=words;$('tk-n').textContent=toks.length;
+  }
+  $('tk-t').addEventListener('input',run);run();
+})();
+
+/* ---------- sıcaklık ---------- */
+(function(){
+  if(!$('tm-bars'))return;
+  var C=[['Türkiye’nin başkenti',[['Ankara',5.0],['İstanbul',3.0],['İzmir',1.0],['Bursa',.5],['Roma',-1.0]]],
+         ['Bugün hava çok',[['güzel',3.0],['sıcak',2.8],['soğuk',2.5],['yağmurlu',1.8],['matematik',-2.0]]],
+         ['Python bir programlama',[['dilidir',4.5],['dili',3.0],['aracıdır',1.0],['yılanıdır',-.5],['şehridir',-2.0]]]];
+  var ci=0,tally={};
+  function dist(){var T=$('tm-t').value/10,L=C[ci][1].map(function(x){return x[1]/T;}),mx=Math.max.apply(null,L),ex=L.map(function(l){return Math.exp(l-mx);}),sm=ex.reduce(function(a,b){return a+b;},0);return ex.map(function(e){return e/sm;});}
+  function render(){var d=dist();$('tm-tv').textContent=($('tm-t').value/10).toFixed(1);
+    var h='';C[ci][1].forEach(function(x,i){h+='<div style="display:flex;align-items:center;gap:16px"><span style="width:200px;font-size:28px;font-weight:600;color:#14202E">'+x[0]+'</span><div class="bar" style="flex:1;height:34px"><i style="width:'+(d[i]*100).toFixed(1)+'%"></i></div><span class="mono" style="width:90px;font-size:26px;text-align:right">'+(d[i]*100).toFixed(1)+'%</span></div>';});
+    var tl=Object.keys(tally).map(function(k){return k+' ×'+tally[k];}).join(' · ');
+    h+='<p class="sm mute" style="margin-top:6px">Seçim sayıları: '+(tl||'henüz yok')+'</p>';
+    $('tm-bars').innerHTML=h;}
+  function ctxs(){var h='';C.forEach(function(c,i){h+='<button type="button" class="tb" data-i="'+i+'" aria-pressed="'+(i===ci)+'">'+c[0]+'</button>';});$('tm-ctx').innerHTML=h;$('tm-s').textContent=C[ci][0]+' …';}
+  $('tm-ctx').addEventListener('click',function(e){var b=e.target.closest('.tb');if(!b)return;ci=+b.getAttribute('data-i');tally={};ctxs();render();e.stopPropagation();});
+  $('tm-t').addEventListener('input',render);
+  $('tm-go').addEventListener('click',function(){var d=dist(),r=Math.random(),a=0,k=d.length-1;for(var i=0;i<d.length;i++){a+=d[i];if(r<a){k=i;break;}}
+    var w=C[ci][1][k][0];tally[w]=(tally[w]||0)+1;$('tm-s').textContent=C[ci][0]+' '+w;render();});
+  $('tm-rs').addEventListener('click',function(){tally={};$('tm-s').textContent=C[ci][0]+' …';render();});
+  ctxs();render();
+})();
+
+/* ---------- dikkat ---------- */
+(function(){
+  if(!$('at-words'))return;
+  var W=['Ali,','kitabı','Ayşe’ye','verdi','çünkü','o','istedi.'];
+  var M=[[.40,.10,.15,.20,.05,.05,.05],[.05,.30,.10,.30,.05,.05,.15],[.10,.10,.35,.25,.05,.05,.10],[.20,.20,.25,.20,.05,.02,.08],[.05,.05,.15,.25,.25,.10,.15],[.15,.03,.55,.05,.07,.10,.05],[.05,.25,.10,.10,.05,.35,.10]];
+  var sel=5;
+  function render(){var h='';W.forEach(function(w,i){var a=M[sel][i];
+    h+='<button type="button" class="at-w" data-i="'+i+'" style="font:600 52px Rubik,Arial,sans-serif;border:'+(i===sel?'5px solid #14202E':'2px solid #C9C4B8')+';border-radius:14px;padding:14px 22px;background:rgba(194,65,12,'+(0.08+a*1.5).toFixed(2)+');color:#14202E;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px">'+w+'<span style="font:500 26px var(--mono)">'+a.toFixed(2)+'</span></button>';});
+    $('at-words').innerHTML=h;}
+  $('at-words').addEventListener('click',function(e){var b=e.target.closest('.at-w');if(!b)return;sel=+b.getAttribute('data-i');render();});
+  render();
+})();
+
+/* ---------- yaşam döngüsü ---------- */
+(function(){
+  var S=[{n:0,m:'İleri’ye bas: bir sohbet modelinin hazırlanış sürecini beş adımda izleyelim.'},
+    {n:1,m:'1 · Veri: Kitaplar, haberler, ansiklopediler, kod depoları gibi dev metin yığınları toplanır ve temizlenir. Kişisel veri ve zararlı içerik ayıklanmaya çalışılır.'},
+    {n:2,m:'2 · Ön eğitim: Model, trilyonlarca token’a kadar metinde “sonraki parçayı tahmin et” görevini çözer. Haftalarca, binlerce GPU ile. Sonuç: dili iyi bilen ham model.'},
+    {n:3,m:'3 · İnce ayar: Örnek soru-cevap çiftleriyle talimat izlemeyi öğrenir: “özetle”, “çevir”, “kodu düzelt” isteklerine uygun cevap verir.'},
+    {n:4,m:'4 · İnsan geri bildirimi: İnsanlar iki cevaptan hangisinin daha iyi ve güvenli olduğunu işaretler; model bu tercihlere göre ayarlanır.'},
+    {n:5,m:'5 · Kullanım (çıkarım): Sen yazarsın, model cevabı üretir. Konuşma sırasında model değişmez. Bazı ürünler arama ve araç bağlantısı da ekler.'}];
+  function render(s){for(var i=1;i<=5;i++){var e=$('lc-'+i);if(!e)return;var on=s.n===i;e.style.outline=on?'6px solid #FF9F5A':'none';e.style.transform=on?'translateY(-8px)':'none';e.style.opacity=(s.n===0||on)?'1':'.55';e.style.transition='all .2s';}
+    $('lc-msg').textContent=s.m;}
+  makeStepper('yasam',S,render);
+})();
+
+/* ---------- RAG ---------- */
+(function(){
+  var DOC=['Madde 1: Öğrenciler en fazla 3 kitabı 15 gün süreyle ödünç alabilir.','Madde 2: Ödünç süresi bir kez 7 gün uzatılabilir.','Madde 3: Kütüphane hafta içi 08.30-17.00 arası açıktır.'];
+  var S=[{n:0,hl:[],a:'…',m:'İleri’ye bas: bir okul botunun soruya nasıl cevap verdiğini izleyelim. Soldaki belge uydurma bir örnektir.'},
+    {n:1,hl:[],a:'Soru: “Bir kitabı kaç gün tutabilirim?”',m:'1 · Öğrenci soruyu yazar.'},
+    {n:2,hl:[0,1],a:'Soru: “Bir kitabı kaç gün tutabilirim?”',m:'2 · Sistem, kural belgesinde soruyla en çok ilgili parçaları arar: Madde 1 ve Madde 2 bulunur.'},
+    {n:3,hl:[0,1],a:'Modele verilen: soru + Madde 1 + Madde 2',m:'3 · Bulunan parçalar, soruyla birlikte modele verilir. Model artık ezberinden değil, bu metinden cevap yazar.'},
+    {n:4,hl:[0,1],a:'Bir kitabı 15 gün tutabilirsin; süre bir kez 7 gün uzatılabilir.',m:'4 · Model cevabı bulunan metne dayanarak yazar.'},
+    {n:5,hl:[0,1],a:'Bir kitabı 15 gün tutabilirsin; süre bir kez 7 gün uzatılabilir. (Kaynak: Kütüphane Kuralları, Madde 1-2)',m:'5 · Cevap kaynağı gösterir. Öğrenci belgeye bakıp doğrulayabilir.'}];
+  function render(s){for(var i=1;i<=5;i++){var e=$('rg-'+i);if(!e)return;var on=s.n===i;e.style.outline=on?'6px solid #14202E':'none';e.style.transform=on?'translateY(-8px)':'none';e.style.opacity=(s.n===0||on)?'1':'.55';e.style.transition='all .2s';}
+    $('rg-doc').innerHTML=DOC.map(function(d,i){return '<span style="display:block;padding:4px 8px;border-radius:6px;'+(s.hl.indexOf(i)>=0?'background:#FFE2CC;outline:3px solid #C2410C':'')+'">'+d+'</span>';}).join('');
+    $('rg-ans').textContent=s.a;$('rg-msg').textContent=s.m;}
+  makeStepper('rag',S,render);
+})();
+
+/* ---------- difüzyon ---------- */
+(function(){
+  var cv=$('df-c');if(!cv)return;var W=640,H=400,ctx=cv.getContext('2d');
+  var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#2F6FDE');g.addColorStop(.62,'#FFD59A');g.addColorStop(1,'#FFD59A');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#FFE27A';ctx.beginPath();ctx.arc(470,150,62,0,7);ctx.fill();
+  ctx.fillStyle='#2E8540';ctx.beginPath();ctx.moveTo(0,400);ctx.lineTo(0,270);ctx.quadraticCurveTo(160,190,330,290);ctx.quadraticCurveTo(480,360,640,260);ctx.lineTo(640,400);ctx.fill();
+  ctx.fillStyle='#14301F';ctx.beginPath();ctx.moveTo(0,400);ctx.lineTo(0,340);ctx.quadraticCurveTo(220,290,420,350);ctx.quadraticCurveTo(540,380,640,330);ctx.lineTo(640,400);ctx.fill();
+  ctx.fillStyle='#7A2E0B';ctx.fillRect(130,250,16,60);ctx.fillStyle='#C2410C';ctx.beginPath();ctx.arc(138,236,36,0,7);ctx.fill();
+  var clean=ctx.getImageData(0,0,W,H),cd=clean.data,CW=160,CH=100,N=new Uint8Array(CW*CH*3),seed=12345;
+  for(var i=0;i<N.length;i++){seed=(seed*1664525+1013904223)>>>0;N[i]=seed>>>24;}
+  var out=ctx.createImageData(W,H),od=out.data;
+  function draw(a){for(var y=0;y<H;y++){for(var x=0;x<W;x++){var k=(y*W+x)*4,n=((y>>2)*CW+(x>>2))*3;
+      od[k]=cd[k]*(1-a)+N[n]*a;od[k+1]=cd[k+1]*(1-a)+N[n+1]*a;od[k+2]=cd[k+2]*(1-a)+N[n+2]*a;od[k+3]=255;}}
+    ctx.putImageData(out,0,0);$('df-v').textContent=Math.round(a*100)+'%';$('df-s').value=Math.round(a*100);}
+  var iv=null;
+  $('df-s').addEventListener('input',function(){if(iv){clearInterval(iv);iv=null;}draw($('df-s').value/100);});
+  $('df-go').addEventListener('click',function(){if(iv)clearInterval(iv);var a=1;draw(a);iv=setInterval(function(){a-=0.05;if(a<=0){a=0;clearInterval(iv);iv=null;}draw(a);},150);});
+  $('df-rs').addEventListener('click',function(){if(iv){clearInterval(iv);iv=null;}draw(1);});
+  draw(1);
+})();
+
+/* ---------- sihirbaz ---------- */
+(function(){
+  if(!$('wz-s'))return;
+  var T=[
+   ['Uzun bir makaleyi özetlemek','Dil modeli (LLM)','Claude, ChatGPT, Gemini gibi sohbet asistanları','Önemli ayrıntıyı atlayabilir; özeti kaynak metinle karşılaştır. Telifli veya gizli metni yüklemeden önce kuralları kontrol et.'],
+   ['Fotoğraftaki bitkinin hastalığını anlamak','Çok kipli model (görsel + metin)','Görsel yüklemeyi destekleyen sohbet modelleri, bitki tanıma uygulamaları','Kesin teşhis değildir; ziraat uzmanına danış.'],
+   ['Toplantı kaydını yazıya dökmek','Konuşma tanıma (sesten yazıya)','Whisper tipi modeller, otomatik altyazı araçları','Kayıt için izin al; özel isim ve aksanlarda hata olabilir.'],
+   ['Okul afişi için görsel üretmek','Görsel üretim modeli (difüzyon)','Midjourney, DALL·E ailesi, Stable Diffusion ailesi, Adobe Firefly','Logo ve kişi fotoğrafı izinsiz kullanılmaz; görseldeki yazılar sık yanlış çıkar.'],
+   ['Videoya Türkçe seslendirme eklemek','Metinden sese + istenirse video modeli','ElevenLabs tipi ses servisleri, telefonların okuma özelliği','Gerçek bir kişinin sesini izinsiz taklit etme; yapay zekâ ürünü olduğunu belirt.'],
+   ['Web sitesi için kod yazdırmak','Kod modeli / geliştirme asistanı','GitHub Copilot, Claude Code, Cursor gibi araçlar','Kodu anlamadan kullanma; güvenlik ve lisans açısından test et.'],
+   ['Okul yönetmeliğine göre cevap veren bot','RAG tabanlı sohbet botu','Belge arayan ve kaynak gösteren sohbet botu çözümleri','Belge güncel olmalı; cevapta kaynak göstermeli.'],
+   ['Her hafta e-postaları sınıflandırıp özet göndermek','Otomasyon + dil modeli (iş akışı / ajan)','Zapier, Make, n8n, Power Automate gibi platformlar','Yetki sınırı koy; önemli işlemde insan onayı ekle.'],
+   ['Müşteri yorumlarını olumlu / olumsuz ayırmak','Metin sınıflandırma (denetimli model veya dil modeli)','Duygu analizi servisleri, dil modelleri','İroniyi yanlış anlayabilir; önce örneklerle test et.'],
+   ['Zor bir mantık problemini adım adım çözmek','Akıl yürüten model','Düşünme süresi ekleyen modeller','Çözüm adımlarını kontrol et; yine de yanlış olabilir.']];
+  var h='';T.forEach(function(t,i){h+='<option value="'+i+'">'+t[0]+'</option>';});$('wz-s').innerHTML=h;
+  function r(){var t=T[$('wz-s').value];$('wz-t').textContent=t[1];$('wz-e').textContent=t[2];$('wz-d').textContent=t[3];}
+  $('wz-s').addEventListener('change',r);r();
+})();
+
+})();
+
+</script>
+</body></html>

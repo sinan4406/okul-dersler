@@ -15,7 +15,7 @@ Sim.mount=function(id,cfg){
   var scene=null;
   if(cfg.scene&&$(id+'-scene')){scene=Ckt.scenes[cfg.scene](id,cfg.map);$(id+'-scene').innerHTML=scene.svg;}
   var rows=leds.map(function(l){return{pin:l.pin,col:COLS[l.color]||'#fff'};});
-  var tlW=cfg.tlW||640,win=cfg.win||10000,compact=leds.length>=4,rh=compact?34:52;
+  var tlW=cfg.tlW||600,win=cfg.win||10000,compact=leds.length>=4,rh=compact?28:50;
   if($(id+'-tl'))$(id+'-tl').innerHTML=Ckt.timelineSvg(id,rows,tlW,rh);
   var rt=null,running=false,speed=cfg.speed||1,raf=0,last=0,prog=null;
 
@@ -23,11 +23,11 @@ Sim.mount=function(id,cfg){
     var el=$(id+'-pins');if(!el)return;
     if(compact){
       var hc='<div style="display:flex;flex-wrap:wrap;gap:8px">';
-      leds.forEach(function(l,i){hc+='<span id="'+id+'-pb'+i+'" class="chip lo" style="font-family:var(--mono);font-size:18px">D'+l.pin+' · 0 V</span>';});
-      el.innerHTML=hc+'</div><p id="'+id+'-now" class="mono" style="font-size:17px;color:#93A3B8;margin-top:8px;white-space:pre-wrap;line-height:1.35">Şu an: —</p>';return;}
+      leds.forEach(function(l,i){hc+='<span id="'+id+'-pb'+i+'" class="chip lo" style="font-family:var(--mono);font-size:23px">D'+l.pin+' · 0 V</span>';});
+      el.innerHTML=hc+'</div><p id="'+id+'-now" class="mono" style="font-size:21px;color:#93A3B8;margin-top:8px;white-space:pre-wrap;line-height:1.35">Şu an: —</p>';return;}
     var h='<table class="pt"><tr><th>Pin</th><th>Mod</th><th>Gerilim</th><th>Akım</th><th>LED</th></tr>';
     leds.forEach(function(l,i){h+='<tr><td>D'+l.pin+'</td><td id="'+id+'-pm'+i+'">—</td><td id="'+id+'-pg'+i+'">0 V</td><td id="'+id+'-pa'+i+'">0,0 mA</td><td id="'+id+'-pl'+i+'"><span class="chip lo">söndü</span></td></tr>';});
-    h+='</table><p id="'+id+'-now" class="mono" style="font-size:19px;color:#93A3B8;margin-top:8px;white-space:pre-wrap">Şu an: —</p>';
+    h+='</table><p id="'+id+'-now" class="mono" style="font-size:22px;color:#93A3B8;margin-top:8px;white-space:pre-wrap">Şu an: —</p>';
     el.innerHTML=h;}
   function render(levels){
     leds.forEach(function(l,i){

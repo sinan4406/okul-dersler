@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hafta 8 - Ek Uygulamalar</title>
+<style>
+:root{--bg:#f4f5fb;--panel:#fff;--text:#14183a;--muted:#5d6385;--line:#dfe3f3;--accent:#6d4aff;--ok:#10955a;--code:#12122b;--codet:#e9ebff}
+:root[data-theme=dark]{--bg:#12132a;--panel:#1c1e3b;--text:#eef0ff;--muted:#a3a8d0;--line:#34376a;--accent:#9b82ff;--ok:#3ddc97}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,"Segoe UI",Arial,sans-serif}
+header.top{background:linear-gradient(135deg,#6d4aff,#a14bff);color:#fff;padding:18px 16px}
+header.top h1{margin:0;font-size:1.4rem}header.top p{margin:4px 0 0;opacity:.9}
+.wrap{max-width:1500px;margin:0 auto;padding:16px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tabs button,.btn{border:2px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.card h2{margin:0 0 6px;font-size:1.15rem}
+.weeks{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.weeks span{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);border-radius:99px;padding:2px 10px;font-size:.82rem;font-weight:700}
+ol.steps{margin:6px 0 0;padding-left:22px}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:14px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.pane.prev{order:-1}.codepane{position:static!important}}
+.codepane{position:sticky;top:8px}
+.pv{overflow:hidden;background:#fff;width:100%}
+.pv iframe{transform-origin:0 0;display:block;max-width:none}
+.hh{margin:6px 0 8px;font-size:1.1rem}
+.pane{border:2px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel);display:flex;flex-direction:column}
+.pane-h{display:flex;justify-content:space-between;align-items:center;gap:8px;background:color-mix(in srgb,var(--accent) 8%,var(--panel));padding:6px 12px;font-weight:800;font-size:.85rem;border-bottom:2px solid var(--line)}
+.pane-h .btn{padding:2px 10px;font-size:.8rem}
+.cw{position:relative;height:460px;overflow:hidden;background:var(--code)}
+.cw textarea{position:absolute;inset:0;width:100%;height:100%;border:0;outline:0;resize:none;background:transparent;color:var(--codet);font:14px/21px ui-monospace,Consolas,monospace;padding:10px;tab-size:2;white-space:pre;overflow:auto}
+.ov{position:absolute;left:0;right:0;top:0;pointer-events:none}
+.ov div{position:absolute;left:0;right:0}
+.ov .gr{background:rgba(16,185,129,.13);border-left:4px solid #10b981}
+.ov .bd{background:rgba(245,158,11,.28);border-left:4px solid #f59e0b}
+.info{padding:6px 12px;font-size:.85rem;background:color-mix(in srgb,#f59e0b 12%,var(--panel));border-bottom:2px solid var(--line);min-height:2.4em}
+.info code{background:#f59e0b;color:#1a1200;border-radius:6px;padding:0 6px;font-weight:800}
+.grid.hc{grid-template-columns:1fr}.grid.hc .codepane{display:none}
+iframe{border:0;background:#fff}
+.leg i{display:inline-block;width:1.6em;height:.9em;vertical-align:middle;border-radius:3px;margin:0 .3em}
+ul.chk{list-style:none;margin:0;padding:8px 12px}
+ul.chk li{padding:3px 0;font-size:.92rem}
+ul.chk li::before{content:"\25CB  ";color:var(--muted)}
+ul.chk li.ok::before{content:"\2714  ";color:var(--ok);font-weight:800}
+ul.chk li.ok{color:var(--ok)}
+ul.chk small{color:var(--muted)}
+.note{color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap" style="padding:0 16px">
+    <h1>Hafta 8 - Ek Uygulamalar (Bağlantılar ve Formlar)</h1>
+    <p>Bitmiş siteyi incele, sonra aynısını kendi editöründe (VS Code) baştan yaz.</p>
+  </div>
+</header>
+<div class="wrap">
+  <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+    <div class="tabs" id="tabs"></div>
+    <button class="btn" id="th" style="height:max-content">Tema</button>
+  </div>
+  <div id="app"></div>
+  <p class="note">Not: Önizlemede bağlantılar bir yere gitmez, form da gönderilmez (sunucu yok); kendi bilgisayarında form verisini işleyen bir sunucu yazılana kadar Gönder düğmesi sayfayı yalnızca yeniler. Resimler örnek görselle değiştirilir.</p>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const APPS=[
+{
+ ad:'1. Okul Rehberi',
+ baslik:'Okul Rehberi',
+ ozet:'Bağlantılarla gezilen tek sayfalık okul rehberi. Menü, sayfanın bölümlerine gider; iletişim bölümünde e-posta, telefon, dış site ve indirme bağlantısı vardır. Hedef siteye bak, sonra aynısını baştan yap.',
+ haftalar:['Hafta 8: a, href, #id, mailto:, tel:, target, rel, download','Hafta 7: header, nav, main, section, footer','Hafta 6: tablo (table, caption, tr, th, td)','Hafta 5: sıralı liste (ol, li)','Hafta 3-4: belge iskeleti (lang, title), başlık'],
+ adimlar:['<code>html</code> etiketine Türkçe dil bilgisini, <code>head</code> içine sayfa başlığını (<code>title</code>) yaz.','<code>header</code> içine ana başlığı (<code>h1</code>) ve bir <code>nav</code> koy. Nav içine üç bağlantı (<code>a</code>) yaz: Kurallar, Ders saatleri, İletişim. Her birinin <code>href</code> değeri aşağıdaki bir bölümün <code>id</code> değeriyle aynı olacak (başında # ile).','<code>main</code> aç. İlk <code>section</code> &quot;Okul kuralları&quot; olsun: <code>id</code> ver, <code>h2</code> yaz ve üç maddelik numaralı liste (<code>ol</code>, <code>li</code>) koy.','İkinci <code>section</code> &quot;Ders saatleri&quot; olsun: <code>id</code> ver; içine başlıklı bir tablo yap (<code>caption</code>, başlık hücreli ilk satır, iki ders satırı).','Tablonun altına bir paragraf aç; içindeki bağlantıya <code>download</code> özelliğini ekle (dosya adı: dosyalar/ders-programi.pdf).','Üçüncü <code>section</code> &quot;İletişim&quot; olsun: <code>id</code> ver. İçine üç paragraf, her birinde bir bağlantı yaz: <code>mailto:</code> ile e-posta, <code>tel:</code> ile telefon, <code>https://</code> ile MEB sitesi.','MEB bağlantısını yeni sekmede açtır: <code>target</code> ve <code>rel</code> özelliklerini ekle.','En alta <code>footer</code> koy; içine sayfanın başına dönen bir bağlantı yaz. Bunun için <code>header</code> etiketine bir <code>id</code> ver ve bağlantıda o <code>id</code>\'yi kullan.'],
+ css:`  <style>
+    body{font-family:sans-serif;margin:0}
+    header,footer{background:#232846;color:#fff;padding:.5em 1em}
+    nav a{color:#ffd166;margin-right:1em}
+    main{padding:.5em 1em}
+    section{border:1px solid #ccc;border-radius:.5em;padding:.3em .8em;margin:.4em 0}
+    section:target{background:#fff3b0}
+    table{border-collapse:collapse}
+    td,th{border:1px solid #999;padding:.2em .6em}
+    footer a{color:#ffd166}
+  </style>`,
+ govde:`<header id="baslangic">
+  <h1>Okulumuz Rehberi</h1>
+  <nav>
+    <a href="#kurallar">Kurallar</a>
+    <a href="#saatler">Ders saatleri</a>
+    <a href="#iletisim">İletişim</a>
+  </nav>
+</header>
+<main>
+  <section id="kurallar">
+    <h2>Okul kuralları</h2>
+    <ol>
+      <li>Zil çalınca sınıfta ol.</li>
+      <li>Koridorda koşma.</li>
+      <li>Kantinde sıraya gir.</li>
+    </ol>
+  </section>
+  <section id="saatler">
+    <h2>Ders saatleri</h2>
+    <table>
+      <caption>Sabah dersleri</caption>
+      <tr><th>Ders</th><th>Başlangıç</th></tr>
+      <tr><td>1. ders</td><td>08.30</td></tr>
+      <tr><td>2. ders</td><td>09.30</td></tr>
+    </table>
+    <p><a href="dosyalar/ders-programi.pdf" download>Ders programını indir (PDF)</a></p>
+  </section>
+  <section id="iletisim">
+    <h2>İletişim</h2>
+    <p><a href="mailto:okul@okul.k12.tr">E-posta gönder</a></p>
+    <p><a href="tel:+903120000000">Okulu ara</a></p>
+    <p><a href="https://www.meb.gov.tr" target="_blank" rel="noopener">MEB'in sitesi</a></p>
+  </section>
+</main>
+<footer>
+  <p><a href="#baslangic">Başa dön</a></p>
+  <p>&copy; 2026 Okulumuz</p>
+</footer>`
+},
+{
+ ad:'2. Kulüp Kayıt Formu',
+ baslik:'Kulüp Kayıt Formu',
+ ozet:'Robotik Kulübü\'ne kayıt formu. Menüdeki bağlantı forma iner; formda yazı, e-posta, seçim ve gönder düğmesi bulunur. Hedefe bak, sonra baştan yap.',
+ haftalar:['Hafta 8: form, label, input, required, placeholder, button','Hafta 8: a, #id (menüden forma git)','Hafta 7: header, nav, main, section, footer','Hafta 4-5: başlık ve paragraf','Hafta 3-4: belge iskeleti (lang, title)'],
+ adimlar:['<code>html</code> etiketine Türkçe dil bilgisini, <code>head</code> içine sayfa başlığını yaz.','<code>header</code> içine kulübün adını (<code>h1</code>) yaz; altına bir <code>nav</code> ve içine &quot;Kayıt&quot; bağlantısı koy. Bağlantı aşağıdaki bölümün <code>id</code> değerine gitsin.','<code>main</code> aç; içine bir tanıtım <code>section</code>\'ı (başlık ve kısa paragraf) yaz.','İkinci bir <code>section</code> aç, <code>id</code> ver, <code>h2</code> yaz. İçine <code>form</code> koy: <code>action</code> ve <code>method="post"</code> özelliklerini yaz.','Forma ad kutusunu ekle: <code>label</code> ve <code>input</code> (<code>type="text"</code>). Label\'ın <code>for</code> değeri, kutunun <code>id</code> değeriyle aynı olsun; kutuya <code>name</code> ver, <code>required</code> ekle.','Aynı şekilde e-posta kutusunu ekle: <code>type="email"</code>. Kutuya örnek yazı çıkması için <code>placeholder</code> ekle.','Sınıf için bir <code>label</code> ve <code>select</code> yaz; içine üç <code>option</code> koy (9, 10, 11. sınıf) ve her birine <code>value</code> ver.','Formun sonuna <code>type="submit"</code> özellikli bir <code>button</code> koy. Sayfanın altına <code>footer</code> ekle. Sonra denemek için ad kutusundan <code>name</code> özelliğini silip Gönder\'e bas ve ne olduğunu gözle; sonra geri yaz.'],
+ css:`  <style>
+    body{font-family:sans-serif;margin:0}
+    header,footer{background:#232846;color:#fff;padding:.5em 1em}
+    nav a{color:#ffd166}
+    main{padding:.5em 1em}
+    section{border:1px solid #ccc;border-radius:.5em;padding:.3em .8em;margin:.4em 0}
+    label{display:block;font-weight:bold;margin-top:.5em}
+    input,select{font:inherit;padding:.2em .4em}
+    button{margin-top:.6em;background:#6d4aff;color:#fff;border:0;border-radius:.4em;padding:.3em 1em;font:inherit}
+  </style>`,
+ govde:`<header>
+  <h1>Robotik Kulübü</h1>
+  <nav>
+    <a href="#kayit">Kayıt ol</a>
+  </nav>
+</header>
+<main>
+  <section>
+    <h2>Biz kimiz?</h2>
+    <p>Her cuma 15.00'te laboratuvarda robot yapıyoruz.</p>
+  </section>
+  <section id="kayit">
+    <h2>Kulübe katıl</h2>
+    <form action="kayit.php" method="post">
+      <label for="ad">Adın</label>
+      <input type="text" id="ad" name="ad" required>
+
+      <label for="mail">E-posta</label>
+      <input type="email" id="mail" name="mail" placeholder="ornek@mail.com" required>
+
+      <label for="sinif">Sınıfın</label>
+      <select id="sinif" name="sinif">
+        <option value="9">9. sınıf</option>
+        <option value="10">10. sınıf</option>
+        <option value="11">11. sınıf</option>
+      </select>
+
+      <button type="submit">Gönder</button>
+    </form>
+  </section>
+</main>
+<footer>
+  <p>&copy; 2026 Robotik Kulübü</p>
+</footer>`
+},
+{
+ ad:'3. İletişim Sayfası',
+ baslik:'İletişim',
+ ozet:'Bir kulübün iletişim sayfası: çalışma saatleri tablosu, e-posta ve telefon bağlantıları ve konu seçimi, mesaj kutusu ve onay kutusu olan bir form. Hedefe bak, sonra baştan yap.',
+ haftalar:['Hafta 8: select, textarea, checkbox, fieldset, button','Hafta 8: form, label, input, required','Hafta 8: mailto:, tel:, #id','Hafta 7: header, nav, main, section, footer','Hafta 6: tablo','Hafta 5: madde işaretli liste (ul, li)'],
+ adimlar:['<code>html</code> etiketine Türkçe dil bilgisini, <code>head</code> içine sayfa başlığını yaz.','<code>header</code> içine sayfa başlığını (<code>h1</code>) yaz; <code>nav</code> içine iki bağlantı koy: &quot;Ana Sayfa&quot; (<code>index.html</code>) ve &quot;Form&quot; (aşağıdaki forma giden #id).','<code>main</code> içinde bir <code>section</code> aç: &quot;Bize ulaşın&quot;. İçine iki maddelik liste (<code>ul</code>, <code>li</code>) koy; birinci madde <code>mailto:</code>, ikincisi <code>tel:</code> bağlantısı olsun.','Aynı bölüme çalışma saatleri tablosu ekle: <code>caption</code>, başlık hücreli ilk satır ve iki gün satırı.','İkinci <code>section</code> aç, <code>id</code> ver; içine <code>form</code> koy. Ad ve e-posta kutularını <code>label</code> ile bağlayarak yaz; ikisi de <code>required</code> olsun.','&quot;Konu&quot; için <code>label</code> ve <code>select</code> yaz; üç <code>option</code> koy (Öneri, Soru, Şikayet) ve <code>value</code> ver.','&quot;Mesajın&quot; için <code>label</code> ve <code>textarea</code> yaz (<code>rows</code> ver, <code>required</code> ekle).','Onay için <code>label</code> içine bir <code>checkbox</code> koy (kuralları kabul ediyorum); <code>required</code> olsun. Sonra <code>type="submit"</code> özellikli <code>button</code> ekle.','Son olarak <code>footer</code> koy. İstersen ad ve e-posta kutularını <code>fieldset</code> + <code>legend</code> içine al ve nasıl değiştiğine bak.'],
+ css:`  <style>
+    body{font-family:sans-serif;margin:0}
+    header,footer{background:#0f766e;color:#fff;padding:.5em 1em}
+    nav a{color:#fde047;margin-right:1em}
+    main{padding:.5em 1em}
+    section{border:1px solid #ccc;border-radius:.5em;padding:.3em .8em;margin:.4em 0}
+    table{border-collapse:collapse}
+    td,th{border:1px solid #999;padding:.2em .6em}
+    label{display:block;font-weight:bold;margin-top:.5em}
+    label.sira{display:block;font-weight:normal}
+    input,select,textarea{font:inherit;padding:.2em .4em}
+    button{margin-top:.6em;background:#0f766e;color:#fff;border:0;border-radius:.4em;padding:.3em 1em;font:inherit}
+  </style>`,
+ govde:`<header>
+  <h1>Bize ulaşın</h1>
+  <nav>
+    <a href="index.html">Ana Sayfa</a>
+    <a href="#form">Form</a>
+  </nav>
+</header>
+<main>
+  <section>
+    <h2>Bize ulaşın</h2>
+    <ul>
+      <li><a href="mailto:kulup@okul.k12.tr">kulup@okul.k12.tr</a></li>
+      <li><a href="tel:+905551234567">0555 123 45 67</a></li>
+    </ul>
+    <table>
+      <caption>Çalışma saatleri</caption>
+      <tr><th>Gün</th><th>Saat</th></tr>
+      <tr><td>Cuma</td><td>15.00 - 17.00</td></tr>
+      <tr><td>Cumartesi</td><td>10.00 - 12.00</td></tr>
+    </table>
+  </section>
+  <section id="form">
+    <h2>Bize yazın</h2>
+    <form action="mesaj.php" method="post">
+      <fieldset>
+        <legend>Kim olduğun</legend>
+        <label for="ad">Adın</label>
+        <input type="text" id="ad" name="ad" required>
+
+        <label for="mail">E-posta</label>
+        <input type="email" id="mail" name="mail" required>
+      </fieldset>
+
+      <label for="konu">Konu</label>
+      <select id="konu" name="konu">
+        <option value="oneri">Öneri</option>
+        <option value="soru">Soru</option>
+        <option value="sikayet">Şikayet</option>
+      </select>
+
+      <label for="mesaj">Mesajın</label>
+      <textarea id="mesaj" name="mesaj" rows="4" required></textarea>
+
+      <label class="sira"><input type="checkbox" name="onay" value="evet" required> Kuralları kabul ediyorum</label>
+
+      <button type="submit">Gönder</button>
+    </form>
+  </section>
+</main>
+<footer>
+  <p>&copy; 2026 Robotik Kulübü</p>
+</footer>`
+},
+{
+ ad:'4. Okul Etkinlik Sitesi',
+ baslik:'Okul Etkinlikleri',
+ ozet:'Önceki haftaların hepsini bir arada kullanan etkinlik sitesi: menü bağlantıları bölümlere gider, duyurular resimli article\'lardır, program tablodur ve sayfanın sonunda seçenekli bir katılım formu vardır. Hedefe bak, baştan yap.',
+ haftalar:['Hafta 8: form, select, radio, checkbox, textarea, button','Hafta 8: a, #id, mailto:, target, rel','Hafta 7: article, aside, figure, figcaption, img, alt','Hafta 7: header, nav, main, section, footer','Hafta 6: tablo (caption, th, td)','Hafta 5: liste (ul, li)'],
+ adimlar:['<code>html</code> etiketine Türkçe dil bilgisini, <code>head</code> içine sayfa başlığını yaz.','<code>header</code> içine site adını (<code>h1</code>) ve bir <code>nav</code> koy: üç bağlantı (Duyurular, Program, Katılım). Hepsi aşağıdaki bölümlerin <code>id</code> değerlerine gitsin.','<code>main</code> içinde &quot;Duyurular&quot; <code>section</code>\'ı aç (<code>id</code> ver). İçine iki <code>article</code> yaz; her birinde <code>h3</code>, bir <code>figure</code> (<code>img</code> + <code>alt</code>, <code>width</code>, <code>height</code> + <code>figcaption</code>) ve bir <code>p</code> olsun.','&quot;Program&quot; <code>section</code>\'ını aç (<code>id</code> ver): <code>caption</code>\'lı tablo, başlık hücreli ilk satır ve iki etkinlik satırı.','&quot;Katılım&quot; <code>section</code>\'ını aç (<code>id</code> ver) ve <code>form</code> koy. Ad kutusunu <code>label</code> ile bağla (<code>required</code>).','Katılım şekli için <code>fieldset</code> ve <code>legend</code> yaz; içine iki <code>radio</code> koy. İkisinin <code>name</code> değeri aynı olsun, <code>value</code>\'ları farklı olsun.','Servis isteği için bir <code>checkbox</code>, düşünceler için <code>label</code> + <code>textarea</code> ekle; sonra <code>type="submit"</code> özellikli <code>button</code> koy.','Main\'in sonuna bir <code>aside</code> koy: içinde dışarı giden bir bağlantı olsun (<code>target</code> ve <code>rel</code> ile yeni sekmede açılsın). En alta <code>footer</code> ekle ve içine <code>mailto:</code> bağlantısı koy.'],
+ css:`  <style>
+    body{font-family:sans-serif;margin:0}
+    header,footer{background:#1d4ed8;color:#fff;padding:.5em 1em}
+    nav a{color:#fde047;margin-right:1em}
+    footer a{color:#fde047}
+    main{padding:.5em 1em}
+    section{border:1px solid #ccc;border-radius:.5em;padding:.3em .8em;margin:.4em 0}
+    section:target{background:#fff3b0}
+    article{background:#f3f4fb;border-radius:.5em;padding:.2em .8em;margin:.4em 0}
+    figure{margin:.3em 0}
+    figcaption{font-size:.85em;color:#555}
+    aside{background:#fff4c9;padding:.3em .8em;border-radius:.5em}
+    table{border-collapse:collapse}
+    td,th{border:1px solid #999;padding:.2em .6em}
+    label{display:block;font-weight:bold;margin-top:.5em}
+    label.sira{font-weight:normal}
+    input,textarea{font:inherit;padding:.2em .4em}
+    fieldset{border:1px solid #aab;border-radius:.4em}
+    button{margin-top:.6em;background:#1d4ed8;color:#fff;border:0;border-radius:.4em;padding:.3em 1em;font:inherit}
+  </style>`,
+ govde:`<header>
+  <h1>Okul Etkinlikleri</h1>
+  <nav>
+    <a href="#duyurular">Duyurular</a>
+    <a href="#program">Program</a>
+    <a href="#katilim">Katılım</a>
+  </nav>
+</header>
+<main>
+  <section id="duyurular">
+    <h2>Duyurular</h2>
+    <article>
+      <h3>Robot Yarışması</h3>
+      <figure>
+        <img src="resimler/robot.jpg" alt="Çizgi izleyen robot yarışı" width="160" height="90">
+        <figcaption>Geçen yılki yarışmadan</figcaption>
+      </figure>
+      <p>Kayıtlar ayın 15'ine kadar sürüyor.</p>
+    </article>
+    <article>
+      <h3>Bahar Şenliği</h3>
+      <figure>
+        <img src="resimler/senlik.jpg" alt="Okul bahçesinde şenlik" width="160" height="90">
+        <figcaption>Okul bahçesi</figcaption>
+      </figure>
+      <p>Şenlik cumartesi günü bahçede yapılacak.</p>
+    </article>
+  </section>
+  <section id="program">
+    <h2>Program</h2>
+    <table>
+      <caption>Etkinlik takvimi</caption>
+      <tr><th>Etkinlik</th><th>Tarih</th></tr>
+      <tr><td>Robot Yarışması</td><td>20 Mayıs</td></tr>
+      <tr><td>Bahar Şenliği</td><td>25 Mayıs</td></tr>
+    </table>
+  </section>
+  <section id="katilim">
+    <h2>Katılım formu</h2>
+    <form action="katilim.php" method="post">
+      <label for="ad">Adın</label>
+      <input type="text" id="ad" name="ad" required>
+
+      <fieldset>
+        <legend>Nasıl katılacaksın?</legend>
+        <label class="sira"><input type="radio" name="sekil" value="takim"> Takım olarak</label>
+        <label class="sira"><input type="radio" name="sekil" value="tek"> Tek başıma</label>
+      </fieldset>
+
+      <label class="sira"><input type="checkbox" name="servis" value="evet"> Okul servisiyle gelmek istiyorum</label>
+
+      <label for="not">Eklemek istediğin bir şey var mı?</label>
+      <textarea id="not" name="not" rows="3"></textarea>
+
+      <button type="submit">Kaydol</button>
+    </form>
+  </section>
+  <aside>
+    <p>Daha fazla bilgi: <a href="https://www.meb.gov.tr" target="_blank" rel="noopener">MEB'in sitesi</a></p>
+  </aside>
+</main>
+<footer>
+  <p><a href="mailto:etkinlik@okul.k12.tr">etkinlik@okul.k12.tr</a></p>
+  <p>&copy; 2026 Okul Etkinlikleri</p>
+</footer>`
+}
+];
+
+/* bitmiş sayfa = iskelet + hazır CSS + gövde */
+function iskelet(a){
+  return '<!DOCTYPE html>\n<html lang="tr">\n<head>\n  <meta charset="UTF-8">\n  <title>'+a.baslik+'</title>\n'+a.css+'\n</head>\n<body>\n'+a.govde+'\n</body>\n</html>';
+}
+/* internetsiz örnek görseller */
+function svg(label){
+  const s='<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d4aff"/><stop offset="1" stop-color="#1b1b3a"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><circle cx="380" cy="70" r="32" fill="#ffd166"/><path d="M0 270 L140 160 L240 220 L340 140 L480 270Z" fill="rgba(255,255,255,.2)"/><text x="50%" y="250" text-anchor="middle" font-family="Arial" font-size="22" fill="#fff">'+label+'</text></svg>';
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+}
+function prep(code){
+  code=code.replace(/<source[^>]*\.(mp4|mp3)"[^>]*>/g,'');
+  return code.replace(/(src|poster)="([^"]+\.(jpg|jpeg|png))"/g,(m,a,n)=>a+'="'+svg(n.split('/').pop())+'"');
+}
+function doc(code){
+  const full=/<html[\s>]/i.test(code);
+  const base='<style>body{font-family:system-ui,Arial,sans-serif}img,video{max-width:100%}</style>';
+  if(full)return prep(code).replace('</head>',base+'</head>');
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'+base+'</head><body style="margin:8px">'+prep(code)+'</body></html>';
+}
+/* etiket sözlüğü */
+const TAGS={html:'sayfanın kök etiketi; lang burada yazılır',head:'ekranda görünmeyen bilgiler (başlık, karakter kodu, stil)',body:'ekranda görünen her şeyin içinde durduğu kap',style:'CSS kurallarının yazıldığı yer',title:'tarayıcı sekmesinde görünen sayfa başlığı',meta:'sayfa hakkında ekranda görünmeyen bilgi',
+header:'sayfanın veya bölümün üst kısmı (başlık, logo)',nav:'ana gezinme bağlantıları (menü)',main:'sayfanın asıl içeriği; sayfada bir tane olur',section:'konusu olan bir bölüm; genelde başlığı vardır',article:'tek başına anlamlı içerik (haber, duyuru, yazı)',aside:'ana içeriğe yan bilgi (ipucu, reklam, not)',footer:'sayfanın veya bölümün alt kısmı (telif, iletişim)',figure:'resim/şema gibi başlığıyla birlikte duran içerik',figcaption:'figure içeriğinin alt yazısı',div:'anlamsız kutu; içindekileri gruplamak için',span:'satır içinde bir parçayı işaretleyen anlamsız etiket',h1:'sayfanın ana başlığı (sayfada bir tane)',h2:'bölüm başlığı',h3:'alt bölüm başlığı',p:'paragraf',ul:'madde işaretli (sırasız) liste',ol:'numaralı (sıralı) liste',li:'listenin bir maddesi',a:'bağlantı; href ile gidilecek yer yazılır',img:'resim; src, alt, width, height ister',table:'tablo',caption:'tablonun başlığı',tr:'tablonun bir satırı',th:'tablonun başlık hücresi',td:'tablonun veri hücresi',video:'video oynatıcı; controls, poster kullanılır',audio:'ses oynatıcı; controls ile düğmeler gelir',source:'video/ses için dosya kaynağı',details:'açılır-kapanır kutu',summary:'details kutusunun her zaman görünen başlığı',iframe:'sayfanın içine başka bir sayfa/video gömer',strong:'önemli (kalın) metin',em:'vurgulu (italik) metin',form:'bilgi toplayıp action adresine gönderen kutu',label:'form alanının adı; for ile kutuya bağlanır',input:'bilgi kutusu; type türü, name sunucuya giden adı belirler',select:'açılır liste; içinde option seçenekleri olur',option:'select listesinin bir seçeneği; value sunucuya giden değerdir',textarea:'çok satırlı yazı kutusu',button:'düğme; type="submit" formu gönderir',fieldset:'ilgili form alanlarını çerçeveye alan grup',legend:'fieldset grubunun başlığı',ul:'madde işaretli (sırasız) liste'};
+const GIZLI=new Set(['html','head','style','title','meta','link','script','source']);
+const VOID=new Set('area base br col embed hr img input link meta source track wbr'.split(' '));
+function parse(code){
+  const els=[],st=[],low=code.toLowerCase();
+  const re=/<\!--[\s\S]*?--\>|<(\/?)([a-zA-Z][\w-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;let m;
+  while((m=re.exec(code))){
+    if(m[0].slice(0,4)==='<'+'!--')continue;
+    const nm=m[2].toLowerCase();
+    if(!m[1]){
+      const e={i:els.length,n:nm,s:m.index,oe:m.index+m[0].length,e:m.index+m[0].length,ins:m.index+1+m[2].length};
+      els.push(e);
+      if(VOID.has(nm)||/\/\s*$/.test(m[3]))continue;
+      st.push(e);
+      if(nm==='style'||nm==='script'){const c=low.indexOf('</'+nm,re.lastIndex);if(c>=0)re.lastIndex=c}
+    }else{
+      for(let j=st.length-1;j>=0;j--)if(st[j].n===nm){
+        for(let k=j+1;k<st.length;k++)if(st[k].e===st[k].oe)st[k].e=m.index;
+        st[j].e=m.index+m[0].length;st.length=j;break}
+    }
+  }
+  return els;
+}
+function enIc(els,a,b){let best=null;for(const e of els)if(e.s<=a&&b<=e.e&&(!best||e.e-e.s<=best.e-best.s))best=e;return best}
+function isaretle(code){
+  const els=parse(code);let out=code;
+  for(let k=els.length-1;k>=0;k--)out=out.slice(0,els[k].ins)+' data-i="'+k+'"'+out.slice(els[k].ins);
+  return out;
+}
+const FR_JS='<style>[data-hl]{outline:.2em dashed #f59e0b!important;outline-offset:-.1em;box-shadow:0 0 0 .3em rgba(245,158,11,.4)!important}</style><scr'+'ipt>(function(){var cur=null;'+
+ 'addEventListener("message",function(e){var d=e.data;if(!d||d.t!=="hl")return;if(cur)cur.removeAttribute("data-hl");cur=null;if(d.i>=0){var el=document.querySelector("[data-i=\\""+d.i+"\\"]");if(el){el.setAttribute("data-hl","");cur=el;var r=el.getBoundingClientRect();parent.postMessage({t:"pos",y:r.top+scrollY,h:r.height},"*")}}});'+
+ 'document.addEventListener("click",function(e){var t=e.target.closest?e.target:e.target.parentElement;var a=t.closest("a");if(a)e.preventDefault();var h=t.closest("[data-i]");parent.postMessage({t:"pick",i:h?+h.getAttribute("data-i"):-1},"*")},true);'+
+ 'document.addEventListener("submit",function(e){e.preventDefault()},true);'+
+ 'function hh(){parent.postMessage({t:"h",h:Math.ceil(document.documentElement.getBoundingClientRect().height)},"*")}if(window.ResizeObserver)new ResizeObserver(hh).observe(document.documentElement);addEventListener("load",hh);hh();parent.postMessage({t:"ready"},"*")})()<\/script>';
+function onizleme(code){
+  const h=doc(isaretle(code));const x=h.toLowerCase().lastIndexOf('</body>');
+  return x<0?h+FR_JS:h.slice(0,x)+FR_JS+h.slice(x);
+}
+const LH=21,PAD=10;
+
+const EDS=[];
+window.addEventListener('message',e=>{for(const d of EDS)if(e.source===d.fr.contentWindow){d.msg(e.data);return}});
+
+/* Salt okunur kod + canlı önizleme bloğu */
+function mkEd(root,o){
+  root.innerHTML=
+   '<div class="grid"><div class="pane codepane"><div class="pane-h"><span>Kod (salt okunur)</span><span><button class="btn cs">CSS\'i katla</button> <button class="btn cc">Yalnız CSS\'i kopyala</button> <button class="btn cp">Kopyala</button></span></div>'+
+   '<div class="info">İmleci koda koy ya da sonuçta bir yere tıkla; ilgili etiket işaretlenir.</div>'+
+   '<div class="cw"><div class="ov"></div><textarea spellcheck="false" wrap="off" readonly></textarea></div></div>'+
+   '<div class="pane prev"><div class="pane-h"><span>Sonuç (tüm sayfa)</span><button class="btn kg">👁 Kodu gizle</button></div><div class="pv"><iframe sandbox="allow-scripts" title="Sonuç" scrolling="no"></iframe></div></div></div>';
+  const q=s=>root.querySelector(s);
+  const ta=q('textarea'),fr=q('iframe'),ov=q('.ov'),info=q('.info'),gr=q('.grid'),pv=q('.pv');
+  ta.value=o.kod;
+  const F={on:false,hidden:'',ph:''};
+  const full=()=>F.on?ta.value.replace(F.ph,()=>F.hidden):ta.value;
+  const pi=()=>F.on?ta.value.indexOf(F.ph):-1;
+  const toView=x=>{const p=pi();if(p<0)return x;const L=F.hidden.length;return x<=p?x:x<p+L?p:x-L+F.ph.length};
+  const lineOf=x=>{const v=ta.value;let n=0;for(let i=v.indexOf('\n');i>=0&&i<x;i=v.indexOf('\n',i+1))n++;return n};
+  let curI=-1,band=null,sc=1,ch=600;
+  /* önizleme ölçeği: mantıksal genişlik 1000px (dar ekranda 600px), kutuya sığdırılır */
+  const fit=()=>{
+    const cw=pv.clientWidth||600,W=cw>=700?1000:600;
+    sc=Math.min(1,cw/W);
+    fr.style.width=W+'px';fr.style.height=ch+'px';
+    fr.style.transform='scale('+sc+')';pv.style.height=Math.ceil(ch*sc)+'px';
+  };
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(pv);
+  addEventListener('resize',fit);
+  const draw=b=>{ov.innerHTML=b?'<div class="bd" style="top:'+(PAD+b[0]*LH)+'px;height:'+((b[1]-b[0]+1)*LH)+'px"></div>':'';ov.style.transform='translateY('+(-ta.scrollTop)+'px)'};
+  const send=()=>{const e=parse(full())[curI];try{fr.contentWindow.postMessage({t:'hl',i:e&&!GIZLI.has(e.n)?curI:-1},'*')}catch(x){}};
+  const vurgu=(i,kaydir)=>{
+    curI=i;const e=parse(full())[i];
+    if(!e){band=null;draw(null);info.textContent='İmleci koda koy ya da sonuçta bir yere tıkla; ilgili etiket işaretlenir.';send();return}
+    const l1=lineOf(toView(e.s)),l2=lineOf(toView(Math.max(e.s,e.e-1)));
+    band=[l1,l2];draw(band);
+    if(kaydir)ta.scrollTop=Math.max(0,PAD+l1*LH-ta.clientHeight/3);
+    info.innerHTML='İmleç: <code>&lt;'+e.n+'&gt;</code> — '+(TAGS[e.n]||'bu etiket için kısa açıklama yok')+(GIZLI.has(e.n)?' (ekranda görünmez)':'')+' <small>· satır '+(l1+1)+(l2>l1?'–'+(l2+1):'')+'</small>';
+    send();
+  };
+  const imlec=()=>{
+    const els=parse(full());const p=pi();
+    const fo=x=>{if(p<0)return x;const L=F.hidden.length,pl=F.ph.length;return x<=p?x:x<p+pl?p:x-pl+L};
+    const e=enIc(els,fo(ta.selectionStart),fo(ta.selectionEnd));
+    vurgu(e?e.i:-1,false);
+  };
+  /* vurgulanan eleman sayfada görünür değilse sayfayı kaydır */
+  const goster=(y,h)=>{
+    const top=fr.getBoundingClientRect().top+y*sc,bot=top+h*sc;
+    if(top<60||bot>innerHeight-20)window.scrollTo({top:Math.max(0,scrollY+top-innerHeight/2+Math.min(h*sc,innerHeight/3)/2),behavior:'smooth'});
+  };
+  EDS.push({fr:fr,msg:d=>{
+    if(!d)return;
+    if(d.t==='ready')send();
+    else if(d.t==='pick'&&d.i>=0)vurgu(d.i,true);
+    else if(d.t==='h'){ch=Math.max(300,d.h);fit()}
+    else if(d.t==='pos'&&document.activeElement===ta)goster(d.y,d.h);
+  }});
+  ['keyup','mouseup','focus'].forEach(ev=>ta.addEventListener(ev,imlec));
+  ta.addEventListener('scroll',()=>{ov.style.transform='translateY('+(-ta.scrollTop)+'px)'});
+  const katla=on=>{
+    if(on){const m=/<style[\s\S]*?<\/style>/i.exec(ta.value);if(!m)return;
+      F.hidden=m[0];F.ph='<style>/* '+m[0].split('\n').length+' satır CSS gizli. "CSS\'i göster" ile aç */</style>';
+      ta.value=ta.value.replace(m[0],()=>F.ph);F.on=true;q('.cs').textContent='CSS\'i göster'}
+    else if(F.on){ta.value=full();F.on=false;q('.cs').textContent='CSS\'i katla'}
+    vurgu(curI,false);
+  };
+  q('.cs').onclick=()=>katla(!F.on);
+  const kopya=(b,txt,ad)=>{const d=()=>{b.textContent='Kopyalandı';setTimeout(()=>b.textContent=ad,1200)};const fb=()=>{const x=document.createElement('textarea');x.value=txt;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(z){}x.remove();d()};if(navigator.clipboard)navigator.clipboard.writeText(txt).then(d,fb);else fb()};
+  q('.cp').onclick=e=>kopya(e.target,full(),'Kopyala');
+  q('.cc').onclick=e=>{const m=/<style[\s\S]*?<\/style>/i.exec(full());kopya(e.target,m?m[0]:'','Yalnız CSS\'i kopyala')};
+  const gizle=g=>{gr.classList.toggle('hc',g);q('.kg').textContent=g?'👁 Kodu göster':'👁 Kodu gizle';try{localStorage.setItem('h8ek-gizle',g?'1':'0')}catch(e){}setTimeout(fit,0)};
+  q('.kg').onclick=()=>gizle(!gr.classList.contains('hc'));
+  let g=false;try{g=localStorage.getItem('h8ek-gizle')==='1'}catch(e){}
+  gizle(g);
+  katla(true);
+  fr.srcdoc=onizleme(full());
+  fit();
+}
+
+function show(k){
+  const a=APPS[k];EDS.length=0;
+  $('#tabs').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===k));
+  $('#app').innerHTML=
+   '<div class="card"><h2>Nasıl çalışacağız?</h2><ol class="steps"><li>Aşağıdaki <b>bitmiş siteyi</b> incele: koda imleç koy ya da sonuçta bir yere tıkla; turuncu işaret kod ile sayfayı eşleştirir.</li><li>Bilgisayarında bir klasör aç; VS Code ile içine <code>index.html</code> dosyasını oluştur.</li><li>&quot;Yalnız CSS&#39;i kopyala&quot; düğmesiyle hazır stili al, kendi dosyanın <code>head</code> bölümüne yapıştır. Class adları hedefle aynıdır.</li><li>Aşağıdaki <b>Yapılacaklar</b> listesini sırayla uygula. Kod verilmez; hangi etiketi kullanacağın yazar.</li><li>Her adımdan sonra dosyayı kaydet, tarayıcıda yenile ve hedefle karşılaştır.</li></ol></div>'+
+   '<div class="card"><h2>'+a.ad+'</h2><p>'+a.ozet+'</p>'+
+   '<div class="weeks">'+a.haftalar.map(h=>'<span>'+h+'</span>').join('')+'</div>'+
+   '<b>Yapılacaklar</b><ol class="steps">'+a.adimlar.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>'+
+   '<h3 class="hh">🎯 Hedef: bitmiş site</h3><div id="eh"></div>';
+  mkEd($('#eh'),{kod:iskelet(a)});
+  try{localStorage.setItem('h8ek-son',k)}catch(e){}
+}
+APPS.forEach((a,i)=>{const b=document.createElement('button');b.textContent=a.ad;b.onclick=()=>show(i);$('#tabs').appendChild(b)});
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('web-tema',t)}catch(e){}}
+let th=null;try{th=localStorage.getItem('web-tema')}catch(e){}
+setTheme(th||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+$('#th').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+let st=0;try{st=+localStorage.getItem('h8ek-son')||0}catch(e){}
+const hm=location.hash.match(/uygulama-(\d)/);if(hm&&APPS[hm[1]-1])st=hm[1]-1;
+show(st);
+</script>
+</body>
+</html>

@@ -13,8 +13,8 @@ window.placeTips=function(root){
   [].forEach.call((root||stage).querySelectorAll('.tip'),function(t){
     var r=t.getBoundingClientRect();if(!r.width&&!r.height)return;
     var x=(r.left-sr.left)/sc,y=(r.top-sr.top)/sc;
-    t.classList.toggle('dn',y<330);
-    t.classList.toggle('lf',x+540>1860);
+    t.classList.toggle('dn',y<260);
+    t.classList.toggle('lf',x+640>1840);
   });
 };
 function go(n){n=Math.max(0,Math.min(slides.length-1,n));

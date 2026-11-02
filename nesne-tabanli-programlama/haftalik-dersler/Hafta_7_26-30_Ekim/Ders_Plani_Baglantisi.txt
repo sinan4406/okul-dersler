@@ -1,0 +1,13 @@
+NTP 10 - 7. Hafta (26-30 Ekim)
+Konu: Donguler (break, continue) ve hata ayiklama (try-catch-finally)
+
+Ders plani (Claude Docs, cevrimici):
+Henuz olusturulmadi (bu hafta icin cevrimici baglanti yok).
+
+Sunumun cevrimici kopyasi:
+Henuz yayinlanmadi.
+
+Sunum.html tek basina ve internetsiz calisir. Klasoru istediginiz yere tasiyabilirsiniz.
+Kisayollar: Sag/Sol ok = ileri/geri, N = ogretmen notu, F = tam ekran.
+
+Not: 29 Ekim Persembe Cumhuriyet Bayrami (tatil), 28 Ekim yarim gun. Sureyi buna gore planlayin.

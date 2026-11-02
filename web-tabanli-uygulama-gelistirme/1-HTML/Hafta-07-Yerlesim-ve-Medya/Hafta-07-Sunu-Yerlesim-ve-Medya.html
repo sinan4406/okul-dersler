@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hafta 7 - Yerleşim ve Medya Elemanları</title>
+<style>
+:root{
+  --bg:#f4f5ff;--panel:#ffffff;--panel2:#eceefb;--text:#0e1230;--muted:#434a6d;--line:#c9cfea;
+  --accent:#5b36f2;--accent2:#00a3c4;--pink:#e8337f;--ok:#0b8a45;--bad:#d63a3f;--warn:#c76a00;
+  --grad:linear-gradient(135deg,#5b36f2 0%,#9a3cf0 55%,#f0407f 100%);
+  --code-bg:#ffffff;--c-tag:#c2185b;--c-attr:#1550d0;--c-str:#0a7a3e;--c-com:#6b7390;--c-css:#a35a00;--c-text:#0e1230;
+}
+:root[data-theme="dark"]{
+  --bg:#090c1c;--panel:#141935;--panel2:#1d2348;--text:#ffffff;--muted:#c3c9ea;--line:#38417a;
+  --accent:#a592ff;--accent2:#3cd8f5;--pink:#ff7ab0;--ok:#55e08f;--bad:#ff8085;--warn:#ffc04d;
+  --grad:linear-gradient(135deg,#7a5cff 0%,#b05cff 55%,#ff6fae 100%);
+  --code-bg:#0e1229;--c-tag:#ff86bd;--c-attr:#86bcff;--c-str:#7ef0a8;--c-com:#8c96bb;--c-css:#ffbf66;--c-text:#ffffff;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(16px,min(1.6vw,2.9vh),36px)}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Inter","Segoe UI Variable","Segoe UI",system-ui,Arial,sans-serif;line-height:1.35}
+button{font:inherit;color:inherit;cursor:pointer}
+code,pre,textarea{font-family:"JetBrains Mono","Cascadia Code",ui-monospace,Consolas,monospace}
+
+#prog{position:fixed;top:0;left:0;height:.6vh;min-height:5px;background:var(--grad);width:0;z-index:50;transition:width .4s}
+#stage{position:fixed;inset:0 0 9vh 0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;gap:1.3vh;padding:2.4vh 3vw 1vh;opacity:0;visibility:hidden;transform:translateX(5vw);transition:opacity .4s,transform .4s cubic-bezier(.2,.8,.2,1),visibility .4s;overflow:hidden}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.slide.past{transform:translateX(-5vw)}
+@media(max-aspect-ratio:1/1){.slide{overflow-y:auto}}
+.mod{align-self:flex-start;font-size:.55rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);padding:.15em .8em;border-radius:99px}
+.h{font-size:1.75rem;font-weight:800;line-height:1.12;letter-spacing:-.01em;margin:0}
+.say{font-size:1.05rem;margin:0;font-weight:500}
+.bn{font-size:.95rem;margin:0;color:var(--muted)}
+.bn b{color:var(--pink)}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:1.4vh}
+.grad-t{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* kapak / bölüm */
+.slide.hero,.slide.sec{background:var(--grad);color:#fff;justify-content:center;align-items:flex-start;padding:6vh 6vw;gap:2.5vh}
+.slide.hero .h,.slide.sec .h{font-size:2.6rem;color:#fff}
+.slide.hero .say,.slide.sec .say{font-size:1.3rem;color:#ffffffe6}
+.slide.sec .big{font-size:5rem;line-height:1}
+.slide.hero .mod,.slide.sec .mod{background:#ffffff30;color:#fff}
+
+/* kod + sonuç */
+.cr{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.cr.one{grid-template-columns:1fr}.cr.one .pane pre{font-size:1.1rem}
+@media(max-aspect-ratio:1/1){.cr{grid-template-columns:1fr}.slide{overflow-y:auto}.cr{flex:none}.pane{min-height:35vh}}
+.col{display:flex;flex-direction:column;gap:1vh;min-height:0;min-width:0}
+.pane{display:flex;flex-direction:column;min-height:0;min-width:0;border:2px solid var(--line);border-radius:1rem;overflow:hidden;background:var(--code-bg);flex:1}
+.pane.code{flex:none;max-height:100%}
+.col .pane.code{flex:0 1 auto}
+.pane-h{display:flex;justify-content:space-between;align-items:center;font-size:.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--panel2);padding:.25em .9em;border-bottom:2px solid var(--line)}
+.pane pre{margin:0;padding:.5em .8em;font-size:.82rem;line-height:1.5;color:var(--c-text);overflow:auto;white-space:pre;flex:1;min-height:0}
+.pane iframe{border:0;width:100%;flex:1;min-height:0;background:#fff}
+.pane textarea{flex:1;min-height:0;border:0;outline:0;resize:none;padding:.5em .8em;font-size:.82rem;line-height:1.5;background:var(--code-bg);color:var(--c-text)}
+.cp{border:2px solid var(--line);background:var(--panel);border-radius:.5em;padding:0 .6em;font-size:.5rem;text-transform:none;letter-spacing:0}
+.cp.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.t-tag{color:var(--c-tag);font-weight:800}.t-attr{color:var(--c-attr);font-weight:600}.t-str{color:var(--c-str);font-weight:600}.t-com{color:var(--c-com);font-style:italic}.t-pun{color:var(--c-com)}.t-cssp{color:var(--c-css)}
+.reg{background:rgba(245,158,11,.22);border-left:.25em solid #f59e0b;margin-left:-.8em;padding-left:.55em}
+.hot{background:#ffd43b;color:#14142b!important;border-radius:.2em;box-shadow:0 0 0 .1em #ffd43b;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 .22em #ffd43b66}}
+.balloon{align-self:flex-start;position:relative;background:#ffd43b;color:#14142b;border-radius:1rem;padding:.3em 1em;font-size:.95rem;font-weight:800;margin-top:.5em}
+.balloon::before{content:"";position:absolute;top:-.4em;left:1.4em;border:.45em solid transparent;border-top:0;border-bottom:.45em solid #ffd43b}
+.lbl{font-size:.8rem;font-weight:800;padding:.1em .8em;border-radius:99px;align-self:flex-start}
+.lbl.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.lbl.neu{background:var(--panel2);color:var(--accent)}
+.lbl.good{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+
+/* kontroller */
+.ctrls{display:flex;flex-wrap:wrap;gap:1vh 1.6vw;align-items:center;font-size:.8rem}
+.ctrls label{display:inline-flex;align-items:center;gap:.4em}
+.ctrls input[type=checkbox]{width:1em;height:1em;accent-color:var(--accent)}
+.ctrls input[type=range]{accent-color:var(--accent);width:10em}
+.ctrls input[type=text],.ctrls select{font-size:.75rem;padding:.1em .5em;border:2px solid var(--line);border-radius:.5em;background:var(--panel);color:var(--text)}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:.8em;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:.2em .9em;border-right:2px solid var(--line);font-size:.8rem}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--grad);color:#fff;font-weight:800}
+.pane-h .seg button{font-size:.55rem;padding:0 .7em;text-transform:none;letter-spacing:0}
+.btn{border:2px solid var(--line);background:var(--panel);border-radius:.8em;padding:.2em .9em;font-size:.8rem}
+.btn.pri{background:var(--grad);color:#fff;border:0;font-weight:800}
+
+/* fikir / liste / seçim kartları */
+.cards{flex:1;min-height:0;display:grid;gap:2vw;grid-template-columns:repeat(var(--n,3),1fr);align-items:stretch}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:1.2rem;padding:1.5vh 1.4vw;display:flex;flex-direction:column;justify-content:center;gap:.6vh;text-align:center}
+.card .em{font-size:5rem;line-height:1}
+.card b{font-size:1.5rem}
+.card span{font-size:1.1rem;color:var(--muted)}
+.card code{font-size:1.5rem;color:var(--c-tag);font-weight:800}
+.list{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2vh}
+.list .it{display:flex;align-items:center;gap:1.2vw;font-size:1.15rem;font-weight:600;background:var(--panel);border:2px solid var(--line);border-radius:1.2rem;padding:1.2vh 1.5vw}
+.list .it .em{font-size:2rem}
+.list.bad .it{border-left:.5rem solid var(--bad)}.list.good .it{border-left:.5rem solid var(--ok)}
+code.i{background:var(--panel2);padding:0 .3em;border-radius:.3em;border:1px solid var(--line);color:var(--c-tag);font-weight:700}
+
+/* sayfa haritası */
+.pmap{flex:1;min-height:0;display:grid;gap:.6vh;grid-template-columns:1fr 14vw;grid-template-rows:auto auto 1fr auto;grid-template-areas:"hd hd" "nv nv" "mn sd" "ft ft";padding:.8vh;background:var(--panel2);border-radius:1rem;border:2px solid var(--line)}
+.pmap .z{border:3px dashed var(--line);border-radius:.8rem;padding:.3em .8em;font-weight:800;font-size:.9rem;opacity:.15;transform:scale(.96);transition:all .5s;display:flex;align-items:center}
+.pmap .z.show{opacity:1;transform:none;border-style:solid}
+.z-hd{grid-area:hd;background:#ffe3d6;color:#7c2d12}.z-nv{grid-area:nv;background:#dbe9ff;color:#1e3a8a}.z-mn{grid-area:mn;background:#d9f5de;color:#14532d;flex-wrap:wrap;gap:.5em}.z-sd{grid-area:sd;background:#fff1bd;color:#713f12}.z-ft{grid-area:ft;background:#e7d8ff;color:#4c1d95}
+.pmap.soup .z{background:var(--panel);color:var(--text);border-color:var(--muted)}
+.pmap .z.hl{outline:4px solid var(--accent)}
+.mn-in{display:flex;gap:.5em;width:100%}
+.mn-in span{flex:1;border:3px dashed #2f855a;border-radius:.6rem;padding:0 .5em;font-size:.8rem;background:#ffffffaa;color:#14532d;opacity:.15;transition:opacity .5s}
+.pmap.soup .mn-in span{background:var(--panel);color:var(--text);border-color:var(--muted)}
+
+.tree{font-family:ui-monospace,Consolas,monospace;font-size:.8rem;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:1vh 1vw;overflow:auto;min-height:0}
+.tree div{padding:.05em .5em;border-radius:.4em;white-space:nowrap}
+.tree .f{cursor:pointer}.tree .f:hover{background:var(--panel2)}
+.tree .from{background:#ffd2bd;color:#7c2d12;font-weight:800}.tree .to{background:#bfeccf;color:#14532d;font-weight:800}
+.pathout{font-size:.9rem;padding:.5em .8em;background:var(--code-bg);border:2px solid var(--line);border-radius:1rem;overflow:auto}
+.bars{display:grid;gap:.8vh;font-size:.7rem}
+.bars .row{display:flex;align-items:center;gap:.6em}
+.bars .lab{width:11em;flex:none}
+.bars .bg{flex:1;height:.9em;background:var(--panel2);border-radius:.5em;overflow:hidden;border:1px solid var(--line)}
+.bars .fill{display:block;height:100%;background:var(--muted)}
+.bars .row.pick .fill{background:var(--ok)}.bars .row.pick .lab{font-weight:800;color:var(--ok)}
+.vp{border:3px solid var(--muted);border-radius:1rem;background:var(--panel2);padding:.4em;text-align:center;font-weight:800;font-size:.75rem;transition:width .15s;max-width:100%}
+.mediabox{flex:1;display:grid;place-items:center;background:var(--panel2);text-align:center;padding:.5em;min-height:0}
+.mediabox video,.mediabox audio{max-width:100%;max-height:100%;border-radius:.6em}
+.hintw{font-size:.6rem;color:var(--warn);font-weight:700}
+
+/* uygulama ara slaytları */
+.slide.app{background:linear-gradient(135deg,#0f766e 0%,#0891b2 55%,#2563eb 100%);color:#fff;border-top:.6vh dashed #fde047}
+.slide.app .h{color:#fff}.slide.app .mod{background:#ffffff30;color:#fff}
+.slide.app .body{flex:1;justify-content:center}
+.appbox{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+@media(max-aspect-ratio:1/1){.appbox{grid-template-columns:1fr}}
+.appbox .c{background:#ffffff1f;border:2px solid #ffffff66;border-radius:1rem;padding:1.2vh 1.2vw;font-size:.95rem}
+.appbox h3{margin:0 0 .3em;font-size:1rem;color:#fde047}.appbox p{margin:0 0 .6em}.appbox ul{margin:0;padding-left:1.2em}.appbox code{color:#fff;font-weight:800}
+.appbtn{align-self:flex-start;background:#fde047;color:#14142b;font-weight:800;font-size:1.05rem;padding:.4em 1.4em;border-radius:1rem;text-decoration:none}
+/* alt çubuk */
+#bottom{position:fixed;inset:auto 0 0 0;height:9vh;display:flex;align-items:center;justify-content:space-between;gap:1vw;padding:0 2vw;background:var(--panel);border-top:2px solid var(--line);z-index:40}
+.nbtn{background:var(--grad);color:#fff;border:0;border-radius:1rem;padding:.25em 1.6em;font-weight:800;font-size:1rem;min-width:7em;height:75%}
+.nbtn:disabled{opacity:.3}
+.sbtn{border:2px solid var(--line);background:var(--panel2);border-radius:1rem;padding:.25em .8em;font-size:.85rem;height:75%}
+#counter{font-size:.9rem;font-weight:700;color:var(--muted);min-width:5em;text-align:center}
+.mid{display:flex;align-items:center;gap:1vw;flex:1;justify-content:center}
+.drawer{position:fixed;top:0;bottom:9vh;left:0;width:min(30rem,92vw);background:var(--panel);border-right:2px solid var(--line);z-index:60;overflow:auto;padding:1vh 1vw;transform:translateX(-105%);transition:transform .3s}
+.drawer.open{transform:none}
+.mi{display:flex;gap:.6em;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:.25em .3em;font-size:.65rem}
+.mi:hover{background:var(--panel2)}.mi.cur{background:var(--panel2);font-weight:800;color:var(--accent)}
+.mi .n{width:2em;color:var(--muted)}
+.mh{font-size:.55rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin:.8em 0 .1em}
+@media(prefers-reduced-motion:reduce){.slide{transition:none}.hot{animation:none}}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div id="stage"></div>
+<div id="menu" class="drawer"></div>
+<div id="bottom">
+  <button class="sbtn" id="bMenu" title="Slayt listesi (M)">&#9776;</button>
+  <div class="mid">
+    <button class="nbtn" id="prev">&larr; Geri</button>
+    <div id="counter"></div>
+    <button class="nbtn" id="next">İleri &rarr;</button>
+  </div>
+  <button class="sbtn" id="bTheme" title="Tema (T)">&#9680;</button>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escA(s){return esc(s).replace(/"/g,'&quot;')}
+
+/* ---------- kod renklendirme ---------- */
+function hlCSS(css){
+  return esc(css).replace(/([^{}]+)\{([^{}]*)\}/g,(m,sel,body)=>'<span class="t-tag">'+sel+'</span>{'+body.replace(/([a-z-]+)(\s*:\s*)([^;]+)(;?)/g,(x,p,c,v,s)=>'<span class="t-cssp tk" data-k="c:'+p+'">'+p+'</span>'+c+'<span class="t-str">'+v+'</span>'+s)+'}');
+}
+function hl2(code){
+  const parts=[];let i=0;
+  const re=/(<!--[\s\S]*?-->)|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/g;let m;
+  while((m=re.exec(code))){
+    parts.push(esc(code.slice(i,m.index)));
+    if(m[1]){parts.push('<span class="t-com">'+esc(m[1])+'</span>');i=re.lastIndex;continue}
+    let a=m[4],self='';
+    if(/\/\s*$/.test(a)){self='/';a=a.replace(/\/\s*$/,'')}
+    const nm=m[3].toLowerCase();
+    const at=a.replace(/([^\s=]+)(?:(=)("[^"]*"|'[^']*'|[^\s]+))?/g,(x,n,e,v)=>'<span class="t-attr tk" data-k="a:'+escA(n)+'">'+esc(n)+'</span>'+(v?'<span class="t-pun">'+esc(e)+'</span><span class="t-str tk" data-k="a:'+escA(n)+'">'+esc(v)+'</span>':''));
+    parts.push('<span class="t-pun">&lt;'+esc(m[2])+'</span><span class="t-tag tk" data-k="t:'+nm+'">'+m[3]+'</span>'+at+'<span class="t-pun">'+self+'&gt;</span>');
+    i=re.lastIndex;
+    if(nm==='style'&&!m[2]){const e=code.indexOf('</style>',i);if(e>-1){parts.push(hlCSS(code.slice(i,e)));i=e;re.lastIndex=e}}
+  }
+  parts.push(esc(code.slice(i)));
+  return parts.join('');
+}
+function copyText(t,btn){
+  const done=()=>{const o=btn.textContent;btn.textContent='Kopyalandı';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok')},1200)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb();
+  function fb(){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()}
+}
+
+/* ---------- internetsiz örnek görseller ---------- */
+function svgImg(w,h,label,color){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${color}"/><stop offset="1" stop-color="#1b1b3a"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><circle cx="${w*0.78}" cy="${h*0.28}" r="${Math.min(w,h)*0.12}" fill="#ffd166"/><rect x="${w*0.18}" y="${h*0.38}" width="${w*0.22}" height="${h*0.32}" rx="${h*0.04}" fill="rgba(255,255,255,.9)"/><circle cx="${w*0.24}" cy="${h*0.5}" r="${h*0.04}" fill="#6d4aff"/><circle cx="${w*0.34}" cy="${h*0.5}" r="${h*0.04}" fill="#6d4aff"/><path d="M0 ${h} L${w*0.3} ${h*0.62} L${w*0.5} ${h*0.8} L${w*0.7} ${h*0.55} L${w} ${h} Z" fill="rgba(255,255,255,.2)"/><text x="50%" y="${h*0.93}" text-anchor="middle" font-family="Arial" font-size="${Math.max(12,h*0.09)}" fill="#fff">${label}</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+const FAKE={'resimler/kulup.jpg':[480,270,'Robot atölyesi','#6d4aff'],'resimler/galeri1.jpg':[480,160,'Etkinlik 1','#ef4444'],'resimler/galeri2.jpg':[480,160,'Etkinlik 2','#10b981'],'resimler/galeri3.jpg':[480,160,'Etkinlik 3','#3b82f6'],'video/kapak.jpg':[480,270,'Video kapağı','#e07a00']};
+const FAKEPLAYER='<body style="margin:0;height:100vh;display:grid;place-items:center;background:#1b1b3a;color:#fff;font:700 14px Arial"><div style="text-align:center"><div style="width:54px;height:54px;margin:0 auto 6px;border-radius:50%;background:#ef4444;display:grid;place-items:center">&#9654;</div>Video sitesinden gömülen oynatıcı</div></body>';
+function resolveForRun(code){
+  code=code.replace(/(<iframe[^>]*?)src="https?:\/\/[^"]*"/,(m,a)=>a+'src="data:text/html;charset=utf-8,'+encodeURIComponent(FAKEPLAYER)+'"');
+  const f=(m,a,n)=>FAKE[n]?a+'="'+svgImg(...FAKE[n])+'"':m;
+  code=code.replace(/<source[^>]*\.(mp4|mp3)"[^>]*>/g,'');
+  return code.replace(/(src|poster)="([^"]+)"/g,(m,a,n)=>f(m,a,n));
+}
+/* sonuç penceresinin stili: yazı boyutu pencerenin genişliğine göre ölçeklenir */
+let o_cols=false;
+function pageCss(mode,fs,cols2){o_cols=!!cols2;
+  const base=`body{font:${fs}vw/1.4 system-ui,"Segoe UI",Arial,sans-serif;margin:0;color:#14183a;background:#fff}img,video{max-width:100%;border-radius:.4em}`;
+  const cols=o_cols?'body{columns:2;column-gap:1.2em}section,article,figure,details{break-inside:avoid}':'';
+  if(mode==='plain')return '<style>'+base+'body{margin:.5em}h2{margin:.15em 0;font-size:1.3em}p{margin:.15em 0}</style>';
+  return '<style>'+base+(cols2?'':'')+`body{background:#f3f4fb}header,.ust{background:linear-gradient(135deg,#6d4aff,#a14bff);color:#fff;padding:.4em .8em}header h1,.ust .baslik{margin:0;font-size:1.4em;font-weight:800}header p{margin:0}nav,.menu{background:#fff;padding:.3em .8em;border-bottom:1px solid #e2e6f3}nav a,.menu a{color:#6d4aff;margin-right:.7em;text-decoration:none;font-weight:700}main,.icerik{display:block;padding:.2em .6em}section,.bolum,article,.yazi,details,.kart{background:#fff;border-radius:.5em;padding:.3em .7em;margin:.3em 0;box-shadow:0 1px 5px #0002}.baslik{font-weight:800}h2,h3{margin:.1em 0;font-size:1.15em}p{margin:.1em 0}aside,.yan{background:#fff4c9;margin:.3em .6em;padding:.3em .7em;border-radius:.5em}footer,.alt{background:#232846;color:#cfd4ef;padding:.4em .8em;font-size:.85em}iframe{width:100%;height:8em;border:0;border-radius:.4em}figure{margin:.2em 0}figcaption{font-size:.8em;color:#667}.slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:.4em}.slider img{flex:none;width:100%;height:4.5em;object-fit:cover;scroll-snap-align:center}.rozet{background:#ece8ff;color:#5b36f2;padding:.1em .6em;margin:.15em;border-radius:99px;font-weight:700}.vurgu{color:#d6336c;font-weight:800;background:#ffe0ef;border-radius:.2em;padding:0 .15em}summary{font-weight:700;cursor:pointer}${cols}</style>`;
+}
+function runDoc(code,o){
+  const ol=o.outline?'<style>'+o.outline+'{outline:.2em dashed #f59e0b!important;outline-offset:-.1em;box-shadow:0 0 0 .3em #f59e0b66!important}</style>':'';
+  const sc=o.outline?'<script>var e=document.querySelector("'+o.outline+'");if(e)e.scrollIntoView({block:"center"})<\/script>':'';
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'+pageCss(o.css||'club',o.fs||3,o.cols)+ol+'</head><body>'+resolveForRun(code)+sc+'</body></html>'}
+/* "Özellik yok / var" önce-sonra düğmesi */
+function offSeg(host,before,apply){
+  const c=ctl('<div class="seg"><button data-v="0">Özellik yok</button><button data-v="1" class="on">Özellik var</button></div>');
+  host.insertBefore(c,before||null);
+  $$('button',c).forEach(x=>x.onclick=()=>{$$('button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');apply(x.dataset.v==='1')});
+}
+
+/* ---------- kod/sonuç parçaları ---------- */
+function mkPane(code,o){
+  o=o||{};
+  const p=document.createElement('div');p.className='pane code';
+  p.innerHTML='<div class="pane-h"><span>'+esc(o.name||'Kod')+'</span><button class="cp">Kopyala</button></div>';
+  const pre=document.createElement('pre');p.appendChild(pre);
+  const ta=document.createElement('textarea');ta.spellcheck=false;ta.style.display='none';p.appendChild(ta);
+  let cur=code,edit=false,onChange=null;
+  /* o.region: etiket adı; bu etiketin başlangıç-bitiş satırları tüm kod içinde işaretlenir */
+  const regionRange=t=>{const L=cur.split('\n');let a=-1,ind='';
+    for(let i=0;i<L.length;i++){const m=L[i].match(new RegExp('^(\\s*)<'+t+'[\\s>]'));if(m){a=i;ind=m[1];break}}
+    if(a<0)return null;
+    for(let j=a;j<L.length;j++)if(L[j].indexOf(ind+'</'+t+'>')===0||(j===a&&L[j].indexOf('</'+t+'>')>0))return [a,j];
+    return [a,a]};
+  const render=()=>{let h=hl2(cur);
+    const rg=o.region&&regionRange(o.region);
+    if(rg){h=h.split('\n').map((l,i)=>i>=rg[0]&&i<=rg[1]?'<span class="reg" style="display:block">'+(l||' ')+'</span>':l+(i<h.split('\n').length-1?'\n':'')).join('')}
+    pre.innerHTML=h;(o.hl||[]).forEach(k=>$$('.tk[data-k="'+k+'"]',pre).forEach(x=>x.classList.add('hot')));
+    const r=$('.reg',pre);if(r)pre.scrollTop=Math.max(0,r.offsetTop-pre.clientHeight/3)};
+  render();
+  $('.cp',p).onclick=e=>copyText(cur,e.target);
+  if(o.edit){
+    const b=document.createElement('button');b.className='cp';b.textContent='✎ Düzenle';$('.pane-h',p).insertBefore(b,$('.cp',p));
+    b.onclick=()=>{edit=!edit;if(edit){ta.value=cur;ta.style.display='block';pre.style.display='none';b.textContent='✓ Bitti'}else{cur=ta.value;ta.style.display='none';pre.style.display='block';b.textContent='✎ Düzenle';render();onChange&&onChange(cur)}};
+    ta.addEventListener('input',()=>{cur=ta.value;onChange&&onChange(cur)});
+  }
+  return {el:p,set(c,h){cur=c;if(h)o.hl=h;render()},get:()=>cur,onChange(f){onChange=f}};
+}
+function mkRes(code,o){
+  o=o||{};
+  const p=document.createElement('div');p.className='pane';
+  p.innerHTML='<div class="pane-h"><span>Sonuç'+(o.outline?' <small>(turuncu çerçeve = bu parça)</small>':'')+'</span></div>';
+  const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts');fr.title='Sonuç';p.appendChild(fr);
+  const upd=c=>{fr.srcdoc=runDoc(c,o)};upd(code);
+  return {el:p,set:upd};
+}
+/* kod + sonuç + (isteğe bağlı) balon */
+function codeRes(host,code,o){
+  o=o||{};
+  const cr=document.createElement('div');cr.className='cr'+(o.run===false?' one':'');
+  const left=document.createElement('div');left.className='col';
+  const cp=mkPane(code,o);left.appendChild(cp.el);
+  if(o.note){const b=document.createElement('div');b.className='balloon';b.innerHTML=o.note;left.appendChild(b)}
+  cr.appendChild(left);
+  let rs=null;
+  if(o.run!==false){rs=mkRes(code,o);cr.appendChild(rs.el)}
+  host.appendChild(cr);
+  if(o.edit&&rs)cp.onChange(c=>rs.set(c));
+  if(o.off&&rs)offSeg(host,cr,on=>{const c=on?code:code.replace(new RegExp(o.off),'');cp.set(c,on?o.hl:[]);rs.set(c)});
+  return {set(c,h){cp.set(c,h);if(rs)rs.set(c)},cp,rs};
+}
+
+/* ---------- Robotik Kulübü sayfası (tüm sunu boyunca aynı örnek) ---------- */
+const CLUB_SEM=`<header>
+  <h1>Robotik Kulübü</h1>
+  <p>Üreten, deneyen, paylaşan öğrenciler</p>
+</header>
+<nav>
+  <a href="#">Ana Sayfa</a>
+  <a href="#">Etkinlikler</a>
+  <a href="#">İletişim</a>
+</nav>
+<main>
+  <section>
+    <h2>Hakkımızda</h2>
+    <p>Her cuma 15.00'te laboratuvarda buluşuruz.</p>
+  </section>
+  <article>
+    <h2>Duyuru: Robot Yarışması</h2>
+    <p>Kayıtlar ayın 15'ine kadar sürüyor.</p>
+  </article>
+</main>
+<aside>
+  <p>Atölyeye laptopunuzu getirin.</p>
+</aside>
+<footer>
+  <p>&copy; 2026 Robotik Kulübü</p>
+</footer>`;
+const FIG=`    <figure>
+      <img src="resimler/kulup.jpg" alt="Kulüp üyeleri robot kolunu programlıyor" width="480" height="270">
+      <figcaption>Şekil 1 - Cuma atölyesinden bir kare</figcaption>
+    </figure>`;
+const CLUB_FIG=CLUB_SEM.replace("<p>Her cuma 15.00'te laboratuvarda buluşuruz.</p>","<p>Her cuma 15.00'te laboratuvarda buluşuruz.</p>\n"+FIG);
+const SLIDER=`  <section>
+    <h2>Etkinlik galerisi</h2>
+    <div class="slider">
+      <img src="resimler/galeri1.jpg" alt="Birinci etkinlik" width="480" height="160">
+      <img src="resimler/galeri2.jpg" alt="İkinci etkinlik" width="480" height="160">
+      <img src="resimler/galeri3.jpg" alt="Üçüncü etkinlik" width="480" height="160">
+    </div>
+  </section>`;
+const VIDEO=`  <section>
+    <h2>Tanıtım videosu</h2>
+    <video controls poster="video/kapak.jpg" width="320">
+      <source src="video/tanitim.mp4" type="video/mp4">
+    </video>
+  </section>`;
+function clubFull(){
+  let s=CLUB_SEM;
+  s=s.replace("<p>Her cuma 15.00'te laboratuvarda buluşuruz.</p>","<p>Her cuma 15.00'te laboratuvarda buluşuruz.</p>\n"+FIG);
+  s=s.replace('  <article>',SLIDER+'\n'+VIDEO+'\n  <article>');
+  s=s.replace("<p>Kayıtlar ayın 15'ine kadar sürüyor.</p>","<p>Kayıtlar ayın 15'ine kadar sürüyor.</p>\n    <audio controls>\n      <source src=\"ses/kulup-marsi.mp3\" type=\"audio/mpeg\">\n    </audio>");
+  return s;
+}
+
+/* ---------- slayt tanımları ---------- */
+const S=[];
+const add=o=>S.push(o);
+const MODA='A. div ve span',MODB='B. Anlamlı etiketler',MODC='C. Resim, video, ses';
+
+add({t:'hero',mod:'HTML5 · Hafta 7',h:'Web sayfasına <span style="text-decoration:underline wavy #ffffffa0">düzen</span> ver,<br>fotoğraf, video ve müzik ekle',say:'Robotik Kulübü sayfasını adım adım kuruyoruz'});
+add({t:'list',mod:'Giriş',h:'Bugün neler yapacağız?',items:[['🧱','Sayfayı bölümlere ayıracağız'],['🏷️','Her bölüme anlamlı bir ad vereceğiz'],['🖼️','Fotoğraf, video ve müzik ekleyeceğiz']]});
+add({t:'result',mod:'Giriş',h:'Sonunda böyle bir sayfamız olacak',code:()=>clubFull(),fs:1.2,cols:true});
+add({t:'cr',mod:'Giriş',h:'Kodu nasıl okuyacağız?',code:'<img src="resimler/kulup.jpg">',run:false,hl:[],
+  extra:()=>`<div class="list" style="flex:none;flex-direction:row;gap:2vw"><div class="it" style="flex:1"><span class="t-tag">&lt;img&gt;</span>&nbsp;= etiket</div><div class="it" style="flex:1"><span class="t-attr">src</span>&nbsp;= özellik</div><div class="it" style="flex:1"><span class="t-str">"resimler/..."</span>&nbsp;= değer</div></div>`,
+  say:'Üç renk: <b style="color:var(--c-tag)">etiket</b>, <b style="color:var(--c-attr)">özellik</b>, <b style="color:var(--c-str)">değer</b>. Sarı parlayan yer, o an anlattığımız yerdir.'});
+
+/* ===== A. div ve span ===== */
+add({t:'sec',mod:MODA,em:'📦',h:'A. Sayfayı gruplara ayırmak',say:'div ve span: neden varlar?'});
+add({t:'cr',mod:MODA,h:'Sorun: gruplayamazsak ne olur?',css:'plain',
+  code:'<h2>Robot Atölyesi</h2>\n<p>Cuma 15.00</p>\n<h2>Yazılım Atölyesi</h2>\n<p>Cumartesi 10.00</p>',
+  say:'Elinde iki etkinlik var, ama sayfa hepsini <b>aynı yığına</b> koyar. Hangi saat hangi etkinliğin? Başlıkla saat birbirine bağlı değil. CSS ile de iki etkinliği ayrı ayrı boyayamazsın, çünkü <b>paketleyecek bir şey yok</b>.',bn:'🧺 <b>Benzetme:</b> çamaşırları, tabakları ve kitapları aynı sepete atmak. Sonra hangisi nerede diye aranırsın.'});
+add({t:'cr',mod:MODA,h:'Çözüm: div = çekmece',
+  code:'<div class="kart">\n  <h2>Robot Atölyesi</h2>\n  <p>Cuma 15.00</p>\n</div>',hl:['t:div'],note:'div = birden çok şeyi tek pakete koyan kutu',
+  say:'<b>div</b>, içine koyduğun her şeyi <b>tek bir pakete</b> çevirir. Kendi başına hiçbir şey göstermez; sadece "bunlar bir arada" der. Olmazsa gruplar birbirinden ayrılamaz, CSS de tek tek kutuya uygulanamaz. Kutular <b>alt alta</b> dizilir (satır başından başlar).',bn:'🗄️ <b>Benzetme:</b> çekmece. İçindekileri tek tek değil, çekmeceyle birlikte taşırsın.'});
+add({t:'cmp',mod:MODA,h:'Önce / sonra: div yok, div var',
+  a:{lbl:'div yok',cls:'bad',css:'plain',code:'<h2>Robot Atölyesi</h2>\n<p>Cuma 15.00</p>\n<h2>Yazılım Atölyesi</h2>\n<p>Cumartesi 10.00</p>'},
+  b:{lbl:'div var',cls:'good',code:'<div class="kart">\n  <h2>Robot Atölyesi</h2>\n  <p>Cuma 15.00</p>\n</div>\n<div class="kart">\n  <h2>Yazılım Atölyesi</h2>\n  <p>Cumartesi 10.00</p>\n</div>'}});
+add({t:'demo',mod:MODA,h:'div ile hepsini birden biçimlendir',say:'Kutuları gruplayınca CSS bir kerede hepsine uygulanır. Düğmelere bas!',build:'cards'});
+add({t:'cr',mod:MODA,h:'span = fosforlu kalem',
+  code:'<p>Her <span class="vurgu">cuma</span>\n   buluşuruz.</p>',hl:['t:span'],note:'span = cümlede yalnızca bir kelimeyi işaretler',
+  say:'<b>span</b>, paragrafı bölmeden <b>sadece bir kelimeyi</b> işaretler. Kendi başına görünür bir şey yapmaz; CSS ile rengi, kalınlığı verilir. Olmazsa o kelimeyi ayrı boyayamazsın, bütün paragraf boyanır. Yazı <b>yan yana</b> akar; satır başına atlamaz.',bn:'🖍️ <b>Benzetme:</b> fosforlu kalem. Sayfadan sadece bir kelimeyi boyarsın.'});
+add({t:'cmp',mod:MODA,h:'Önce / sonra: span yok, span var',
+  a:{lbl:'span yok',cls:'bad',css:'plain',code:'<p style="color:#d6336c">\n  Her cuma buluşuruz.\n</p>'},
+  b:{lbl:'span var',cls:'good',code:'<p>Her <span class="vurgu">cuma</span>\n   buluşuruz.</p>'}});
+add({t:'demo',mod:MODA,h:'div alt alta, span yan yana',say:'Aynı üç rozeti div ve span ile yaz. Farkı gör!',build:'block'});
+add({t:'cmp',mod:MODA,h:'div ile span farkı: satır başı mı, yan yana mı?',
+  a:{lbl:'div = alt alta (blok)',cls:'neu',css:'plain',code:'<div class="rozet">Robotik</div>\n<div class="rozet">Yazılım</div>'},
+  b:{lbl:'span = yan yana (satır içi)',cls:'neu',css:'plain',code:'<span class="rozet">Robotik</span>\n<span class="rozet">Yazılım</span>'},
+  say:'<b>div</b> her seferinde yeni satıra geçer, <b>kutu</b> gibidir. <b>span</b> yazının içinde kalır, <b>kelime</b> gibidir. Seçim: kutu mu lazım, kelime mi?'});
+add({t:'cards',mod:MODA,h:'Ne zaman hangisi?',n:3,items:[['📦','<code>div</code>','Birkaç şeyi tek pakete koy: kart, galeri, kutu. Alt alta dizilir.'],['🖍️','<code>span</code>','Cümlede tek kelimeyi işaretle: renk, kalın. Yan yana akar.'],['🏷️','Anlamlı etiket','Görevi belliyse (üst, menü, alt) div değil onu yaz.']],say:'Sıra: önce <b>görevi söyleyen</b> etiketi ara (header, nav...). Yoksa kutu için <b>div</b>, kelime için <b>span</b>.'});
+add({t:'cr',mod:MODA,h:'Her şeye div yazarsak?',
+  code:'<div class="ust">Robotik Kulübü</div>\n<div class="menu">Ana Sayfa</div>\n<div class="icerik">Asıl içerik</div>\n<div class="yan">Yan not</div>\n<div class="alt">Alt kısım</div>',
+  note:'Sayfa düzgün görünür ama etiketler hep aynı: div',
+  say:'Sayfa düzgün görünür ama <b>hepsi aynı etiket</b>. Hangisi menü, hangisi alt bilgi? Sadece class adından tahmin ediyoruz. Ekran okuyucu ve Google class adlarına bakmaz, <b>"menüye atla"</b> diyemez. Çözüm: anlamlı etiketler.'});
+
+/* ===== B. Anlamlı etiketler ===== */
+add({t:'sec',mod:MODB,em:'🏷️',h:'B. Anlamlı etiketler',say:'Sayfanın odalarına ad verelim'});
+add({t:'cards',mod:MODB,h:'Anlamlı etiket nedir?',n:3,items:[['🚪','Odanın kapısındaki yazı','mutfak, salon, banyo: odanın işini söyler'],['🧑‍🦯','Ekran okuyucu bilir','"menü burada, ana içerik şurada" diyebilir'],['🔎','Google anlar','sayfanın hangi kısmı ne, ona göre sıralar']],say:'Anlamlı etiket, kutunun <b>görevini adıyla</b> söyler. Görünüşü değişmez; değişen, sayfanın <b>anlaşılır</b> olmasıdır.'});
+add({t:'demo',mod:MODB,h:'Sayfa adım adım kurulur',say:'Oynat ve izle. İstersen "div çorbası"na geç.',build:'map'});
+function tg(name,say,bn,code,note,hl,mod){add({t:'cr',mod:mod||MODB,h:'&lt;'+name+'&gt;',say:say,bn:bn,code:code,hl:hl||['t:'+name],note:note,ctx:name})}
+tg('header','Sayfanın (ya da bir bölümün) <b>üst kısmı</b>: kulübün adı, logo, kısa slogan. Olmazsa tarayıcı ve ekran okuyucu üstün nerede bittiğini bilemez. <b>Fark:</b> header bir <b>kutudur</b>, içine başlık (h1) konur. h1 ise sadece <b>başlık yazısıdır</b>.','📰 <b>Benzetme:</b> gazetenin manşet bölümü: büyük başlık ve altındaki küçük yazı birlikte.','<header>\n  <h1>Robotik Kulübü</h1>\n  <p>Üreten, deneyen, paylaşan</p>\n</header>','header = sayfanın üst kısmı');
+add({t:'cmp',mod:MODB,h:'header ile h1 farkı',
+  a:{lbl:'h1 = sadece başlık yazısı',cls:'neu',code:'<h1>Robotik Kulübü</h1>'},
+  b:{lbl:'header = başlığı taşıyan kutu',cls:'neu',code:'<header>\n  <h1>Robotik Kulübü</h1>\n  <p>Üreten, deneyen, paylaşan</p>\n</header>'},
+  say:'<b>h1</b> bir yazının adıdır. <b>header</b> ise o başlığı, sloganı, logoyu <b>toplayan üst bölümdür</b>. Biri yazı, diğeri kutu; yan yana kullanılır, birbirinin yerine geçmez. <b>Ne zaman?</b> Sadece başlık varsa h1; başlıkla birlikte logo, slogan gibi şeyler varsa header.'});
+tg('nav','Sayfanın <b>ana menüsü</b>: sayfalar arası geçiş bağlantıları. Olmazsa ekran okuyucu kullanan biri menüyü bulamaz, her bağlantıyı tek tek dinler. Tüm bağlantılar değil, sadece <b>gezinme</b> bağlantıları buraya girer.','🪧 <b>Benzetme:</b> alışveriş merkezindeki yön tabelası: "Giyim, Kafe, Çıkış".','<nav>\n  <a href="#">Ana Sayfa</a>\n  <a href="#">Etkinlikler</a>\n  <a href="#">İletişim</a>\n</nav>','nav = menü (gezinme) bağlantıları');
+add({t:'cmp',mod:MODB,h:'nav ile sıradan bağlantı farkı',
+  a:{lbl:'sıradan bağlantı (nav değil)',cls:'neu',code:'<p>Kaynak:\n  <a href="#">MEB</a> ve\n  <a href="#">Vikipedi</a>\n</p>'},
+  b:{lbl:'nav = sayfanın ana menüsü',cls:'neu',code:'<nav>\n  <a href="#">Ana Sayfa</a>\n  <a href="#">Etkinlikler</a>\n  <a href="#">İletişim</a>\n</nav>'},
+  say:'İkisinde de <b>a</b> etiketi var. Fark, bağlantının <b>görevinde</b>. Cümle içindeki "kaynak" bağlantısı sıradandır, nav gerekmez. Sayfayı gezdiren <b>ana menü</b> nav olur. Kural: "Bu bağlantılar siteyi gezmemi sağlıyor mu?" Evet → nav.'});
+tg('main','Sayfanın <b>asıl içeriği</b>: ziyaretçinin gelme sebebi. Menü, üst ve alt bilgi dışında kalan her şey. <b>Sayfada tek tane</b> olur. Olmazsa ekran okuyucu "asıl içeriğe atla" diyemez. <b>Fark:</b> main bütün sayfa için tektir; section ise main içinde çok kez kullanılır.','🍽️ <b>Benzetme:</b> restoranın yemek salonu. Mutfak, kasa, tabela dışarıda; yemeğin yendiği yer burası.','<main>\n  <h2>Duyurular</h2>\n  <p>Bu haftaki etkinlikler...</p>\n</main>','main = sayfanın asıl içeriği (tek tane)');
+add({t:'cards',mod:MODB,h:'main ile section farkı',n:2,items:[['🍽️','<code>main</code>','Sayfada <b>bir tane</b>. Asıl içeriğin tamamını sarar. Menü, üst, alt dışarıda kalır.'],['📚','<code>section</code>','Sayfada <b>çok tane</b> olabilir. main içinde her biri konulu bir bölümdür. Genelde kendi başlığı (h2) vardır.']],say:'main = <b>yemek salonu</b>, section = salondaki <b>masalar</b>. Salon tek, masalar çok. <b>Ne zaman?</b> Asıl içeriği sarmak için main; içini konulara bölmek için section.'});
+tg('section','Konusu olan bir <b>bölüm</b>: kendi başlığı vardır ("Hakkımızda", "Galeri"). Olmazsa sayfa tek parça yığın olur, bölümler ayrılamaz. <b>Fark:</b> section konulu bir parçadır; sadece kutu (CSS için paket) lazımsa div kullan.','📚 <b>Benzetme:</b> kitabın bir bölümü: kendi başlığı var, ama kitabın bütününden ayrı okunmaz.',"<section>\n  <h2>Hakkımızda</h2>\n  <p>Her cuma 15.00'te buluşuruz.</p>\n</section>",'section = konusu olan bölüm');
+add({t:'cmp',mod:MODB,h:'section ile div farkı',
+  a:{lbl:'div = konusu olmayan kutu',cls:'neu',code:'<div class="kart">\n  <h2>Hakkımızda</h2>\n  <p>Her cuma 15.00\'te buluşuruz.</p>\n</div>'},
+  b:{lbl:'section = konulu bölüm',cls:'neu',code:'<section>\n  <h2>Hakkımızda</h2>\n  <p>Her cuma 15.00\'te buluşuruz.</p>\n</section>'},
+  say:'Gözle ikisi <b>aynı</b>. Fark anlamda: section "bu parçanın bir konusu var" der, div hiçbir şey demez. <b>Ne zaman?</b> Parçanın başlığı varsa ve sayfanın bir bölümüyse section. Sadece düzen için sarmalıyorsan (süs, boşluk) div.'});
+tg('article','<b>Tek başına anlaşılan</b> içerik: haber, duyuru, blog yazısı. Kesip başka yere koysan anlamı bozulmaz. Olmazsa arama motoru ve haber okuyucular bağımsız yazıyı seçemez. <b>Fark:</b> section sayfanın parçasıdır; article kendi başına yaşayabilir.','📰 <b>Benzetme:</b> gazetedeki tek bir haber. Kesip arkadaşına versen yine anlaşılır.',"<article>\n  <h2>Robot Yarışması</h2>\n  <p>Kayıtlar ayın 15'ine kadar.</p>\n</article>",'article = bağımsız içerik (haber, duyuru)');
+add({t:'cmp',mod:MODB,h:'section mı, article mı?',
+  a:{lbl:'section = kitabın bölümü',cls:'neu',code:'<section>\n  <h2>Hakkımızda</h2>\n  <p>Her cuma 15.00\'te buluşuruz.</p>\n</section>'},
+  b:{lbl:'article = gazete haberi',cls:'neu',code:'<article>\n  <h2>Robot Yarışması</h2>\n  <p>Kayıtlar ayın 15\'ine kadar.</p>\n</article>'},
+  say:'Kendine sor: <b>"Bunu kesip başka sayfaya koysam tek başına anlaşılır mı?"</b> Evet → <b>article</b> (haber, duyuru, yorum). Hayır, sayfanın bir bölümü → <b>section</b>. Emin olamazsan section yaz.'});
+tg('aside','Ana içeriğin <b>yanındaki</b> küçük bilgi: ipucu, reklam, ilgili bağlantılar. Silsen de asıl içerik anlaşılır. Olmazsa yan not asıl içerikle karışır. <b>Fark:</b> aside sayfanın ortasında ya da yanında durur; sayfanın sonunda duran bilgi footer\'dır.','📝 <b>Benzetme:</b> kitabın kenarındaki not: okumasan da hikâye anlaşılır.','<aside>\n  <p>Atölyeye laptopunuzu getirin.</p>\n</aside>','aside = yan bilgi / hatırlatma');
+tg('footer','Sayfanın <b>alt kısmı</b>: telif, iletişim, adres, sosyal medya. Her sayfada aynı yerde bulunur, ziyaretçi "en alta bakayım" der. Olmazsa bu bilgiler sayfaya dağılır. <b>Fark:</b> footer sayfanın <b>sonudur</b>; aside ise içeriğin yanındaki nottur.','✉️ <b>Benzetme:</b> mektubun altındaki imza ve adres.','<footer>\n  <p>&copy; 2026 Robotik Kulübü</p>\n</footer>','footer = sayfanın alt bilgisi');
+add({t:'cmp',mod:MODB,h:'aside ile footer farkı',
+  a:{lbl:'aside = yan not',cls:'neu',code:'<aside>\n  <p>Atölyeye laptopunuzu getirin.</p>\n</aside>'},
+  b:{lbl:'footer = sayfa sonu bilgisi',cls:'neu',code:'<footer>\n  <p>&copy; 2026 Robotik Kulübü</p>\n</footer>'},
+  say:'<b>aside</b> içerikle ilgili <b>ek bilgidir</b> (ipucu, hatırlatma); yerine göre ortada ya da yanda durur. <b>footer</b> sayfanın <b>en altında</b> telif ve iletişim taşır. Soru: "Bu, konuyla ilgili ek not mu?" → aside. "Sayfa bitti, künye mi?" → footer.'});
+add({t:'app',mod:MODB,n:1,h:'🛠️ Uygulama 1: Okul Kantini Menüsü',know:[['div, span','A bölümü: div ve span'],['header, main, footer','B bölümü: anlamlı etiketler'],['Başlık, liste, tablo','Önceki haftalar']],goal:'Bitmiş kantin menüsü sayfasını inceleyip aynısını baştan yaz. Kartları <b>div</b> ile grupla, fiyatı <b>span</b> ile vurgula, sayfayı <b>header</b>, <b>main</b> ve <b>footer</b> ile kur.',time:'10-15 dakika'});
+add({t:'cmp',mod:MODB,h:'Aynı sayfa: hangisi daha anlaşılır?',say:'Gözle ikisi <b>aynı görünüyor</b>. Fark: ekran okuyucu ve Google yalnızca sağdakini anlar.',
+  a:{lbl:'div çorbası',cls:'bad',code:'<div class="ust">Robotik Kulübü</div>\n<div class="menu">Ana Sayfa</div>\n<div class="icerik">Asıl içerik</div>\n<div class="yan">Yan not</div>\n<div class="alt">Alt kısım</div>'},
+  b:{lbl:'anlamlı etiketler',cls:'good',code:'<header>Robotik Kulübü</header>\n<nav>Ana Sayfa</nav>\n<main>Asıl içerik</main>\n<aside>Yan not</aside>\n<footer>Alt kısım</footer>'}});
+add({t:'cr',mod:MODB,h:'&lt;figure&gt; ve &lt;figcaption&gt;',
+  code:'<figure>\n  <img src="resimler/kulup.jpg"\n       alt="Robot atölyesi">\n  <figcaption>Cuma atölyesi</figcaption>\n</figure>',hl:['t:figure','t:figcaption'],note:'figure = resim + altyazı bir arada',ctx:'figure',ctxFull:true,
+  say:'<b>figure</b> resmi (ya da tablo, kod gibi bir görseli) ve <b>altyazısını</b> tek pakette tutar; altyazıyı <b>figcaption</b> yazar. Olmazsa altyazı sıradan bir paragraf olur, resimle bağı kaybolur. Resim taşınırsa altyazı da birlikte gider.',bn:'🖼️ <b>Benzetme:</b> müzedeki tablo ve altındaki etiket: ikisi birlikte asılır.'});
+add({t:'cmp',mod:MODB,h:'figure ile img farkı',
+  a:{lbl:'sadece img + p',cls:'neu',code:'<img src="resimler/kulup.jpg"\n     alt="Robot atölyesi">\n<p>Cuma atölyesi</p>'},
+  b:{lbl:'figure = resim + altyazı bağlı',cls:'neu',code:'<figure>\n  <img src="resimler/kulup.jpg"\n       alt="Robot atölyesi">\n  <figcaption>Cuma atölyesi</figcaption>\n</figure>'},
+  say:'<b>img</b> sadece resmin kendisidir. <b>figure</b> resmi ve altyazısını <b>birbirine bağlayan kutudur</b>; içinde img durur. Altyazı yoksa figure şart değil, img yeter. <b>Ne zaman?</b> Resmin "Şekil 1" gibi bir açıklaması varsa figure.'});
+add({t:'cr',mod:MODB,h:'&lt;details&gt; ve &lt;summary&gt;',
+  code:'<details>\n  <summary>Nasıl katılırım?</summary>\n  <p>Cuma günü laboratuvara gel.</p>\n</details>',hl:['t:details','t:summary'],note:'details = tıklayınca açılan çekmece',
+  say:'<b>details</b> tıklayınca <b>açılıp kapanan</b> bölümdür. <b>summary</b> her zaman görünen başlıktır; geri kalan içerik tıklayınca açılır. Sık sorulan sorular için ideal. JavaScript yazmadan, tarayıcı kendisi yapar. Olmazsa cevapların hepsi sayfada açık durur, sayfa uzar.',bn:'🗄️ <b>Benzetme:</b> çekmece: dışarıda etiketi görürsün, çekince içi açılır.'});
+add({t:'cmp',mod:MODB,h:'details ile normal paragraf farkı',
+  a:{lbl:'normal p = hep açık',cls:'neu',code:'<p>Nasıl katılırım?</p>\n<p>Cuma günü laboratuvara gel.</p>'},
+  b:{lbl:'details = tıklayınca açılır',cls:'neu',code:'<details>\n  <summary>Nasıl katılırım?</summary>\n  <p>Cuma günü laboratuvara gel.</p>\n</details>'},
+  say:'Normal paragrafta <b>her şey açık durur</b>; sayfa uzar. details içeriği <b>gizler</b>, ziyaretçi isterse açar. Soruyu sol örnekte görmek için kaydırman gerekir. <b>Ne zaman?</b> Cevap uzunsa ve herkes okumak zorunda değilse details; önemli bilgiyi gizleme, paragraf yaz.'});
+add({t:'demo',mod:MODB,h:'Düzen atölyesi: iskeleti sen kur',say:'Kutuları aç/kapat, kodu ve sayfayı izle.',build:'lab'});
+add({t:'list',mod:MODB,cls:'bad',h:'Sık yapılan 3 hata',items:[['❌','Sayfadaki her bağlantıyı <code class="i">nav</code> içine koymak (nav sadece ana menü)'],['❌','Birden çok <code class="i">main</code> yazmak (sayfada tek)'],['❌','Kutu lazım diye <code class="i">section</code> yazmak (başlığı olmayan kutu için div)']]});
+add({t:'list',mod:MODB,cls:'good',h:'Sektörde nasıl yapılıyor?',items:[['🏢','Sayfa önce <b>anlamlı iskeletle</b> kurulur'],['🔎','Google ve ekran okuyucu bu yapıyı kullanır'],['✅','Tek <code class="i">main</code>, tek <code class="i">h1</code>']]});
+add({t:'result',mod:MODB,h:'Sayfamız şimdi: iskelet hazır',code:()=>CLUB_SEM,fs:1.5});
+
+/* ===== C. Medya ===== */
+add({t:'sec',mod:MODC,em:'🎞️',h:'C. Resim, video ve ses',say:'Sayfaya hayat katalım'});
+add({t:'cards',mod:MODC,h:'Medya ne işe yarar?',n:3,items:[['🖼️','Resim','<code>img</code>: sabit görüntü'],['🎬','Video','<code>video</code>: hareketli görüntü + ses'],['🎵','Ses','<code>audio</code>: sadece ses']],say:'Eskiden bunlar için <b>eklenti</b> kurmak gerekirdi. Artık <b>tek etiket</b> yeter; tarayıcı kendisi oynatır. Etiket çok basit, ama <b>doğru dosyayı</b> ve <b>doğru özelliği</b> seçmek önemli.'});
+add({t:'cards',mod:MODC,h:'Hangi dosya, ne için?',n:3,items:[['📷','JPG','fotoğraf'],['🪟','PNG','şeffaf logo'],['⚡','WebP / AVIF','küçük ve hızlı'],['✏️','SVG','büyüyünce bozulmaz'],['🎬','MP4','video'],['🎵','MP3','ses']],say:'Dosya adında <b>Türkçe karakter ve boşluk</b> kullanma: <code class="i">kulup-marsi.mp3</code>'});
+add({t:'cards',mod:MODC,h:'Dosya yolu: dosya nerede?',n:2,items:[['🗺️','Adres tarifi','HTML dosyası, resmin nerede olduğunu <b>yazıyla</b> söyler'],['⬆️','<code>../</code>','"Bir klasör yukarı çık" demektir']],say:'Yol yanlışsa resim görünmez.'});
+add({t:'demo',mod:MODC,h:'Yol gezgini',say:'Önce hangi sayfadasın, sonra hangi dosyayı çağırıyorsun?',build:'path'});
+add({t:'cr',mod:MODC,h:'&lt;img&gt;: resim koy',
+  code:'<img src="resimler/kulup.jpg">',hl:['t:img'],note:'img = sayfaya resim koyar (kapanış etiketi yok)',
+  say:'<b>img</b> sayfaya bir <b>resim</b> koyar. İçine yazı girmez, o yüzden <b>kapanış etiketi yoktur</b>. Hangi resim olduğunu özellikler (src, alt...) söyler. Etiketi yazmazsan sayfada resim olmaz; sadece yazı kalır.',bn:'🖼️ <b>Benzetme:</b> duvara fotoğraf asmak. Çerçeve etiket, hangi fotoğraf olduğu özellik.'});
+add({t:'cr',mod:MODC,h:'src = resmin adresi',
+  code:'<img src="resimler/kulup.jpg">',hl:['a:src'],note:'src = resmin adresi (hangi dosya?)',
+  say:'<b>src</b> ("sorsa" okunur, kaynak) tarayıcıya <b>hangi dosyayı</b> göstereceğini söyler. Olmazsa tarayıcı hangi resmi koyacağını bilemez; boş kalır. Yol yanlışsa da resim görünmez.',bn:'📮 <b>Benzetme:</b> paketin üstündeki adres: yanlışsa paket ulaşmaz.'});
+add({t:'cr',mod:MODC,h:'alt = resmin yazılı tarifi',
+  code:'<img src="resimler/kulup.jpg"\n     alt="Robot atölyesi">',hl:['a:alt'],note:'alt = resmin yazılı tarifi',
+  say:'<b>alt</b> ("alternatif metin") resmi <b>yazıyla anlatır</b>. Üç işe yarar: resim yüklenemezse yerine çıkar; görme engelli kullanıcıların ekran okuyucusu bunu okur; Google resmi bununla tanır. Olmazsa bu kişiler resimden hiçbir şey anlamaz.',bn:'📞 <b>Benzetme:</b> telefonda bir fotoğrafı arkadaşına tarif etmek.'});
+add({t:'demo',mod:MODC,h:'alt neden önemli?',say:'Dosya bulunamazsa ne olur?',build:'alt'});
+add({t:'cr',mod:MODC,h:'width ve height = boyut',
+  code:'<img src="resimler/kulup.jpg"\n     alt="Robot atölyesi"\n     width="240" height="135">',hl:['a:width','a:height'],off:'\\n\\s*width="240" height="135"',note:'width, height = genişlik ve yükseklik (piksel)',
+  say:'<b>width</b> genişlik, <b>height</b> yüksekliktir (piksel). Sayfa yüklenirken tarayıcı resim inmeden <b>yerini ayırır</b>. Olmazsa resim gelince yazılar aşağı <b>kayar</b>, okuyan kişi satırını kaybeder. "Özellik yok / var" düğmesiyle dene.',bn:'🪑 <b>Benzetme:</b> sinemada koltuğu önceden ayırtmak: gelen yerini bulur, kimse itişmez.'});
+add({t:'demo',mod:MODC,h:'Boyutu değiştir',say:'Kaydırıcıları oynat, kodu ve resmi izle.',build:'img'});
+add({t:'cr',mod:MODC,h:'loading="lazy" = tembel yükleme',
+  code:'<img src="resimler/kulup.jpg"\n     alt="Robot atölyesi"\n     loading="lazy">',hl:['a:loading'],note:'lazy = tembel: bu resim, sen aşağı kaydırıp ona yaklaşana kadar indirilmez',
+  say:'Sayfada 20 resim olsun. Normalde tarayıcı <b>hepsini sayfa açılırken indirir</b>, sayfa geç açılır. <b>lazy</b> yazarsan yalnızca ekranda görünen resimler hemen iner; aşağıdakiler <b>sen kaydırdıkça</b> iner.',bn:'🍕 <b>Benzetme:</b> 20 pizza kutusunu masaya birden açmak yerine, sıra gelince birer birer açmak.'});
+add({t:'cr',mod:MODC,h:'srcset = aynı resmin boyları',
+  code:'<img src="resimler/kulup-720.jpg"\n     srcset="resimler/kulup-360.jpg 360w,\n             resimler/kulup-720.jpg 720w"\n     alt="Robot atölyesi">',run:false,hl:['a:srcset'],note:'srcset = aynı resmin küçük ve büyük hâlleri; tarayıcı seçer',
+  say:'<b>srcset</b> aynı resmin <b>birden çok boyunu</b> listeler (360w = 360 piksel genişlikte). Tarayıcı ekrana uygun olanı seçer. Telefon küçüğü indirir, veri harcamaz. Olmazsa telefon da büyük resmi indirir, sayfa yavaşlar. <b>Aynı resim</b>, sadece boyu farklı.',bn:'🍕 <b>Benzetme:</b> küçük, orta, büyük pizza: kaç kişiysen onu getirirler.'});
+add({t:'demo',mod:MODC,h:'Tarayıcı hangisini seçer?',say:'Ekran genişliğini değiştir.',build:'srcset'});
+add({t:'cr',mod:MODC,h:'&lt;picture&gt; = biçim seç',
+  code:'<picture>\n  <source srcset="kulup.avif"\n          type="image/avif">\n  <source srcset="kulup.webp"\n          type="image/webp">\n  <img src="resimler/kulup.jpg"\n       alt="Robot atölyesi">\n</picture>',run:false,hl:['t:picture'],note:'picture = tarayıcı bildiği ilk biçimi seçer',
+  say:'<b>picture</b> aynı resmin <b>farklı dosya biçimlerini</b> (AVIF, WebP, JPG) sıralar. Tarayıcı bildiği <b>ilk</b> biçimi indirir. Yeni biçimler küçüktür ama eski tarayıcı bilmez; en alttaki <b>img yedektir</b> ve zorunludur. Olmazsa eski tarayıcılarda resim görünmez.',bn:'🗣️ <b>Benzetme:</b> bir kitabı Türkçe, İngilizce, Almanca bastırmak; okur bildiği dili alır.'});
+add({t:'demo',mod:MODC,h:'picture: hangi dosya inecek?',say:'Tarayıcıyı değiştir; sarı satır, seçilen dosyayı gösterir.',build:'picture'});
+add({t:'cards',mod:MODC,h:'img, srcset, picture: farkları',n:3,items:[['🖼️','<code>img</code>','Tek resim, tek dosya. Her yerde çalışır. Basit sayfalar için yeter.'],['📏','<code>srcset</code>','Aynı resim, <b>farklı boyutlar</b>. Tarayıcı ekrana göre seçer. img içindeki özelliktir.'],['🎞️','<code>picture</code>','Aynı resim, <b>farklı biçimler</b> (AVIF/WebP/JPG). Tarayıcı bildiğini seçer. Ayrı bir etikettir.']],say:'<b>Boyut</b> farkı için srcset, <b>biçim</b> farkı için picture. İkisi birlikte de olabilir. Üçünde de <code class="i">alt</code> yazmayı unutma.'});
+add({t:'app',mod:MODC,n:2,h:'🛠️ Uygulama 2: Kişisel Tanıtım Kartı',know:[['header, section, article, aside','B bölümü'],['figure, figcaption','B bölümü: figure ile img farkı'],['img, src, alt, width/height','C bölümü: img slaytları'],['a (bağlantı)','Hafta 5']],goal:'Kendini tanıtan bir kart sayfası yap: semantik iskelet kur, <b>figure</b> içine fotoğrafını ve altyazısını koy, bir <b>a</b> bağlantısı ekle.',time:'15 dakika'});
+add({t:'cr',mod:MODC,h:'&lt;video&gt;: video koy',
+  code:'<video src="video/tanitim.mp4">\n</video>',media:'video',hl:['t:video'],note:'video = sayfaya video oynatıcı ekler',
+  say:'<b>video</b> sayfaya bir <b>video oynatıcı</b> koyar; görüntü ve ses birlikte gelir. Ayrı program ya da eklenti gerekmez. Dikkat: sadece etiketi yazarsan video <b>donuk bir kare</b> gibi görünür; oynatma düğmesi için controls lazım (sonraki slayt).',bn:'📺 <b>Benzetme:</b> sayfaya gömülü küçük bir televizyon.'});
+add({t:'cr',mod:MODC,h:'controls = kumanda',
+  code:'<video controls\n       src="video/tanitim.mp4">\n</video>',hl:['a:controls'],off:' controls',note:'controls = oynat, durdur, ses, tam ekran düğmeleri',
+  say:'<b>controls</b> ("kıntrols", kumanda) oynat, durdur, ses ve tam ekran <b>düğmelerini</b> ekler. Değer yazılmaz; yazılması yeter. Olmazsa kullanıcı videoyu <b>başlatamaz</b>. Düğmeyle önce-sonra farkına bak.',bn:'🎮 <b>Benzetme:</b> televizyonun kumandası: kumanda yoksa açamazsın.',media:'video'});
+add({t:'cr',mod:MODC,h:'poster = video kapağı',
+  code:'<video controls\n       poster="video/kapak.jpg"\n       src="video/tanitim.mp4">\n</video>',hl:['a:poster'],off:'\\n\\s*poster="video/kapak.jpg"',note:'poster = video başlamadan önceki kapak resmi',
+  say:'<b>poster</b> ("postır", afiş) video başlamadan önce görünen <b>kapak resmidir</b>. Olmazsa videonun ilk karesi (çoğu zaman siyah ya da boş) görünür; ziyaretçi neye tıkladığını anlamaz. Adresi src gibi bir resim dosyasıdır.',bn:'🎬 <b>Benzetme:</b> sinema afişi: filmi izlemeden önce neyle ilgili olduğunu gösterir.',media:'video'});
+add({t:'cr',mod:MODC,h:'loop, muted, autoplay',
+  code:'<video controls loop muted\n       src="video/tanitim.mp4">\n</video>',run:false,hl:['a:loop','a:muted'],note:'loop = tekrar et · muted = sessiz · autoplay = kendiliğinden başla',
+  say:'Üç ayrı anahtar: <b>loop</b> (lup) bitince baştan başlatır; <b>muted</b> (myutıd) sesi kapatır; <b>autoplay</b> (otoplay) sayfa açılınca kendiliğinden başlatır. Tarayıcılar <b>sesli</b> kendiliğinden başlamayı engeller; autoplay ancak <b>muted</b> ile çalışır. Olmazsa autoplay sessizce hiçbir şey yapmaz.',bn:'🔁 <b>Benzetme:</b> mağaza vitrinindeki sessiz ve sürekli dönen tanıtım ekranı.'});
+add({t:'demo',mod:MODC,h:'Video özelliklerini dene',say:'Kutuları işaretle; kodu ve videoyu izle.',build:'video'});
+add({t:'cr',mod:MODC,h:'&lt;audio&gt;: ses koy',
+  code:'<audio controls>\n  <source src="ses/kulup-marsi.mp3"\n          type="audio/mpeg">\n</audio>',run:false,hl:['t:audio'],note:'audio = ses oynatıcı (video ile aynı özellikler)',
+  say:'<b>audio</b> sayfaya <b>ses</b> koyar: müzik, podcast, konuşma. Görüntüsü yoktur, sadece oynatma çubuğu çıkar. <b>controls</b>, <b>loop</b>, <b>muted</b> gibi özellikleri video ile aynıdır. Olmazsa ses sayfaya girmez. <b>source</b> yedek dosya sunar: tarayıcı bildiği biçimi seçer.',bn:'🎧 <b>Benzetme:</b> cep müzik çalar: sadece ses, ekran yok.'});
+add({t:'cards',mod:MODC,h:'video ile audio farkı',n:2,items:[['🎬','<code>video</code>','Görüntü + ses. Ekranda <b>bir kutu</b> yer kaplar. Kapak resmi (<code>poster</code>) vardır, boyut (<code>width</code>) verilir.'],['🎵','<code>audio</code>','Sadece ses. Ekranda <b>ince bir çubuk</b> olur. Poster ve görüntü yoktur. Dosyası genelde çok küçüktür.']],say:'İkisi aynı mantıkla çalışır (controls, loop, muted, source). Fark: görüntü var mı? <b>Konuşma, müzik</b> için audio; <b>görüntülü anlatım</b> için video. Sadece sesli içeriği video yapmak dosyayı gereksiz büyütür.'});
+add({t:'demo',mod:MODC,h:'Ses oynatıcıyı dene',say:'Çal tuşuna bas!',build:'audio'});
+add({t:'app',mod:MODC,n:3,h:'🛠️ Uygulama 3: Medya Köşesi',know:[['video, controls, poster','C bölümü: video slaytları'],['audio','C bölümü: audio slaydı ve demo'],['details, summary','B bölümü: details'],['img','C bölümü']],goal:'Video, ses ve resimden oluşan bir medya köşesi kur. Videoya <b>controls</b> ve <b>poster</b> ekle, sesi <b>audio</b> ile koy, açıklamayı <b>details</b> içine sakla.',time:'15 dakika'});
+add({t:'cr',mod:MODC,h:'Slider = kaydırmalı galeri',
+  code:'<div class="slider">\n  <img src="resimler/galeri1.jpg">\n  <img src="resimler/galeri2.jpg">\n  <img src="resimler/galeri3.jpg">\n</div>',hl:['a:class'],note:'slider = HTML\'de yalnızca bir div. Kaydırma işini CSS yapar (sonraki slayt)',
+  say:'Slider, <b>HTML\'de özel bir etiket değildir</b>. Üç resmi bir <b>div</b> kutusuna koyarız, adına da <b>slider</b> deriz. Resimlerin yan yana dizilmesini ve kaydırılmasını <b>CSS</b> sağlar.',bn:'📖 <b>Benzetme:</b> fotoğraf albümü: sayfaları çevirdikçe tek tek resim görürsün.'});
+add({t:'demo',mod:MODC,h:'Slider nasıl çalışır? Dene ve düzenle',say:'<b>1)</b> <code class="i">display:flex</code> resimleri alt alta değil <b>yan yana</b> dizer. <b>2)</b> <code class="i">width:100%</code> her resmi kutu kadar geniş yapar; böylece <b>aynı anda tek resim</b> görünür, diğerleri sağda saklı kalır. <b>3)</b> <code class="i">overflow-x:auto</code> taşan kısmı <b>yatay kaydırılır</b> yapar. <b>4)</b> <code class="i">scroll-snap</code> kaydırınca resmin yerine oturmasını sağlar. Sonucu fareyle ya da parmakla kaydır. <b>✎ Düzenle</b> ile <code class="i">width:100%</code> yerine <code class="i">50%</code> yaz: iki resim birden görünür!',build:'slider'});
+add({t:'cr',mod:MODC,h:'iframe = başka siteden gömme',
+  code:'<iframe src="https://www.youtube.com/embed/KOD"\n        title="Etkinlik videosu"\n        allowfullscreen>\n</iframe>',hl:['t:iframe'],note:'iframe = başka siteyi sayfanın içine gömer',
+  say:'<b>iframe</b> ("ayfreym") başka bir sitenin sayfasını (video, harita, form) senin sayfanın <b>içinde küçük bir pencere</b> gibi gösterir. Video dosyası sende durmaz, o site oynatır. Böylece büyük dosyayla sunucunu yormazsın. <b>title</b> ekran okuyucuya pencerenin ne olduğunu söyler. Olmazsa o siteyi sayfana koyamazsın.',bn:'🪟 <b>Benzetme:</b> evinizdeki pencere: dışarıdaki manzara başkasına ait, sen sadece içerden bakıyorsun.'});
+add({t:'cards',mod:MODC,h:'video ile iframe farkı',n:2,items:[['🎬','<code>video</code>','Dosya <b>sende</b> durur (tanitim.mp4). Oynatıcıyı tarayıcı yapar. Yer, hız ve telif senin sorumluluğun.'],['🪟','<code>iframe</code>','Video <b>başka sitede</b> durur (YouTube). Oynatıcı onların. Sen sadece bir adres verirsin; internet gerekir.']],say:'Kısa, kendi çektiğin tanıtım → <b>video</b>. Uzun video ya da çok izleyici beklediğin içerik → YouTube\'a yükle, <b>iframe</b> ile göm. iframe ayrıca harita ve form gömmek için de kullanılır.'});
+add({t:'list',mod:MODC,cls:'bad',h:'Medyada sık yapılan hatalar',items:[['🔍','Yol yanlış ya da büyük/küçük harf farkı: <code class="i">Kedi.JPG</code> ≠ <code class="i">kedi.jpg</code>'],['🙈','<code class="i">alt</code> yazmamak (ekran okuyucu "resim" der, başka bir şey söyleyemez)'],['🔊','<code class="i">autoplay</code> ile sesi kendiliğinden başlatmak (ziyaretçiyi kaçırır, tarayıcı da engeller)']]});
+add({t:'list',mod:MODC,cls:'good',h:'Sektörde nasıl yapılıyor?',items:[['⚡','Resimler sıkıştırılır (WebP/AVIF)'],['📐','Her resimde <code class="i">alt</code>, <code class="i">width</code>, <code class="i">height</code> yazılır'],['📜','Telifsiz ya da kendi çektiğin içerik kullanılır']]});
+add({t:'result',mod:MODC,h:'Sayfamız şimdi: hepsi bir arada',code:()=>clubFull(),fs:1.2,cols:true});
+add({t:'app',mod:MODC,n:4,h:'🛠️ Uygulama 4: Mini Site: Sınıf Sayfası',know:[['Semantik iskelet, article','B bölümü'],['# ile sayfa içi bağlantı','Hafta 5'],['Tablo, ol','Önceki haftalar'],['lang ve title','Hafta 2']],goal:'Önceki haftaların hepsini bir arada kullan: menüden sayfa içi bölümlere giden bağlantılar, ders programı tablosu, numaralı kurallar listesi ve <b>article</b> ile yazılmış duyurular bulunan sınıf sayfasını baştan yaz.',time:'20 dakika'});
+add({t:'list',mod:'Pekiştirme',h:'Alıştırmalar: 4 uygulama',items:[['1️⃣','Kolay: <b>Uygulama 1</b> (kantin menüsü) ve <b>Uygulama 2</b> (tanıtım kartı) bittiyse cümlede bir kelimeyi <code class="i">span</code> ile renklendir'],['2️⃣','Orta: <b>Uygulama 3</b> (medya köşesi) bittiyse kendi kulübün için <code class="i">header nav main footer</code> iskeletini yaz'],['3️⃣','Zor: <b>Uygulama 4</b> (sınıf sayfası) bittiyse <code class="i">figure</code>, <code class="i">audio</code> ve <code class="i">video</code> ekleyerek geliştir']]});
+add({t:'list',mod:'Pekiştirme',h:'Mini proje ve quiz',items:[['🛠️','Dört uygulama: <b>Hafta-07-Ek-Uygulamalar</b> dosyasında (yapamadığını evde tamamla)'],['🏠','Mini proje: <b>Hafta-07-Uygulama</b> dosyasındaki Robotik Kulübü sayfası'],['✅','Mini quiz: öğretmenin vereceği ayrı dosya']]});
+add({t:'cards',mod:'Pekiştirme',h:'Özet',n:3,items:[['📦','<code>div</code> / <code>span</code>','Paket ve fosforlu kalem'],['🏷️','<code>header nav main footer</code>','Sayfanın odaları'],['🎞️','<code>img video audio</code>','Resim, video, ses']],say:'Sonraki hafta: bağlantılar ve formlar.'});
+
+/* ---------- demo yapıcıları ---------- */
+function ctl(html){const d=document.createElement('div');d.className='ctrls';d.innerHTML=html;return d}
+const DEMOS={
+ cards(b){
+  const state={renk:false,orta:false,yan:false};
+  const gen=()=>{
+    const css=['.kart{ padding:.5em;'+(state.renk?' background:#ece8ff;':'')+(state.orta?' text-align:center;':'')+' }'];
+    if(state.yan)css.push('.sira{ display:flex; gap:1em; }');
+    return '<style>\n  '+css.join('\n  ')+'\n</style>\n<div class="sira">\n  <div class="kart">\n    <h2>Robot Atölyesi</h2>\n  </div>\n  <div class="kart">\n    <h2>Yazılım Atölyesi</h2>\n  </div>\n</div>';
+  };
+  const c=ctl('<label><input type="checkbox" data-k="renk"> Renk ver</label><label><input type="checkbox" data-k="orta"> Ortala</label><label><input type="checkbox" data-k="yan"> Yan yana diz</label>');
+  b.appendChild(c);
+  const cr=codeRes(b,gen(),{css:'plain'});
+  const fix=()=>cr.set(gen(),state.renk?['c:background']:[]);
+  $$('input',c).forEach(i=>i.onchange=()=>{state[i.dataset.k]=i.checked;cr.set(gen(),i.checked?[({renk:'c:background',orta:'c:text-align',yan:'c:display'})[i.dataset.k]]:[])});
+ },
+ block(b){
+  const gen=t=>`<${t} class="rozet">Robotik</${t}>\n<${t} class="rozet">Yazılım</${t}>\n<${t} class="rozet">Elektronik</${t}>`;
+  const c=document.createElement('div');c.className='ctrls';c.innerHTML='<div class="seg"><button data-v="div" class="on">&lt;div&gt; (kutu)</button><button data-v="span">&lt;span&gt; (kelime)</button></div>';
+  b.appendChild(c);
+  const cr=codeRes(b,gen('div'),{hl:['t:div']});
+  $$('button',c).forEach(x=>x.onclick=()=>{$$('button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');cr.set(gen(x.dataset.v),['t:'+x.dataset.v])});
+ },
+ map(b){
+  const STEPS=['Boş sayfa','header','nav','main','section','article','aside','footer'];
+  let i=0,timer=null,soup=false;
+  const c=ctl('<button class="btn" id="mp">&larr;</button><button class="btn pri" id="mpl">&#9654; Oynat</button><button class="btn" id="mn">&rarr;</button><button class="btn" id="mr">Sıfırla</button><div class="seg" id="sg"><button data-v="sem" class="on">Anlamlı etiket</button><button data-v="soup">div çorbası</button></div>');
+  b.appendChild(c);
+  const cr=document.createElement('div');cr.className='cr';
+  cr.innerHTML='<div class="pmap" id="pm"><div class="z z-hd" data-i="1"><span class="zn">header</span></div><div class="z z-nv" data-i="2"><span class="zn">nav</span></div><div class="z z-mn" data-i="3"><span class="zn">main</span><div class="mn-in"><span data-i="4" class="inz"><b class="z4">section</b></span><span data-i="5" class="inz"><b class="z5">article</b></span></div></div><div class="z z-sd" data-i="6"><span class="zn">aside</span></div><div class="z z-ft" data-i="7"><span class="zn">footer</span></div></div>';
+  b.appendChild(cr);
+  const cp=mkPane('',{name:'Bu adıma kadar yazılan kod'});cr.appendChild(cp.el);
+  const code=()=>{const S=soup,p=[];
+    if(i>=1)p.push(S?'<div class="ust">...</div>':'<header>...</header>');
+    if(i>=2)p.push(S?'<div class="menu">...</div>':'<nav>...</nav>');
+    if(i>=3){let n='';if(i>=4)n+=S?'  <div>...</div>\n':'  <section>...</section>\n';if(i>=5)n+=S?'  <div>...</div>\n':'  <article>...</article>\n';p.push((S?'<div class="icerik">\n':'<main>\n')+n+(S?'</div>':'</main>'))}
+    if(i>=6)p.push(S?'<div class="yan">...</div>':'<aside>...</aside>');
+    if(i>=7)p.push(S?'<div class="alt">...</div>':'<footer>...</footer>');
+    return p.length?p.join('\n'):'<!-- sayfa boş -->'};
+  const draw=()=>{
+    $$('#pm .z,#pm .inz').forEach(z=>{const k=+z.dataset.i,s=k<=i;if(z.classList.contains('inz'))z.style.opacity=s?1:.15;else{z.classList.toggle('show',s);z.classList.toggle('hl',k===i)}});
+    $('#pm').classList.toggle('soup',soup);
+    const lab=['header','nav','main','aside','footer'];$$('#pm > .z').forEach((z,k)=>{$('.zn',z).textContent=soup?'div':lab[k]});
+    $('.z4').textContent=soup?'div':'section';$('.z5').textContent=soup?'div':'article';
+    cp.set(code());
+  };
+  const go=k=>{i=Math.max(0,Math.min(7,k));draw()};
+  const stop=()=>{clearInterval(timer);timer=null;$('#mpl').innerHTML='&#9654; Oynat'};
+  $('#mn').onclick=()=>go(i+1);$('#mp').onclick=()=>go(i-1);$('#mr').onclick=()=>{stop();go(0)};
+  $('#mpl').onclick=()=>{if(timer){stop();return}if(i>=7)go(0);$('#mpl').innerHTML='&#10074;&#10074; Duraklat';timer=setInterval(()=>{if(i>=7){stop();return}go(i+1)},1300)};
+  $$('#sg button').forEach(x=>x.onclick=()=>{$$('#sg button').forEach(y=>y.classList.remove('on'));x.classList.add('on');soup=x.dataset.v==='soup';draw()});
+  draw();
+ },
+ lab(b){
+  const c=ctl(['header','nav','main','article','aside','footer'].map(k=>'<label><input type="checkbox" value="'+k+'"'+(k==='aside'?'':' checked')+'> '+k+'</label>').join(''));
+  b.appendChild(c);
+  const gen=()=>{const on={};$$('input',c).forEach(i=>on[i.value]=i.checked);const L=[];
+    if(on.header)L.push('<header>\n  <h1>Robotik Kulübü</h1>\n</header>');
+    if(on.nav)L.push('<nav>\n  <a href="#">Ana Sayfa</a>\n</nav>');
+    const art='<article>\n    <h2>Robot Yarışması</h2>\n  </article>',asd='<aside>\n    <p>Laptop getirin.</p>\n  </aside>';
+    if(on.main){const n=[];if(on.article)n.push('  '+art);if(on.aside)n.push('  '+asd);L.push('<main>\n'+(n.length?n.join('\n')+'\n':'  <p>...</p>\n')+'</main>')}
+    else{if(on.article)L.push(art.replace(/\n  /g,'\n'));if(on.aside)L.push(asd.replace(/\n  /g,'\n'))}
+    if(on.footer)L.push('<footer>\n  <p>&copy; 2026</p>\n</footer>');
+    return L.join('\n')||'<!-- kutu seçilmedi -->'};
+  const cr=codeRes(b,gen(),{});
+  $$('input',c).forEach(i=>i.onchange=()=>cr.set(gen()));
+ },
+ path(b){
+  const FILES=[['okul-kulubu',0,1],['okul-kulubu/index.html',1],['okul-kulubu/logo.png',1],['okul-kulubu/resimler',1,1],['okul-kulubu/resimler/kulup.jpg',2],['okul-kulubu/sayfalar',1,1],['okul-kulubu/sayfalar/galeri.html',2]];
+  let from='okul-kulubu/index.html',to='okul-kulubu/resimler/kulup.jpg';
+  const c=ctl('<span>Bulunduğum sayfa:</span><div class="seg"><button data-v="okul-kulubu/index.html" class="on">index.html</button><button data-v="okul-kulubu/sayfalar/galeri.html">sayfalar/galeri.html</button></div>');
+  b.appendChild(c);
+  const cr=document.createElement('div');cr.className='cr';cr.innerHTML='<div class="tree" id="tr"></div><div class="col"><div style="font-size:.85rem">Yazman gereken <b>src</b>:</div><div class="pathout" id="po"></div><div id="pw" style="font-size:.8rem;color:var(--muted)"></div></div>';
+  b.appendChild(cr);
+  const rel=(f,t)=>{const a=f.split('/').slice(0,-1),z=t.split('/');let i=0;while(i<a.length&&i<z.length-1&&a[i]===z[i])i++;return '../'.repeat(a.length-i)+z.slice(i).join('/')};
+  const draw=()=>{
+    const T=$('#tr');T.innerHTML='<div style="font-size:.6rem;color:var(--muted)">Resme tıkla</div>';
+    FILES.forEach(([p,d,dir])=>{const x=document.createElement('div');x.style.paddingLeft=(.5+d*1.2)+'em';x.textContent=(dir?'📁 ':'📄 ')+p.split('/').pop();
+      if(!dir&&!/\.html$/.test(p)){x.className='f';x.onclick=()=>{to=p;draw()}}
+      if(p===from)x.classList.add('from');if(p===to)x.classList.add('to');T.appendChild(x)});
+    const r=rel(from,to);$('#po').innerHTML=hl2('<img src="'+r+'">');
+    const u=(r.match(/\.\.\//g)||[]).length;$('#pw').textContent=u?'Bir klasör yukarı çıkıyoruz (../), sonra hedefe iniyoruz.':'Aynı klasördeyiz: alt klasör adlarını yazarız.';
+  };
+  $$('.seg button',c).forEach(x=>x.onclick=()=>{$$('.seg button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');from=x.dataset.v;draw()});
+  draw();
+ },
+ alt(b){
+  const gen=br=>'<img src="resimler/'+(br?'yok.jpg':'kulup.jpg')+'"\n     alt="Robot atölyesi">';
+  const c=ctl('<div class="seg"><button data-v="0" class="on">Dosya var</button><button data-v="1">Dosya bulunamadı</button></div>');
+  b.appendChild(c);
+  const cr=codeRes(b,gen(0),{hl:['a:alt']});
+  $$('button',c).forEach(x=>x.onclick=()=>{$$('button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');cr.set(gen(+x.dataset.v))});
+ },
+ img(b){
+  const c=ctl('<label>width <input type="range" id="iw" min="80" max="360" value="240"> <b id="iwv">240</b></label><label>height <input type="range" id="ih" min="60" max="240" value="135"> <b id="ihv">135</b></label>');
+  b.appendChild(c);
+  const gen=()=>'<img src="resimler/kulup.jpg"\n     alt="Robot atölyesi"\n     width="'+$('#iw').value+'" height="'+$('#ih').value+'">';
+  const cr=codeRes(b,gen(),{hl:['a:width','a:height']});
+  const u=()=>{$('#iwv').textContent=$('#iw').value;$('#ihv').textContent=$('#ih').value;cr.set(gen())};
+  $('#iw').oninput=u;$('#ih').oninput=u;
+ },
+ srcset(b){
+  const SS=[{w:360,kb:35},{w:720,kb:110},{w:1440,kb:380}];let dpr=1;
+  const c=ctl('<label>Ekran <input type="range" id="vw" min="320" max="1200" step="10" value="400"> <b id="vwv">400</b> px</label><div class="seg"><button data-v="1" class="on">Normal ekran</button><button data-v="2">Yüksek yoğunluk (2x)</button></div>');
+  b.appendChild(c);
+  const w=document.createElement('div');w.className='col';w.style.flex='1';
+  w.innerHTML='<div class="vp" id="vpp"></div><div class="bars" id="br"></div><div style="font-size:.8rem;color:var(--muted)">Yeşil: tarayıcının seçtiği dosya.</div>';
+  b.appendChild(w);
+  const draw=()=>{const v=+$('#vw').value;$('#vwv').textContent=v;const slot=v>=800?720:v,need=slot*dpr,pk=SS.find(s=>s.w>=need)||SS[2];
+    $('#vpp').style.width=Math.max(25,Math.min(100,v/1200*100))+'%';$('#vpp').textContent='Ekran '+v+' px → '+need+' px gerekir';
+    $('#br').innerHTML=SS.map(s=>'<div class="row '+(s===pk?'pick':'')+'"><span class="lab">kulup-'+s.w+'.jpg ('+s.kb+' KB)</span><span class="bg"><span class="fill" style="width:'+(s.kb/380*100)+'%"></span></span><span>'+(s===pk?'✓ indirilir':'')+'</span></div>').join('')};
+  $('#vw').oninput=draw;$$('.seg button',c).forEach(x=>x.onclick=()=>{$$('.seg button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');dpr=+x.dataset.v;draw()});
+  draw();
+ },
+ picture(b){
+  const PIC='<picture>\n  <source srcset="kulup.avif"\n          type="image/avif">\n  <source srcset="kulup.webp"\n          type="image/webp">\n  <img src="resimler/kulup.jpg"\n       alt="Robot atölyesi">\n</picture>';
+  const F=[['kulup.avif',28],['kulup.webp',45],['resimler/kulup.jpg',120]];let lv=0;
+  const c=ctl('<span>Tarayıcın:</span><div class="seg"><button data-v="0" class="on">Yeni (AVIF bilir)</button><button data-v="1">Orta (WebP bilir)</button><button data-v="2">Eski (yalnız JPG)</button></div>');
+  b.appendChild(c);
+  const cr=document.createElement('div');cr.className='cr';b.appendChild(cr);
+  const cp=mkPane(PIC,{name:'Kod'});cr.appendChild(cp.el);
+  const col=document.createElement('div');col.className='col';cr.appendChild(col);
+  const rs=mkRes('<img src="resimler/kulup.jpg" alt="Robot atölyesi">',{fs:3});col.appendChild(rs.el);
+  const bars=document.createElement('div');bars.className='bars';col.appendChild(bars);
+  const draw=()=>{
+    cp.set(PIC,[]);$$('.t-str',cp.el).forEach(x=>{if(x.textContent==='"'+F[lv][0]+'"')x.classList.add('hot')});
+    bars.innerHTML=F.map((f,k)=>'<div class="row '+(k===lv?'pick':'')+'"><span class="lab">'+f[0].split('/').pop()+' ('+f[1]+' KB)</span><span class="bg"><span class="fill" style="width:'+(f[1]/120*100)+'%"></span></span><span>'+(k===lv?'✓ indirilir':'')+'</span></div>').join('')+'<div style="font-size:.8rem;color:var(--muted)">Görüntü aynı kalır; yalnızca indirilen dosya küçülür.</div>';
+  };
+  $$('.seg button',c).forEach(x=>x.onclick=()=>{$$('.seg button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');lv=+x.dataset.v;draw()});
+  draw();
+ },
+ video(b){
+  const c=ctl('<label><input type="checkbox" value="controls" checked> controls</label><label><input type="checkbox" value="autoplay"> autoplay</label><label><input type="checkbox" value="loop"> loop</label><label><input type="checkbox" value="muted"> muted</label><label><input type="checkbox" value="poster"> poster</label>');
+  b.appendChild(c);
+  const cr=document.createElement('div');cr.className='cr';b.appendChild(cr);
+  const cp=mkPane('',{name:'Kod'});cr.appendChild(cp.el);
+  const mp=document.createElement('div');mp.className='pane';mp.innerHTML='<div class="pane-h"><span>Sonuç (gerçek video)</span></div><div class="mediabox" id="vb">Video hazırlanıyor...</div>';cr.appendChild(mp);
+  const draw=()=>{
+    const on={};$$('input',c).forEach(i=>on[i.value]=i.checked);
+    const a=[];['controls','autoplay','loop','muted'].forEach(k=>{if(on[k])a.push(k)});if(on.poster)a.push('poster="video/kapak.jpg"');
+    cp.set('<video '+a.join(' ')+'\n       src="video/tanitim.mp4">\n</video>',a.map(x=>'a:'+x.split('=')[0]));
+    const box=$('#vb');
+    if(vidFailed){box.textContent='Bu tarayıcı demo video üretemiyor.';return}
+    if(!vidURL){makeVideo(draw);return}
+    const v=document.createElement('video');v.preload='metadata';v.src=vidURL;v.controls=on.controls;v.loop=on.loop;v.muted=on.muted;v.autoplay=on.autoplay;
+    if(on.poster)v.poster=svgImg(480,270,'Video kapağı','#e07a00');
+    box.innerHTML='';box.appendChild(v);
+    if(!on.controls){const bt=document.createElement('button');bt.className='btn';bt.textContent='▶ Oynat/Durdur';bt.onclick=()=>v.paused?v.play():v.pause();box.appendChild(bt)}
+    if(on.autoplay&&!on.muted){const n=document.createElement('div');n.className='hintw';n.textContent='autoplay + muted yoksa tarayıcı engelleyebilir';box.appendChild(n)}
+  };
+  $$('input',c).forEach(i=>i.onchange=draw);draw();
+ },
+ audio(b){
+  const c=ctl('<label><input type="checkbox" value="controls" checked> controls</label><label><input type="checkbox" value="loop"> loop</label><label><input type="checkbox" value="muted"> muted</label>');
+  b.appendChild(c);
+  const cr=document.createElement('div');cr.className='cr';b.appendChild(cr);
+  const cp=mkPane('',{name:'Kod'});cr.appendChild(cp.el);
+  const mp=document.createElement('div');mp.className='pane';mp.innerHTML='<div class="pane-h"><span>Sonuç (gerçek ses)</span></div><div class="mediabox" id="ab"></div>';cr.appendChild(mp);
+  const draw=()=>{
+    const on={};$$('input',c).forEach(i=>on[i.value]=i.checked);
+    const a=[];['controls','loop','muted'].forEach(k=>{if(on[k])a.push(k)});
+    cp.set('<audio '+a.join(' ')+'>\n  <source src="ses/kulup-marsi.mp3"\n          type="audio/mpeg">\n</audio>',a.map(x=>'a:'+x));
+    const box=$('#ab');box.innerHTML='';const el=document.createElement('audio');el.src=makeAudio();el.controls=on.controls;el.loop=on.loop;el.muted=on.muted;box.appendChild(el);
+    if(!on.controls){const bt=document.createElement('button');bt.className='btn';bt.textContent='▶ Çal/Durdur';bt.onclick=()=>el.paused?el.play():el.pause();box.appendChild(bt)}
+  };
+  $$('input',c).forEach(i=>i.onchange=draw);draw();
+ },
+ slider(b){
+  codeRes(b,'<style>\n  .slider{display:flex;overflow-x:auto;\n          scroll-snap-type:x mandatory}\n  .slider img{flex:none;width:100%;\n          height:150px;object-fit:cover;\n          scroll-snap-align:center}\n</style>\n<div class="slider">\n  <img src="resimler/galeri1.jpg">\n  <img src="resimler/galeri2.jpg">\n  <img src="resimler/galeri3.jpg">\n</div>',{edit:true,hl:['c:scroll-snap-type']});
+ }
+};
+
+/* gerçek video / ses üretimi (internetsiz) */
+let vidURL=null,vidFailed=false;
+function makeVideo(cb){
+  if(vidURL||vidFailed){cb();return}
+  try{
+    if(!window.MediaRecorder)throw 0;
+    const cv=document.createElement('canvas');cv.width=480;cv.height=270;
+    const x=cv.getContext('2d'),stream=cv.captureStream(30);
+    const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm','video/mp4'].find(m=>MediaRecorder.isTypeSupported(m));
+    const rec=new MediaRecorder(stream,mime?{mimeType:mime}:{}),ch=[];
+    rec.ondataavailable=e=>{if(e.data.size)ch.push(e.data)};
+    rec.onstop=()=>{vidURL=URL.createObjectURL(new Blob(ch,{type:rec.mimeType||'video/webm'}));cb()};
+    const t0=performance.now();
+    const iv=setInterval(()=>{const t=(performance.now()-t0)/1000;
+      x.fillStyle='#1b1b3a';x.fillRect(0,0,480,270);x.fillStyle='#ffd166';x.beginPath();x.arc(60+((t*120)%360),135+Math.sin(t*4)*60,26,0,7);x.fill();
+      x.fillStyle='#fff';x.font='bold 26px Arial';x.fillText('Robotik Kulübü',20,40);
+      if(t>=3){clearInterval(iv);rec.stop()}},33);
+    rec.start();
+  }catch(e){vidFailed=true;cb()}
+}
+let audURL=null;
+function makeAudio(){
+  if(audURL)return audURL;
+  const sr=16000,notes=[392,494,587,784,587,494,392,330],dur=0.3,n=sr*dur*notes.length,buf=new DataView(new ArrayBuffer(44+n*2));
+  const ws=(o,s)=>[...s].forEach((c,i)=>buf.setUint8(o+i,c.charCodeAt(0)));
+  ws(0,'RIFF');buf.setUint32(4,36+n*2,true);ws(8,'WAVEfmt ');buf.setUint32(16,16,true);buf.setUint16(20,1,true);buf.setUint16(22,1,true);buf.setUint32(24,sr,true);buf.setUint32(28,sr*2,true);buf.setUint16(32,2,true);buf.setUint16(34,16,true);ws(36,'data');buf.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){const k=Math.floor(i/(sr*dur)),t=(i%(sr*dur))/sr,env=Math.min(1,t*30)*Math.exp(-t*5);buf.setInt16(44+i*2,Math.sin(2*Math.PI*notes[k]*i/sr)*env*9000,true)}
+  audURL=URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));return audURL;
+}
+
+/* ---------- slaytları kur ---------- */
+const stage=$('#stage');
+S.forEach((s,idx)=>{
+  const el=document.createElement('section');el.className='slide '+(s.t==='hero'?'hero':s.t==='sec'?'sec':s.t==='app'?'app':'');
+  el.dataset.title=(s.h||'').replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>');el.dataset.mod=s.mod;
+  let h='<span class="mod">'+esc(s.mod)+'</span>';
+  if(s.t==='sec')h+='<div class="big">'+s.em+'</div>';
+  h+='<h2 class="h">'+s.h+'</h2>';
+  if(s.say)h+='<p class="say">'+s.say+'</p>';
+  if(s.bn)h+='<p class="bn">'+s.bn+'</p>';
+  el.innerHTML=h;
+  const body=document.createElement('div');body.className='body';
+  if(s.t==='hero'||s.t==='sec'){el.appendChild(body);body.style.display='none'}
+  else el.appendChild(body);
+  s.el=el;s.body=body;s.built=false;
+  stage.appendChild(el);
+});
+function buildSlide(s){
+  if(s.built)return;s.built=true;const b=s.body;
+  if(s.t==='cards'){b.innerHTML='<div class="cards" style="--n:'+Math.min(s.n,3)+'">'+s.items.map(i=>'<div class="card"><div class="em">'+i[0]+'</div><b>'+i[1]+'</b><span>'+i[2]+'</span></div>').join('')+'</div>'}
+  else if(s.t==='list'){b.innerHTML='<div class="list '+(s.cls||'')+'">'+s.items.map(i=>'<div class="it"><span class="em">'+i[0]+'</span><span>'+i[1]+'</span></div>').join('')+'</div>'}
+  else if(s.t==='cr'){
+    const o={hl:s.hl,note:s.note,css:s.css,run:s.run,fs:3,off:s.off};
+    /* parça slaytları: parçayı tek başına değil, bütün sayfa içinde göster */
+    if(s.ctx){o.region=s.ctx;o.outline=s.ctx;o.fs=1.5;s.code=s.ctx==='figure'?CLUB_FIG:CLUB_SEM}
+    if(s.media==='video'){
+      const cr=document.createElement('div');cr.className='cr';b.appendChild(cr);
+      let curCode=s.code;
+      const col=document.createElement('div');col.className='col';const cp=mkPane(s.code,{hl:s.hl});col.appendChild(cp.el);
+      if(s.note){const bl=document.createElement('div');bl.className='balloon';bl.innerHTML=s.note;col.appendChild(bl)}
+      cr.appendChild(col);
+      const mp=document.createElement('div');mp.className='pane';mp.innerHTML='<div class="pane-h"><span>Sonuç (gerçek video)</span></div><div class="mediabox"></div>';cr.appendChild(mp);
+      const fill=()=>{const box=$('.mediabox',mp);box.innerHTML='';if(vidFailed){box.textContent='Demo video üretilemedi';return}if(!vidURL){makeVideo(fill);return}
+        const v=document.createElement('video');v.preload='metadata';v.src=vidURL;v.controls=/controls/.test(curCode);if(/poster=/.test(curCode))v.poster=svgImg(480,270,'Video kapağı','#e07a00');box.appendChild(v);
+        if(!v.controls){const n=document.createElement('div');n.className='hintw';n.textContent='controls yok: oynat düğmesi görünmez';box.appendChild(n)}};
+      if(s.off)offSeg(b,cr,on=>{curCode=on?s.code:s.code.replace(new RegExp(s.off),'');cp.set(curCode,on?s.hl:[]);if(s.lazyDone)fill()});
+      s.lazy=fill;
+    }else codeRes(b,s.code,o);
+    if(s.extra)b.insertAdjacentHTML('afterbegin',s.extra());
+  }
+  else if(s.t==='app'){
+    b.innerHTML='<div class="appbox"><div class="c"><h3>📚 Şimdiye kadar öğrendiklerimiz</h3><ul>'+s.know.map(k=>'<li><code>'+k[0]+'</code> <small>('+k[1]+')</small></li>').join('')+'</ul></div><div class="c"><h3>🎯 Hedef</h3><p>'+s.goal+'</p><h3>⏱️ Süre önerisi</h3><p>'+s.time+'</p></div></div><a class="appbtn" target="_blank" rel="noopener" href="Hafta-07-Ek-Uygulamalar-Yerlesim-ve-Medya.html#uygulama-'+s.n+'">Ek uygulamalar dosyasını aç &rarr; '+s.n+'. sekme</a><p class="hintw" style="color:#fff">Bitmiş siteye bak, kendi editöründe baştan yaz. Bitirince sunuya dön ve devam et.</p>'}
+  else if(s.t==='cmp'){
+    const g=document.createElement('div');g.className='cr';b.appendChild(g);
+    [s.a,s.b].forEach(x=>{
+      const col=document.createElement('div');col.className='col';
+      col.innerHTML='<span class="lbl '+x.cls+'">'+(x.cls==='bad'?'✗ ':x.cls==='good'?'✓ ':'')+x.lbl+'</span>';
+      col.appendChild(mkPane(x.code,{name:'Kod'}).el);
+      if(s.run!==false)col.appendChild(mkRes(x.code,{css:x.css||'club',fs:2.8}).el);
+      g.appendChild(col);
+    });
+  }
+  else if(s.t==='result'){
+    const r=mkRes(s.code(),{fs:s.fs,cols:s.cols});r.el.style.flex='1';b.appendChild(r.el);
+  }
+  else if(s.t==='demo'){DEMOS[s.build](b)}
+}
+
+/* ---------- gezinme ---------- */
+let cur=0;
+const KEY='web-h7-son-slayt-v6';
+function buildMenu(){
+  const m=$('#menu');m.innerHTML='';let last='';
+  S.forEach((s,i)=>{if(s.mod!==last){last=s.mod;m.insertAdjacentHTML('beforeend','<div class="mh">'+esc(last)+'</div>')}
+    const b=document.createElement('button');b.className='mi'+(i===cur?' cur':'');b.innerHTML='<span class="n">'+(i+1)+'</span><span>'+esc(S[i].el.dataset.title)+'</span>';
+    b.onclick=()=>{go(i);m.classList.remove('open')};m.appendChild(b)});
+}
+function go(i){
+  i=Math.max(0,Math.min(S.length-1,i));
+  S.forEach((s,k)=>{s.el.classList.toggle('active',k===i);s.el.classList.toggle('past',k<i)});
+  cur=i;buildSlide(S[i]);if(S[i+1])setTimeout(()=>buildSlide(S[i+1]),400);
+  if(S[i].lazy&&!S[i].lazyDone){S[i].lazyDone=true;S[i].lazy()}
+  $('#counter').textContent=(i+1)+' / '+S.length;
+  $('#prog').style.width=((i+1)/S.length*100)+'%';
+  $('#prev').disabled=i===0;$('#next').disabled=i===S.length-1;
+  document.title='Hafta 7 - '+S[i].el.dataset.title;
+  try{localStorage.setItem(KEY,String(i))}catch(e){}
+  $$('.mi').forEach((x,k)=>x.classList.toggle('cur',k===i));
+}
+$('#next').onclick=()=>go(cur+1);$('#prev').onclick=()=>go(cur-1);
+$('#bMenu').onclick=()=>$('#menu').classList.toggle('open');
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea,select'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' ')go(cur+1);
+  else if(e.key==='ArrowLeft'||e.key==='PageUp')go(cur-1);
+  else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);
+  else if(e.key==='m'||e.key==='M')$('#bMenu').click();
+  else if(e.key==='t'||e.key==='T')$('#bTheme').click();
+  else if(e.key==='Escape')$('#menu').classList.remove('open');
+});
+let tx=null;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;tx=null;
+  if(e.target.closest('textarea,input,iframe,pre,.mediabox,.tree,.drawer'))return;if(Math.abs(dx)>70)go(cur+(dx<0?1:-1))},{passive:true});
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('web-tema',t)}catch(e){}}
+let th=null;try{th=localStorage.getItem('web-tema')}catch(e){}
+if(!th)th=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+setTheme(th);
+$('#bTheme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+buildMenu();
+let start=0;try{start=parseInt(localStorage.getItem(KEY)||'0',10)||0}catch(e){}
+go(start);
+</script>
+</body>
+</html>
