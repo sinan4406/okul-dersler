@@ -37,4 +37,19 @@ summary{cursor:pointer;font-weight:700;color:var(--cfg)}
 .apps a{color:var(--ink)}
 .apps a:hover{color:var(--cfg);text-decoration:underline}
 h2.sec{margin:34px 0 14px;font-size:1.1rem;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+.nav{position:sticky;top:0;z-index:50;background:#141a2b;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.nav .wrap{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;padding-top:6px;padding-bottom:6px}
+.nav a{padding:7px 12px;border-radius:8px;font-weight:600;font-size:.9rem;color:#dfe5f3;white-space:nowrap}
+.nav a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav .brand{font-weight:800;color:#fff}
+.nav .sep{width:1px;height:20px;background:rgba(255,255,255,.25);margin:0 4px}
+.nav .links{display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px}
+.nav .tg,.nav .burger{display:none}
+@media (max-width:760px){
+.nav .burger{display:block;margin-left:auto;padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);font-weight:700;font-size:.9rem;cursor:pointer}
+.nav .links{display:none;width:100%;flex-direction:column;align-items:stretch;padding-bottom:8px}
+.nav .tg:checked~.links{display:flex}
+.nav .sep{width:auto;height:1px;margin:4px 0}
+.nav .links a{padding:10px 12px}
+}
 footer{text-align:center;color:var(--mute);font-size:.85rem;padding:0 20px 36px}
