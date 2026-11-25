@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>U4 S2 · Ek Uygulamalar</title>
+<style>
+:root{--bg:#f4f5fb;--panel:#fff;--text:#14183a;--muted:#5d6385;--line:#dfe3f3;--accent:#6d4aff;--ok:#10955a;--code:#12122b;--codet:#e9ebff}
+:root[data-theme=dark]{--bg:#12132a;--panel:#1c1e3b;--text:#eef0ff;--muted:#a3a8d0;--line:#34376a;--accent:#9b82ff;--ok:#3ddc97}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,"Segoe UI",Arial,sans-serif}
+header.top{background:linear-gradient(135deg,#6d4aff,#a14bff);color:#fff;padding:18px 16px}
+header.top h1{margin:0;font-size:1.4rem}header.top p{margin:4px 0 0;opacity:.9}
+.wrap{max-width:1500px;margin:0 auto;padding:16px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tabs button,.btn{border:2px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.card h2{margin:0 0 6px;font-size:1.15rem}
+.weeks{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.weeks span{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);border-radius:99px;padding:2px 10px;font-size:.82rem;font-weight:700}
+ol.steps{margin:6px 0 0;padding-left:22px}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:14px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.pane.prev{order:-1}.codepane{position:static!important}}
+.codepane{position:sticky;top:8px}
+.pv{overflow:hidden;background:#fff;width:100%}
+.pv iframe{transform-origin:0 0;display:block;max-width:none}
+.hh{margin:6px 0 8px;font-size:1.1rem}
+.pane{border:2px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel);display:flex;flex-direction:column}
+.pane-h{display:flex;justify-content:space-between;align-items:center;gap:8px;background:color-mix(in srgb,var(--accent) 8%,var(--panel));padding:6px 12px;font-weight:800;font-size:.85rem;border-bottom:2px solid var(--line)}
+.pane-h .btn{padding:2px 10px;font-size:.8rem}
+.cw{position:relative;height:460px;overflow:hidden;background:var(--code)}
+.cw textarea{position:absolute;inset:0;width:100%;height:100%;border:0;outline:0;resize:none;background:transparent;color:var(--codet);font:14px/21px ui-monospace,Consolas,monospace;padding:10px;tab-size:2;white-space:pre;overflow:auto}
+.ov{position:absolute;left:0;right:0;top:0;pointer-events:none}
+.ov div{position:absolute;left:0;right:0}
+.ov .gr{background:rgba(16,185,129,.13);border-left:4px solid #10b981}
+.ov .fl{background:rgba(16,185,129,.35);border-left:4px solid #10b981;animation:flf 3s ease-out forwards}
+@keyframes flf{0%,40%{opacity:1}100%{opacity:0}}
+.ov .bd{background:rgba(245,158,11,.28);border-left:4px solid #f59e0b}
+.info{padding:6px 12px;font-size:.85rem;background:color-mix(in srgb,#f59e0b 12%,var(--panel));border-bottom:2px solid var(--line);min-height:2.4em}
+.info code{background:#f59e0b;color:#1a1200;border-radius:6px;padding:0 6px;font-weight:800}
+.grid.hc{grid-template-columns:1fr}.grid.hc .codepane{display:none}
+iframe{border:0;background:#fff}
+.leg i{display:inline-block;width:1.6em;height:.9em;vertical-align:middle;border-radius:3px;margin:0 .3em}
+ul.chk{list-style:none;margin:0;padding:8px 12px}
+ul.chk li{padding:3px 0;font-size:.92rem}
+ul.chk li::before{content:"\25CB  ";color:var(--muted)}
+ul.chk li.ok::before{content:"\2714  ";color:var(--ok);font-weight:800}
+ul.chk li.ok{color:var(--ok)}
+ul.chk small{color:var(--muted)}
+.note{color:var(--muted);font-size:.9rem}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.card.hata{border-color:#f59e0b}.card.ek{border-color:#10b981}
+ul.chk label{cursor:pointer;display:flex;gap:8px;align-items:flex-start}
+ul.chk input{margin-top:.3em}
+ul.chk li::before{content:""}
+ul.chk li.ok{color:var(--ok)}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card ul.chk{padding-left:0}
+.ov .rb{background:rgba(37,99,235,.2);border-left:4px solid #2563eb}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap" style="padding:0 16px">
+    <h1>U4 S2 · Ek Uygulamalar (İlişki ve Durum Seçicileri)</h1>
+    <p>Bitmiş siteyi incele, sonra aynısını kendi editöründe (VS Code) baştan yaz. CSS kuralına tıklayınca hangi elemanların etkilendiğini görürsün.</p>
+  </div>
+</header>
+<div class="wrap">
+  <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+    <div class="tabs" id="tabs"></div>
+    <button class="btn" id="th" style="height:max-content">Tema</button>
+  </div>
+  <div id="app"></div>
+  <p class="note">Not: Önizlemede bağlantılar bir yere gitmez, form da gönderilmez (sunucu yok); kendi bilgisayarında form verisini işleyen bir sunucu yazılana kadar Gönder düğmesi sayfayı yalnızca yeniler. Resimler örnek görselle değiştirilir.</p>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const APPS=[
+{
+ ad:`1. Kulüpler Panosu`,
+ baslik:`Kuzey Lisesi Kulüpler Panosu`,
+ ozet:`Senaryo: Kuzey Lisesi rehberlik servisi, koridordaki kulüp panosunu okul sitesine taşımak istiyor. Her kulübün bir kutusu, danışmanı ve iç içe bir etkinlik listesi var. İçerik sık değiştiği için HTML'e mümkün olduğunca az sınıf yazılacak: görünüm, elemanların birbirine göre yerinden (ağaçtaki konumundan) gelmeli.`,
+ haftalar:[`U4 S2: HTML ağacı (iç içe liste)`,`U4 S2: çocuk seçici (>)`,`U4 S2: torun seçici (boşluk)`,`U4 S1: sınıf seçici, sayfa içi CSS`,`U3: header, main, section, footer, iç içe ul`],
+ adimlar:[`İskeleti kur ve içeriği yaz. Kulüp kutularına yalnız <code>class="kulup"</code> ver; başka hiçbir etikete sınıf ya da kimlik verme.`,`Kâğıda sayfanın ağacını çiz: bir alt madde (li) kaç kat aşağıda? Kimin çocuğu, kimin torunu?`,`Üst banttaki h1 ve p ile kulüp kutularındaki h2 ve p farklı görünmeli. Hangi kapsayıcıdan, hangi işaretle seçersin?`,`Ana maddeler kalın, alt maddeler normal ve gri olsun. Ana madde "bir alt seviye", alt madde "li'nin içindeki li" demek.`,`Danışman adları renkli olsun ama footer'daki kalın yazı bundan etkilenmesin.`,`F12 → Elements'te bir alt maddeye tıkla; Styles panelinde hangi kuralların uyduğunu oku.`],
+ olcut:[`HTML'de yalnız section etiketlerinde <code>class="kulup"</code> var; başka class/id yok`,`En az 3 çocuk (<code>&gt;</code>) ve 2 torun (boşluk) seçici kullanıldı`,`Üst banttaki h1 ve p, kulüp kutularındaki başlık ve paragraftan farklı görünüyor`,`Ana maddeler kalın; alt maddeler normal ağırlıkta ve gri`,`Danışman adları renkli; footer'daki kalın yazı başka renkte`,`Alt listeler (ul) li'nin İÇİNDE; HTML ağacı doğru kurulmuş`,`F12'de bir alt maddeye uyan kurallar okunabiliyor`],
+ hatalar:[`<code>.kulup &gt; li</code> yazmak: li, section'ın değil ul'nin çocuğudur; hiçbir şey seçilmez.`,`Alt maddeler de kalın çıkıyor: kalınlık üst maddeden içeri geçer. Alt maddeler için ayrı bir torun kuralı yaz.`,`Alt <code>ul</code>'yi iki li'nin arasına yazmak: ağaç değişir, <code>li li</code> eşleşmez.`],
+ ekstra:{metin:`Her kulüp kutusunda yalnız başlığın HEMEN ARDINDAN gelen paragrafı seç. İpucu: bitişik kardeş seçicisi <code>h2 + p</code>; kardeş fikrini bugün ağaçta gördük.`,link:`https://developer.mozilla.org/en-US/docs/Web/CSS/Next-sibling_combinator`,ad:`MDN: Next-sibling combinator`},
+ css:`  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f4f1fa;
+      color: #2b2240;
+    }
+    header {
+      background-color: rebeccapurple;
+      color: white;
+      padding: 14px 24px;
+    }
+    header > h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    header > p {
+      margin: 4px 0 0;
+      color: #e6dcff;
+    }
+    main {
+      padding: 4px 24px;
+    }
+    .kulup {
+      background-color: white;
+      border-left: 6px solid rebeccapurple;
+      border-radius: 8px;
+      padding: 6px 18px;
+      margin: 12px 0;
+    }
+    .kulup > h2 {
+      color: rebeccapurple;
+      margin: 4px 0;
+    }
+    .kulup > p {
+      color: #5b4f73;
+      margin: 4px 0;
+    }
+    .kulup b {
+      color: #b4235a;
+    }
+    .kulup > ul > li {
+      font-weight: bold;
+      margin: 6px 0;
+    }
+    .kulup li li {
+      font-weight: normal;
+      color: #5b4f73;
+    }
+    footer {
+      text-align: center;
+      color: #5b4f73;
+      padding: 12px;
+    }
+    footer b {
+      color: rebeccapurple;
+    }
+  </style>`,
+ govde:`<header>
+  <h1>Kuzey Lisesi Kulüpler Panosu</h1>
+  <p>2026–2027 güz dönemi · Başvurular 4 Aralık Cuma günü kapanıyor</p>
+</header>
+<main>
+  <section class="kulup">
+    <h2>Robotik Kulübü</h2>
+    <p>Danışman: <b>Selda Aydın</b> · Salı 15.30 · Atölye 2</p>
+    <ul>
+      <li>Çizgi izleyen robot projesi
+        <ul>
+          <li>9. sınıflar için başlangıç grubu</li>
+          <li>Malzemeler okuldan karşılanır</li>
+        </ul>
+      </li>
+      <li>Bölge robot yarışmasına hazırlık
+        <ul>
+          <li>Takım seçmeleri 11 Aralık'ta</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+  <section class="kulup">
+    <h2>Münazara Kulübü</h2>
+    <p>Danışman: <b>Kerem Yıldız</b> · Perşembe 15.30 · Konferans salonu</p>
+    <ul>
+      <li>Haftalık serbest münazara
+        <ul>
+          <li>Konular bir hafta önce duyurulur</li>
+          <li>Her öğrenci ayda en az bir kez konuşur</li>
+        </ul>
+      </li>
+      <li>Liseler arası münazara turnuvası</li>
+    </ul>
+  </section>
+  <section class="kulup">
+    <h2>Doğa ve Çevre Kulübü</h2>
+    <p>Danışman: <b>Nur Korkmaz</b> · Cuma 14.40 · Biyoloji laboratuvarı</p>
+    <ul>
+      <li>Okul bahçesinde kompost köşesi
+        <ul>
+          <li>Kantin atıklarından gübre üretimi</li>
+        </ul>
+      </li>
+      <li>Ayda bir doğa yürüyüşü
+        <ul>
+          <li>Aralık: Kocaçay vadisi (veli izni gerekir)</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+</main>
+<footer>Başvuru: kulüp danışmanına ya da <b>rehberlik servisine</b> adını yazdır.</footer>`
+},
+{
+ ad:`2. Şehir Otobüs Hatları`,
+ baslik:`Yeşilvadi Belediyesi · Otobüs Hatları`,
+ ozet:`Senaryo: Yeşilvadi Belediyesi otobüs hatları sayfasını yeniliyor. Yolcular "bu hatlara baktım mı?", "şu an hangi kutudayım?" sorularını sayfadan anlayabilmeli. Menü, arama kutusu, hat kutuları ve sefer bağlantıları kullanıcının hareketine tepki vermeli. Her hattın kalkış ve son durağı öne çıkmalı; durak listeleri sık değiştiği için li'lere sınıf yazılmayacak.`,
+ haftalar:[`U4 S2: :link, :visited, :hover, :active`,`U4 S2: :focus`,`U4 S2: :first-child, :last-child`,`U4 S2: çocuk seçici (>)`,`U3: form, label, input, ol`],
+ adimlar:[`İçeriği yaz: menü, arama formu, üç hat kutusu (her birinde durak listesi ve sefer bağlantısı).`,`Menü bağlantıları dört durumda dört farklı görünmeli. Kuralları hangi sırayla yazmalısın?`,`Kullanıcı arama kutusunda olduğunu görsün; fareyle de Tab tuşuyla da çalışmalı.`,`Kalkış ve son durak, HTML'e sınıf eklenmeden öne çıksın. Listede "ilk" ve "son" olmak hangi seçicilerle anlatılır?`,`Hat kutusu fareyle işaretlenince belirginleşsin; sefer bağlantısı menüden farklı görünsün.`,`F12 → Styles → <b>:hov</b> ile bir menü bağlantısını :hover durumuna zorla, kuralını kontrol et.`],
+ olcut:[`Menü bağlantısının 4 durumu ayrı; kurallar L-V-H-A sırasında`,`Arama kutusu odaklanınca zemini ve çerçevesi değişiyor`,`Her hattın ilk ve son durağı farklı renkte; bu li'lerde sınıf yok`,`Fare bir hat kutusunun üstüne gelince kutu belirginleşiyor`,`Sefer bağlantıları menüden farklı görünüyor (çocuk seçiciyle ayrıldı)`,`CSS'te <code>outline: none</code> yok; odak her zaman görünüyor`],
+ hatalar:[`<code>a:hover</code>'ı <code>a:visited</code>'dan önce yazmak: ziyaret edilmiş bağlantıda hover rengi hiç görünmez.`,`<code>ol:first-child</code> yazmak: bu, ilk durağı değil, ol'nin KENDİSİNİN ilk çocuk olup olmadığını sorar.`,`<code>nav &gt; a :hover</code> (boşluklu) yazmak: "a'nın içindeki, üstünde durulan eleman" anlamına gelir; çalışmaz.`],
+ ekstra:{metin:`Arama kutusu odaktayken bütün arama formunun zemini değişsin. İpucu: içindeki bir eleman odaktayken kapsayıcıyı seçen <code>:focus-within</code> sözde sınıfı.`,link:`https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within`,ad:`MDN: :focus-within`},
+ css:`  <style>
+    body {
+      font-family: Verdana, sans-serif;
+      margin: 0;
+      background-color: #eef5f0;
+      color: #1d2b22;
+    }
+    header {
+      background-color: #1f7a4d;
+      color: white;
+      padding: 12px 24px;
+    }
+    header > h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+    nav > a {
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    nav > a:link {
+      color: white;
+    }
+    nav > a:visited {
+      color: #c9f2dc;
+    }
+    nav > a:hover {
+      background-color: #ffd23f;
+      color: #1d2b22;
+    }
+    nav > a:active {
+      background-color: white;
+    }
+    main {
+      padding: 6px 24px;
+    }
+    .ara {
+      background-color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+    }
+    .ara input {
+      font-size: 16px;
+      padding: 6px;
+      border: 2px solid #9bb8a6;
+      border-radius: 6px;
+    }
+    .ara input:focus {
+      border-color: #1f7a4d;
+      background-color: #fffbe6;
+    }
+    .hat {
+      background-color: white;
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 6px 18px;
+      margin: 12px 0;
+    }
+    .hat:hover {
+      border-color: #1f7a4d;
+    }
+    .hat > h2 {
+      color: #1f7a4d;
+      font-size: 20px;
+      margin: 4px 0;
+    }
+    .hat li:first-child {
+      font-weight: bold;
+      color: #1f7a4d;
+    }
+    .hat li:last-child {
+      font-weight: bold;
+      color: #c2410c;
+    }
+    .hat > a:link {
+      color: #1f5fa8;
+    }
+    .hat > a:visited {
+      color: #7a4a9e;
+    }
+    .hat > a:hover {
+      background-color: #ffd23f;
+    }
+    footer {
+      background-color: #1d2b22;
+      color: #dfe9e3;
+      padding: 10px 24px;
+    }
+  </style>`,
+ govde:`<header>
+  <h1>Yeşilvadi Belediyesi · Otobüs Hatları</h1>
+  <nav>
+    <a href="hatlar.html">Hatlar</a>
+    <a href="duraklar.html">Duraklar</a>
+    <a href="kentkart.html">Kent Kart</a>
+    <a href="iletisim.html">İletişim</a>
+  </nav>
+</header>
+<main>
+  <form class="ara">
+    <label for="hat">Hat ya da durak ara</label>
+    <input type="text" id="hat" placeholder="ör. 12 ya da Hastane">
+    <button type="submit">Ara</button>
+  </form>
+  <section class="hat">
+    <h2>12 · Otogar – Devlet Hastanesi</h2>
+    <p>Her 15 dakikada bir · İlk sefer 06.00, son sefer 23.30</p>
+    <ol>
+      <li>Otogar</li>
+      <li>Cumhuriyet Meydanı</li>
+      <li>Belediye Sarayı</li>
+      <li>Devlet Hastanesi</li>
+    </ol>
+    <a href="12-saatler.html">Sefer saatlerini gör</a>
+  </section>
+  <section class="hat">
+    <h2>27 · Üniversite – Sahil</h2>
+    <p>Her 20 dakikada bir · İlk sefer 06.30, son sefer 00.00</p>
+    <ol>
+      <li>Üniversite Kampüsü</li>
+      <li>Fen Lisesi</li>
+      <li>Çarşı</li>
+      <li>Balıkçı Barınağı</li>
+      <li>Sahil Parkı</li>
+    </ol>
+    <a href="27-saatler.html">Sefer saatlerini gör</a>
+  </section>
+  <section class="hat">
+    <h2>40 · Organize Sanayi – Toki Konutları</h2>
+    <p>Yalnız hafta içi · Her 30 dakikada bir</p>
+    <ol>
+      <li>Organize Sanayi</li>
+      <li>Kent Kart Merkezi</li>
+      <li>Toki Konutları</li>
+    </ol>
+    <a href="40-saatler.html">Sefer saatlerini gör</a>
+  </section>
+</main>
+<footer>Kayıp eşya ve öneriler: 0 (312) 555 12 12 · Alo 153</footer>`
+},
+{
+ ad:`3. Kalem Edebiyat Dergisi`,
+ baslik:`Kalem · Sayı 7`,
+ ozet:`Senaryo: Atatürk Anadolu Lisesi edebiyat kulübü, basılı dergisi "Kalem"in yeni sayısını internette yayınlayacak. Sayfa basılı dergi gibi görünmeli: paragrafların ilk harfi büyük, alıntıların iki yanında büyük tırnaklar, yazar adlarının başında kalem işareti. Yazılar her ay değiştiği için süslemeler HTML'e değil CSS'e yazılacak; editör yalnız düz metni değiştirecek.`,
+ haftalar:[`U4 S2: ::first-letter, ::first-line`,`U4 S2: ::before, ::after, content`,`U4 S2: ::selection`,`U4 S2: :hover, çocuk seçici`,`U3: article, blockquote, header, footer`],
+ adimlar:[`İçeriği yaz: iki yazı (article) ve bir duyuru bölümü. Tırnak, ok ve kalem karakterlerini HTML'e yazma.`,`Basılı dergideki gibi yazı paragraflarının ilk harfi büyük ve renkli, ilk satırı kalın olsun.`,`Yazar satırının başına kalem işareti, alıntıların iki yanına büyük tırnak gelsin. Hepsi CSS'ten.`,`Duyuru bağlantılarının sonuna ok eklensin; fareyle üstüne gelince belirginleşsin.`,`Okur bir cümleyi seçince seçim rengi derginin rengi olsun.`,`Pencereyi daralt: ilk satırdaki kelimeler nasıl değişiyor? F12'de <b>::before</b> düğümlerini bul.`],
+ olcut:[`Yazar satırının başındaki kalem (✒) CSS'ten geliyor`,`Alıntıların iki yanındaki tırnaklar CSS'ten geliyor`,`Yazı paragraflarının ilk harfi büyük ve renkli, ilk satırı kalın`,`Duyuru bağlantılarının sonunda " →" var; fareyle üstüne gelince renkleri değişiyor`,`Metin seçilince seçim rengi derginin bordo rengi`,`Her ::before / ::after kuralında <code>content</code> var`,`HTML'de tırnak, ok ya da kalem karakteri elle yazılmamış`],
+ hatalar:[`<code>content</code> yazmamak: ::before ve ::after hiç oluşmaz, hata mesajı da çıkmaz.`,`Değeri tırnaksız yazmak (<code>content: →;</code>): içerik metni her zaman "…" içinde yazılır.`,`Yazar satırını da p yapıp <code>.yazi &gt; p::first-letter</code> yazmak: yazar adının da ilk harfi büyür. Yazar satırını div yap ya da sınıfla ayır.`],
+ ekstra:{metin:`Duyuru bölümüne kısa bir liste ekle ve madde işaretlerini derginin bordo rengine boya. İpucu: liste işaretini seçen <code>::marker</code> sözde elemanı.`,link:`https://developer.mozilla.org/en-US/docs/Web/CSS/::marker`,ad:`MDN: ::marker`},
+ css:`  <style>
+    body {
+      font-family: Georgia, serif;
+      margin: 0;
+      background-color: #fbf7ef;
+      color: #2e2a24;
+    }
+    header {
+      background-color: #2e2a24;
+      color: #fbf7ef;
+      text-align: center;
+      padding: 14px;
+    }
+    header > h1 {
+      margin: 0;
+      font-size: 44px;
+      letter-spacing: 6px;
+    }
+    header > p {
+      margin: 4px 0 0;
+      font-style: italic;
+    }
+    main {
+      padding: 4px 28px;
+    }
+    .yazi {
+      background-color: white;
+      padding: 6px 22px;
+      margin: 14px 0;
+      border-radius: 6px;
+    }
+    .yazi > h2 {
+      color: #8b2e16;
+      margin: 6px 0 2px;
+    }
+    .yazar {
+      color: #7a6f60;
+      font-style: italic;
+    }
+    .yazar::before {
+      content: "✒ ";
+    }
+    .yazi > p::first-letter {
+      font-size: 34px;
+      font-weight: bold;
+      color: #8b2e16;
+    }
+    .yazi > p::first-line {
+      font-weight: bold;
+    }
+    blockquote {
+      font-style: italic;
+      color: #5a5246;
+    }
+    blockquote::before {
+      content: "“ ";
+      font-size: 30px;
+      color: #8b2e16;
+    }
+    blockquote::after {
+      content: " ”";
+      font-size: 30px;
+      color: #8b2e16;
+    }
+    .duyuru {
+      background-color: #fff1c9;
+      padding: 6px 22px;
+      border-radius: 6px;
+    }
+    .duyuru > a {
+      color: #8b2e16;
+      margin-right: 14px;
+    }
+    .duyuru > a::after {
+      content: " →";
+    }
+    .duyuru > a:hover {
+      background-color: #8b2e16;
+      color: white;
+    }
+    ::selection {
+      background-color: #8b2e16;
+      color: white;
+    }
+    footer {
+      text-align: center;
+      color: #7a6f60;
+      padding: 12px;
+    }
+  </style>`,
+ govde:`<header>
+  <h1>KALEM</h1>
+  <p>Atatürk Anadolu Lisesi edebiyat kulübü dergisi · Sayı 7 · Kasım 2026</p>
+</header>
+<main>
+  <article class="yazi">
+    <h2>Ekransız Bir Hafta</h2>
+    <div class="yazar">Defne Ak, 10-B</div>
+    <p>Geçen hafta telefonumu kapattım ve yalnız kâğıt kitap okudum. İlk iki gün elim sürekli cebime gitti; üçüncü gün bir romanın kırk sayfasını tek oturuşta bitirdiğimi fark ettim.</p>
+    <p>En çok şaşırdığım şey, okuduklarımı ertesi gün hâlâ hatırlamamdı. Ekrandan okuduğum yazılar ise akşam olmadan aklımdan siliniyordu.</p>
+    <blockquote>Bir kitabı bitirmek değil, onunla birlikte değişmek önemli.</blockquote>
+  </article>
+  <article class="yazi">
+    <h2>Kantin Kuyruğunda Haiku</h2>
+    <div class="yazar">Emir Çelik, 11-A</div>
+    <p>Haiku, üç dizeden oluşan kısa bir Japon şiir biçimidir. Kulüpte bu ay herkes okul hayatından bir an yakaladı. Benimki teneffüs zilinin hemen ardından:</p>
+    <blockquote>Zil çaldı, koştuk / tost makinesi tıslıyor / sıra hâlâ uzun</blockquote>
+  </article>
+  <section class="duyuru">
+    <h2>Bu ayın yarışması</h2>
+    <p>"Pencereden ne görüyorsun?" konulu öykü yarışmasına son katılım 18 Aralık.</p>
+    <a href="kurallar.html">Katılım kuralları</a>
+    <a href="eski-sayilar.html">Eski sayılar</a>
+  </section>
+</main>
+<footer>Kalem · Yayın kurulu: Edebiyat Kulübü · Danışman: Gül Ertem</footer>`
+},
+{
+ ad:`4. Mini proje: Gözlemevi`,
+ baslik:`Kuzey Yıldızı Gözlemevi`,
+ ozet:`Senaryo: Kuzey Yıldızı Gözlemevi, aralık ayındaki halka açık gözlem gecelerini duyuran tek sayfalık bir site istiyor: menü, giriş yazısı, etkinlik takvimi, gözlem ipuçları ve kayıt formu. Sayfa gece temalı olacak ve ziyaretçinin her hareketine (fare, tıklama, klavye) tepki verecek. Takvim her ay güncelleneceği için "sıradaki" ve "son" etkinlik sınıfla değil konumla belirlenecek.`,
+ haftalar:[`U4 S2: çocuk ve torun seçici`,`U4 S2: bağlantı durumları, :focus, :first-child, :last-child`,`U4 S2: ::before, ::first-letter, ::first-line, ::selection`,`U4 S1: sınıf ve kimlik seçici`,`U3: form, select, label, nav`],
+ adimlar:[`Sayfayı yaz: menü, giriş, takvim (4 etkinlik), ipucu bölümü, kayıt formu.`,`Ağacı çiz. Her stil için önce "bu elemana ağaçta hangi yoldan ulaşırım?" diye sor; yeni sınıf eklemeden önce ilişki seçicisini dene.`,`Menü, takvim satırları, form alanları ve düğme kullanıcının hareketine tepki versin (fare, basılı tutma, klavye odağı).`,`Sıradaki etkinlik öne çıksın, son etkinlik sönük dursun; HTML'e ek sınıf yazmadan.`,`Logodaki ve etkinlik notlarındaki süs işaretleri, giriş paragrafının büyük ilk harfi ve seçim rengi CSS'ten gelsin.`,`Bitince arkadaşınla değiş: onun sayfasında F12 ile 3 ilişki, 3 durum, 2 sözde eleman kuralı bul.`],
+ olcut:[`Menü bağlantılarının dört durumu L-V-H-A sırasıyla yazılmış`,`Takvimde ilk etkinlik vurgulu, son etkinlik sönük; li'lerde ek sınıf yok`,`Etkinlik satırının üstüne gelince satır belirginleşiyor`,`Form alanları odaklanınca belli oluyor; düğme basılı tutulunca değişiyor`,`Logo ve not işaretleri ::before ile; giriş paragrafının ilk harfi ::first-letter ile`,`Tarihler (b) yalnız takvimde renkli; logo bundan etkilenmiyor`,`Seçim rengi (::selection) gece temasına uygun`,`HTML'de süs karakteri (✦, •) elle yazılmamış`],
+ hatalar:[`<code>.takvim:first-child</code> yazmak: bu, takvim bölümünün kendisini sorar; doğrusu takvimin içindeki ilk li.`,`Süs işaretini hem HTML'e hem <code>content</code>'e yazmak: işaret iki kez görünür.`,`Tarihleri <code>b</code> etiket seçicisiyle boyamak: logo da boyanır. Kapsayıcıyla daralt (<code>.takvim b</code>).`],
+ ekstra:{metin:`Menüdeki "Kayıt ol" bağlantısına tıklanınca adres <code>#kayit</code> olur; o anda form kısa süre vurgulansın. İpucu: adresteki #kimlikle eşleşen elemanı seçen <code>:target</code> sözde sınıfı.`,link:`https://developer.mozilla.org/en-US/docs/Web/CSS/:target`,ad:`MDN: :target`},
+ css:`  <style>
+    body {
+      font-family: "Trebuchet MS", sans-serif;
+      margin: 0;
+      background-color: #0f1b3d;
+      color: #e8ecff;
+    }
+    header {
+      background-color: #08112b;
+      padding: 12px 24px;
+    }
+    .logo {
+      font-size: 24px;
+      color: #ffd166;
+    }
+    .logo::before {
+      content: "✦ ";
+    }
+    nav > a {
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    nav > a:link {
+      color: #e8ecff;
+    }
+    nav > a:visited {
+      color: #b9c3ff;
+    }
+    nav > a:hover {
+      background-color: #ffd166;
+      color: #08112b;
+    }
+    nav > a:active {
+      background-color: white;
+    }
+    main {
+      padding: 4px 24px;
+    }
+    main h2 {
+      color: #ffd166;
+    }
+    .giris > p::first-letter {
+      font-size: 40px;
+      font-weight: bold;
+      color: #ffd166;
+    }
+    .takvim li {
+      padding: 6px 10px;
+      margin: 4px 0;
+      border-radius: 8px;
+      background-color: #1a2a5c;
+    }
+    .takvim li:first-child {
+      background-color: #2b4190;
+      border-left: 6px solid #ffd166;
+    }
+    .takvim li:last-child {
+      color: #9aa6d6;
+    }
+    .takvim li:hover {
+      background-color: #36509f;
+    }
+    .takvim b {
+      color: #ffd166;
+    }
+    .etkinlik span {
+      color: #9fe3c1;
+      font-size: 14px;
+    }
+    .etkinlik span::before {
+      content: " • ";
+    }
+    .ipucu p::first-line {
+      font-weight: bold;
+    }
+    input:focus, select:focus {
+      background-color: #fff7d6;
+      outline: 3px solid #ffd166;
+    }
+    button {
+      background-color: #ffd166;
+      color: #08112b;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: white;
+    }
+    button:active {
+      font-size: 18px;
+    }
+    ::selection {
+      background-color: #ffd166;
+      color: #08112b;
+    }
+    footer {
+      text-align: center;
+      color: #9aa6d6;
+      padding: 12px;
+    }
+  </style>`,
+ govde:`<header>
+  <b class="logo">Kuzey Yıldızı Gözlemevi</b>
+  <nav>
+    <a href="index.html">Ana sayfa</a>
+    <a href="etkinlikler.html">Etkinlikler</a>
+    <a href="gokyuzu.html">Bu ay gökyüzü</a>
+    <a href="#kayit">Kayıt ol</a>
+  </nav>
+</header>
+<main>
+  <section class="giris">
+    <h1>Aralık gözlem geceleri</h1>
+    <p>Teleskopla Satürn'ün halkalarını, Ay'ın kraterlerini ve Geminid meteor yağmurunu birlikte izleyelim. Etkinlikler ücretsizdir; hava bulutluysa bir sonraki cumartesiye ertelenir.</p>
+  </section>
+  <section class="takvim">
+    <h2>Etkinlik takvimi</h2>
+    <ul>
+      <li class="etkinlik"><b>5 Aralık</b> Satürn ve halkaları <span>12 yer kaldı</span></li>
+      <li class="etkinlik"><b>13 Aralık</b> Geminid meteor yağmuru <span>Gece yarısına kadar</span></li>
+      <li class="etkinlik"><b>19 Aralık</b> Ay'da kraterler <span>Çocuklar için</span></li>
+      <li class="etkinlik"><b>27 Aralık</b> Kış takımyıldızları <span>Yılın son etkinliği</span></li>
+    </ul>
+  </section>
+  <section class="ipucu">
+    <h2>Gözleme gelmeden önce</h2>
+    <p>Kalın giyin; gece sıcaklığı 0 °C'nin altına düşebilir. Kırmızı ışıklı fener getirin: beyaz ışık gözün karanlığa alışmasını bozar.</p>
+  </section>
+  <form id="kayit">
+    <h2>Kayıt ol</h2>
+    <label for="ad">Ad soyad</label>
+    <input type="text" id="ad">
+    <label for="tarih">Etkinlik</label>
+    <select id="tarih">
+      <option>5 Aralık · Satürn</option>
+      <option>13 Aralık · Geminid</option>
+      <option>19 Aralık · Ay</option>
+      <option>27 Aralık · Takımyıldızlar</option>
+    </select>
+    <button type="submit">Kaydımı yap</button>
+  </form>
+</main>
+<footer>Kuzey Yıldızı Gözlemevi · Yaylabaşı Mevkii · Her cumartesi 20.00–23.00</footer>`
+}
+];
+APPS.forEach(a=>{if(a.sayfalar&&!a.govde)a.govde=a.sayfalar[0].govde});
+
+
+
+/* bitmiş sayfa = iskelet + hazır CSS + gövde */
+function iskelet(a,pg){
+  const g=pg!=null&&a.sayfalar?a.sayfalar[pg].govde:a.govde;
+  const lk=a.dis?a.dis.map(f=>'  <link rel="stylesheet" href="'+f+'">').join('\n')+'\n  <!-- Önizleme için '+a.dis.join(' ve ')+' içeriği aşağıda style içinde gösteriliyor; sen bunu ayrı dosyaya yaz -->\n':'';
+  return '<!DOCTYPE html>\n<html lang="tr">\n<head>\n  <meta charset="UTF-8">\n  <title>'+a.baslik+'</title>\n'+lk+a.css+'\n</head>\n<body>\n'+g+'\n</body>\n</html>';
+}
+/* internetsiz örnek görseller */
+function svg(label){
+  const s='<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d4aff"/><stop offset="1" stop-color="#1b1b3a"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><circle cx="380" cy="70" r="32" fill="#ffd166"/><path d="M0 270 L140 160 L240 220 L340 140 L480 270Z" fill="rgba(255,255,255,.2)"/><text x="50%" y="250" text-anchor="middle" font-family="Arial" font-size="22" fill="#fff">'+label+'</text></svg>';
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+}
+function prep(code){
+  code=code.replace(/url\((['"]?)[^)'"]+\.(jpg|jpeg|png|gif)\1\)/g,'url("'+svg('resim')+'")');
+  code=code.replace(/<source[^>]*\.(mp4|mp3)"[^>]*>/g,'');
+  return code.replace(/(src|poster)="([^"]+\.(jpg|jpeg|png))"/g,(m,a,n)=>a+'="'+svg(n.split('/').pop())+'"');
+}
+function doc(code){
+  const full=/<html[\s>]/i.test(code);
+  const base='<style>body{font-family:system-ui,Arial,sans-serif}img,video{max-width:100%}</style>';
+  if(full)return prep(code).replace('</head>',base+'</head>');
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'+base+'</head><body style="margin:8px">'+prep(code)+'</body></html>';
+}
+/* etiket sözlüğü */
+const TAGS={link:'dış CSS dosyasını sayfaya bağlar; rel="stylesheet" ve href kullanılır',html:'sayfanın kök etiketi; lang burada yazılır',head:'ekranda görünmeyen bilgiler (başlık, karakter kodu, stil)',body:'ekranda görünen her şeyin içinde durduğu kap',style:'CSS kurallarının yazıldığı yer',title:'tarayıcı sekmesinde görünen sayfa başlığı',meta:'sayfa hakkında ekranda görünmeyen bilgi',
+header:'sayfanın veya bölümün üst kısmı (başlık, logo)',nav:'ana gezinme bağlantıları (menü)',main:'sayfanın asıl içeriği; sayfada bir tane olur',section:'konusu olan bir bölüm; genelde başlığı vardır',article:'tek başına anlamlı içerik (haber, duyuru, yazı)',aside:'ana içeriğe yan bilgi (ipucu, reklam, not)',footer:'sayfanın veya bölümün alt kısmı (telif, iletişim)',figure:'resim/şema gibi başlığıyla birlikte duran içerik',figcaption:'figure içeriğinin alt yazısı',div:'anlamsız kutu; içindekileri gruplamak için',span:'satır içinde bir parçayı işaretleyen anlamsız etiket',h1:'sayfanın ana başlığı (sayfada bir tane)',h2:'bölüm başlığı',h3:'alt bölüm başlığı',p:'paragraf',ul:'madde işaretli (sırasız) liste',ol:'numaralı (sıralı) liste',li:'listenin bir maddesi',a:'bağlantı; href ile gidilecek yer yazılır',img:'resim; src, alt, width, height ister',table:'tablo',caption:'tablonun başlığı',tr:'tablonun bir satırı',th:'tablonun başlık hücresi',td:'tablonun veri hücresi',video:'video oynatıcı; controls, poster kullanılır',audio:'ses oynatıcı; controls ile düğmeler gelir',source:'video/ses için dosya kaynağı',details:'açılır-kapanır kutu',summary:'details kutusunun her zaman görünen başlığı',iframe:'sayfanın içine başka bir sayfa/video gömer',strong:'önemli (kalın) metin',em:'vurgulu (italik) metin',form:'bilgi toplayıp action adresine gönderen kutu',label:'form alanının adı; for ile kutuya bağlanır',input:'bilgi kutusu; type türü, name sunucuya giden adı belirler',select:'açılır liste; içinde option seçenekleri olur',option:'select listesinin bir seçeneği; value sunucuya giden değerdir',textarea:'çok satırlı yazı kutusu',button:'düğme; type="submit" formu gönderir',fieldset:'ilgili form alanlarını çerçeveye alan grup',legend:'fieldset grubunun başlığı',ul:'madde işaretli (sırasız) liste'};
+const GIZLI=new Set(['html','head','style','title','meta','link','script','source']);
+const VOID=new Set('area base br col embed hr img input link meta source track wbr'.split(' '));
+function parse(code){
+  const els=[],st=[],low=code.replace(/İ/g,'I').toLowerCase();
+  const re=/<\!--[\s\S]*?--\>|<(\/?)([a-zA-Z][\w-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;let m;
+  while((m=re.exec(code))){
+    if(m[0].slice(0,4)==='<'+'!--')continue;
+    const nm=m[2].toLowerCase();
+    if(!m[1]){
+      const e={i:els.length,n:nm,s:m.index,oe:m.index+m[0].length,e:m.index+m[0].length,ins:m.index+1+m[2].length};
+      els.push(e);
+      if(VOID.has(nm)||/\/\s*$/.test(m[3]))continue;
+      st.push(e);
+      if(nm==='style'||nm==='script'){const c=low.indexOf('</'+nm,re.lastIndex);if(c>=0)re.lastIndex=c}
+    }else{
+      for(let j=st.length-1;j>=0;j--)if(st[j].n===nm){
+        for(let k=j+1;k<st.length;k++)if(st[k].e===st[k].oe)st[k].e=m.index;
+        st[j].e=m.index+m[0].length;st.length=j;break}
+    }
+  }
+  return els;
+}
+function enIc(els,a,b){let best=null;for(const e of els)if(e.s<=a&&b<=e.e&&(!best||e.e-e.s<=best.e-best.s))best=e;return best}
+function isaretle(code){
+  const els=parse(code);let out=code;
+  for(let k=els.length-1;k>=0;k--)out=out.slice(0,els[k].ins)+' data-i="'+k+'"'+out.slice(els[k].ins);
+  return out;
+}
+const FR_JS='<style>[data-hl]{outline:.2em dashed #f59e0b!important;outline-offset:-.1em;box-shadow:0 0 0 .3em rgba(245,158,11,.4)!important}</style><scr'+'ipt>(function(){var cur=null;'+
+ 'addEventListener("message",function(e){var d=e.data;if(!d||d.t!=="hl")return;if(cur)cur.removeAttribute("data-hl");cur=null;if(d.i>=0){var el=document.querySelector("[data-i=\\""+d.i+"\\"]");if(el){el.setAttribute("data-hl","");cur=el;var r=el.getBoundingClientRect();parent.postMessage({t:"pos",y:r.top+scrollY,h:r.height},"*")}}});'+
+ 'document.addEventListener("click",function(e){var t=e.target.closest?e.target:e.target.parentElement;var a=t.closest("a");if(a)e.preventDefault();var h=t.closest("[data-i]");parent.postMessage({t:"pick",i:h?+h.getAttribute("data-i"):-1},"*")},true);'+
+ 'document.addEventListener("submit",function(e){e.preventDefault()},true);'+
+ 'function hh(){parent.postMessage({t:"h",h:Math.ceil(document.documentElement.getBoundingClientRect().height)},"*")}if(window.ResizeObserver)new ResizeObserver(hh).observe(document.documentElement);addEventListener("load",hh);hh();parent.postMessage({t:"ready"},"*")})()<\/script>';
+const FR_JS2='<scr'+'ipt>(function(){var strip=function(s){return s.split(",").map(function(x){return x.replace(/::?[a-zA-Z-]+(\\([^)]*\\))?/g,"").trim()||"*"})};addEventListener("message",function(e){var d=e.data;if(!d||d.t!=="hs")return;document.querySelectorAll("[data-hl]").forEach(function(x){x.removeAttribute("data-hl")});var n=0,f=null;if(d.q){try{document.querySelectorAll(strip(d.q).join(",")).forEach(function(x){x.setAttribute("data-hl","");n++;if(!f)f=x})}catch(z){}}if(f){var r=f.getBoundingClientRect();parent.postMessage({t:"pos",y:r.top+scrollY,h:r.height},"*")}parent.postMessage({t:"hsn",n:n},"*")});'+
+ 'document.addEventListener("click",function(e){var t=e.target.closest?e.target:e.target.parentElement;var el=t.closest("[data-i]");var out=[];if(el){for(var i=0;i<document.styleSheets.length;i++){var rs;try{rs=document.styleSheets[i].cssRules}catch(z){continue}for(var j=0;j<rs.length;j++){var r=rs[j];if(!r.selectorText)continue;var q=strip(r.selectorText),ok=false;for(var k=0;k<q.length;k++){try{if(el.matches(q[k]))ok=true}catch(z){}}if(ok)out.push(r.selectorText)}}}parent.postMessage({t:"rules",r:out},"*")},true)})()<\/scr'+'ipt>';
+function onizleme(code){
+  const h=doc(isaretle(code));const x=h.replace(/İ/g,'I').toLowerCase().lastIndexOf('</body>');
+  return x<0?h+FR_JS+FR_JS2:h.slice(0,x)+FR_JS+FR_JS2+h.slice(x);
+}
+const LH=21,PAD=10;
+
+const EDS=[];
+window.addEventListener('message',e=>{for(const d of EDS)if(e.source===d.fr.contentWindow){d.msg(e.data);return}});
+
+/* Salt okunur kod + canlı önizleme bloğu */
+function mkEd(root,o){
+  root.innerHTML=
+   '<div class="grid"><div class="pane codepane"><div class="pane-h"><span>Kod (salt okunur)</span><span><button class="btn cs">CSS\'i katla</button> <button class="btn cc">Yalnız CSS\'i kopyala</button> <button class="btn cp">Kopyala</button></span></div>'+
+   '<div class="info">İmleci koda koy ya da sonuçta bir yere tıkla; ilgili etiket işaretlenir.</div>'+
+   '<div class="cw"><div class="ov"></div><textarea spellcheck="false" wrap="off" readonly></textarea></div></div>'+
+   '<div class="pane prev"><div class="pane-h"><span>Sonuç (tüm sayfa)</span><button class="btn kg">👁 Kodu gizle</button></div><div class="pv"><iframe sandbox="allow-scripts" title="Sonuç" scrolling="no"></iframe></div></div></div>';
+  const q=s=>root.querySelector(s);
+  const ta=q('textarea'),fr=q('iframe'),ov=q('.ov'),info=q('.info'),gr=q('.grid'),pv=q('.pv');
+  ta.value=o.kod;
+  const F={on:false,hidden:'',ph:''};
+  const full=()=>F.on?ta.value.replace(F.ph,()=>F.hidden):ta.value;
+  const pi=()=>F.on?ta.value.indexOf(F.ph):-1;
+  const toView=x=>{const p=pi();if(p<0)return x;const L=F.hidden.length;return x<=p?x:x<p+L?p:x-L+F.ph.length};
+  const lineOf=x=>{const v=ta.value;let n=0;for(let i=v.indexOf('\n');i>=0&&i<x;i=v.indexOf('\n',i+1))n++;return n};
+  let curI=-1,band=null,sc=1,ch=600;
+  /* önizleme ölçeği: mantıksal genişlik 1000px (dar ekranda 600px), kutuya sığdırılır */
+  const fit=()=>{
+    const cw=pv.clientWidth||600,W=cw>=700?1000:600;
+    sc=Math.min(1,cw/W);
+    fr.style.width=W+'px';fr.style.height=ch+'px';
+    fr.style.transform='scale('+sc+')';pv.style.height=Math.ceil(ch*sc)+'px';
+  };
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(pv);
+  addEventListener('resize',fit);
+  const draw=b=>{ov.innerHTML=b?'<div class="bd" style="top:'+(PAD+b[0]*LH)+'px;height:'+((b[1]-b[0]+1)*LH)+'px"></div>':'';ov.style.transform='translateY('+(-ta.scrollTop)+'px)'};
+  const send=()=>{const e=parse(full())[curI];try{fr.contentWindow.postMessage({t:'hl',i:e&&!GIZLI.has(e.n)?curI:-1},'*')}catch(x){}};
+  const vurgu=(i,kaydir)=>{
+    curI=i;const e=parse(full())[i];
+    if(!e){band=null;draw(null);info.textContent='İmleci koda koy ya da sonuçta bir yere tıkla; ilgili etiket işaretlenir.';send();return}
+    const l1=lineOf(toView(e.s)),l2=lineOf(toView(Math.max(e.s,e.e-1)));
+    band=[l1,l2];draw(band);
+    if(kaydir)ta.scrollTop=Math.max(0,PAD+l1*LH-ta.clientHeight/3);
+    info.innerHTML='İmleç: <code>&lt;'+e.n+'&gt;</code> — '+(TAGS[e.n]||'bu etiket için kısa açıklama yok')+(GIZLI.has(e.n)?' (ekranda görünmez)':'')+' <small>· satır '+(l1+1)+(l2>l1?'–'+(l2+1):'')+'</small>';
+    send();
+  };
+  const ruleAt=pos=>{
+    const t=full(),m=/<style[^>]*>([\s\S]*?)<\/style>/i.exec(t);if(!m)return null;
+    const a=m.index+m[0].indexOf('>')+1,b=a+m[1].length;if(pos<a||pos>b)return null;
+    const css=t.slice(a,b),p=pos-a;
+    const ob=css.lastIndexOf('{',Math.max(0,p-1)),cb=css.lastIndexOf('}',Math.max(0,p-1));
+    let o2,end;
+    if(ob>cb){o2=ob;end=css.indexOf('}',ob)}else{o2=css.indexOf('{',p);if(o2<0)return null;end=css.indexOf('}',o2)}
+    if(end<0)return null;
+    const st=css.lastIndexOf('}',o2)+1;
+    const raw=css.slice(st,o2),sel=raw.replace(/\/\*[\s\S]*?\*\//g,'').trim();
+    if(!sel||sel[0]==='@')return null;
+    const lead=raw.length-raw.trimStart().length;
+    return {sel:sel,s:a+st+lead,e:a+end+1};
+  };
+  const imlec=()=>{
+    const rr=ruleAt(ta.selectionStart);
+    if(rr){
+      const l1=lineOf(toView(rr.s)),l2=lineOf(toView(rr.e-1));
+      curI=-1;band=null;ov.innerHTML='<div class="rb" style="top:'+(PAD+l1*LH)+'px;height:'+((l2-l1+1)*LH)+'px"></div>';
+      info.innerHTML='CSS kuralı: <code>'+rr.sel.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</code> <small>· satır '+(l1+1)+(l2>l1?'–'+(l2+1):'')+'</small> <span class="rn"></span>';
+      try{fr.contentWindow.postMessage({t:'hs',q:rr.sel},'*')}catch(x){}
+      return;
+    }
+    try{fr.contentWindow.postMessage({t:'hs',q:''},'*')}catch(x){}
+    const els=parse(full());const p=pi();
+    const fo=x=>{if(p<0)return x;const L=F.hidden.length,pl=F.ph.length;return x<=p?x:x<p+pl?p:x-pl+L};
+    const e=enIc(els,fo(ta.selectionStart),fo(ta.selectionEnd));
+    vurgu(e?e.i:-1,false);
+  };
+  /* vurgulanan eleman sayfada görünür değilse sayfayı kaydır */
+  const goster=(y,h)=>{
+    const top=fr.getBoundingClientRect().top+y*sc,bot=top+h*sc;
+    if(top<60||bot>innerHeight-20)window.scrollTo({top:Math.max(0,scrollY+top-innerHeight/2+Math.min(h*sc,innerHeight/3)/2),behavior:'smooth'});
+  };
+  EDS.push({fr:fr,msg:d=>{
+    if(!d)return;
+    if(d.t==='ready')send();
+    else if(d.t==='pick'&&d.i>=0)vurgu(d.i,true);
+    else if(d.t==='h'){ch=Math.max(300,d.h);fit()}
+    else if(d.t==='hsn'){const r=q('.rn');if(r)r.textContent='→ sayfada '+d.n+' eleman bu kurala uyuyor (turuncu çerçeve)'}
+    else if(d.t==='rules'){if(d.r&&d.r.length&&curI>=0)info.insertAdjacentHTML('beforeend','<br><small>Bu elemana uyan CSS kuralları: '+d.r.map(x=>'<code>'+x.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</code>').join(' ')+'</small>')}
+    else if(d.t==='pos'&&document.activeElement===ta)goster(d.y,d.h);
+  }});
+  ['keyup','mouseup','focus'].forEach(ev=>ta.addEventListener(ev,imlec));
+  ta.addEventListener('scroll',()=>{ov.style.transform='translateY('+(-ta.scrollTop)+'px)'});
+  let katla=on=>{
+    if(on){const m=/<style[\s\S]*?<\/style>/i.exec(ta.value);if(!m)return;
+      F.hidden=m[0];F.ph='<style>/* '+m[0].split('\n').length+' satır CSS gizli. "CSS\'i göster" ile aç */</style>';
+      ta.value=ta.value.replace(m[0],()=>F.ph);F.on=true;q('.cs').textContent='CSS\'i göster'}
+    else if(F.on){ta.value=full();F.on=false;q('.cs').textContent='CSS\'i katla'}
+    vurgu(curI,false);
+  };
+  const katla0=katla;
+  katla=on=>{
+    if(!F.rdy){F.rdy=true;katla0(on);return}
+    const st=ta.scrollTop,sl=ta.scrollLeft,v0=ta.value;
+    katla0(on);
+    if(ta.value===v0)return;
+    const A=v0.split('\n'),B=ta.value.split('\n');let s=0;while(s<A.length&&s<B.length&&A[s]===B[s])s++;let e=0;while(e<A.length-s&&e<B.length-s&&A[A.length-1-e]===B[B.length-1-e])e++;
+    const add=B.length-s-e,rem=A.length-s-e;
+    /* değişiklik görünür alanın üstündeyse, bakılan satırlar aynı yerde kalsın */
+    let top=st;if(PAD+s*LH<st)top=st+(add-rem)*LH;
+    if(add>rem&&F.sv!=null){top=F.sv;F.sv=null}else if(add<=rem)F.sv=st;
+    ta.scrollTop=Math.max(0,top);ta.scrollLeft=sl;ov.style.transform='translateY('+(-ta.scrollTop)+'px)';
+    if(add>0)ov.insertAdjacentHTML('beforeend','<div class="fl" style="top:'+(PAD+s*LH)+'px;height:'+(add*LH)+'px"></div>');
+    info.textContent=add>rem?'CSS açıldı: '+add+' satır eklendi (satır '+(s+1)+'-'+(s+add)+', yeşil bantla gösterildi)':'CSS katlandı: '+rem+' satır, tek satıra indi (satır '+(s+1)+')';
+  };
+  q('.cs').onclick=()=>katla(!F.on);
+  const kopya=(b,txt,ad)=>{const d=()=>{b.textContent='Kopyalandı';setTimeout(()=>b.textContent=ad,1200)};const fb=()=>{const x=document.createElement('textarea');x.value=txt;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(z){}x.remove();d()};if(navigator.clipboard)navigator.clipboard.writeText(txt).then(d,fb);else fb()};
+  q('.cp').onclick=e=>kopya(e.target,full(),'Kopyala');
+  q('.cc').onclick=e=>{const m=/<style[\s\S]*?<\/style>/i.exec(full());kopya(e.target,m?m[0]:'','Yalnız CSS\'i kopyala')};
+  const gizle=g=>{if(g)ta._st=ta.scrollTop;gr.classList.toggle('hc',g);q('.kg').textContent=g?'👁 Kodu göster':'👁 Kodu gizle';try{localStorage.setItem('web-u4s2ek-gizle-v2',g?'1':'0')}catch(e){}setTimeout(fit,0);if(!g)ta.scrollTop=ta._st||0};
+  q('.kg').onclick=()=>gizle(!gr.classList.contains('hc'));
+  let g=false;try{g=localStorage.getItem('web-u4s2ek-gizle-v2')==='1'}catch(e){}
+  gizle(g);
+  katla(false);
+  fr.srcdoc=onizleme(full());
+  fit();
+}
+
+function show(k){
+  const a=APPS[k];EDS.length=0;
+  $('#tabs').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===k));
+  $('#app').innerHTML=
+   '<div class="card"><h2>Nasıl çalışacağız?</h2><ol class="steps"><li>Aşağıdaki <b>bitmiş siteyi</b> incele: koda imleç koy ya da sonuçta bir yere tıkla; turuncu işaret kod ile sayfayı eşleştirir.</li><li>Bilgisayarında bir klasör aç; VS Code ile içine <code>index.html</code> dosyasını oluştur.</li><li>Bu sunumun konusu CSS olduğu için <b>CSS kodu açık</b> gelir: önce kendin yazmayı dene; takılırsan kodu hedefle karşılaştır ya da &quot;Yalnız CSS&#39;i kopyala&quot; ile al. Class ve id adları hedefle aynıdır.</li><li>Koddaki <b>CSS kuralının içine</b> tıkla: kural mavi bantla, sayfada o kurala uyan elemanlar turuncu çerçeveyle işaretlenir. Sonuçta bir yere tıklarsan o elemana uyan kuralların listesi çıkar.</li><li>Aşağıdaki <b>Yapılacaklar</b> listesini sırayla uygula. Kod verilmez; hangi etiketi kullanacağın yazar.</li><li>Her adımdan sonra dosyayı kaydet, tarayıcıda yenile ve hedefle karşılaştır. <b>Bitti sayılması için</b> kutucuklarını işaretle.</li></ol></div>'+
+   '<div class="card"><h2>'+a.ad+'</h2><p>'+a.ozet+'</p>'+
+   '<div class="weeks">'+a.haftalar.map(h=>'<span>'+h+'</span>').join('')+'</div>'+
+   '<b>Yapılacaklar</b><ol class="steps">'+a.adimlar.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>'+
+   '<div class="cols"><div class="card"><h2>✅ Bitti sayılması için</h2><ul class="chk" id="olc"></ul></div><div class="card hata"><h2>⚠️ Sık yapılan hatalar</h2><ul>'+a.hatalar.map(x=>'<li>'+x+'</li>').join('')+'</ul></div></div>'+
+   (a.ekstra?'<div class="card ek"><h2>⭐ Ekstra görev</h2><p>'+a.ekstra.metin+'</p><p>📘 <a href="'+a.ekstra.link+'" target="_blank" rel="noopener">'+a.ekstra.ad+'</a></p></div>':'')+
+   '<h3 class="hh">🎯 Hedef: bitmiş site</h3>'+(a.sayfalar?'<div class="tabs" id="pgs">'+a.sayfalar.map((p,i)=>'<button data-p="'+i+'"'+(i?'':' class="on"')+'>📄 '+p.ad+'</button>').join('')+'</div>':'')+'<div id="eh"></div>';
+  (function(){const ul=$('#olc'),KEY='web-u4s2ek-olc-v2-'+k;let sv={};try{sv=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+    a.olcut.forEach((x,i)=>{const li=document.createElement('li');li.innerHTML='<label><input type="checkbox"><span>'+x+'</span></label>';const cb=li.querySelector('input');cb.checked=!!sv[i];li.classList.toggle('ok',cb.checked);
+      cb.onchange=()=>{li.classList.toggle('ok',cb.checked);sv[i]=cb.checked;try{localStorage.setItem(KEY,JSON.stringify(sv))}catch(e){}};ul.appendChild(li)})})();
+  mkEd($('#eh'),{kod:iskelet(a,a.sayfalar?0:null)});
+  if(a.sayfalar)$('#pgs').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('#pgs').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));EDS.length=0;mkEd($('#eh'),{kod:iskelet(a,+b.dataset.p)})});
+  try{localStorage.setItem('web-u4s2ek-son-v2',k)}catch(e){}
+}
+APPS.forEach((a,i)=>{const b=document.createElement('button');b.textContent=a.ad;b.onclick=()=>show(i);$('#tabs').appendChild(b)});
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('web-tema',t)}catch(e){}}
+let th=null;try{th=localStorage.getItem('web-tema')}catch(e){}
+setTheme(th||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+$('#th').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+let st=0;try{st=+localStorage.getItem('web-u4s2ek-son-v2')||0}catch(e){}
+const hm=location.hash.match(/uygulama-(\d)/);if(hm&&APPS[hm[1]-1])st=hm[1]-1;
+show(st);
+</script>
+</body>
+</html>

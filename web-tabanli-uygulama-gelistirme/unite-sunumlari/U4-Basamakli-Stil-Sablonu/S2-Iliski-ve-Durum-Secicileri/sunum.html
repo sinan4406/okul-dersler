@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>U4 S2 · İlişki ve Durum Seçicileri</title>
+<style>
+:root{
+  --bg:#f4f5ff;--panel:#ffffff;--panel2:#eceefb;--text:#0e1230;--muted:#434a6d;--line:#c9cfea;
+  --accent:#5b36f2;--accent2:#00a3c4;--pink:#e8337f;--ok:#0b8a45;--bad:#d63a3f;--warn:#c76a00;
+  --grad:linear-gradient(135deg,#5b36f2 0%,#9a3cf0 55%,#f0407f 100%);
+  --code-bg:#ffffff;--c-tag:#c2185b;--c-attr:#1550d0;--c-str:#0a7a3e;--c-com:#6b7390;--c-css:#a35a00;--c-text:#0e1230;
+}
+:root[data-theme="dark"]{
+  --bg:#090c1c;--panel:#141935;--panel2:#1d2348;--text:#ffffff;--muted:#c3c9ea;--line:#38417a;
+  --accent:#a592ff;--accent2:#3cd8f5;--pink:#ff7ab0;--ok:#55e08f;--bad:#ff8085;--warn:#ffc04d;
+  --grad:linear-gradient(135deg,#7a5cff 0%,#b05cff 55%,#ff6fae 100%);
+  --code-bg:#0e1229;--c-tag:#ff86bd;--c-attr:#86bcff;--c-str:#7ef0a8;--c-com:#8c96bb;--c-css:#ffbf66;--c-text:#ffffff;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(16px,min(1.6vw,2.9vh),36px)}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Inter","Segoe UI Variable","Segoe UI",system-ui,Arial,sans-serif;line-height:1.35}
+button{font:inherit;color:inherit;cursor:pointer}
+code,pre,textarea{font-family:"JetBrains Mono","Cascadia Code",ui-monospace,Consolas,monospace}
+
+#prog{position:fixed;top:0;left:0;height:.6vh;min-height:5px;background:var(--grad);width:0;z-index:50;transition:width .4s}
+#stage{position:fixed;inset:0 0 9vh 0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;gap:1.3vh;padding:2.4vh 3vw 1vh;opacity:0;visibility:hidden;transform:translateX(5vw);transition:opacity .4s,transform .4s cubic-bezier(.2,.8,.2,1),visibility .4s;overflow:hidden}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.slide.past{transform:translateX(-5vw)}
+@media(max-aspect-ratio:1/1){.slide{overflow-y:auto}}
+.mod{align-self:flex-start;font-size:.55rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);padding:.15em .8em;border-radius:99px}
+.h{font-size:1.75rem;font-weight:800;line-height:1.12;letter-spacing:-.01em;margin:0}
+.say{font-size:1.05rem;margin:0;font-weight:500}
+.bn{font-size:.95rem;margin:0;color:var(--muted)}
+.bn b{color:var(--pink)}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:1.4vh}
+.grad-t{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* kapak / bölüm */
+.slide.hero,.slide.sec{background:var(--grad);color:#fff;justify-content:center;align-items:flex-start;padding:6vh 6vw;gap:2.5vh}
+.slide.hero .h,.slide.sec .h{font-size:2.6rem;color:#fff}
+.slide.hero .say,.slide.sec .say{font-size:1.3rem;color:#ffffffe6}
+.slide.sec .big{font-size:5rem;line-height:1}
+.slide.hero .mod,.slide.sec .mod{background:#ffffff30;color:#fff}
+
+/* kod + sonuç */
+.cr{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.cr.one{grid-template-columns:1fr}.cr.one .pane pre{font-size:1.1rem}
+@media(max-aspect-ratio:1/1){.cr{grid-template-columns:1fr}.slide{overflow-y:auto}.cr{flex:none}.pane{min-height:35vh}}
+.col{display:flex;flex-direction:column;gap:1vh;min-height:0;min-width:0}
+.pane{display:flex;flex-direction:column;min-height:0;min-width:0;border:2px solid var(--line);border-radius:1rem;overflow:hidden;background:var(--code-bg);flex:1}
+.pane.code{flex:none;max-height:100%}
+.col .pane.code{flex:0 1 auto}
+.pane-h{display:flex;justify-content:space-between;align-items:center;font-size:.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--panel2);padding:.25em .9em;border-bottom:2px solid var(--line)}
+.pane pre{margin:0;padding:.5em .8em;font-size:.82rem;line-height:1.5;color:var(--c-text);overflow:auto;white-space:pre;flex:1;min-height:0}
+.pane iframe{border:0;width:100%;flex:1;min-height:0;background:#fff}
+.pane textarea{flex:1;min-height:0;border:0;outline:0;resize:none;padding:.5em .8em;font-size:.82rem;line-height:1.5;background:var(--code-bg);color:var(--c-text)}
+.cp{border:2px solid var(--line);background:var(--panel);border-radius:.5em;padding:0 .6em;font-size:.5rem;text-transform:none;letter-spacing:0}
+.cp.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.t-tag{color:var(--c-tag);font-weight:800}.t-attr{color:var(--c-attr);font-weight:600}.t-str{color:var(--c-str);font-weight:600}.t-com{color:var(--c-com);font-style:italic}.t-pun{color:var(--c-com)}.t-cssp{color:var(--c-css)}
+.reg{background:rgba(245,158,11,.22);border-left:.25em solid #f59e0b;margin-left:-.8em;padding-left:.55em}
+.hot{background:#ffd43b;color:#14142b!important;border-radius:.2em;box-shadow:0 0 0 .1em #ffd43b;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 .22em #ffd43b66}}
+.balloon{align-self:flex-start;position:relative;background:#ffd43b;color:#14142b;border-radius:1rem;padding:.3em 1em;font-size:.95rem;font-weight:800;margin-top:.5em}
+.balloon::before{content:"";position:absolute;top:-.4em;left:1.4em;border:.45em solid transparent;border-top:0;border-bottom:.45em solid #ffd43b}
+.lbl{font-size:.8rem;font-weight:800;padding:.1em .8em;border-radius:99px;align-self:flex-start}
+.lbl.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.lbl.neu{background:var(--panel2);color:var(--accent)}
+.lbl.good{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+
+/* kontroller */
+.ctrls{display:flex;flex-wrap:wrap;gap:1vh 1.6vw;align-items:center;font-size:.8rem}
+.ctrls label{display:inline-flex;align-items:center;gap:.4em}
+.ctrls input[type=checkbox]{width:1em;height:1em;accent-color:var(--accent)}
+.ctrls input[type=range]{accent-color:var(--accent);width:10em}
+.ctrls input[type=text],.ctrls select{font-size:.75rem;padding:.1em .5em;border:2px solid var(--line);border-radius:.5em;background:var(--panel);color:var(--text)}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:.8em;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:.2em .9em;border-right:2px solid var(--line);font-size:.8rem}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--grad);color:#fff;font-weight:800}
+.pane-h .seg button{font-size:.55rem;padding:0 .7em;text-transform:none;letter-spacing:0}
+.btn{border:2px solid var(--line);background:var(--panel);border-radius:.8em;padding:.2em .9em;font-size:.8rem}
+.btn.pri{background:var(--grad);color:#fff;border:0;font-weight:800}
+
+/* fikir / liste / seçim kartları */
+.cards{flex:1;min-height:0;display:grid;gap:2vw;grid-template-columns:repeat(var(--n,3),1fr);align-items:stretch}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:1.2rem;padding:1.5vh 1.4vw;display:flex;flex-direction:column;justify-content:center;gap:.6vh;text-align:center}
+.card .em{font-size:5rem;line-height:1}
+.card b{font-size:1.5rem}
+.card span{font-size:1.1rem;color:var(--muted)}
+.card code{font-size:1.5rem;color:var(--c-tag);font-weight:800}
+.list{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2vh}
+.list .it{display:flex;align-items:center;gap:1.2vw;font-size:1.15rem;font-weight:600;background:var(--panel);border:2px solid var(--line);border-radius:1.2rem;padding:1.2vh 1.5vw}
+.list .it .em{font-size:2rem}
+.list.bad .it{border-left:.5rem solid var(--bad)}.list.good .it{border-left:.5rem solid var(--ok)}
+code.i{background:var(--panel2);padding:0 .3em;border-radius:.3em;border:1px solid var(--line);color:var(--c-tag);font-weight:700}
+
+/* sayfa haritası */
+.pmap{flex:1;min-height:0;display:grid;gap:.6vh;grid-template-columns:1fr 14vw;grid-template-rows:auto auto 1fr auto;grid-template-areas:"hd hd" "nv nv" "mn sd" "ft ft";padding:.8vh;background:var(--panel2);border-radius:1rem;border:2px solid var(--line)}
+.pmap .z{border:3px dashed var(--line);border-radius:.8rem;padding:.3em .8em;font-weight:800;font-size:.9rem;opacity:.15;transform:scale(.96);transition:all .5s;display:flex;align-items:center}
+.pmap .z.show{opacity:1;transform:none;border-style:solid}
+.z-hd{grid-area:hd;background:#ffe3d6;color:#7c2d12}.z-nv{grid-area:nv;background:#dbe9ff;color:#1e3a8a}.z-mn{grid-area:mn;background:#d9f5de;color:#14532d;flex-wrap:wrap;gap:.5em}.z-sd{grid-area:sd;background:#fff1bd;color:#713f12}.z-ft{grid-area:ft;background:#e7d8ff;color:#4c1d95}
+.pmap.soup .z{background:var(--panel);color:var(--text);border-color:var(--muted)}
+.pmap .z.hl{outline:4px solid var(--accent)}
+.mn-in{display:flex;gap:.5em;width:100%}
+.mn-in span{flex:1;border:3px dashed #2f855a;border-radius:.6rem;padding:0 .5em;font-size:.8rem;background:#ffffffaa;color:#14532d;opacity:.15;transition:opacity .5s}
+.pmap.soup .mn-in span{background:var(--panel);color:var(--text);border-color:var(--muted)}
+
+.tree{font-family:ui-monospace,Consolas,monospace;font-size:.8rem;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:1vh 1vw;overflow:auto;min-height:0}
+.tree div{padding:.05em .5em;border-radius:.4em;white-space:nowrap}
+.tree .f{cursor:pointer}.tree .f:hover{background:var(--panel2)}
+.tree .from{background:#ffd2bd;color:#7c2d12;font-weight:800}.tree .to{background:#bfeccf;color:#14532d;font-weight:800}
+.pathout{font-size:.9rem;padding:.5em .8em;background:var(--code-bg);border:2px solid var(--line);border-radius:1rem;overflow:auto}
+.bars{display:grid;gap:.8vh;font-size:.7rem}
+.bars .row{display:flex;align-items:center;gap:.6em}
+.bars .lab{width:11em;flex:none}
+.bars .bg{flex:1;height:.9em;background:var(--panel2);border-radius:.5em;overflow:hidden;border:1px solid var(--line)}
+.bars .fill{display:block;height:100%;background:var(--muted)}
+.bars .row.pick .fill{background:var(--ok)}.bars .row.pick .lab{font-weight:800;color:var(--ok)}
+.vp{border:3px solid var(--muted);border-radius:1rem;background:var(--panel2);padding:.4em;text-align:center;font-weight:800;font-size:.75rem;transition:width .15s;max-width:100%}
+.mediabox{flex:1;display:grid;place-items:center;background:var(--panel2);text-align:center;padding:.5em;min-height:0}
+.mediabox video,.mediabox audio{max-width:100%;max-height:100%;border-radius:.6em}
+.hintw{font-size:.6rem;color:var(--warn);font-weight:700}
+
+/* uygulama ara slaytları */
+.slide.app{background:linear-gradient(135deg,#0f766e 0%,#0891b2 55%,#2563eb 100%);color:#fff;border-top:.6vh dashed #fde047}
+.slide.app .h{color:#fff}.slide.app .mod{background:#ffffff30;color:#fff}
+.slide.app .body{flex:1;justify-content:center}
+.appbox{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+@media(max-aspect-ratio:1/1){.appbox{grid-template-columns:1fr}}
+.appbox .c{background:#ffffff1f;border:2px solid #ffffff66;border-radius:1rem;padding:1.2vh 1.2vw;font-size:.95rem}
+.appbox h3{margin:0 0 .3em;font-size:1rem;color:#fde047}.appbox p{margin:0 0 .6em}.appbox ul{margin:0;padding-left:1.2em}.appbox code{color:#fff;font-weight:800}
+.appbtn{align-self:flex-start;background:#fde047;color:#14142b;font-weight:800;font-size:1.05rem;padding:.4em 1.4em;border-radius:1rem;text-decoration:none}
+/* alt çubuk */
+#bottom{position:fixed;inset:auto 0 0 0;height:9vh;display:flex;align-items:center;justify-content:space-between;gap:1vw;padding:0 2vw;background:var(--panel);border-top:2px solid var(--line);z-index:40}
+.nbtn{background:var(--grad);color:#fff;border:0;border-radius:1rem;padding:.25em 1.6em;font-weight:800;font-size:1rem;min-width:7em;height:75%}
+.nbtn:disabled{opacity:.3}
+.sbtn{border:2px solid var(--line);background:var(--panel2);border-radius:1rem;padding:.25em .8em;font-size:.85rem;height:75%}
+#counter{font-size:.9rem;font-weight:700;color:var(--muted);min-width:5em;text-align:center}
+.mid{display:flex;align-items:center;gap:1vw;flex:1;justify-content:center}
+.drawer{position:fixed;top:0;bottom:9vh;left:0;width:min(30rem,92vw);background:var(--panel);border-right:2px solid var(--line);z-index:60;overflow:auto;padding:1vh 1vw;transform:translateX(-105%);transition:transform .3s}
+.drawer.open{transform:none}
+.mi{display:flex;gap:.6em;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:.25em .3em;font-size:.65rem}
+.mi:hover{background:var(--panel2)}.mi.cur{background:var(--panel2);font-weight:800;color:var(--accent)}
+.mi .n{width:2em;color:var(--muted)}
+.mh{font-size:.55rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin:.8em 0 .1em}
+@media(prefers-reduced-motion:reduce){.slide{transition:none}.hot{animation:none}}
+
+.try{flex:none;background:color-mix(in srgb,var(--warn) 16%,var(--panel));border:2px solid var(--warn);border-radius:1rem;padding:.35em 1em;font-size:.85rem}
+.flow{flex:1;min-height:0;position:relative;display:flex;justify-content:space-between;align-items:stretch;padding:1.5vh 2vw;background:var(--panel2);border:2px solid var(--line);border-radius:1rem}
+.fbox{width:34%;background:var(--panel);border:3px solid var(--line);border-radius:1rem;padding:.5em .8em;transition:border-color .4s,box-shadow .4s;overflow:auto}
+.fbox.act{border-color:var(--accent);box-shadow:0 0 0 .25em color-mix(in srgb,var(--accent) 25%,transparent)}
+.fbox h4{margin:0 0 .3em;font-size:.8rem;color:var(--accent)}
+.fbox .fl,.fbox .fr{font-size:.85rem}
+.fpk{position:absolute;top:50%;left:18%;transform:translate(-50%,-50%);background:#ffd43b;color:#14142b;border-radius:.8rem;padding:.25em .8em;font-weight:800;font-size:.8rem;transition:left 1s ease,opacity .4s;white-space:nowrap;box-shadow:0 3px 10px #0004;z-index:2}
+.fcap{flex:none;font-size:1rem;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.4em 1em}
+.addr{font-family:ui-monospace,Consolas,monospace;font-size:.85rem;padding:.5em .8em;overflow:auto;word-break:break-all}
+.addr mark{background:#ffd43b;color:#14142b;border-radius:.2em;padding:0 .2em}
+.why{font-size:.85rem;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.4em .9em}
+.hintbox{flex:none;font-size:.9rem;background:var(--panel);border:2px solid var(--accent);border-radius:1rem;padding:.3em 1em}
+
+/* ek bileşenler */
+:root{--u:.055rem}
+.bxd{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto;padding:1vh;background:var(--panel2)}
+.ly{transition:background .5s,border-color .5s,padding .3s,border-width .3s;box-sizing:content-box}
+.ly-m{background:#f9cc9d}
+.ly-b{background:#fddc69;border-style:solid;border-color:#c79100}
+.ly-p{background:#c1e1a6}
+.ly-c{background:#8ec5f0;color:#0b3a66;display:grid;place-items:center;font-size:.7rem;font-weight:800;text-align:center;transition:width .3s,height .3s,background .5s}
+.ly.off{background:transparent!important;border-color:transparent!important}
+.ly-c.off{color:transparent}
+.legend{font-size:.8rem;display:grid;gap:.3em;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.4em .9em}
+.legend i{display:inline-block;width:1.1em;height:.8em;border-radius:.2em;vertical-align:middle;border:1px solid #0003}
+.legend .tot{border-top:1px solid var(--line);padding-top:.3em}
+.anat{font-family:ui-monospace,Consolas,monospace;font-size:1.7rem;line-height:1.6;background:var(--code-bg);border:2px solid var(--line);border-radius:1rem;padding:.6em .9em}
+.ap{cursor:pointer;border-radius:.2em;padding:0 .05em;border-bottom:3px dotted var(--muted)}
+.ap:hover{background:var(--panel2)}.ap.on{background:#ffd43b;color:#14142b;border-bottom-color:transparent}
+.sbox{flex:1;min-height:0;overflow:auto;background:#fff;color:#14183a;font-family:system-ui,Arial,sans-serif;font-size:.8rem;padding:.4em .6em}
+.sbox h1{font-size:1.3rem;margin:.2em 0}.sbox nav a{margin-right:.8em}.sbox p,.sbox ul{margin:.3em 0}
+.rules{display:grid;gap:.4em;padding:.6em .8em;background:var(--panel)}
+.ru{display:flex;align-items:center;gap:.5em;padding:.25em .5em;border:2px solid var(--line);border-radius:.7em;font-size:.8rem}
+.ru small{color:var(--muted);margin-left:auto}.ru .win{display:none;background:var(--ok);color:#fff;border-radius:.5em;padding:0 .5em;font-weight:800;font-size:.65rem}
+.ru.w{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--panel))}.ru.w .win{display:inline}
+.bsb{flex:1;display:flex;flex-direction:column;justify-content:center;gap:.5em;padding:.5em .8em;background:var(--panel2);overflow:auto}
+.rul{height:calc(10 * var(--u));background:gray;border-radius:.2em;min-height:6px}
+.bxx{background:lightblue;color:#0b2a4a;font-weight:800;text-align:left}
+.bsr{font-weight:600;text-transform:none;letter-spacing:0}
+.pane textarea{resize:vertical}
+.chgmsg{flex:1;text-align:center;color:#0b8a45;font-weight:800;text-transform:none;letter-spacing:0;font-size:.5rem;padding:0 .5em}
+.chgmsg.rem{color:#d63a3f}
+.chgl{background:rgba(16,185,129,.22);border-left:.25em solid #10b981;margin-left:-.8em;padding-left:.55em;animation:chgfl 1.6s ease-out}
+@keyframes chgfl{0%{background:rgba(16,185,129,.7)}100%{background:rgba(16,185,129,.22)}}
+
+.plus{display:inline-block;font-size:.85em;font-weight:800;background:color-mix(in srgb,var(--accent2) 22%,transparent);border:1px solid var(--accent2);border-radius:99px;padding:0 .6em;margin-right:.3em}
+.rl{display:block;margin-left:-.8em;padding-left:.55em;border-left:.25em solid transparent;white-space:pre;cursor:default}
+.rl.on{background:rgba(245,158,11,.22);border-left-color:#f59e0b}
+.rl.hv{background:rgba(37,99,235,.22);border-left-color:#2563eb}
+.tree .f.tr-sel{background:#bfdbfe;color:#14142b;font-weight:800}
+.tree .f.tr-par{background:#fed7aa;color:#14142b}
+.tree .f.tr-ch{background:#bbf7d0;color:#14142b}
+.tree .f.tr-gc{background:#dcfce7;color:#14142b}
+.tree .f.tr-sib{background:#e9d5ff;color:#14142b}
+.tree .f.tr-m{outline:3px solid #f59e0b;outline-offset:-2px}
+.exl{flex:1;min-height:0;display:grid;gap:1.2vh;overflow:auto;align-content:start}
+.exr{background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.4em 1em;font-size:.85rem}
+.exg{font-weight:800;color:var(--accent)}
+.ext{margin:.2em 0}
+.exr details{margin:.2em 0}.exr summary{cursor:pointer;font-weight:700}
+.exh{padding:.3em .8em;background:var(--panel2);border-radius:.5em}
+.exs{margin:.3em 0;padding:.5em .8em;background:var(--code-bg);border:2px solid var(--line);border-radius:.6em;font-size:.75rem;overflow:auto;color:var(--c-text)}
+.slide.app .appbox{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.4vw;flex:1;min-height:0;overflow:hidden}
+.slide.app .appbox .c1,.slide.app .appbox .c2{display:flex;flex-direction:column;gap:1vh;min-height:0;min-width:0}
+.slide.app .appbox .c{font-size:.72rem;line-height:1.3;padding:.7vh .9vw;overflow:auto;min-height:0}
+.slide.app .appbox .c1 .c:last-child{flex:1}
+.slide.app .appbox h3{font-size:.8rem}.slide.app .appbox p{margin:0 0 .3em}.slide.app .appbox li{margin:.1em 0}
+.appprev{flex:1;min-height:0;display:flex}
+.appprev .pane{flex:1;color:var(--text)}.appprev .pane-h{color:#14183a}
+.slide.app .h{font-size:1.35rem}
+@media(max-aspect-ratio:1/1){.slide.app .appbox{grid-template-columns:1fr;overflow:visible}.appprev{min-height:40vh}.slide.app .appbox .c{overflow:visible}}
+
+/* C2: gerçek sayfa maketleri */
+.usebar{font-size:.8rem;background:color-mix(in srgb,#f59e0b 16%,transparent);border-left:.3em solid #f59e0b;padding:.25em .8em;border-radius:.5em}
+.infobar{font-size:.75rem;color:var(--muted);min-height:1.4em}
+.infobar b{color:var(--accent)}
+.cr.site{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+.cr.site .pane{min-height:0;max-height:100%}
+.mockwrap{flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start;overflow:auto;background:#eef0f7}
+.mockbox{position:relative;flex:none}
+.mockbox iframe{position:absolute;left:0;top:0;transform-origin:0 0;background:#fff;flex:none;border:0}
+.sl{display:block;margin-left:-.8em;padding-left:.55em;border-left:.25em solid transparent;cursor:default}
+.sl.on{background:rgba(245,158,11,.22);border-left-color:#f59e0b}
+.sl.hv{background:rgba(37,99,235,.22);border-left-color:#2563eb}
+.mx{border-collapse:collapse;font-size:.7rem;width:100%}
+.mx th,.mx td{border:1px solid var(--line);padding:.2em .5em;text-align:center}
+.mx th{background:var(--panel2)}.mx td:first-child{text-align:left;font-family:ui-monospace,Consolas,monospace;font-weight:800;color:var(--c-tag)}
+.mx td.y{background:color-mix(in srgb,var(--ok) 22%,transparent);font-weight:800}
+.mx td.z{color:var(--bad);font-weight:800}
+.tblwrap{flex:1;min-height:0;overflow:auto;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:1vh 1vw}
+.fnote{font-size:.7rem;color:var(--muted)}
+@media(max-aspect-ratio:1/1){.cr.site{grid-template-columns:minmax(0,1fr);flex:none}.mockwrap{min-height:45vh}.ctrls .seg{flex-wrap:wrap}.slide .body,.usebar,.infobar{min-width:0;max-width:100%}.ctrls{max-width:100%}}
+@media(min-aspect-ratio:1/1){.cr.site{grid-template-columns:minmax(0,2.3fr) minmax(0,1fr)}.cr.site.vm,.cr.site.vk{grid-template-columns:minmax(0,1fr)}}
+.slide.sitesl{gap:.8vh}.slide.sitesl .h{font-size:1.35rem}.slide.sitesl .say{font-size:.72rem;line-height:1.3}
+.usebar{font-size:.72rem}.infobar{font-size:.68rem}.cr.site .pane pre{font-size:.62rem}.slide.sitesl .ctrls{font-size:.7rem}.slide.sitesl .seg button{font-size:.7rem}
+.pane pre,.pane textarea{font-size:.8rem}
+.cr.one .pane pre{font-size:.9rem}
+.defbox{flex:1;display:flex;flex-direction:column;justify-content:center;gap:3vh}
+.defbig{font-size:1.45rem;font-weight:600;background:var(--panel);border:2px solid var(--line);border-left:.5rem solid var(--accent);border-radius:1rem;padding:.6em 1em}
+.defrow{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5vw}
+.defrow>div{background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.5em .8em;font-size:1.05rem;font-weight:700}
+.dk{display:block;font-size:.75rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.defnote{font-size:.95rem;color:var(--muted)}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:.95rem;background:var(--panel);border:2px solid var(--line);border-radius:1rem;overflow:hidden;margin:auto 0}
+.tbl th,.tbl td{padding:.45em .7em;border-bottom:2px solid var(--line);text-align:left;vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{background:var(--panel2);color:var(--accent);font-size:1rem}
+.tbl td:first-child{font-weight:800;color:var(--muted);white-space:nowrap}
+.tbl code{color:var(--c-tag);font-weight:700}
+.okb{background:color-mix(in srgb,var(--ok) 25%,var(--panel))!important;border-color:var(--ok)!important}
+.nob{background:color-mix(in srgb,var(--bad) 22%,var(--panel))!important;border-color:var(--bad)!important}
+.qz{flex:1;display:grid;gap:2vh;align-content:center}
+.qc{background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.6em 1em;display:flex;flex-direction:column;gap:.6vh}
+.qq{font-size:1.05rem;font-weight:700}
+.qo{display:grid;grid-template-columns:1fr 1fr;gap:.6vh 1vw}
+.qb{text-align:left;background:var(--panel2);border:2px solid var(--line);border-radius:.7em;padding:.25em .7em;font-size:.88rem}
+.qb b{color:var(--accent);margin-right:.3em}
+.qa{font-size:.88rem;min-height:1.3em;color:var(--muted)}
+.qz.n1 .qq{font-size:1.25rem}.qz.n1 .qb{font-size:1.05rem;padding:.6em .9em}.qz.n1 .qa{font-size:1rem}
+.ozet{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5vw;align-items:stretch}
+.oz{background:var(--panel);border:2px solid var(--line);border-top:.5rem solid var(--accent);border-radius:1rem;padding:.7em .9em;display:flex;flex-direction:column;gap:.6em;font-size:.95rem;justify-content:center}
+.oz h4{margin:0;font-size:1.15rem;color:var(--accent)}
+.oz code{color:var(--c-tag);font-weight:800}
+.oz.o2{border-top-color:var(--accent2)}.oz.o3{border-top-color:var(--pink)}
+.sozluk{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:1.2vh 1.2vw;align-content:center}
+.sozluk>div{background:var(--panel);border:2px solid var(--line);border-radius:.8rem;padding:.35em .7em;font-size:.82rem;color:var(--muted)}
+.sozluk b{display:block;font-size:.95rem;color:var(--text)}
+.kapanis{flex:1;display:grid;grid-template-columns:1fr 1.3fr;gap:2vw;align-items:center}
+.kc{background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.8em 1em;display:flex;flex-direction:column;gap:.6em;font-size:.95rem}
+.kc h4{margin:0;font-size:1.15rem;color:var(--accent)}
+.kc.nx{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--panel))}
+.kc code{color:var(--c-tag);font-weight:700}
+.slide.app .appbox .c{font-size:.74rem}
+.slide.app .kn{display:flex;flex-wrap:wrap;gap:.4em}
+.slide.app .kn span{background:#ffffff26;border-radius:.5em;padding:.1em .5em}
+.slide.app .appbox .c2 .knw{flex:none}
+.slide.app .appbtn{font-size:.9rem}
+.exr{font-size:.9rem}.exs{font-size:.8rem}
+.list .it{font-size:1.05rem}
+.pane-h,.cp{font-size:.62rem}
+.pane-h .seg button{font-size:.62rem}
+.mockwrap{align-items:center}
+
+.slide.app .appbox .c{font-size:.84rem}.slide.app .appbox h3{font-size:.9rem}
+/* ===== U4 S2 · konuya özel ===== */
+code.big{font-size:1.25em;color:var(--c-tag);font-weight:800;background:var(--code-bg);border:2px solid var(--line);border-radius:.4em;padding:0 .3em}
+.defbig code{color:var(--c-tag);font-weight:800}
+.defnote code,.defrow code{color:var(--c-tag);font-weight:800}
+.defrow.r4{grid-template-columns:repeat(4,1fr)}
+.bn2{font-size:1.05rem;color:var(--pink);font-weight:700}
+/* ağaç */
+.tv{flex:1;min-height:0;min-width:0;display:flex;align-items:center;justify-content:center;background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:1vh .5vw;overflow:hidden}
+.tv ul{display:flex;justify-content:center;margin:0;padding:1.2em 0 0;list-style:none;position:relative}
+.tv>ul{padding-top:0}
+.tv li{position:relative;padding:1.2em .3em 0;display:flex;flex-direction:column;align-items:center}
+.tv li::before,.tv li::after{content:'';position:absolute;top:0;right:50%;width:50%;height:1.2em;border-top:2px solid var(--muted)}
+.tv li::after{right:auto;left:50%;border-left:2px solid var(--muted)}
+.tv li:only-child::before,.tv li:only-child::after{display:none}
+.tv li:only-child{padding-top:0}
+.tv li:first-child::before,.tv li:last-child::after{border:0}
+.tv li:last-child::before{border-right:2px solid var(--muted);border-radius:0 .4em 0 0}
+.tv li:first-child::after{border-radius:.4em 0 0 0}
+.tv ul ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid var(--muted);height:1.2em}
+.tv>ul>li{padding-top:0}.tv>ul>li::before,.tv>ul>li::after{display:none}
+.nd{display:inline-flex;flex-direction:column;align-items:center;font-family:"JetBrains Mono","Cascadia Code",ui-monospace,Consolas,monospace;font-weight:800;font-size:.85rem;line-height:1.15;padding:.15em .55em;border:2px solid var(--line);border-radius:.55em;background:var(--panel2);color:var(--c-tag);cursor:pointer;transition:background .3s;white-space:nowrap}
+.nd i{font-style:normal;font-size:.68rem;color:var(--c-attr)}
+.nd small{font-family:system-ui,"Segoe UI",Arial,sans-serif;font-weight:600;font-size:.68rem;color:var(--muted)}
+.tv.big .nd{font-size:1.05rem}.tv.big .nd small{font-size:.75rem}
+.nd.m{background:#ffd43b;border-color:#f59e0b;color:#14142b}
+.nd.nw{animation:ndin .6s ease-out;border-color:var(--accent);box-shadow:0 0 0 .2em color-mix(in srgb,var(--accent) 30%,transparent)}
+@keyframes ndin{from{transform:scale(.3);opacity:0}}
+.nd.r-sel,.tlg .r-sel{background:#93c5fd;border-color:#2563eb}
+.nd.r-par,.tlg .r-par{background:#fdba74;border-color:#c2410c}
+.nd.r-ch,.tlg .r-ch{background:#86efac;border-color:#15803d}
+.nd.r-gc,.tlg .r-gc{background:#dcfce7;border-color:#86efac}
+.nd.r-sib,.tlg .r-sib{background:#d8b4fe;border-color:#7e22ce}
+.nd.m,.nd.m i,.nd.m small,.nd[class*="r-"],.nd[class*="r-"] i,.nd[class*="r-"] small{color:#14142b}
+.tlg{display:flex;gap:.8vw;flex-wrap:wrap}.tlg span{font-size:.85rem;font-weight:800;padding:.1em .8em;border-radius:99px;color:#14142b;border:2px solid}
+.cr.fen{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.cr.fen2{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
+.kurp{font-size:.85rem!important}
+.mini{flex:1;min-height:0;background:#fff;color:#14183a;font-family:system-ui,"Segoe UI",Arial,sans-serif;font-size:.95rem;line-height:1.4;padding:.4em .8em;overflow:hidden}
+.mini header{background:#14365c;color:#ffd23f;padding:.2em .6em;border-radius:.4em}
+.mini nav{display:inline;margin-left:.6em}.mini nav a{color:#cfe0ff;margin-right:.5em}
+.mini a{text-decoration:underline}
+.mini article{margin-top:.4em}.mini p{margin:.2em 0}
+.mini .yanit{border-left:4px solid #b8c9dc;padding:.1em .6em;margin:.3em 0}
+.mini .m{outline:3px dashed #f59e0b;outline-offset:2px;background:#fff3b0;color:#14142b!important}
+.seg.mk{display:flex;flex-wrap:wrap}.seg.mk button{font-size:.72rem;border-bottom:2px solid var(--line)}
+.cr.site .pane pre{font-size:.8rem}
+.fin{width:9em}
+/* yaşam döngüsü */
+.lcs{background:#2e1a7a;border-radius:1rem;display:flex;align-items:center;justify-content:center;min-height:0;border:2px solid var(--line)}
+.lcn{position:relative;font-family:system-ui,Arial,sans-serif;transform:scale(2.2)}
+.lca{color:orange;font-size:22px;padding:.1em .3em;border-radius:.2em;text-decoration:underline;transition:all .3s}
+.lcm{position:absolute;right:-1.3em;bottom:-1.1em;font-size:22px;transition:all .3s}
+.rules.lcr{flex:1;align-content:center;background:transparent;padding:0}
+.rules.lcr .ru{font-size:.9rem;padding:.5em .7em}
+.rules.lcr .ru code{font-size:.85rem}
+/* ilk satır */
+.ilw{background:var(--panel2);border:2px solid var(--line);border-radius:1rem;padding:1vh 1vw;display:flex;align-items:center;min-height:0}
+.ilb{background:#fff;color:#14183a;border:3px dashed #f59e0b;border-radius:.6rem;padding:.4em .8em;width:100%;font-family:Georgia,serif;font-size:1.15rem;line-height:1.5;transition:width .15s}
+.ilb p{margin:0}.ilb p::first-line{background-color:orange;color:black}
+/* hayalet */
+.hyr{flex:1;display:flex;align-items:center;justify-content:center;background:#fff;color:#14183a}
+.hyr h3{font-family:system-ui,Arial,sans-serif;font-size:2.1rem;margin:0}
+.gh{color:seagreen;outline:3px dashed #9ca3af;outline-offset:4px;border-radius:.2em}
+.ghl{color:var(--muted);font-style:italic;border:1px dashed var(--muted);padding:0 .3em;border-radius:.3em}
+/* sözde eleman görseli */
+.psv{font-family:Georgia,serif;font-size:1.45rem;line-height:1.9;background:#fff;color:#14183a;border:2px solid var(--line);border-radius:1rem;padding:.5em 1em}
+.ps-b,.ps-a{font-family:ui-monospace,Consolas,monospace;font-size:.8rem;color:#4b5563;border:2px dashed #9ca3af;border-radius:.4em;padding:0 .4em;margin:0 .3em;vertical-align:middle}
+.ps-f{font-size:2.2rem;font-weight:800;color:crimson;outline:3px solid crimson;outline-offset:2px;line-height:1}
+.ps-l{background:#ffd9a0}
+.plg2{display:flex;gap:1vw;flex-wrap:wrap}.plg2 span{font-size:.95rem;font-weight:700;padding:.2em .8em;border-radius:99px;border:3px solid var(--line);background:var(--panel)}
+.plg2 .k1{border-color:crimson}.plg2 .k2{border-color:#f59e0b}.plg2 .k3{border-color:#9ca3af;border-style:dashed}
+/* diğer sözde sınıflar */
+.dsz{flex:1;display:grid;grid-template-columns:1.4fr 1fr;gap:2vw;align-items:center}
+.dszc{background:var(--panel);border:2px solid var(--line);border-radius:1rem;padding:.8em 1em;display:flex;flex-direction:column;gap:.9em;font-size:1rem}
+.dszc label{display:flex;gap:.5em;align-items:center}
+.dszc input{width:1.3em;height:1.3em;accent-color:var(--accent)}
+.dszc input:checked{outline:4px solid var(--ok);outline-offset:3px}
+.dszc button{font-size:.95rem;padding:.3em .8em;border-radius:.6em;border:2px solid var(--line);background:var(--panel2)}
+.dszc button:disabled{opacity:.45;cursor:not-allowed}
+.dszc .bos{height:1.6em;border:2px dashed var(--line);border-radius:.4em}
+.dszc .bos:empty{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.dszc small{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div id="stage"></div>
+<div id="menu" class="drawer"></div>
+<div id="bottom">
+  <button class="sbtn" id="bMenu" title="Slayt listesi (M)">&#9776;</button>
+  <div class="mid">
+    <button class="nbtn" id="prev">&larr; Geri</button>
+    <div id="counter"></div>
+    <button class="nbtn" id="next">İleri &rarr;</button>
+  </div>
+  <button class="sbtn" id="bTheme" title="Tema (T)">&#9680;</button>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escA(s){return esc(s).replace(/"/g,'&quot;')}
+const TIMERS=[];
+function clearTimers(){while(TIMERS.length)clearInterval(TIMERS.pop())}
+
+/* ---------- kod renklendirme ---------- */
+function hlCSS(css){
+  return esc(css).replace(/([^{}]+)\{([^{}]*)\}/g,(m,sel,body)=>(sel.match(/^\s*/)[0])+'<span class="t-tag">'+sel.replace(/^\s+/,'').replace(/\s+$/,'')+'</span>'+(sel.match(/\s*$/)[0])+'{'+body.replace(/([a-z-]+)(\s*:\s*)([^;]+)(;?)/g,(x,p,c,v,s)=>'<span class="t-cssp tk" data-k="c:'+p+'">'+p+'</span>'+c+'<span class="t-str">'+v+'</span>'+s)+'}');
+}
+function hl2(code){
+  const parts=[];let i=0;
+  const re=/(<!--[\s\S]*?-->)|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/g;let m;
+  while((m=re.exec(code))){
+    parts.push(esc(code.slice(i,m.index)));
+    if(m[1]){parts.push('<span class="t-com">'+esc(m[1])+'</span>');i=re.lastIndex;continue}
+    let a=m[4],self='';
+    if(/\/\s*$/.test(a)){self='/';a=a.replace(/\/\s*$/,'')}
+    const nm=m[3].toLowerCase();
+    const at=a.replace(/([^\s=]+)(?:(=)("[^"]*"|'[^']*'|[^\s]+))?/g,(x,n,e,v)=>'<span class="t-attr tk" data-k="a:'+escA(n)+'">'+esc(n)+'</span>'+(v?'<span class="t-pun">'+esc(e)+'</span><span class="t-str tk" data-k="a:'+escA(n)+'">'+esc(v)+'</span>':''));
+    parts.push('<span class="t-pun">&lt;'+esc(m[2])+'</span><span class="t-tag tk" data-k="t:'+nm+'">'+m[3]+'</span>'+at+'<span class="t-pun">'+self+'&gt;</span>');
+    i=re.lastIndex;
+    if(nm==='style'&&!m[2]){const e=code.indexOf('</style>',i);if(e>-1){parts.push(hlCSS(code.slice(i,e)));i=e;re.lastIndex=e}}
+  }
+  parts.push(esc(code.slice(i)));
+  return parts.join('');
+}
+function copyText(t,btn){
+  const done=()=>{const o=btn.textContent;btn.textContent='Kopyalandı';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok')},1200)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb();
+  function fb(){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()}
+}
+
+/* ---------- sonuç penceresi ---------- */
+function pageCss(mode,fs){
+  if(mode==='raw')return '<style>body{font:'+fs+'vw/1.45 system-ui,"Segoe UI",Arial,sans-serif;color:#14183a;background:#fff}img{max-width:100%}</style>';
+  const base=`body{font:${fs}vw/1.4 system-ui,"Segoe UI",Arial,sans-serif;margin:0;color:#14183a;background:#fff;scroll-behavior:smooth}img{max-width:100%}`+
+  `label{display:block;font-weight:700;margin:.35em 0 .1em}input,select,textarea,button{font:inherit;padding:.15em .4em;margin:.1em 0;max-width:100%}input[type=checkbox],input[type=radio]{padding:0;margin:.1em .4em .1em 0}label>input{font-weight:400}`+
+  `button{background:#6d4aff;color:#fff;border:0;border-radius:.4em;padding:.25em .9em;font-weight:700;cursor:pointer}button[type=reset]{background:#6b7390}`+
+  `fieldset{border:1px solid #aab2d6;border-radius:.5em;margin:.4em 0;padding:.2em .7em}legend{font-weight:800;color:#5b36f2;padding:0 .3em}`+
+  `a.dugme,button.dugme{display:inline-block;background:#6d4aff;color:#fff;padding:.25em .9em;border-radius:.5em;border:0;text-decoration:none;font:inherit;font-weight:700}`+
+  `:target{background:#fff3b0!important}.sol{color:#8a90ab;font-weight:400}`;
+  if(mode==='plain')return '<style>'+base+'body{margin:.5em}h2{margin:.15em 0;font-size:1.3em}p{margin:.15em 0}a{color:#5b36f2}</style>';
+  return '<style>'+base+`body{background:#f3f4fb}header,.ust{background:linear-gradient(135deg,#6d4aff,#a14bff);color:#fff;padding:.4em .8em}header h1{margin:0;font-size:1.4em;font-weight:800}header p{margin:0}nav{background:#fff;padding:.3em .8em;border-bottom:1px solid #e2e6f3}nav a{margin-right:.7em}a{color:#6d4aff;font-weight:700}main{display:block;padding:.2em .6em}section,article,details,.kart{background:#fff;border-radius:.5em;padding:.3em .7em;margin:.3em 0;box-shadow:0 1px 5px #0002}h2,h3{margin:.1em 0;font-size:1.15em}p{margin:.1em 0}aside{background:#fff4c9;margin:.3em .6em;padding:.3em .7em;border-radius:.5em}footer{background:#232846;color:#cfd4ef;padding:.4em .8em;font-size:.85em}table{border-collapse:collapse}td,th{border:1px solid #bbb;padding:.1em .5em}</style>`;
+}
+const RUN_JS='<script>(function(){'+
+ 'var t;function toast(m){var d=document.getElementById("__t");if(!d){d=document.createElement("div");d.id="__t";d.style.cssText="position:fixed;left:.4em;right:.4em;bottom:.4em;background:#232846;color:#fff;padding:.4em .7em;border-radius:.5em;font:700 12px/1.3 system-ui,Arial;z-index:9;box-shadow:0 2px 8px #0006";document.body.appendChild(d)}d.textContent=m;d.style.display="block";clearTimeout(t);t=setTimeout(function(){d.style.display="none"},3500)}'+
+ 'document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(!a)return;var h=a.getAttribute("href");if(h===null){toast("href yok: bu bir bağlantı değil, tıklayınca bir şey olmaz");e.preventDefault();return}if(h.charAt(0)==="#"&&h.length>1)return;e.preventDefault();'+
+ 'var m;if(/^mailto:/.test(h))m="E-posta programı açılırdı: "+h.slice(7);else if(/^tel:/.test(h))m="Telefon araması başlardı: "+h.slice(4);else if(a.hasAttribute("download"))m="Dosya indirilirdi: "+h;else m="Giderdi: "+h+(a.getAttribute("target")==="_blank"?" (YENİ sekmede)":" (aynı sekmede)");toast(m)},true);'+
+ 'document.addEventListener("submit",function(e){e.preventDefault();var f=e.target,d=new FormData(f),s=[];d.forEach(function(v,k){s.push(k+"="+(v&&v.name!==undefined?v.name:v))});var o=document.getElementById("__out");if(!o){o=document.createElement("pre");o.id="__out";o.style.cssText="background:#e8f8ee;color:#064;padding:.4em;border-radius:.4em;font:700 .85em ui-monospace,Consolas,monospace;white-space:pre-wrap;margin:.3em .6em";f.parentNode.insertBefore(o,f.nextSibling)}o.textContent="Sunucuya giden: "+(s.join("&")||"(hiçbir şey: alanlarda name yok ya da hepsi boş)")},true);'+
+ '})()<\/script>';
+function runDoc(code,o){
+  const ol=o.outline?'<style>'+o.outline+'{outline:.2em dashed #f59e0b!important;outline-offset:-.1em;box-shadow:0 0 0 .3em #f59e0b66!important}</style>':'';
+  const sc=o.outline?'<script>try{var e=document.querySelector('+JSON.stringify(o.outline)+');if(e)e.scrollIntoView({block:"center"})}catch(x){}<\/script>':'';
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'+pageCss(o.css||'club',o.fs||3)+ol+'</head><body>'+prepImg(code)+RUN_JS+sc+(o.js?'<script>'+o.js+'<\/script>':'')+'</body></html>'}
+/* "Özellik yok / var" önce-sonra düğmesi */
+function ctl(html){const d=document.createElement('div');d.className='ctrls';d.innerHTML=html;return d}
+function offSeg(host,before,apply){
+  const c=ctl('<div class="seg"><button data-v="0">Özellik yok</button><button data-v="1" class="on">Özellik var</button></div>');
+  host.insertBefore(c,before||null);
+  $$('button',c).forEach(x=>x.onclick=()=>{$$('button',c).forEach(y=>y.classList.remove('on'));x.classList.add('on');apply(x.dataset.v==='1')});
+}
+
+/* ---------- kod/sonuç parçaları ---------- */
+function mkPane(code,o){
+  o=o||{};
+  const p=document.createElement('div');p.className='pane code';
+  p.innerHTML='<div class="pane-h"><span>'+esc(o.name||'Kod')+'</span><span class="chgmsg"></span><button class="cp">Kopyala</button></div>';
+  const pre=document.createElement('pre');p.appendChild(pre);
+  const msg=$('.chgmsg',p);let msgT=null;
+  const ta=document.createElement('textarea');ta.spellcheck=false;ta.style.display='none';p.appendChild(ta);
+  let cur=code,edit=false,onChange=null,first=true;
+  /* o.band: {s:'başlangıç satırı regex', e:'bitiş satırı regex (yoksa tek satır)'} ya da dizi */
+  const bands=()=>{const L=cur.split('\n'),R=[];
+    [].concat(o.band||[]).forEach(b=>{const rs=new RegExp(b.s);const a=L.findIndex(l=>rs.test(l));if(a<0)return;let z=a;
+      if(b.e){const re=new RegExp(b.e);for(let j=a;j<L.length;j++)if(re.test(L[j])){z=j;break}}
+      R.push([a,z])});
+    return R};
+  /* önceki ve yeni kod arasındaki değişen satır aralığı */
+  const diff=(a,b)=>{const A=a.split('\n'),B=b.split('\n');let s=0;while(s<A.length&&s<B.length&&A[s]===B[s])s++;let e=0;while(e<A.length-s&&e<B.length-s&&A[A.length-1-e]===B[B.length-1-e])e++;return {s:s,add:B.length-s-e,rem:A.length-s-e}};
+  const render=(prev)=>{
+    const keep=pre.scrollTop,keepL=pre.scrollLeft;
+    let h=(o.lang==='css'&&typeof hlCSS==='function')?hlCSS(cur):hl2(cur);
+    const R=bands();let D=null;
+    if(prev!=null&&prev!==cur){D=diff(prev,cur);if(!D.add&&!D.rem)D=null}
+    const isB=i=>R.some(r=>i>=r[0]&&i<=r[1]),isC=i=>D&&D.add>0&&i>=D.s&&i<D.s+D.add;
+    if(R.length||(D&&D.add>0)){const Ls=h.split('\n');h=Ls.map((l,i)=>{const c=(isB(i)?'reg ':'')+(isC(i)?'chgl':'');return c?'<span class="'+c.trim()+'" style="display:block">'+(l||' ')+'</span>':l+(i<Ls.length-1?'\n':'')}).join('')}
+    pre.innerHTML=h;(o.hl||[]).forEach(k=>$$('.tk[data-k="'+k+'"]',pre).forEach(x=>x.classList.add('hot')));
+    if(first){first=false;const r=$('.reg',pre);if(r)pre.scrollTop=Math.max(0,r.offsetTop-pre.clientHeight/3)}
+    else{pre.scrollTop=keep;pre.scrollLeft=keepL}
+    clearTimeout(msgT);
+    if(D){const t=D.add>0?'+ '+D.add+' satır eklendi (satır '+(D.s+1)+(D.add>1?'-'+(D.s+D.add):'')+', yeşil)':'− '+D.rem+' satır çıkarıldı (satır '+(D.s+1)+' civarı)';msg.textContent=t;msg.classList.toggle('rem',D.add===0);msgT=setTimeout(()=>{msg.textContent=''},7000)}
+    else msg.textContent='';
+  };
+  render();
+  $('.cp',p).onclick=e=>copyText(cur,e.target);
+  if(o.edit){
+    const b=document.createElement('button');b.className='cp';b.textContent='✎ Düzenle';$('.pane-h',p).insertBefore(b,$('.cp',p));
+    b.onclick=()=>{edit=!edit;
+      if(edit){
+        const rem=parseFloat(getComputedStyle(document.documentElement).fontSize)||16;
+        const ph=Math.max(p.getBoundingClientRect().height,13*rem);
+        p.style.minHeight=ph+'px';
+        ta.value=cur;ta.style.display='block';ta.style.flex='1 1 auto';ta.style.minHeight=(ph-2*rem)+'px';
+        const st=pre.scrollTop;pre.style.display='none';ta.scrollTop=st;b.textContent='✓ Bitti'}
+      else{const st=ta.scrollTop;cur=ta.value;ta.style.display='none';p.style.minHeight='';pre.style.display='block';b.textContent='✎ Düzenle';first=false;render();pre.scrollTop=st;onChange&&onChange(cur)}};
+    ta.addEventListener('input',()=>{cur=ta.value;onChange&&onChange(cur)});
+  }
+  return {el:p,set(c,h){const prev=cur;cur=c;if(h)o.hl=h;if(edit){const st=ta.scrollTop;ta.value=c;ta.scrollTop=st}render(prev)},get:()=>cur,onChange(f){onChange=f}};
+}
+function mkRes(code,o){
+  o=o||{};
+  const p=document.createElement('div');p.className='pane';
+  p.innerHTML='<div class="pane-h"><span>Sonuç'+(o.outline?' <small>(turuncu çerçeve = bu parça)</small>':'')+'</span></div>';
+  const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts');fr.title='Sonuç';p.appendChild(fr);
+  const upd=c=>{fr.srcdoc=runDoc(c,o)};upd(code);
+  return {el:p,set:upd};
+}
+function codeRes(host,code,o){
+  o=o||{};
+  const cr=document.createElement('div');cr.className='cr'+(o.run===false?' one':'');
+  const left=document.createElement('div');left.className='col';
+  const cp=mkPane(code,o);left.appendChild(cp.el);
+  if(o.note){const b=document.createElement('div');b.className='balloon';b.innerHTML=o.note;left.appendChild(b)}
+  cr.appendChild(left);
+  let rs=null;
+  if(o.run!==false){rs=mkRes(code,o);cr.appendChild(rs.el)}
+  host.appendChild(cr);
+  if(o.edit&&rs)cp.onChange(c=>rs.set(c));
+  if(o.off&&rs){let saved=code;offSeg(host,cr,on=>{if(!on){saved=cp.get();const c=saved.replace(new RegExp(o.off,'g'),'');cp.set(c,[]);rs.set(c)}else{cp.set(saved,o.hl);rs.set(saved)}})}
+  return {set(c,h){cp.set(c,h);if(rs)rs.set(c)},cp,rs};
+}
+const IMG_DATA='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d4aff"/><stop offset="1" stop-color="#1b1b3a"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><circle cx="380" cy="70" r="32" fill="#ffd166"/><path d="M0 270 L140 160 L240 220 L340 140 L480 270Z" fill="rgba(255,255,255,.35)"/></svg>');
+function prepImg(c){return c.replace(/(src|poster)="[^"]+\.(jpg|jpeg|png|gif)"/g,'$1="'+IMG_DATA+'"').replace(/url\((['"]?)[^)'"]+\.(jpg|jpeg|png|gif)\1\)/g,'url("'+IMG_DATA+'")')}
+const APPS=[
+{
+ ad:`1. Kulüpler Panosu`,
+ baslik:`Kuzey Lisesi Kulüpler Panosu`,
+ ozet:`Senaryo: Kuzey Lisesi rehberlik servisi, koridordaki kulüp panosunu okul sitesine taşımak istiyor. Her kulübün bir kutusu, danışmanı ve iç içe bir etkinlik listesi var. İçerik sık değiştiği için HTML'e mümkün olduğunca az sınıf yazılacak: görünüm, elemanların birbirine göre yerinden (ağaçtaki konumundan) gelmeli.`,
+ haftalar:[`U4 S2: HTML ağacı (iç içe liste)`,`U4 S2: çocuk seçici (>)`,`U4 S2: torun seçici (boşluk)`,`U4 S1: sınıf seçici, sayfa içi CSS`,`U3: header, main, section, footer, iç içe ul`],
+ adimlar:[`İskeleti kur ve içeriği yaz. Kulüp kutularına yalnız <code>class="kulup"</code> ver; başka hiçbir etikete sınıf ya da kimlik verme.`,`Kâğıda sayfanın ağacını çiz: bir alt madde (li) kaç kat aşağıda? Kimin çocuğu, kimin torunu?`,`Üst banttaki h1 ve p ile kulüp kutularındaki h2 ve p farklı görünmeli. Hangi kapsayıcıdan, hangi işaretle seçersin?`,`Ana maddeler kalın, alt maddeler normal ve gri olsun. Ana madde "bir alt seviye", alt madde "li'nin içindeki li" demek.`,`Danışman adları renkli olsun ama footer'daki kalın yazı bundan etkilenmesin.`,`F12 → Elements'te bir alt maddeye tıkla; Styles panelinde hangi kuralların uyduğunu oku.`],
+ olcut:[`HTML'de yalnız section etiketlerinde <code>class="kulup"</code> var; başka class/id yok`,`En az 3 çocuk (<code>&gt;</code>) ve 2 torun (boşluk) seçici kullanıldı`,`Üst banttaki h1 ve p, kulüp kutularındaki başlık ve paragraftan farklı görünüyor`,`Ana maddeler kalın; alt maddeler normal ağırlıkta ve gri`,`Danışman adları renkli; footer'daki kalın yazı başka renkte`,`Alt listeler (ul) li'nin İÇİNDE; HTML ağacı doğru kurulmuş`,`F12'de bir alt maddeye uyan kurallar okunabiliyor`],
+ hatalar:[`<code>.kulup &gt; li</code> yazmak: li, section'ın değil ul'nin çocuğudur; hiçbir şey seçilmez.`,`Alt maddeler de kalın çıkıyor: kalınlık üst maddeden içeri geçer. Alt maddeler için ayrı bir torun kuralı yaz.`,`Alt <code>ul</code>'yi iki li'nin arasına yazmak: ağaç değişir, <code>li li</code> eşleşmez.`],
+ ekstra:{metin:`Her kulüp kutusunda yalnız başlığın HEMEN ARDINDAN gelen paragrafı seç. İpucu: bitişik kardeş seçicisi <code>h2 + p</code>; kardeş fikrini bugün ağaçta gördük.`,link:`https://developer.mozilla.org/en-US/docs/Web/CSS/Next-sibling_combinator`,ad:`MDN: Next-sibling combinator`},
+ css:`  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f4f1fa;
+      color: #2b2240;
+    }
+    header {
+      background-color: rebeccapurple;
+      color: white;
+      padding: 14px 24px;
+    }
+    header > h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    header > p {
+      margin: 4px 0 0;
+      color: #e6dcff;
+    }
+    main {
+      padding: 4px 24px;
+    }
+    .kulup {
+      background-color: white;
+      border-left: 6px solid rebeccapurple;
+      border-radius: 8px;
+      padding: 6px 18px;
+      margin: 12px 0;
+    }
+    .kulup > h2 {
+      color: rebeccapurple;
+      margin: 4px 0;
+    }
+    .kulup > p {
+      color: #5b4f73;
+      margin: 4px 0;
+    }
+    .kulup b {
+      color: #b4235a;
+    }
+    .kulup > ul > li {
+      font-weight: bold;
+      margin: 6px 0;
+    }
+    .kulup li li {
+      font-weight: normal;
+      color: #5b4f73;
+    }
+    footer {
+      text-align: center;
+      color: #5b4f73;
+      padding: 12px;
+    }
+    footer b {
+      color: rebeccapurple;
+    }
+  </style>`,
+ govde:`<header>
+  <h1>Kuzey Lisesi Kulüpler Panosu</h1>
+  <p>2026–2027 güz dönemi · Başvurular 4 Aralık Cuma günü kapanıyor</p>
+</header>
+<main>
+  <section class="kulup">
+    <h2>Robotik Kulübü</h2>
+    <p>Danışman: <b>Selda Aydın</b> · Salı 15.30 · Atölye 2</p>
+    <ul>
+      <li>Çizgi izleyen robot projesi
+        <ul>
+          <li>9. sınıflar için başlangıç grubu</li>
+          <li>Malzemeler okuldan karşılanır</li>
+        </ul>
+      </li>
+      <li>Bölge robot yarışmasına hazırlık
+        <ul>
+          <li>Takım seçmeleri 11 Aralık'ta</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+  <section class="kulup">
+    <h2>Münazara Kulübü</h2>
+    <p>Danışman: <b>Kerem Yıldız</b> · Perşembe 15.30 · Konferans salonu</p>
+    <ul>
+      <li>Haftalık serbest münazara
+        <ul>
+          <li>Konular bir hafta önce duyurulur</li>
+          <li>Her öğrenci ayda en az bir kez konuşur</li>
+        </ul>
+      </li>
+      <li>Liseler arası münazara turnuvası</li>
+    </ul>
+  </section>
+  <section class="kulup">
+    <h2>Doğa ve Çevre Kulübü</h2>
+    <p>Danışman: <b>Nur Korkmaz</b> · Cuma 14.40 · Biyoloji laboratuvarı</p>
+    <ul>
+      <li>Okul bahçesinde kompost köşesi
+        <ul>
+          <li>Kantin atıklarından gübre üretimi</li>
+        </ul>
+      </li>
+      <li>Ayda bir doğa yürüyüşü
+        <ul>
+          <li>Aralık: Kocaçay vadisi (veli izni gerekir)</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+</main>
+<footer>Başvuru: kulüp danışmanına ya da <b>rehberlik servisine</b> adını yazdır.</footer>`
+},
+{
+ ad:`2. Şehir Otobüs Hatları`,
+ baslik:`Yeşilvadi Belediyesi · Otobüs Hatları`,
+ ozet:`Senaryo: Yeşilvadi Belediyesi otobüs hatları sayfasını yeniliyor. Yolcular "bu hatlara baktım mı?", "şu an hangi kutudayım?" sorularını sayfadan anlayabilmeli. Menü, arama kutusu, hat kutuları ve sefer bağlantıları kullanıcının hareketine tepki vermeli. Her hattın kalkış ve son durağı öne çıkmalı; durak listeleri sık değiştiği için li'lere sınıf yazılmayacak.`,
+ haftalar:[`U4 S2: :link, :visited, :hover, :active`,`U4 S2: :focus`,`U4 S2: :first-child, :last-child`,`U4 S2: çocuk seçici (>)`,`U3: form, label, input, ol`],
+ adimlar:[`İçeriği yaz: menü, arama formu, üç hat kutusu (her birinde durak listesi ve sefer bağlantısı).`,`Menü bağlantıları dört durumda dört farklı görünmeli. Kuralları hangi sırayla yazmalısın?`,`Kullanıcı arama kutusunda olduğunu görsün; fareyle de Tab tuşuyla da çalışmalı.`,`Kalkış ve son durak, HTML'e sınıf eklenmeden öne çıksın. Listede "ilk" ve "son" olmak hangi seçicilerle anlatılır?`,`Hat kutusu fareyle işaretlenince belirginleşsin; sefer bağlantısı menüden farklı görünsün.`,`F12 → Styles → <b>:hov</b> ile bir menü bağlantısını :hover durumuna zorla, kuralını kontrol et.`],
+ olcut:[`Menü bağlantısının 4 durumu ayrı; kurallar L-V-H-A sırasında`,`Arama kutusu odaklanınca zemini ve çerçevesi değişiyor`,`Her hattın ilk ve son durağı farklı renkte; bu li'lerde sınıf yok`,`Fare bir hat kutusunun üstüne gelince kutu belirginleşiyor`,`Sefer bağlantıları menüden farklı görünüyor (çocuk seçiciyle ayrıldı)`,`CSS'te <code>outline: none</code> yok; odak her zaman görünüyor`],
+ hatalar:[`<code>a:hover</code>'ı <code>a:visited</code>'dan önce yazmak: ziyaret edilmiş bağlantıda hover rengi hiç görünmez.`,`<code>ol:first-child</code> yazmak: bu, ilk durağı değil, ol'nin KENDİSİNİN ilk çocuk olup olmadığını sorar.`,`<code>nav &gt; a :hover</code> (boşluklu) yazmak: "a'nın içindeki, üstünde durulan eleman" anlamına gelir; çalışmaz.`],
+ ekstra:{metin:`Arama kutusu odaktayken bütün arama formunun zemini değişsin. İpucu: içindeki bir eleman odaktayken kapsayıcıyı seçen <code>:focus-within</code> sözde sınıfı.`,link:`https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within`,ad:`MDN: :focus-within`},
+ css:`  <style>
+    body {
+      font-family: Verdana, sans-serif;
+      margin: 0;
+      background-color: #eef5f0;
+      color: #1d2b22;
+    }
+    header {
+      background-color: #1f7a4d;
+      color: white;
+      padding: 12px 24px;
+    }
+    header > h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+    nav > a {
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    nav > a:link {
+      color: white;
+    }
+    nav > a:visited {
+      color: #c9f2dc;
+    }
+    nav > a:hover {
+      background-color: #ffd23f;
+      color: #1d2b22;
+    }
+    nav > a:active {
+      background-color: white;
+    }
+    main {
+      padding: 6px 24px;
+    }
+    .ara {
+      background-color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+    }
+    .ara input {
+      font-size: 16px;
+      padding: 6px;
+      border: 2px solid #9bb8a6;
+      border-radius: 6px;
+    }
+    .ara input:focus {
+      border-color: #1f7a4d;
+      background-color: #fffbe6;
+    }
+    .hat {
+      background-color: white;
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 6px 18px;
+      margin: 12px 0;
+    }
+    .hat:hover {
+      border-color: #1f7a4d;
+    }
+    .hat > h2 {
+      color: #1f7a4d;
+      font-size: 20px;
+      margin: 4px 0;
+    }
+    .hat li:first-child {
+      font-weight: bold;
+      color: #1f7a4d;
+    }
+    .hat li:last-child {
+      font-weight: bold;
+      color: #c2410c;
+    }
+    .hat > a:link {
+      color: #1f5fa8;
+    }
+    .hat > a:visited {
+      color: #7a4a9e;
+    }
+    .hat > a:hover {
+      background-color: #ffd23f;
+    }
+    footer {
+      background-color: #1d2b22;
+      color: #dfe9e3;
+      padding: 10px 24px;
+    }
+  </style>`,
+ govde:`<header>
+  <h1>Yeşilvadi Belediyesi · Otobüs Hatları</h1>
+  <nav>
+    <a href="hatlar.html">Hatlar</a>
+    <a href="duraklar.html">Duraklar</a>
+    <a href="kentkart.html">Kent Kart</a>
+    <a href="iletisim.html">İletişim</a>
+  </nav>
+</header>
+<main>
+  <form class="ara">
+    <label for="hat">Hat ya da durak ara</label>
+    <input type="text" id="hat" placeholder="ör. 12 ya da Hastane">
+    <button type="submit">Ara</button>
+  </form>
+  <section class="hat">
+    <h2>12 · Otogar – Devlet Hastanesi</h2>
+    <p>Her 15 dakikada bir · İlk sefer 06.00, son sefer 23.30</p>
+    <ol>
+      <li>Otogar</li>
+      <li>Cumhuriyet Meydanı</li>
+      <li>Belediye Sarayı</li>
+      <li>Devlet Hastanesi</li>
+    </ol>
+    <a href="12-saatler.html">Sefer saatlerini gör</a>
+  </section>
+  <section class="hat">
+    <h2>27 · Üniversite – Sahil</h2>
+    <p>Her 20 dakikada bir · İlk sefer 06.30, son sefer 00.00</p>
+    <ol>
+      <li>Üniversite Kampüsü</li>
+      <li>Fen Lisesi</li>
+      <li>Çarşı</li>
+      <li>Balıkçı Barınağı</li>
+      <li>Sahil Parkı</li>
+    </ol>
+    <a href="27-saatler.html">Sefer saatlerini gör</a>
+  </section>
+  <section class="hat">
+    <h2>40 · Organize Sanayi – Toki Konutları</h2>
+    <p>Yalnız hafta içi · Her 30 dakikada bir</p>
+    <ol>
+      <li>Organize Sanayi</li>
+      <li>Kent Kart Merkezi</li>
+      <li>Toki Konutları</li>
+    </ol>
+    <a href="40-saatler.html">Sefer saatlerini gör</a>
+  </section>
+</main>
+<footer>Kayıp eşya ve öneriler: 0 (312) 555 12 12 · Alo 153</footer>`
+},
+{
+ ad:`3. Kalem Edebiyat Dergisi`,
+ baslik:`Kalem · Sayı 7`,
+ ozet:`Senaryo: Atatürk Anadolu Lisesi edebiyat kulübü, basılı dergisi "Kalem"in yeni sayısını internette yayınlayacak. Sayfa basılı dergi gibi görünmeli: paragrafların ilk harfi büyük, alıntıların iki yanında büyük tırnaklar, yazar adlarının başında kalem işareti. Yazılar her ay değiştiği için süslemeler HTML'e değil CSS'e yazılacak; editör yalnız düz metni değiştirecek.`,
+ haftalar:[`U4 S2: ::first-letter, ::first-line`,`U4 S2: ::before, ::after, content`,`U4 S2: ::selection`,`U4 S2: :hover, çocuk seçici`,`U3: article, blockquote, header, footer`],
+ adimlar:[`İçeriği yaz: iki yazı (article) ve bir duyuru bölümü. Tırnak, ok ve kalem karakterlerini HTML'e yazma.`,`Basılı dergideki gibi yazı paragraflarının ilk harfi büyük ve renkli, ilk satırı kalın olsun.`,`Yazar satırının başına kalem işareti, alıntıların iki yanına büyük tırnak gelsin. Hepsi CSS'ten.`,`Duyuru bağlantılarının sonuna ok eklensin; fareyle üstüne gelince belirginleşsin.`,`Okur bir cümleyi seçince seçim rengi derginin rengi olsun.`,`Pencereyi daralt: ilk satırdaki kelimeler nasıl değişiyor? F12'de <b>::before</b> düğümlerini bul.`],
+ olcut:[`Yazar satırının başındaki kalem (✒) CSS'ten geliyor`,`Alıntıların iki yanındaki tırnaklar CSS'ten geliyor`,`Yazı paragraflarının ilk harfi büyük ve renkli, ilk satırı kalın`,`Duyuru bağlantılarının sonunda " →" var; fareyle üstüne gelince renkleri değişiyor`,`Metin seçilince seçim rengi derginin bordo rengi`,`Her ::before / ::after kuralında <code>content</code> var`,`HTML'de tırnak, ok ya da kalem karakteri elle yazılmamış`],
+ hatalar:[`<code>content</code> yazmamak: ::before ve ::after hiç oluşmaz, hata mesajı da çıkmaz.`,`Değeri tırnaksız yazmak (<code>content: →;</code>): içerik metni her zaman "…" içinde yazılır.`,`Yazar satırını da p yapıp <code>.yazi &gt; p::first-letter</code> yazmak: yazar adının da ilk harfi büyür. Yazar satırını div yap ya da sınıfla ayır.`],
+ ekstra:{metin:`Duyuru bölümüne kısa bir liste ekle ve madde işaretlerini derginin bordo rengine boya. İpucu: liste işaretini seçen <code>::marker</code> sözde elemanı.`,link:`https://developer.mozilla.org/en-US/docs/Web/CSS/::marker`,ad:`MDN: ::marker`},
+ css:`  <style>
+    body {
+      font-family: Georgia, serif;
+      margin: 0;
+      background-color: #fbf7ef;
+      color: #2e2a24;
+    }
+    header {
+      background-color: #2e2a24;
+      color: #fbf7ef;
+      text-align: center;
+      padding: 14px;
+    }
+    header > h1 {
+      margin: 0;
+      font-size: 44px;
+      letter-spacing: 6px;
+    }
+    header > p {
+      margin: 4px 0 0;
+      font-style: italic;
+    }
+    main {
+      padding: 4px 28px;
+    }
+    .yazi {
+      background-color: white;
+      padding: 6px 22px;
+      margin: 14px 0;
+      border-radius: 6px;
+    }
+    .yazi > h2 {
+      color: #8b2e16;
+      margin: 6px 0 2px;
+    }
+    .yazar {
+      color: #7a6f60;
+      font-style: italic;
+    }
+    .yazar::before {
+      content: "✒ ";
+    }
+    .yazi > p::first-letter {
+      font-size: 34px;
+      font-weight: bold;
+      color: #8b2e16;
+    }
+    .yazi > p::first-line {
+      font-weight: bold;
+    }
+    blockquote {
+      font-style: italic;
+      color: #5a5246;
+    }
+    blockquote::before {
+      content: "“ ";
+      font-size: 30px;
+      color: #8b2e16;
+    }
+    blockquote::after {
+      content: " ”";
+      font-size: 30px;
+      color: #8b2e16;
+    }
+    .duyuru {
+      background-color: #fff1c9;
+      padding: 6px 22px;
+      border-radius: 6px;
+    }
+    .duyuru > a {
+      color: #8b2e16;
+      margin-right: 14px;
+    }
+    .duyuru > a::after {
+      content: " →";
+    }
+    .duyuru > a:hover {
+      background-color: #8b2e16;
+      color: white;
+    }
+    ::selection {
+      background-color: #8b2e16;
+      color: white;
+    }
+    footer {
+      text-align: center;
+      color: #7a6f60;
+      padding: 12px;
+    }
+  </style>`,
+ govde:`<header>
+  <h1>KALEM</h1>
+  <p>Atatürk Anadolu Lisesi edebiyat kulübü dergisi · Sayı 7 · Kasım 2026</p>
+</header>
+<main>
+  <article class="yazi">
+    <h2>Ekransız Bir Hafta</h2>
+    <div class="yazar">Defne Ak, 10-B</div>
+    <p>Geçen hafta telefonumu kapattım ve yalnız kâğıt kitap okudum. İlk iki gün elim sürekli cebime gitti; üçüncü gün bir romanın kırk sayfasını tek oturuşta bitirdiğimi fark ettim.</p>
+    <p>En çok şaşırdığım şey, okuduklarımı ertesi gün hâlâ hatırlamamdı. Ekrandan okuduğum yazılar ise akşam olmadan aklımdan siliniyordu.</p>
+    <blockquote>Bir kitabı bitirmek değil, onunla birlikte değişmek önemli.</blockquote>
+  </article>
+  <article class="yazi">
+    <h2>Kantin Kuyruğunda Haiku</h2>
+    <div class="yazar">Emir Çelik, 11-A</div>
+    <p>Haiku, üç dizeden oluşan kısa bir Japon şiir biçimidir. Kulüpte bu ay herkes okul hayatından bir an yakaladı. Benimki teneffüs zilinin hemen ardından:</p>
+    <blockquote>Zil çaldı, koştuk / tost makinesi tıslıyor / sıra hâlâ uzun</blockquote>
+  </article>
+  <section class="duyuru">
+    <h2>Bu ayın yarışması</h2>
+    <p>"Pencereden ne görüyorsun?" konulu öykü yarışmasına son katılım 18 Aralık.</p>
+    <a href="kurallar.html">Katılım kuralları</a>
+    <a href="eski-sayilar.html">Eski sayılar</a>
+  </section>
+</main>
+<footer>Kalem · Yayın kurulu: Edebiyat Kulübü · Danışman: Gül Ertem</footer>`
+},
+{
+ ad:`4. Mini proje: Gözlemevi`,
+ baslik:`Kuzey Yıldızı Gözlemevi`,
+ ozet:`Senaryo: Kuzey Yıldızı Gözlemevi, aralık ayındaki halka açık gözlem gecelerini duyuran tek sayfalık bir site istiyor: menü, giriş yazısı, etkinlik takvimi, gözlem ipuçları ve kayıt formu. Sayfa gece temalı olacak ve ziyaretçinin her hareketine (fare, tıklama, klavye) tepki verecek. Takvim her ay güncelleneceği için "sıradaki" ve "son" etkinlik sınıfla değil konumla belirlenecek.`,
+ haftalar:[`U4 S2: çocuk ve torun seçici`,`U4 S2: bağlantı durumları, :focus, :first-child, :last-child`,`U4 S2: ::before, ::first-letter, ::first-line, ::selection`,`U4 S1: sınıf ve kimlik seçici`,`U3: form, select, label, nav`],
+ adimlar:[`Sayfayı yaz: menü, giriş, takvim (4 etkinlik), ipucu bölümü, kayıt formu.`,`Ağacı çiz. Her stil için önce "bu elemana ağaçta hangi yoldan ulaşırım?" diye sor; yeni sınıf eklemeden önce ilişki seçicisini dene.`,`Menü, takvim satırları, form alanları ve düğme kullanıcının hareketine tepki versin (fare, basılı tutma, klavye odağı).`,`Sıradaki etkinlik öne çıksın, son etkinlik sönük dursun; HTML'e ek sınıf yazmadan.`,`Logodaki ve etkinlik notlarındaki süs işaretleri, giriş paragrafının büyük ilk harfi ve seçim rengi CSS'ten gelsin.`,`Bitince arkadaşınla değiş: onun sayfasında F12 ile 3 ilişki, 3 durum, 2 sözde eleman kuralı bul.`],
+ olcut:[`Menü bağlantılarının dört durumu L-V-H-A sırasıyla yazılmış`,`Takvimde ilk etkinlik vurgulu, son etkinlik sönük; li'lerde ek sınıf yok`,`Etkinlik satırının üstüne gelince satır belirginleşiyor`,`Form alanları odaklanınca belli oluyor; düğme basılı tutulunca değişiyor`,`Logo ve not işaretleri ::before ile; giriş paragrafının ilk harfi ::first-letter ile`,`Tarihler (b) yalnız takvimde renkli; logo bundan etkilenmiyor`,`Seçim rengi (::selection) gece temasına uygun`,`HTML'de süs karakteri (✦, •) elle yazılmamış`],
+ hatalar:[`<code>.takvim:first-child</code> yazmak: bu, takvim bölümünün kendisini sorar; doğrusu takvimin içindeki ilk li.`,`Süs işaretini hem HTML'e hem <code>content</code>'e yazmak: işaret iki kez görünür.`,`Tarihleri <code>b</code> etiket seçicisiyle boyamak: logo da boyanır. Kapsayıcıyla daralt (<code>.takvim b</code>).`],
+ ekstra:{metin:`Menüdeki "Kayıt ol" bağlantısına tıklanınca adres <code>#kayit</code> olur; o anda form kısa süre vurgulansın. İpucu: adresteki #kimlikle eşleşen elemanı seçen <code>:target</code> sözde sınıfı.`,link:`https://developer.mozilla.org/en-US/docs/Web/CSS/:target`,ad:`MDN: :target`},
+ css:`  <style>
+    body {
+      font-family: "Trebuchet MS", sans-serif;
+      margin: 0;
+      background-color: #0f1b3d;
+      color: #e8ecff;
+    }
+    header {
+      background-color: #08112b;
+      padding: 12px 24px;
+    }
+    .logo {
+      font-size: 24px;
+      color: #ffd166;
+    }
+    .logo::before {
+      content: "✦ ";
+    }
+    nav > a {
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    nav > a:link {
+      color: #e8ecff;
+    }
+    nav > a:visited {
+      color: #b9c3ff;
+    }
+    nav > a:hover {
+      background-color: #ffd166;
+      color: #08112b;
+    }
+    nav > a:active {
+      background-color: white;
+    }
+    main {
+      padding: 4px 24px;
+    }
+    main h2 {
+      color: #ffd166;
+    }
+    .giris > p::first-letter {
+      font-size: 40px;
+      font-weight: bold;
+      color: #ffd166;
+    }
+    .takvim li {
+      padding: 6px 10px;
+      margin: 4px 0;
+      border-radius: 8px;
+      background-color: #1a2a5c;
+    }
+    .takvim li:first-child {
+      background-color: #2b4190;
+      border-left: 6px solid #ffd166;
+    }
+    .takvim li:last-child {
+      color: #9aa6d6;
+    }
+    .takvim li:hover {
+      background-color: #36509f;
+    }
+    .takvim b {
+      color: #ffd166;
+    }
+    .etkinlik span {
+      color: #9fe3c1;
+      font-size: 14px;
+    }
+    .etkinlik span::before {
+      content: " • ";
+    }
+    .ipucu p::first-line {
+      font-weight: bold;
+    }
+    input:focus, select:focus {
+      background-color: #fff7d6;
+      outline: 3px solid #ffd166;
+    }
+    button {
+      background-color: #ffd166;
+      color: #08112b;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: white;
+    }
+    button:active {
+      font-size: 18px;
+    }
+    ::selection {
+      background-color: #ffd166;
+      color: #08112b;
+    }
+    footer {
+      text-align: center;
+      color: #9aa6d6;
+      padding: 12px;
+    }
+  </style>`,
+ govde:`<header>
+  <b class="logo">Kuzey Yıldızı Gözlemevi</b>
+  <nav>
+    <a href="index.html">Ana sayfa</a>
+    <a href="etkinlikler.html">Etkinlikler</a>
+    <a href="gokyuzu.html">Bu ay gökyüzü</a>
+    <a href="#kayit">Kayıt ol</a>
+  </nav>
+</header>
+<main>
+  <section class="giris">
+    <h1>Aralık gözlem geceleri</h1>
+    <p>Teleskopla Satürn'ün halkalarını, Ay'ın kraterlerini ve Geminid meteor yağmurunu birlikte izleyelim. Etkinlikler ücretsizdir; hava bulutluysa bir sonraki cumartesiye ertelenir.</p>
+  </section>
+  <section class="takvim">
+    <h2>Etkinlik takvimi</h2>
+    <ul>
+      <li class="etkinlik"><b>5 Aralık</b> Satürn ve halkaları <span>12 yer kaldı</span></li>
+      <li class="etkinlik"><b>13 Aralık</b> Geminid meteor yağmuru <span>Gece yarısına kadar</span></li>
+      <li class="etkinlik"><b>19 Aralık</b> Ay'da kraterler <span>Çocuklar için</span></li>
+      <li class="etkinlik"><b>27 Aralık</b> Kış takımyıldızları <span>Yılın son etkinliği</span></li>
+    </ul>
+  </section>
+  <section class="ipucu">
+    <h2>Gözleme gelmeden önce</h2>
+    <p>Kalın giyin; gece sıcaklığı 0 °C'nin altına düşebilir. Kırmızı ışıklı fener getirin: beyaz ışık gözün karanlığa alışmasını bozar.</p>
+  </section>
+  <form id="kayit">
+    <h2>Kayıt ol</h2>
+    <label for="ad">Ad soyad</label>
+    <input type="text" id="ad">
+    <label for="tarih">Etkinlik</label>
+    <select id="tarih">
+      <option>5 Aralık · Satürn</option>
+      <option>13 Aralık · Geminid</option>
+      <option>19 Aralık · Ay</option>
+      <option>27 Aralık · Takımyıldızlar</option>
+    </select>
+    <button type="submit">Kaydımı yap</button>
+  </form>
+</main>
+<footer>Kuzey Yıldızı Gözlemevi · Yaylabaşı Mevkii · Her cumartesi 20.00–23.00</footer>`
+}
+];
+APPS.forEach(a=>{if(a.sayfalar&&!a.govde)a.govde=a.sayfalar[0].govde});
+
+const CKJS=`(function(){var R=[];
+function sz(){parent.postMessage({ck:1,h:Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)},'*')}
+function mark(a,sel){var x=document.querySelectorAll('['+a+']');for(var i=0;i<x.length;i++)x[i].removeAttribute(a);var n=0;if(sel){try{var q=document.querySelectorAll(sel);n=q.length;for(var j=0;j<q.length;j++)q[j].setAttribute(a,'')}catch(e){}}return n}
+addEventListener('message',function(e){var d=e.data||{};if(d.rules)R=d.rules;if('hi' in d)mark('data-hl',d.hi);if('hv' in d){var n=mark('data-hv',d.hv);parent.postMessage({ck:1,n:n,k:d.k},'*')}});
+document.addEventListener('mouseover',function(e){var el=e.target,idx=[];for(var i=0;i<R.length;i++){try{if(el.matches(R[i]))idx.push(i)}catch(x){}}var c=typeof el.className==='string'&&el.className.trim()?'.'+el.className.trim().split(/\\s+/).join('.'):'';parent.postMessage({ck:1,over:idx,el:el.tagName.toLowerCase()+c},'*')});
+document.documentElement.addEventListener('mouseleave',function(){parent.postMessage({ck:1,over:[],el:''},'*')});
+document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(a)e.preventDefault()},true);
+document.addEventListener('submit',function(e){e.preventDefault()},true);
+addEventListener('load',sz);var t=0,iv=setInterval(function(){sz();if(++t>14)clearInterval(iv)},300);
+})();`;
+function ckDoc(style,html){return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'+style+'<style>[data-hl]{outline:3px dashed #f59e0b!important;outline-offset:-3px}[data-hv]{outline:3px solid #2563eb!important;outline-offset:-3px;background-image:linear-gradient(rgba(37,99,235,.2),rgba(37,99,235,.2))!important}</style></head><body>'+prepImg(html)+'<script>'+CKJS+'<\/script></body></html>'}
+const CKS=[];
+addEventListener('message',e=>{const d=e.data;if(!d||!d.ck)return;const m=CKS.find(x=>x.fr.contentWindow===e.source);if(m)m.onMsg(d)});
+function mkFrame(doc,LW,title,est){
+  const el=document.createElement('div');el.className='pane mock';
+  el.innerHTML='<div class="pane-h"><span>'+title+'</span></div><div class="mockwrap"><div class="mockbox"><iframe sandbox="allow-scripts" title="Sayfa maketi"></iframe></div></div>';
+  const wrap=$('.mockwrap',el),box=$('.mockbox',el),fr=$('iframe',el);let ch=0,got=false;est=est||Math.round(LW*.62);
+  const fit=()=>{const W=wrap.clientWidth,Hh=wrap.clientHeight;if(!W||!Hh)return;const h=ch||est;const sc=Math.min(W/LW,Hh/h,3);box.style.width=LW*sc+'px';box.style.height=h*sc+'px';fr.style.width=LW+'px';fr.style.height=h+'px';fr.style.transform='scale('+sc+')'};
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(wrap);
+  const api={el,fr,fit,send(m){try{fr.contentWindow.postMessage(m,'*')}catch(e){}},onMsg:null,ready:null};
+  api.onMsg=d=>{if(d.h&&d.h!==ch){const first=!got;got=true;ch=d.h;fit();if(first&&api.ready)api.ready()}if(api.extra)api.extra(d)};
+  fr.style.width=LW+'px';fr.style.height=est+'px';fr.style.transform='scale(.25)';box.style.width=LW*.25+'px';box.style.height=est*.25+'px';
+  CKS.push(api);fr.srcdoc=doc;return api;
+}
+
+/* ---------- ağaç yardımcıları ---------- */
+function parseBody(html){const d=new DOMParser().parseFromString('<!DOCTYPE html><html><head></head><body>'+html+'</body></html>','text/html');let n=0;const all=[d.body,...d.body.querySelectorAll('*')];all.forEach(e=>e.setAttribute('data-n',n++));return {doc:d,body:d.body,all}}
+function nodeLab(e){let t='';for(const c of e.childNodes)if(c.nodeType===3)t+=c.nodeValue;t=t.replace(/\s+/g,' ').trim();return t.length>13?t.slice(0,12)+'…':t}
+function treeHTML(root,vis){
+  const rec=e=>{const n=+e.getAttribute('data-n');if(vis&&!vis(n))return '';const kids=[...e.children].map(rec).filter(Boolean);
+    const cl=e.className?'.'+String(e.className).split(' ')[0]:'';
+    return '<li><span class="nd" data-n="'+n+'">'+e.tagName.toLowerCase()+(cl?'<i>'+esc(cl)+'</i>':'')+(nodeLab(e)?'<small>'+esc(nodeLab(e))+'</small>':'')+'</span>'+(kids.length?'<ul>'+kids.join('')+'</ul>':'')+'</li>'};
+  return '<ul>'+rec(root)+'</ul>';
+}
+function miniOf(P){const m=document.createElement('div');m.className='mini';m.innerHTML=P.body.innerHTML;return m}
+function lines(code,on){return code.split('\n').map((l,i)=>'<span class="sl'+(on&&on.includes(i)?' on':'')+'">'+(hl2(l)||' ')+'</span>').join('')}
+
+/* koşan örnek: BitKafa ağaç parçası */
+const AG_CODE=`<body>
+  <header>
+    <b>BitKafa</b>
+    <nav>
+      <a>Konular</a>
+      <a>Kurallar</a>
+    </nav>
+  </header>
+  <article>
+    <p>Hız nasıl <b>bulunur</b>?</p>
+  </article>
+</body>`;
+const AG_HTML=AG_CODE.replace(/^<body>\n|\n<\/body>$/g,'');
+
+/* gerçek sayfa maketleri */
+const MAKET={
+forum:{n:'BitKafa forumu (bitmiş hâli)',w:720,h:420,
+ css:`body{margin:0;font-family:Arial,sans-serif;font-size:17px;background:#eef3f8;color:#1c2733}
+header{background:#14365c;padding:8px 16px}.logo{color:#ffd23f;font-size:22px;margin-right:18px}
+nav{display:inline}nav>a{color:white;text-decoration:none;padding:3px 10px;border-radius:6px;margin-right:4px}
+nav>a:hover{background:#ffd23f;color:#14365c}
+.konu{background:white;margin:10px 14px;padding:6px 14px;border-radius:10px}
+.konu h2{font-size:20px;margin:6px 0;color:#14365c}.cozuldu::before{content:"✔ ";color:seagreen}
+.soru::first-letter{font-size:30px;font-weight:bold;color:#14365c}.konu p{margin:4px 0}
+.yanit{border-left:4px solid #b8c9dc;padding:4px 10px;margin:8px 0}.yanit:hover{background:#fffbe6}
+.yanit>b{color:#14365c}.yanit p b{background:#e2f6ea;color:#0b6b3a}
+.yanit .yanit{margin-left:24px;border-left-color:#ffd23f}
+textarea{width:95%;font:inherit;padding:4px;border:2px solid #b8c9dc}textarea:focus{border-color:#14365c;background:#fffbe6}
+::selection{background:#ffd23f;color:#14365c}`,
+ html:`<header><b class="logo">BitKafa</b><nav><a href="#">Konular</a><a href="#">Popüler</a><a href="#">Kurallar</a></nav></header>
+<article class="konu"><h2 class="cozuldu">Serbest düşmede 3. saniyedeki hız?</h2>
+<p class="soru">Taş 3 saniye boyunca serbest düşüyor. Hızını nasıl bulurum? <a href="#">Kitap s. 42</a></p>
+<div class="yanitlar"><div class="yanit"><b>Ece</b><p>v = g · t formülünü kullan: <b>29,4 m/s</b>.</p>
+<div class="yanit"><b>Arda</b><p>Teşekkürler, çözüldü!</p></div></div></div>
+<textarea rows="1" placeholder="Yanıtını yaz…"></textarea></article>`,
+ rules:[
+  ['nav > a','color: white;\npadding: 3px 10px;','nav > a','Çocuk: yalnız menünün kendi bağlantıları; yazıdaki "Kitap s. 42" etkilenmez.'],
+  ['nav > a:hover','background: #ffd23f;','nav > a','Durum: fareyle menüye gel (makette dene).'],
+  ['.yanit > b','color: #14365c;','.yanit > b','Çocuk: yanıtın kendi b\'si = yazar adı.'],
+  ['.yanit p b','background: #e2f6ea;','.yanit p b','Torun: paragraf içindeki b = sonuç vurgusu.'],
+  ['.yanit .yanit','margin-left: 24px;','.yanit .yanit','Torun: yanıtın içindeki yanıt içeri kayar.'],
+  ['.yanit:hover','background: #fffbe6;','.yanit','Durum: fare yanıt kutusunun üstündeyken.'],
+  ['textarea:focus','border-color: #14365c;','textarea','Durum: yazı kutusuna tıkla.'],
+  ['.cozuldu::before','content: "✔ ";','.cozuldu','Parça: HTML\'de olmayan onay işareti.'],
+  ['.soru::first-letter','font-size: 30px;','.soru','Parça: sorunun ilk harfi.']]},
+arama:{n:'Arama motoru sonuç sayfası',w:720,h:470,
+ css:`body{margin:0;font-family:Arial,sans-serif;font-size:16px;background:white;color:#202124}
+header{padding:10px 18px;border-bottom:1px solid #ddd}.marka{font-size:22px;font-weight:bold;color:#3367d6;margin-right:14px}
+input{font-size:16px;width:340px;padding:6px 14px;border:1px solid #ccc;border-radius:20px}input:focus{border-color:#3367d6;outline:2px solid #3367d6}
+.sonuc{padding:4px 18px;margin:8px 0}.yol{font-size:13px;color:#4d5156}.yol span::after{content:" › "}.yol span:last-child::after{content:""}
+.sonuc>a{display:block;font-size:20px;color:#1a0dab;text-decoration:none;margin:2px 0}.sonuc>a:hover{text-decoration:underline}
+.sonuc>a.v,.sonuc>a:visited{color:#681da8}.sonuc>p{margin:2px 0;font-size:14px;color:#4d5156}
+.reklam::before{content:"Sponsorlu · ";font-weight:bold;color:#202124;font-size:13px}`,
+ html:`<header><span class="marka">Bulgu</span><input value="serbest düşme formülü"></header>
+<div class="sonuc reklam"><div class="yol"><span>fizikdershanem.com</span><span>kampanya</span></div><a href="#">Fizik kursu %30 indirimli</a><p>Kayıtlar devam ediyor.</p></div>
+<div class="sonuc"><div class="yol"><span>ansiklopedi.org</span><span>fizik</span><span>serbest-dusme</span></div><a href="#" class="v">Serbest düşme: tanım ve formüller</a><p>Hava direnci yoksa cisim g ivmesiyle hızlanır: v = g · t.</p></div>
+<div class="sonuc"><div class="yol"><span>egitim.gov.tr</span><span>ders</span><span>fizik-9</span></div><a href="#">9. sınıf fizik: Hareket ve kuvvet</a><p>Konu anlatımı, çözümlü örnekler ve testler.</p></div>
+<div class="sonuc"><div class="yol"><span>bilimgunlugu.com</span><span>deney</span></div><a href="#">Evde serbest düşme deneyi</a><p>Telefon kronometresiyle g'yi ölçün.</p></div>`,
+ rules:[
+  ['.sonuc > a','color: #1a0dab;\nfont-size: 20px;','.sonuc > a','Çocuk: her sonucun başlık bağlantısı; açıklamadaki yazılar etkilenmez.'],
+  ['.sonuc > a:hover','text-decoration: underline;','.sonuc > a','Durum: başlığın üstüne gel, altı çizilir.'],
+  ['.sonuc > a:visited','color: #681da8;','.sonuc > a.v','Durum: daha önce tıkladığın sonuç mor (makette ikinci sonuç ziyaret edilmiş gibi).'],
+  ['input:focus','outline: 2px solid #3367d6;','input','Durum: arama kutusuna tıkla.'],
+  ['.yol span::after','content: " › ";','.yol span','Parça: adres parçalarının arasındaki ok HTML\'de yok.'],
+  ['.reklam::before','content: "Sponsorlu · ";','.reklam','Parça: reklam etiketi CSS\'ten eklenir.']]}
+};
+
+/* ---------- slayt tanımları ---------- */
+const S=[];
+const add=o=>S.push(o);
+const MG='Giriş',MA='A. HTML ağacı',MB='B. Çocuk ve torun seçici',MC='C. Sözde sınıflar: durumlar',MD='D. Sözde elemanlar: parçalar',ME='E. Gerçek hayatta',MF='F. Pekiştirme',MK='Kapanış';
+const K=x=>'<code class="i">'+esc(x)+'</code>';
+const PLUS=src=>'<span class="plus">➕ Kitabın ötesinde · '+src+'</span>';
+function cr(mod,h,say,code,o){add(Object.assign({t:'cr',mod:mod,h:h,say:say,code:code},o||{}))}
+
+/* ===== GİRİŞ ===== */
+add({t:'hero',mod:'Web Tabanlı Uygulama Geliştirme · U4 · S2',h:'Yerine, anına ve parçasına göre seç:<br>ilişki ve durum seçicileri',say:'Kitap 4.1.5 (s. 110–111, 118–124) · Koşan örnek: BitKafa öğrenci soru-cevap forumu'});
+add({t:'list',mod:MG,h:'🎯 Bu sunumun sonunda…',items:[
+ ['🌳','Bir HTML kodunun <b>ağacını</b> çizip çocuk, torun, kardeş ilişkisini söyleyeceksin'],
+ ['🎯','<b>A &gt; B</b> (çocuk) ve <b>A B</b> (torun) seçicilerini ayırt edeceksin'],
+ ['🖱️','Fare, tıklama ve klavyeye tepki veren <b>:hover, :focus</b>… kuralları yazacaksın'],
+ ['✂️','<b>::first-letter, ::before</b>… ile elemanın bir parçasını seçeceksin'],
+ ['⚖️','<b>:</b> ile <b>::</b> farkını açıklayacaksın']]});
+add({t:'cards',mod:MG,h:'🔗 Ön bilgi: S1 ve U3\'ten hatırla',n:3,items:[
+ ['🏷️','Üç temel seçici','<code>p</code> bütün p\'ler · <code>#nobet</code> tek eleman · <code>.kart</code> o sınıftakiler'],
+ ['➕','Çoklu seçici','<code>h1, .kart</code> → virgül "bunları da" demek'],
+ ['📦','İç içe etiket','U3: etiketler birbirinin içine yazılır; içteki önce kapanır']]});
+add({t:'demo',mod:MG,h:'❓ Sorun: BitKafa forumunda iki dert',say:'Forum yöneticisi Deniz: "Menü bağlantıları düğme gibi olsun, yazıdakiler olmasın. Bir de sayfa ölü gibi: fareyle üstüne gelince hiçbir şey olmuyor." Düğmelere sırayla bas.',build:'acilis'});
+add({t:'cards',mod:MG,h:'Bugün seçicilere üç yeni soru soracağız',n:3,items:[
+ ['🌳','NEREDE?','"Yalnız <b>menünün içindeki</b> bağlantılar" → ilişki seçicileri'],
+ ['⏱️','NE ZAMAN?','"Fare <b>üstündeyken</b>, kutuya <b>tıklanınca</b>" → sözde sınıflar'],
+ ['✂️','HANGİ PARÇA?','"Paragrafın <b>ilk harfi</b>, başına bir işaret" → sözde elemanlar']]});
+
+/* ===== A. HTML AĞACI ===== */
+add({t:'sec',mod:MA,em:'🌳',h:'A. HTML ağacı',say:'"Nerede?" sorusunu sormak için önce sayfanın haritasını çıkarmalıyız. Kitap s. 110–111'});
+add({t:'html',mod:MA,h:'İç içe etiketler bir ağaç oluşturur',html:`<div class="defbox"><div class="defbig">HTML'de her etiket, kendisini <b>kapsayan</b> etiketin bir <b>dalıdır</b>. En üstte <code>html</code>, görünen her şey <code>body</code>'nin altında.</div>
+<div class="bn2">Benzetme: soy ağacı. Kitap da aynı kelimeleri kullanır.</div>
+<div class="defrow r4"><div><span class="dk">Kapsayan · parent ("perınt")</span>bir üst seviye: ebeveyn</div><div><span class="dk">Çocuk · child ("çayld")</span>tam bir alt seviye</div><div><span class="dk">Torun · descendant</span>altındaki her seviye</div><div><span class="dk">Kardeş · sibling</span>aynı kapsayanın çocukları, aynı seviye</div></div></div>`});
+add({t:'demo',mod:MA,h:'Ağacı satır satır kuralım',say:'"Sonraki satır" ile ilerle: her açılış etiketi ağaca bir düğüm ekler. Düğüm, hangi etiketin içine yazıldıysa onun altına asılır.',build:'kur'});
+add({t:'demo',mod:MA,h:'🔍 Akrabalık gezgini',say:'Bir düğüme tıkla: kapsayanı, çocukları, torunları ve kardeşleri renklenir.',build:'gezgin'});
+add({t:'quiz',mod:MA,h:'✋ Hızlı kontrol: ağacı oku',qs:[
+ {q:'Ağaçtaki <code>nav</code> düğümünün kardeşi hangisi?',o:['a','b (BitKafa)','header','article'],c:1,a:'nav ve b ikisi de header\'ın çocuğudur; aynı seviyedeler. a\'lar nav\'ın çocuğudur.'},
+ {q:'"bulunur" yazan <code>b</code>, kimler tarafından kapsanır (yakından uzağa)?',o:['p → article → body','article → p → body','nav → header → body','yalnız p'],c:0,a:'Kitaptaki gibi: önce en yakın kapsayan (p), sonra article, en üstte body (ve html).'}]});
+
+/* ===== B. ÇOCUK VE TORUN ===== */
+add({t:'sec',mod:MB,em:'🎯',h:'B. Çocuk ve torun seçici',say:'Ağaçtaki konumla seçim: "şunun içindeki şu". Kitap 4.1.5.5 – 4.1.5.6'});
+add({t:'html',mod:MB,h:'Çocuk (child) seçici: A > B',html:`<div class="defbox"><div class="defbig"><code class="big">A &gt; B</code> → A'nın <b>tam bir alt seviyesindeki</b> (çocuğu olan) bütün B'leri seçer.</div>
+<div class="defrow"><div><span class="dk">Okunuşu</span>"A'nın çocuğu olan B"</div><div><span class="dk">İşaret</span><code>&gt;</code> büyüktür; boşluk konsa da olur</div><div><span class="dk">Neden?</span>B her yerde değil, yalnız A'nın hemen içindeyse</div></div>
+<div class="defnote">A ve B etiket, sınıf ya da kimlik olabilir: <code>nav &gt; a</code> · <code>.konu &gt; p</code> · <code>#menu &gt; li</code></div></div>`});
+cr(MB,'Çocuk seçici menüyü ayırır',`Açılıştaki dert: menü bağlantıları düğme olsun, paragraftaki bağlantı olmasın.`,
+`<style>
+  nav > a {
+    color: white;
+    background-color: teal;
+  }
+</style>
+<nav>
+  <a href="konular.html">Konular</a>
+  <a href="kurallar.html">Kurallar</a>
+</nav>
+<p>Bkz. <a href="kod.html">çözüm</a></p>`,{edit:true,band:{s:'nav > a'},fs:3.6,try:'<code>nav &gt; a</code> yerine yalnız <code>a</code> yaz. Paragraftaki bağlantıya ne oldu?'});
+add({t:'demo',mod:MB,h:'🔦 Ağaç feneri: çocuk seçici',say:'Bir seçiciye bas: eşleşen düğümler ağaçta ve sayfada turuncu yanar. Sıfır eşleşme de bir cevaptır!',build:'fener',cfg:'cocuk'});
+add({t:'html',mod:MB,h:'Torun (descendant) seçici: A B',html:`<div class="defbox"><div class="defbig"><code class="big">A B</code> → A'nın içindeki <b>bütün</b> B'leri seçer: çocuk, torun, torunun torunu…</div>
+<div class="defrow"><div><span class="dk">Okunuşu</span>"A'nın içindeki her B"</div><div><span class="dk">İşaret</span>tek bir <b>boşluk</b></div><div><span class="dk">Dikkat</span>Çocuklar da dahil: torun seçici daha geniş ağ atar</div></div>
+<div class="defnote">Kitap Tablo 4.5'te "AB" bitişik basılmış; arada boşluk olmalı: <code>A B</code>. Bitişik yazarsan tek bir ad sanılır.</div></div>`});
+cr(MB,'Torun seçici: içerideki her b',`Konu kutusundaki bütün kalın yazılar kırmızı; kutu dışındaki etkilenmez.`,
+`<style>
+  .konu b {
+    color: crimson;
+  }
+</style>
+<article class="konu">
+  <b>Ayşe soruyor:</b>
+  <p>g neden <b>9,8 m/s²</b>?</p>
+</article>
+<p>Forum <b>7/24</b> açık.</p>`,{edit:true,band:{s:'\\.konu b'},fs:3.6,try:'<code>.konu b</code> → <code>.konu &gt; b</code> yap. Hangi b söndü, neden?'});
+add({t:'demo',mod:MB,h:'⚖️ Aynı ağaç, iki işaret: > mı, boşluk mu?',say:'Bir çift seç, sonra işareti değiştir. Turuncu düğümler nasıl değişiyor?',build:'fener',cfg:'fark'});
+add({t:'quiz',mod:MB,h:'✋ Kitaptan: Başlık-1 ve Başlık-2 ne olur?',say:'HTML (iki soruda aynı): <code>&lt;div class="cerceve"&gt; &lt;h3&gt;Başlık-1&lt;/h3&gt; &lt;span&gt;&lt;h3&gt;Başlık-2&lt;/h3&gt;&lt;/span&gt; &lt;/div&gt;</code>',qs:[
+ {q:'CSS: <code>div &gt; h3 { color: purple; }</code>',o:['İkisi de mor','Yalnız Başlık-1 mor','Yalnız Başlık-2 mor','Hiçbiri'],c:1,a:'Başlık-1 div\'in çocuğu. Başlık-2 span\'ın çocuğu, div\'in torunu; > onu seçmez.'},
+ {q:'CSS: <code>.cerceve h3 { color: purple; }</code>',o:['İkisi de mor','Yalnız Başlık-1 mor','Yalnız Başlık-2 mor','Hiçbiri'],c:0,a:'Boşluk = içerideki her h3. İkisi de .cerceve\'nin içinde.'}]});
+add({t:'app',mod:MB,n:1,app:0,h:'🛠️ Uygulama 1 · Kulüpler Panosu',goal:'Kulüp panosu siteye taşınıyor. Görünüm sınıftan değil, ağaçtaki konumdan gelsin.',time:'25–30 dakika',
+ know:[['A > B','çocuk'],['A B','torun'],['class="kulup"','tek sınıf'],['ul > li > ul','U3 iç içe liste']]});
+
+/* ===== C. SÖZDE SINIFLAR ===== */
+add({t:'sec',mod:MC,em:'⏱️',h:'C. Sözde sınıflar: elemanın durumu',say:'Aynı bağlantı, farklı anlarda farklı görünsün. Kitap 4.1.5.7'});
+add({t:'html',mod:MC,h:'Sözde sınıf (pseudo-class) nedir?',html:`<div class="defbox"><div class="defbig"><b>Sözde sınıf</b>, elemanın <b>o anki durumunu</b> seçer: üstünde fare var mı, tıklandı mı, odakta mı, kaçıncı çocuk?</div>
+<div class="defrow"><div><span class="dk">Okunuşu</span>pseudo-class: "sudo klas"</div><div><span class="dk">Yazımı</span><code>seçici:durum</code> → <code>a:hover</code></div><div><span class="dk">Neden "sözde"?</span>HTML'de böyle bir class yok; tarayıcı durumu kendisi bilir</div></div>
+<div class="defnote">İki nokta ile seçici arasına <b>boşluk konmaz</b>: <code>a:hover</code> ✓ · <code>a :hover</code> ✗</div></div>`});
+add({t:'demo',mod:MC,h:'Bir bağlantının yaşam döngüsü',say:'Adım adım ilerle: fare gelir, basar, sayfaya gider, geri döner. Her an hangi kural çalışıyor?',build:'durum'});
+cr(MC,'Bağlantının dört durumu (kitap Uygulama 12)',`Fareyle bağlantıya gel, tuşu basılı tut. ${K(':visited')} önizlemede görünmez; kendi bilgisayarında dene.`,
+`<style>
+  nav { background-color: indigo; }
+  a:link { color: orange; }
+  a:visited { color: gray; }
+  a:hover { background-color: white; }
+  a:active { font-size: 30px; }
+</style>
+<nav>
+  <a href="konular.html">Konular</a>
+  <a href="populer.html">Popüler</a>
+</nav>`,{edit:true,fs:4,band:{s:'a:link',e:'a:active'},try:'<code>a:hover</code> kuralına <code>cursor: pointer;</code> ekle. (Eskiden <code>cursor: hand</code> yazılırdı; bugün geçersiz.)'});
+add({t:'cmp',mod:MC,h:'Sıra önemli: L · V · H · A',say:`${PLUS('MDN: :active')} Sözde sınıfların gücü eşittir; çakışınca <b>sonra yazılan</b> kazanır. İki sayfada da bağlantının üstüne gel.`,css:'raw',
+ a:{lbl:'hover önce yazılmış',cls:'bad',code:`<style>
+  a:hover { color: crimson; }
+  a:link { color: orange; }
+</style>
+<a href="konular.html">Konular</a>`},
+ b:{lbl:'L-V-H-A sırası',cls:'good',code:`<style>
+  a:link { color: orange; }
+  a:visited { color: gray; }
+  a:hover { color: crimson; }
+  a:active { color: blue; }
+</style>
+<a href="konular.html">Konular</a>`}});
+add({t:'cards',mod:MC,h:':visited yalnız rengi değiştirebilir',bn:`${PLUS('MDN: Privacy and the :visited selector')} Kötü niyetli bir site, ziyaret ettiğin sayfaları ölçüp öğrenemesin diye tarayıcılar bunu sınırladı.`,n:3,items:[
+ ['✅','Çalışır','color, background-color, border-color gibi <b>renkler</b>'],
+ ['🚫','Çalışmaz','font-size, opacity, width… boyut ya da görünürlük'],
+ ['🕰️','Eskiden / bugün','Kitap Tablo 4.6: <code>a:visited{opacity:0.5}</code>. Eskiden çalışırdı; bugün etkisizdir.']]});
+cr(MC,':hover yalnız bağlantı için değil',`Her elemana uygulanır. Fareyle yanıtların üstünde gezin.`,
+`<style>
+  .yanit:hover {
+    background-color: lightyellow;
+    cursor: pointer;
+  }
+</style>
+<div class="yanit">
+  <b>Ece:</b> v = g · t formülünü kullan.
+</div>
+<div class="yanit">
+  <b>Mert:</b> g yaklaşık 9,8 m/s².
+</div>`,{edit:true,fs:3.6,band:{s:'yanit:hover'},try:'Kurala <code>font-size: 30px;</code> ekle (kitaptaki <code>div:hover</code> örneği gibi büyüsün).'});
+cr(MC,':focus · odaktaki eleman',`<b>Odak</b> (focus): klavyeden gelecek yazıyı o an alan eleman. Tıklayınca ya da <b>Tab</b> ile gelinir.`,
+`<style>
+  input:focus, textarea:focus {
+    background-color: lightyellow;
+    border: 3px solid teal;
+  }
+</style>
+<input placeholder="Konu başlığı">
+<textarea placeholder="Yanıtını yaz">
+</textarea>
+<button>Gönder</button>`,{edit:true,fs:3.6,band:{s:'focus,',e:'}'},try:'Önizlemeye tıkla, sonra <b>Tab</b> tuşuyla alanlar arasında gez. Listeye <code>, button:focus</code> ekle.'});
+add({t:'cmp',mod:MC,h:'Odak çerçevesini silme, güzelleştir',say:`${PLUS('MDN: :focus-visible · web.dev')} Fare kullanmayanlar sayfada odak çerçevesiyle yol bulur. Her iki sonuca tıkla, <b>Tab</b> ile gez.`,css:'raw',
+ a:{lbl:'outline: none → kaybolur',cls:'bad',code:`<style>
+  button:focus { outline: none; }
+</style>
+<button>Beğen</button>
+<button>Yanıtla</button>
+<button>Bildir</button>`},
+ b:{lbl:':focus-visible → klavyede belirgin',cls:'good',code:`<style>
+  button:focus-visible {
+    outline: 4px solid orange;
+  }
+</style>
+<button>Beğen</button>
+<button>Yanıtla</button>
+<button>Bildir</button>`}});
+cr(MC,':first-child ve :last-child',`Kardeşlerin <b>ilki</b> ve <b>sonuncusu</b>. HTML'e sınıf eklemeden listenin başını ve sonunu seçer.`,
+`<style>
+  li:first-child {
+    font-weight: bold;
+    color: seagreen;
+  }
+  li:last-child { color: gray; }
+</style>
+<h3>Benzer konular</h3>
+<ul>
+  <li>Eğik atışta menzil</li>
+  <li>Sürtünme kuvveti</li>
+  <li>Newton'un 3. yasası</li>
+</ul>`,{edit:true,fs:3.6,band:[{s:'first-child'},{s:'last-child'}],try:'Listenin başına yeni bir <code>&lt;li&gt;</code> ekle. Yeşil hangi maddeye geçti?'});
+add({t:'demo',mod:MC,h:'⚠️ Tuzak: p:first-child "ilk p" demek değildir',say:`Okunuşu: "kardeşlerinin <b>ilki olan</b> p". Seçicileri sırayla dene. ${PLUS('MDN: :first-of-type')}`,build:'fener',cfg:'tuzak'});
+add({t:'html',mod:MC,h:'Diğer sözde sınıflar: adını bil, gerekince bak',html:`<div class="dsz"><table class="tbl"><tr><th>Seçici</th><th>Ne zaman?</th></tr>
+<tr><td><code>:checked</code></td><td>kutu / radyo işaretliyken</td></tr>
+<tr><td><code>:disabled</code></td><td>eleman kullanılamazken</td></tr>
+<tr><td><code>:enabled</code></td><td>eleman kullanılabilirken</td></tr>
+<tr><td><code>:empty</code></td><td>içi tamamen boşken</td></tr>
+<tr><td><code>:target</code></td><td>adresteki #kimlik o elemanınken</td></tr></table>
+<div class="dszc"><b>Canlı dene</b><label><input type="checkbox"> Bildirimleri aç</label><button disabled>Gönder (giriş yap)</button><div class="bos"></div><small>input:checked · button:disabled · div:empty</small></div></div>`});
+add({t:'quiz',mod:MC,h:'✋ Hızlı kontrol: hangi durum?',qs:[
+ {q:'Forumda kullanıcı "Yanıt" kutusuna tıklayınca kutu sarı olsun.',o:['textarea:hover','textarea:active','textarea:focus','textarea:visited'],c:2,a:'Yazı almaya hazır olma durumu odaktır. hover yalnız fare üstündeyken; kutudan çıkınca sarı kaybolurdu.'},
+ {q:'Konu listesinin son maddesinin altında çizgi olmasın.',o:['li:last-child','ul:last-child','li:first-child','li::after'],c:0,a:'Kardeşlerin sonuncusu olan li. ul:last-child, ul\'nin kendisine bakar.'}]});
+add({t:'app',mod:MC,n:2,app:1,h:'🛠️ Uygulama 2 · Şehir Otobüs Hatları',goal:'Hat sayfası kullanıcıya tepki versin; ilk ve son durak sınıfsız öne çıksın.',time:'30–35 dakika',
+ know:[['a:link … a:active','L-V-H-A'],[':focus','arama kutusu'],['li:first-child','ilk durak'],['form · ol','U3']]});
+
+/* ===== D. SÖZDE ELEMANLAR ===== */
+add({t:'sec',mod:MD,em:'✂️',h:'D. Sözde elemanlar: elemanın parçası',say:'İlk harf, ilk satır, başa ya da sona eklenen süs… Kitap 4.1.5.8'});
+add({t:'html',mod:MD,h:'Sözde eleman (pseudo-element) nedir?',html:`<div class="defbox"><div class="defbig"><b>Sözde eleman</b>, bir elemanın <b>parçasını</b> ya da HTML'de olmayan bir <b>eki</b> seçer. İşareti <b>iki tane</b> iki nokta: <code>::</code></div>
+<div class="psv"><span class="ps-b">::before</span><span class="ps-l"><span class="ps-f">K</span>urallar: soru sormadan önce</span><br><span>arama kutusunu kullan.</span><span class="ps-a">::after</span></div>
+<div class="plg2"><span class="k1">::first-letter → ilk harf</span><span class="k2">::first-line → ilk satır</span><span class="k3">::before / ::after → başa / sona ek</span></div></div>`});
+add({t:'demo',mod:MD,h:'::first-line · ilk satır sabit değildir',say:'Kutunun genişliğini değiştir. Turuncu bant hep "ekranda görünen" ilk satırda kalır (kitap Uygulama 13).',build:'ilksatir'});
+cr(MD,'::first-letter · ilk harf',`Dergi ve gazetelerdeki büyük ilk harf. HTML'e <b>span</b> eklemeden yapılır.`,
+`<style>
+  .kural::first-letter {
+    font-size: 48px;
+    font-weight: bold;
+    color: crimson;
+  }
+</style>
+<p class="kural">Soru sormadan önce
+arama kutusunu kullan; aynı
+soru yanıtlanmış olabilir.</p>`,{edit:true,fs:3.6,band:{s:'first-letter'},try:'<code>::first-letter</code> yerine <code>::first-line</code> yaz. Ne değişti?'});
+add({t:'demo',mod:MD,h:'::before ve ::after · hayalet etiketler',say:'Benzetme: HTML\'de yazılmayan ama ekranda görünen hayalet bir kutu. Tarayıcı onu elemanın <b>içine</b>, en başa ya da en sona ekler. <code>content</code> seç.',build:'hayalet'});
+cr(MD,'::before / ::after ile süs ekle',`${K('content')} özelliği eklenecek metni söyler; metin tırnak içinde yazılır.`,
+`<style>
+  .cozuldu::before {
+    content: "✔ ";
+    color: seagreen;
+  }
+  .yeni::after {
+    content: " YENİ";
+    color: crimson;
+  }
+</style>
+<h3 class="cozuldu">Serbest düşme</h3>
+<h3 class="yeni">Eğik atış menzili</h3>`,{edit:true,fs:3.6,band:[{s:'::before'},{s:'::after'}],try:'İlk kuraldan <code>content</code> satırını sil. Onay işaretine ne oldu?'});
+cr(MD,'::selection · seçilen bölüm',`Fareyle sürükleyip metni seç: seçim rengi değişir.`,
+`<style>
+  p::selection {
+    background-color: gold;
+    color: black;
+  }
+  .kod::selection {
+    background-color: lime;
+  }
+</style>
+<p>Bu yanıtı seçip kopyala.</p>
+<p class="kod">v = 9,8 · 3 = 29,4 m/s</p>`,{edit:true,fs:3.6,band:{s:'p::selection'},try:'İki paragrafı birlikte seç. Neden iki farklı renk görünüyor?'});
+add({t:'html',mod:MD,h:'Tek iki nokta mı, çift iki nokta mı?',html:`<table class="tbl"><tr><th></th><th>Sözde sınıf <code>:</code></th><th>Sözde eleman <code>::</code></th></tr>
+<tr><td>Ne seçer?</td><td>elemanın bütününü, bir <b>durumda</b></td><td>elemanın bir <b>parçasını</b> ya da eki</td></tr>
+<tr><td>Soru</td><td>NE ZAMAN? KAÇINCI?</td><td>HANGİ PARÇA?</td></tr>
+<tr><td>Örnek</td><td><code>a:hover</code> · <code>li:first-child</code></td><td><code>p::first-line</code> · <code>h3::before</code></td></tr>
+<tr><td>Karışan</td><td><code>:first-child</code> = ilk çocuk</td><td><code>::first-letter</code> = ilk harf</td></tr>
+<tr><td>Eskiden</td><td>—</td><td><code>p:first-line</code> tek iki nokta (kitap Tablo 4.5); hâlâ çalışır, bugün <code>::</code> yazılır</td></tr></table>`});
+add({t:'quiz',mod:MD,h:'✋ Hızlı kontrol: parça mı, durum mu?',qs:[
+ {q:'Her forum başlığının başına HTML\'e dokunmadan 💬 koymak istiyorsun.',o:['h3:first-child { content: "💬"; }','h3::before { content: "💬 "; }','h3::first-letter { content: "💬"; }','h3:before-child { … }'],c:1,a:'Başa ek = ::before ve mutlaka content.'},
+ {q:'Hangisi bir sözde <b>eleman</b>dır?',o:[':focus','::first-line',':last-child',':visited'],c:1,a:'İki nokta iki kez: parça seçer. Diğerleri durum (sözde sınıf).'}]});
+add({t:'app',mod:MD,n:3,app:2,h:'🛠️ Uygulama 3 · Kalem Edebiyat Dergisi',goal:'Okul dergisi: ilk harfler, tırnaklar ve işaretler HTML\'den değil CSS\'ten.',time:'30–35 dakika',
+ know:[['::first-letter','ilk harf'],['::before · ::after','content'],['::selection','seçim'],['article · blockquote','U3']]});
+
+/* ===== E. GERÇEK HAYATTA ===== */
+add({t:'demo',mod:ME,h:'🏁 BitKafa tamamlandı: hangi seçici nerede?',say:'Bir kurala bas: maketteki eşleşen elemanlar mavi çerçeveyle parlar. Makette fareyle gezin, yazı kutusuna tıkla.',build:'maket',cfg:'forum'});
+add({t:'cards',mod:ME,h:'🏢 Sektörde nasıl yapılıyor?',bn:PLUS('web.dev: Learn CSS · MDN: :hover'),n:3,items:[
+ ['🪜','Kısa zincir','<code>body div ul li a</code> gibi uzun zincir yazılmaz: HTML biraz değişince bozulur. En çok 2–3 halka.'],
+ ['⌨️','Odak zorunlu','Erişilebilirlik kuralları odak çerçevesini ister; <code>outline: none</code> kod incelemesinde geri çevrilir.'],
+ ['📱','Hover\'a sır saklama','Dokunmatik ekranda fare yok: önemli bilgi yalnız <code>:hover</code> ile gösterilmez.']]});
+add({t:'demo',mod:ME,h:'🌐 Gerçek sitede: arama sonuçları sayfası',say:'Her gün gördüğün sayfa bugünkü seçicilerle dolu. Bir kurala bas; makette başlıkların üstüne gel, arama kutusuna tıkla.',build:'maket',cfg:'arama'});
+add({t:'list',mod:ME,h:'🔍 F12 görevi: durumları ve hayaletleri yakala',items:[
+ ['1️⃣','Bir sitede menü bağlantısına sağ tık → <b>İncele</b>.'],
+ ['2️⃣','Styles panelinde <b>:hov</b> düğmesine bas, <b>:hover</b> kutusunu işaretle: fare orada değilken hover görünümü kalır.'],
+ ['3️⃣','Aynı yerde <b>:focus</b>\'u dene; hangi kurallar eklendi?'],
+ ['4️⃣','Elements panelinde soluk <b>::before</b> ya da <b>::after</b> satırı ara; tıklayıp <code>content</code> değerini oku.'],
+ ['5️⃣','Seçici zincirini oku (ör. <code>.menu &gt; li a</code>): kaç halka var?']]});
+
+/* ===== F. PEKİŞTİRME ===== */
+add({t:'list',mod:MF,cls:'bad',h:'⚠️ Sık hatalar (1): boşluk ve işaret',items:[
+ ['❌','<code>a :hover</code> → boşluk "a\'nın içindeki" demek; durum çalışmaz. Doğrusu bitişik: <code>a:hover</code>.'],
+ ['❌','<code>div&gt;p</code> ile <code>div p</code>\'yi aynı sanmak: biri yalnız çocuk, öteki bütün torunlar.'],
+ ['❌','Seçiciyi tahmine göre yazmak: önce ağacı çiz; <code>p &gt; b</code> çalışmıyorsa b belki bir <code>span</code>\'ın içindedir.']]});
+add({t:'list',mod:MF,cls:'bad',h:'⚠️ Sık hatalar (2): durum ve parça',items:[
+ ['❌','<code>::before</code> yazıp <code>content</code>\'i unutmak: hayalet kutu hiç oluşmaz.'],
+ ['❌','<code>a:hover</code>\'ı <code>a:link</code>\'ten önce yazmak: sonra gelen kazanır, hover görünmez.'],
+ ['❌','<code>p:first-child</code>\'ı "ilk p" sanmak: p, kardeşlerinin ilki değilse hiçbir şey seçilmez.']]});
+add({t:'ex',mod:MF,h:'✍️ Alıştırma (1): kitaptan Sıra Sizde',items:[
+ {g:'1. Ağacı çiz (s. 111)',t:'<code>body</code> içinde: bir <code>div</code> (içinde <code>h3</code>) ve bir <code>div</code> (içinde <code>table</code> → 2 <code>tr</code> → her birinde 2 <code>td</code> → her td\'de bir <code>b</code>).',h:'Önce body\'nin çocuklarını (iki div) yan yana koy, sonra her birinin altına in.',c:'body\n├─ div ─ h3\n└─ div ─ table\n         ├─ tr ─ td ─ b  (Telefon) · td ─ b (Tablet)\n         └─ tr ─ td ─ b  (Bilgisayar) · td ─ b (Televizyon)'},
+ {g:'2. Ne olur? (s. 122)',t:'<code>#mail:focus</code> ve <code>#sifre:focus</code> kurallarının ikisi de <code>background-color: tomato;</code>. Kutulara yazı yazınca ne olur? Bu iki kuralı tek kurala indir.',h:'Yazı yazılan kutu odaktadır. Aynı gövde → çoklu seçici (S1).',c:'Yazı yazılan kutunun zemini domates kırmızısı olur.\n#mail:focus, #sifre:focus {\n  background-color: tomato;\n}'}]});
+add({t:'ex',mod:MF,h:'✍️ Alıştırma (2): tahmin et, sen yaz',items:[
+ {g:'3. Ne görünür? (s. 124)',t:'<code>&lt;h5 id="icerik_ekleme"&gt;Before-After&lt;/h5&gt;</code> · <code>::before</code>: content \'(önceki)\', zemin kırmızı · <code>::after</code>: content "(sonraki)", zemin mavi, ikisinde de yazı beyaz.',h:'Hayaletler elemanın içinde, metnin başına ve sonuna eklenir.',c:'(önceki)Before-After(sonraki)\nbaştaki kırmızı, sondaki mavi zeminli; ikisi beyaz yazılı.'},
+ {g:'4. Menü ve yazı bağlantıları',t:'<code>nav</code> içindeki bağlantılar normalde altı çizgisiz, yalnız fare üstündeyken altı çizili olsun. Diğer bağlantılara dokunma.',h:'Çocuk seçici + :hover. Altı çizgi: text-decoration.',c:'nav > a { text-decoration: none; }\nnav > a:hover { text-decoration: underline; }'}]});
+add({t:'app',mod:MF,n:4,app:3,h:'🏁 Mini proje · Kuzey Yıldızı Gözlemevi',goal:'Gözlemevi etkinlik sayfası: ilişki, durum ve parça seçicilerinin hepsi bir arada.',time:'40 dakika + evde tamamlama',
+ know:[['nav > a · .takvim b','ilişki'],[':hover · :focus · :first-child','durum'],['::before · ::first-letter','parça'],['form · select','U3']]});
+add({t:'quiz',mod:MF,h:'📝 Kendini test et (1/3)',qs:[
+ {q:'<code>p &gt; b</code> seçicisi hangisini seçer?',o:['p\'nin içindeki bütün b\'leri','p\'nin doğrudan çocuğu olan b\'leri','b\'nin içindeki p\'leri','p ve b\'nin hepsini'],c:1,a:'> yalnız bir alt seviye: p\'nin hemen içindeki b.'},
+ {q:'Hangisi torun seçicidir?',o:['ul > li','ul, li','ul li','ul:li'],c:2,a:'Torun seçici iki seçici arasında tek boşluktur.'}]});
+add({t:'quiz',mod:MF,h:'📝 Kendini test et (2/3)',qs:[
+ {q:'Bağlantı kurallarının doğru sırası hangisi?',o:['hover, link, active, visited','link, visited, hover, active','active, hover, visited, link','visited, link, active, hover'],c:1,a:'L-V-H-A: sonra yazılan kazandığı için hover ve active en sonda.'},
+ {q:'Fare sol tuşu basılı tutulduğu andaki görünümü hangisi belirler?',o:[':hover',':focus',':active',':visited'],c:2,a:':active = tıklanma anı (tuş basılı).'}]});
+add({t:'quiz',mod:MF,h:'📝 Kendini test et (3/3)',qs:[
+ {q:'<code>.not::after { color: red; }</code> yazıldı ama ekranda hiçbir şey çıkmadı. Neden?',o:['::after yalnız bağlantılarda çalışır','content özelliği yok','Tek iki nokta yazılmalıydı','color yerine background yazılmalı'],c:1,a:'content olmadan ::before / ::after kutusu oluşmaz.'}]});
+
+/* ===== KAPANIŞ ===== */
+add({t:'html',mod:MK,h:'🧭 Özet şeması',html:`<div class="ozet">
+<div class="oz o1"><h4>🌳 NEREDE? · ilişki</h4><span><code>A &gt; B</code> → A'nın çocuğu B</span><span><code>A B</code> → A'nın içindeki her B</span><span>Önce ağacı çiz</span></div>
+<div class="oz o2"><h4>⏱️ NE ZAMAN? · <code>:</code></h4><span><code>:link :visited :hover :active</code> (bu sırayla)</span><span><code>:focus</code> → odakta</span><span><code>:first-child :last-child</code></span></div>
+<div class="oz o3"><h4>✂️ HANGİ PARÇA? · <code>::</code></h4><span><code>::first-letter ::first-line</code></span><span><code>::before ::after</code> + content</span><span><code>::selection</code></span></div>
+</div>`});
+add({t:'html',mod:MK,h:'📖 Sözlük',html:`<div class="sozluk">
+<div><b>HTML ağacı</b>iç içe etiketlerin hiyerarşik yapısı</div>
+<div><b>Kapsayan (parent)</b>bir üst seviyedeki eleman</div>
+<div><b>Çocuk (child)</b>tam bir alt seviye · <code>A&gt;B</code></div>
+<div><b>Torun (descendant)</b>altındaki her seviye · <code>A B</code></div>
+<div><b>Kardeş (sibling)</b>aynı kapsayanın çocukları</div>
+<div><b>Sözde sınıf</b>durum seçer · <code>:</code></div>
+<div><b>Odak (focus)</b>klavye girdisini alan eleman</div>
+<div><b>L-V-H-A</b>link, visited, hover, active sırası</div>
+<div><b>Sözde eleman</b>parça seçer · <code>::</code></div>
+<div><b>content</b>::before/::after metni</div>
+<div><b>outline</b>odak çerçevesi; silinmez</div>
+<div><b>:hov (F12)</b>durumu zorla göster</div></div>`});
+add({t:'html',mod:MK,h:'📚 Kaynaklar ve gelecek sunum',html:`<div class="kapanis"><div class="kc"><h4>Kaynaklar</h4><span>Ders kitabı: Web Tabanlı Uygulama Geliştirme 11, s. 110–111, 118–124</span><span>MDN Web Docs: :active · :visited gizliliği · :focus-visible · :first-of-type</span><span>web.dev: Learn CSS</span></div>
+<div class="kc nx"><h4>Gelecek sunum: Kutu modeli ve görünüm</h4><span>Bugün <b>kime</b> ve <b>ne zaman</b> stil vereceğimizi öğrendik. Sırada her elemanın aslında bir <b>kutu</b> olduğu var: iç boşluk, kenarlık, dış boşluk ve ölçü birimleri.</span></div></div>`});
+
+/* ---------- etkileşimli bileşenler ---------- */
+const FENER={
+ cocuk:{html:AG_HTML,sels:[
+  ['nav > a','nav\'ın iki çocuğu. Paragraftaki b etkilenmez.'],
+  ['header > b','header\'ın çocuğu olan b: logo. "bulunur" header\'da değil.'],
+  ['p > b','p\'nin çocuğu olan b: "bulunur".'],
+  ['header > a','Sıfır! a\'lar header\'ın torunu, çocuğu değil (arada nav var).'],
+  ['body > article','article body\'nin çocuğu.']]},
+ fark:{html:AG_HTML,pairs:[['header','a'],['article','b'],['body','b']],
+  cap:{'header > a':'Çocuk aranıyor: header\'ın hemen altında a yok → 0.','header a':'Torun: header\'ın içindeki her a → nav\'ın iki çocuğu da.','article > b':'article\'ın çocuğu p; b bir kat aşağıda → 0.','article b':'article içindeki her b → "bulunur".','body > b':'body\'nin çocukları header ve article → 0.','body b':'body\'deki bütün b\'ler: logo ve "bulunur".'}},
+ tuzak:{html:`<div class="yanit">
+  <b>Ece</b>
+  <p>Hız her saniye 9,8 m/s artar.</p>
+  <p>Kitapta s. 42'ye bak.</p>
+</div>
+<div class="yanit">
+  <p>Ben de aynısını buldum.</p>
+  <p>Teşekkürler!</p>
+</div>`,sels:[
+  ['p:first-child','Yalnız ikinci yanıttaki p! İlk yanıtta ilk çocuk b; oradaki p\'ler "ilk çocuk" değil.'],
+  ['b:first-child','"Ece": b, kardeşlerinin ilki.'],
+  ['p:last-child','İki yanıtın da son çocuğu p: ikisi de seçildi.'],
+  ['p:first-of-type','➕ "Türünün ilki": her yanıttaki ilk p. Aradığın genelde budur.']]}
+};
+const DEMOS={
+ acilis(b){
+  const base=`<header><b>BitKafa</b>
+<nav><a href="konular.html">Konular</a> <a href="populer.html">Popüler</a> <a href="kurallar.html">Kurallar</a></nav></header>
+<h2>Serbest düşmede 3. saniyedeki hız?</h2>
+<p>Taş 3 saniye düşüyor. Hızı nasıl bulurum? <a href="kitap.html">Kitap s. 42</a></p>
+<textarea placeholder="Yanıtını yaz…"></textarea>`;
+  const ST=[
+   ['Başlangıç','body{font-family:Arial}header{background:#14365c;color:#ffd23f;padding:6px 12px}nav a{color:#cfe0ff}','Menü koyu bantta. Henüz bağlantılara özel kural yok.'],
+   ['a { … } ekledik','body{font-family:Arial}header{background:#14365c;color:#ffd23f;padding:6px 12px}a{color:white;background:crimson;padding:2px 8px;text-decoration:none}','<code>a { … }</code> yazınca menüdekilerle birlikte yazıdaki "Kitap s. 42" de kırmızı düğme oldu! Fareyle üstüne gel: hiçbir tepki yok.'],
+   ['Sunum sonunda','body{font-family:Arial}header{background:#14365c;color:#ffd23f;padding:6px 12px}nav>a{color:white;padding:2px 8px;text-decoration:none;border-radius:6px}nav>a:hover{background:#ffd23f;color:#14365c}textarea:focus{background:#fffbe6;outline:3px solid #14365c}p::first-letter{font-size:1.6em;font-weight:bold}','Yalnız menü düğme; fareyle üstüne gelince sararıyor; yazı kutusuna tıklayınca belirginleşiyor; paragrafın ilk harfi büyük. Hepsi bugün.']];
+  const c=ctl('<div class="seg">'+ST.map((s,i)=>'<button data-i="'+i+'"'+(i?'':' class="on"')+'>'+(i+1)+'. '+s[0]+'</button>').join('')+'</div>');b.appendChild(c);
+  const r=mkRes('',{css:'raw',fs:3});r.el.style.flex='1';b.appendChild(r.el);
+  const cap=document.createElement('div');cap.className='fcap';b.appendChild(cap);
+  const show=i=>{r.set('<style>'+ST[i][1]+'</style>'+base);cap.innerHTML='<b>'+(i+1)+'.</b> '+ST[i][2];$$('button',c).forEach(x=>x.classList.toggle('on',+x.dataset.i===i))};
+  $$('button',c).forEach(x=>x.onclick=()=>show(+x.dataset.i));show(0);
+ },
+ kur(b){
+  const P=parseBody(AG_HTML);
+  /* adım: [görünen düğüm sayısı (body dahil), vurgulanan satır, açıklama] */
+  const ST=[[1,0,'<b>body</b>: görünen her şeyin kapsayanı. Ağacın tepesi (üstünde html var).'],[2,1,'<b>header</b> body\'nin içine yazıldı → body\'nin <b>çocuğu</b>.'],[3,2,'<b>b</b> header\'ın içinde → header\'ın çocuğu, body\'nin <b>torunu</b>.'],[4,3,'<b>nav</b> da header\'ın içinde → b ile <b>kardeş</b> (aynı seviye).'],[5,4,'<b>a</b> nav\'ın içinde: bir kat daha aşağı.'],[6,5,'İkinci <b>a</b>: ilk a\'nın kardeşi. İkisinin de kapsayanı nav.'],[7,8,'header kapandı. <b>article</b> yine body\'nin içinde → header\'ın kardeşi.'],[8,9,'<b>p</b> article\'ın çocuğu.'],[9,9,'<b>b</b> p\'nin içinde: p → article → body tarafından kapsanır. Ağaç tamam!']];
+  let i=0;
+  const c=ctl('<button class="btn" data-a="p">&larr; Önceki</button><button class="btn pri" data-a="n">Sonraki satır &rarr;</button><button class="btn" data-a="h">Hepsi</button>');b.appendChild(c);
+  const g=document.createElement('div');g.className='cr fen2';b.appendChild(g);
+  g.innerHTML='<div class="pane code"><div class="pane-h"><span>HTML</span></div><pre class="kurp"></pre></div><div class="tv"></div>';
+  const cap=document.createElement('div');cap.className='fcap';b.appendChild(cap);
+  const draw=()=>{const s=ST[i];$('.kurp',g).innerHTML=lines(AG_CODE,[s[1]]);$('.tv',g).innerHTML=treeHTML(P.body,n=>n<s[0]);
+   const nd=$('.tv .nd[data-n="'+(s[0]-1)+'"]',g);if(nd)nd.classList.add('nw');cap.innerHTML='<b>Adım '+(i+1)+'/'+ST.length+':</b> '+s[2]};
+  c.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const a=t.dataset.a;i=a==='h'?ST.length-1:Math.max(0,Math.min(ST.length-1,i+(a==='n'?1:-1)));draw()});
+  draw();
+ },
+ gezgin(b){
+  const P=parseBody(AG_HTML);
+  const leg=document.createElement('div');leg.className='tlg';leg.innerHTML='<span class="r-sel">seçilen</span><span class="r-par">kapsayan</span><span class="r-ch">çocuk</span><span class="r-gc">daha alt torun</span><span class="r-sib">kardeş</span>';b.appendChild(leg);
+  const tv=document.createElement('div');tv.className='tv big';tv.innerHTML=treeHTML(P.body);b.appendChild(tv);
+  const cap=document.createElement('div');cap.className='fcap';cap.innerHTML='👆 Bir düğüme tıkla. Önerilen: <b>nav</b>.';b.appendChild(cap);
+  const nm=e=>e.tagName.toLowerCase()+(nodeLab(e)?' ('+nodeLab(e)+')':'');
+  const pick=n=>{const e=P.all[n];$$('.nd',tv).forEach(x=>x.className='nd');
+   const set=(el,c)=>{const x=$('.nd[data-n="'+el.getAttribute('data-n')+'"]',tv);if(x)x.classList.add(c)};
+   set(e,'r-sel');const par=e.parentElement&&e!==P.body?e.parentElement:null;if(par)set(par,'r-par');
+   const ch=[...e.children];ch.forEach(x=>set(x,'r-ch'));const all=[...e.querySelectorAll('*')];all.filter(x=>!ch.includes(x)).forEach(x=>set(x,'r-gc'));
+   const sib=par?[...par.children].filter(x=>x!==e):[];sib.forEach(x=>set(x,'r-sib'));
+   const anc=[];let a=par;while(a){anc.push(a.tagName.toLowerCase());a=a===P.body?null:a.parentElement}
+   cap.innerHTML='<b>'+esc(nm(e))+'</b> · kapsayanlar: '+(anc.length?anc.join(' › ')+' › html':'html')+' · çocuk: '+(ch.length?ch.map(x=>x.tagName.toLowerCase()).join(', '):'yok')+' · torun (hepsi): '+all.length+' · kardeş: '+(sib.length?sib.map(x=>x.tagName.toLowerCase()).join(', '):'yok')};
+  tv.addEventListener('click',e=>{const t=e.target.closest('.nd');if(t)pick(+t.dataset.n)});
+ },
+ fener(b,s){
+  const F=FENER[s.cfg];const P=parseBody(F.html);let op='>',pi=0;
+  let ch;
+  if(F.pairs){ch=ctl('<div class="seg pr">'+F.pairs.map((p,i)=>'<button data-p="'+i+'"'+(i?'':' class="on"')+'>'+p[0]+' … '+p[1]+'</button>').join('')+'</div><div class="seg op"><button data-o="&gt;" class="on">&gt; çocuk</button><button data-o=" ">␣ torun</button></div>')}
+  else ch=ctl('<div class="seg">'+F.sels.map((x,i)=>'<button data-q="'+escA(x[0])+'">'+esc(x[0])+'</button>').join('')+'</div><label>Kendin yaz: <input type="text" class="fin" spellcheck="false"></label>');
+  b.appendChild(ch);
+  const g=document.createElement('div');g.className='cr fen';b.appendChild(g);
+  const tv=document.createElement('div');tv.className='tv';tv.innerHTML=treeHTML(P.body);g.appendChild(tv);
+  const col=document.createElement('div');col.className='col';g.appendChild(col);
+  const pn=document.createElement('div');pn.className='pane';pn.innerHTML='<div class="pane-h"><span>Sayfa</span></div>';const mi=miniOf(P);pn.appendChild(mi);col.appendChild(pn);
+  const cap=document.createElement('div');cap.className='fcap';col.appendChild(cap);
+  const run=(q,txt)=>{$$('.m',g).forEach(x=>x.classList.remove('m'));let m=[];
+   try{m=q?[...P.body.querySelectorAll(q)]:[]}catch(e){cap.innerHTML='<code>'+esc(q)+'</code> geçerli bir seçici değil.';return}
+   if(P.body.matches&&q){try{if(P.body.matches(q))m.unshift(P.body)}catch(e){}}
+   m.forEach(e=>{const n=e.getAttribute('data-n');$$('[data-n="'+n+'"]',g).forEach(x=>x.classList.add('m'))});
+   cap.innerHTML=q?'<code>'+esc(q)+'</code> → <b>'+m.length+'</b> eleman. '+(txt||''):'Bir seçici seç.'};
+  if(F.pairs){
+   const go2=()=>{const p=F.pairs[pi],q=p[0]+(op==='>'?' > ':' ')+p[1];run(q,F.cap[q])};
+   ch.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
+    if(t.dataset.p!==undefined){pi=+t.dataset.p;$$('.pr button',ch).forEach(x=>x.classList.toggle('on',x===t))}
+    if(t.dataset.o!==undefined){op=t.dataset.o;$$('.op button',ch).forEach(x=>x.classList.toggle('on',x===t))}go2()});
+   go2();
+  }else{
+   $$('.seg button',ch).forEach(x=>x.onclick=()=>{$$('.seg button',ch).forEach(y=>y.classList.toggle('on',y===x));$('.fin',ch).value='';const it=F.sels.find(z=>z[0]===x.dataset.q);run(it[0],it[1])});
+   $('.fin',ch).addEventListener('input',e=>{$$('.seg button',ch).forEach(y=>y.classList.remove('on'));run(e.target.value.trim(),'')});
+   $$('.seg button',ch)[0].click();
+  }
+ },
+ durum(b){
+  const R=[['a:link','color: orange; font-size: 22px;'],['a:visited','color: gray;'],['a:hover','background-color: white;'],['a:active','font-size: 30px;']];
+  const ST=[['🏠 Sayfa açıldı, bağlantıya hiç tıklanmadı.',[0],0,0],['🖱️ Fare bağlantının üstüne geldi.',[0,2],1,0],['👇 Fare tuşu basılı (tıklama anı).',[0,2,3],1,1],['↩️ Bağlantı açıldı; geri dönüldü. Artık "ziyaret edilmiş".',[1],0,0],['🖱️ Ziyaret edilmiş bağlantının üstüne yine gelindi.',[1,2],1,0]];
+  let i=0;
+  const c=ctl('<button class="btn" data-a="p">&larr; Önceki</button><button class="btn pri" data-a="n">Sonraki an &rarr;</button>');b.appendChild(c);
+  const g=document.createElement('div');g.className='cr';b.appendChild(g);
+  g.innerHTML='<div class="lcs"><div class="lcn"><a class="lca">Popüler konular</a><span class="lcm">🖱️</span></div></div><div class="col"><div class="rules lcr"></div><div class="hintbox">Aynı anda <b>birden çok</b> durum doğru olabilir; kurallar üst üste uygulanır.</div></div>';
+  const cap=document.createElement('div');cap.className='fcap';b.appendChild(cap);
+  const draw=()=>{const s=ST[i];const a=$('.lca',g);let st={color:'',fontSize:'',backgroundColor:''};
+   s[1].forEach(k=>{R[k][1].split(';').forEach(d=>{const p=d.split(':');if(p.length<2)return;const pr=p[0].trim().replace(/-(\w)/g,(m,x)=>x.toUpperCase());st[pr]=p[1].trim()})});
+   Object.assign(a.style,st);
+   const m=$('.lcm',g);m.style.opacity=s[2]?'1':'0';m.style.transform=s[3]?'scale(.8) translate(-.2em,.2em)':'none';
+   $('.lcr',g).innerHTML=R.map((r,k)=>'<div class="ru'+(s[1].includes(k)?' w':'')+'"><code>'+r[0]+' { '+r[1]+' }</code><span class="win">ÇALIŞIYOR</span></div>').join('');
+   cap.innerHTML='<b>An '+(i+1)+'/'+ST.length+':</b> '+s[0]+' Çalışan: <b>'+s[1].map(k=>R[k][0]).join(' + ')+'</b>'};
+  c.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;i=Math.max(0,Math.min(ST.length-1,i+(t.dataset.a==='n'?1:-1)));draw()});
+  draw();
+ },
+ ilksatir(b){
+  const c=ctl('<label>Kutu genişliği: <input type="range" min="35" max="100" value="100" class="ilr"> <b class="ilv">100%</b></label>');b.appendChild(c);
+  const g=document.createElement('div');g.className='cr';g.style.gridTemplateColumns='2fr 1fr';b.appendChild(g);
+  g.innerHTML='<div class="ilw"><div class="ilb"><p>BitKafa\'da soru sormadan önce arama kutusunu kullan; aynı soru daha önce yanıtlanmış olabilir. Başlığa sorunun özünü yaz, ayrıntıyı metinde anlat. Yanıt işine yaradıysa "Çözüldü" işaretlemeyi unutma.</p></div></div><div class="col"><div class="pane code"><div class="pane-h"><span>CSS</span></div><pre>'+hlCSS('p::first-line {\n  background-color: orange;\n  color: black;\n}')+'</pre></div><div class="hintbox">HTML\'de "ilk satır" diye bir etiket yok; tarayıcı satırı ekrana çizerken belirler.</div></div>';
+  $('.ilr',c).addEventListener('input',e=>{$('.ilb',g).style.width=e.target.value+'%';$('.ilv',c).textContent=e.target.value+'%'});
+ },
+ hayalet(b){
+  const V=[['content yok',''],['content: "✔ "','✔ '],['content: "✔ Çözüldü: "','✔ Çözüldü: ']];
+  const c=ctl('<div class="seg">'+V.map((v,i)=>'<button data-i="'+i+'"'+(i===1?' class="on"':'')+'>'+esc(v[0])+'</button>').join('')+'</div>');b.appendChild(c);
+  const g=document.createElement('div');g.className='cr';b.appendChild(g);
+  g.innerHTML='<div class="col"><div class="pane code"><div class="pane-h"><span>F12 · Elements paneli</span></div><pre class="hyp"></pre></div><div class="pane code"><div class="pane-h"><span>CSS</span></div><pre class="hyc"></pre></div></div><div class="pane"><div class="pane-h"><span>Ekranda</span></div><div class="hyr"><h3><span class="gh"></span>Serbest düşme</h3></div></div>';
+  const show=i=>{const v=V[i];
+   $('.hyp',g).innerHTML='<span class="t-pun">&lt;</span><span class="t-tag">h3</span> <span class="t-attr">class</span>=<span class="t-str">"cozuldu"</span><span class="t-pun">&gt;</span>\n'+(v[1]?'  <span class="ghl">::before</span>\n':'  <span class="t-com">(::before yok)</span>\n')+'  "Serbest düşme"\n<span class="t-pun">&lt;/</span><span class="t-tag">h3</span><span class="t-pun">&gt;</span>';
+   $('.hyc',g).innerHTML=hlCSS('.cozuldu::before {\n'+(v[1]?'  '+v[0]+';\n':'')+'  color: seagreen;\n}');
+   const gh=$('.gh',g);gh.textContent=v[1];gh.style.display=v[1]?'':'none';
+   $$('button',c).forEach(x=>x.classList.toggle('on',+x.dataset.i===i))};
+  $$('button',c).forEach(x=>x.onclick=()=>show(+x.dataset.i));show(1);
+  b.insertAdjacentHTML('beforeend','<div class="fcap">HTML dosyasında bu işaret <b>yok</b>; F12\'de soluk <b>::before</b> satırı olarak görünür. <code>content</code> yoksa hayalet hiç doğmaz.</div>');
+ },
+ maket(b,s){
+  const M=MAKET[s.cfg];
+  const c=ctl('<div class="seg mk">'+M.rules.map((r,i)=>'<button data-i="'+i+'">'+esc(r[0])+'</button>').join('')+'</div>');b.appendChild(c);
+  const g=document.createElement('div');g.className='cr site';b.appendChild(g);
+  const mk=mkFrame(ckDoc('<style>'+M.css+'</style>',M.html),M.w,M.n,M.h);g.appendChild(mk.el);mk.fit();
+  const r=document.createElement('div');r.className='col';g.appendChild(r);
+  const p=mkPane('',{name:'Kural (CSS)',lang:'css'});r.appendChild(p.el);
+  const inf=document.createElement('div');inf.className='hintbox';r.appendChild(inf);
+  let cur=0;
+  const pick=i=>{cur=i;const ru=M.rules[i];p.set(ru[0]+' {\n'+ru[1].split('\n').map(x=>'  '+x).join('\n')+'\n}');inf.innerHTML=ru[3];
+   $$('button',c).forEach((x,k)=>x.classList.toggle('on',k===i));mk.send({hv:ru[2],k:i})};
+  mk.ready=()=>pick(cur);
+  mk.extra=d=>{if(d.n!==undefined&&d.k===cur)inf.innerHTML=M.rules[cur][3]+' <b>('+d.n+' eleman)</b>'};
+  $$('button',c).forEach((x,i)=>x.onclick=()=>pick(i));pick(0);
+ }
+};
+
+
+/* ---------- slaytları oluştur ---------- */
+const stage=$('#stage');
+S.forEach((s,idx)=>{
+  const el=document.createElement('section');el.className='slide '+(s.t==='hero'?'hero':s.t==='sec'?'sec':s.t==='app'?'app':'')+(s.t==='csite'||s.t==='app'?' sitesl':'')+' t-'+s.t;
+  el.dataset.title=(s.h||'').replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');el.dataset.mod=s.mod;
+  let h='<span class="mod">'+esc(s.mod)+'</span>';
+  if(s.t==='sec')h+='<div class="big">'+s.em+'</div>';
+  h+='<h2 class="h">'+s.h+'</h2>';
+  if(s.say)h+='<p class="say">'+s.say+'</p>';
+  if(s.bn)h+='<p class="bn">'+s.bn+'</p>';
+  el.innerHTML=h;
+  const body=document.createElement('div');body.className='body';
+  el.appendChild(body);if(s.t==='hero'||s.t==='sec')body.style.display='none';
+  s.el=el;s.body=body;s.built=false;
+  stage.appendChild(el);
+});
+const EKFILE='ek-uygulamalar.html';
+function buildSlide(s){
+  if(s.built)return;s.built=true;const b=s.body;
+  if(s.t==='cards'){b.innerHTML='<div class="cards" style="--n:'+Math.min(s.n,3)+'">'+s.items.map(i=>'<div class="card"><div class="em">'+i[0]+'</div><b>'+i[1]+'</b><span>'+i[2]+'</span></div>').join('')+'</div>'}
+  else if(s.t==='list'){b.innerHTML='<div class="list '+(s.cls||'')+'">'+s.items.map(i=>'<div class="it"><span class="em">'+i[0]+'</span><span>'+i[1]+'</span></div>').join('')+'</div>'}
+  else if(s.t==='html'){b.innerHTML=s.html}
+  else if(s.t==='cr'){
+    codeRes(b,s.code,{hl:s.hl,note:s.note,css:s.css||'raw',run:s.run,fs:s.fs||3,band:s.band,edit:s.edit});
+    if(s.try)b.insertAdjacentHTML('beforeend','<div class="try">🧪 <b>Dene:</b> '+s.try+'</div>');
+  }
+  else if(s.t==='quiz'){
+    b.innerHTML='<div class="qz n'+s.qs.length+'">'+s.qs.map((q,k)=>'<div class="qc" data-q="'+k+'"><div class="qq">'+q.q+'</div><div class="qo">'+q.o.map((o,j)=>'<button class="qb" data-j="'+j+'"><b>'+'ABCD'[j]+'</b> '+(/<code>/.test(o)?o:esc(o))+'</button>').join('')+'</div><div class="qa"></div></div>').join('')+'</div>';
+    b.addEventListener('click',e=>{const t=e.target.closest('.qb');if(!t)return;const c=t.closest('.qc'),q=s.qs[+c.dataset.q];
+      $$('.qb',c).forEach(x=>{x.classList.remove('okb','nob');if(+x.dataset.j===q.c)x.classList.add('okb')});
+      const ok=+t.dataset.j===q.c;if(!ok)t.classList.add('nob');
+      $('.qa',c).innerHTML=(ok?'✅ Doğru. ':'❌ Doğru cevap '+'ABCD'[q.c]+'. ')+q.a});
+  }
+  else if(s.t==='app'){
+    const a=APPS[s.app];
+    b.innerHTML='<div class="appbox"><div class="c1"><div class="c"><h3>🎯 Senaryo</h3><p>'+s.goal+'</p></div><div class="c"><h3>✅ Bitti sayılması için</h3><ul>'+a.olcut.slice(0,4).map(x=>'<li>'+x+'</li>').join('')+'<li>… tamamı ('+a.olcut.length+' madde) ek dosyada</li>'+'</ul></div></div><div class="c2"><div class="c knw"><h3>🧰 Kullanacakların · ⏱️ '+s.time+'</h3><div class="kn">'+s.know.map(k=>'<span><code>'+esc(k[0])+'</code> '+k[1]+'</span>').join('')+'</div></div><div class="appprev"></div></div></div><a class="appbtn" target="_blank" rel="noopener" href="'+EKFILE+'#uygulama-'+s.n+'">Ek uygulamalar dosyasında aç &rarr; '+s.n+'. sekme</a>';
+    const mk=mkFrame(ckDoc(a.css,a.govde),1000,'Hedef sayfa (küçük önizleme)');
+    mk.ready=()=>{};
+    $('.appprev',b).appendChild(mk.el);mk.fit();
+  }
+  else if(s.t==='ex'){
+    b.innerHTML='<div class="exl">'+s.items.map(x=>'<div class="exr"><span class="exg">'+x.g+'</span><div class="ext">'+x.t+'</div><details><summary>💡 İpucu</summary><div class="exh">'+x.h+'</div></details><details><summary>✅ Çözümü göster</summary><pre class="exs">'+esc(x.c)+'</pre></details></div>').join('')+'</div>';
+  }
+  else if(s.t==='cmp'){
+    const g=document.createElement('div');g.className='cr';b.appendChild(g);
+    [s.a,s.b].forEach(x=>{
+      const col=document.createElement('div');col.className='col';
+      col.innerHTML='<span class="lbl '+x.cls+'">'+(x.cls==='bad'?'✗ ':x.cls==='good'?'✓ ':'')+x.lbl+'</span>';
+      col.appendChild(mkPane(x.code,{name:'Kod'}).el);
+      if(s.run!==false){const r=mkRes(x.code,{css:x.css||s.css||'raw',fs:4});col.appendChild(r.el)}
+      g.appendChild(col);
+    });
+  }
+  else if(s.t==='csite')buildCSite(b,s);
+  else if(s.t==='demo'){DEMOS[s.build](b,s)}
+}
+
+/* ---------- gezinme ---------- */
+
+/* ---------- gezinme ---------- */
+let cur=0;
+const KEY='web-u4s2-son-slayt-v1';
+function buildMenu(){
+  const m=$('#menu');m.innerHTML='';let last='';
+  S.forEach((s,i)=>{if(s.mod!==last){last=s.mod;m.insertAdjacentHTML('beforeend','<div class="mh">'+esc(last)+'</div>')}
+    const b=document.createElement('button');b.className='mi'+(i===cur?' cur':'');b.innerHTML='<span class="n">'+(i+1)+'</span><span>'+esc(S[i].el.dataset.title)+'</span>';
+    b.onclick=()=>{go(i);m.classList.remove('open')};m.appendChild(b)});
+}
+function go(i){
+  i=Math.max(0,Math.min(S.length-1,i));
+  clearTimers();
+  S.forEach((s,k)=>{s.el.classList.toggle('active',k===i);s.el.classList.toggle('past',k<i)});
+  cur=i;buildSlide(S[i]);if(S[i+1])setTimeout(()=>buildSlide(S[i+1]),400);
+  $('#counter').textContent=(i+1)+' / '+S.length;
+  $('#prog').style.width=((i+1)/S.length*100)+'%';
+  $('#prev').disabled=i===0;$('#next').disabled=i===S.length-1;
+  document.title='U4 S2 · '+S[i].el.dataset.title;
+  try{localStorage.setItem(KEY,String(i))}catch(e){}
+  $$('.mi').forEach((x,k)=>x.classList.toggle('cur',k===i));
+}
+$('#next').onclick=()=>go(cur+1);$('#prev').onclick=()=>go(cur-1);
+$('#bMenu').onclick=()=>$('#menu').classList.toggle('open');
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea,select'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' ')go(cur+1);
+  else if(e.key==='ArrowLeft'||e.key==='PageUp')go(cur-1);
+  else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);
+  else if(e.key==='m'||e.key==='M')$('#bMenu').click();
+  else if(e.key==='t'||e.key==='T')$('#bTheme').click();
+  else if(e.key==='Escape')$('#menu').classList.remove('open');
+});
+let tx=null;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;tx=null;
+  if(e.target.closest('textarea,input,iframe,pre,.mediabox,.tree,.drawer,.mockwrap'))return;if(Math.abs(dx)>70)go(cur+(dx<0?1:-1))},{passive:true});
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('web-tema',t)}catch(e){}}
+let th=null;try{th=localStorage.getItem('web-tema')}catch(e){}
+if(!th)th=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+setTheme(th);
+$('#bTheme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+buildMenu();
+let start=0;try{start=parseInt(localStorage.getItem(KEY)||'0',10)||0}catch(e){}
+go(start);
+window.__S=S;
+
+</script>
+</body>
+</html>
